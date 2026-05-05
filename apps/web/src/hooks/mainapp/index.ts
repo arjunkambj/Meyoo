@@ -24,7 +24,5 @@ export * from "./useOrganization";
 export * from "./useDashboardOverview";
 export * from "./usePnLAnalytics";
 export * from "./useTeam";
-// ============ SUPPORT HOOKS ============
-export * from "./useTickets";
 // ============ CORE HOOKS ============
 export * from "./useUser";

@@ -7,7 +7,6 @@ import {
   integrationSessions,
   invites,
   invoices,
-  notifications,
   onboarding,
   organizations,
   syncSessions,
@@ -28,7 +27,6 @@ import {
   customerDailySummaries,
 } from "./schema/metrics";
 import { gdprRequests, auditLogs, webhookReceipts } from "./schema/security";
-import { tickets, ticketResponses } from "./schema/tickets";
 import {
   shopifyCustomers,
   shopifyOrderItems,
@@ -51,7 +49,6 @@ import {
   integrationStatus,
 } from "./schema/sync";
 // Sync orchestration tables trimmed for now
-// Tickets trimmed for now
 
 export default defineSchema({
   // Core tables
@@ -109,8 +106,6 @@ export default defineSchema({
   webhookReceipts,
   auditLogs,
   gdprRequests,
-  tickets,
-  ticketResponses,
 
   // Cost management tables (simplified)
   globalCosts,
@@ -119,8 +114,4 @@ export default defineSchema({
 
   // Admin & Support tables (omitted)
   integrationRequests,
-
-  // Notifications
-  notifications,
-
 });

@@ -89,7 +89,6 @@ async function ensureAdminAccess(
 const RESET_DEFAULT_BATCH_SIZE = 200;
 const RESET_MAX_BATCH_SIZE = 500;
 const RESET_MEMBER_BATCH_SIZE = 25;
-const RESET_TICKET_BATCH_SIZE = 10;
 const ANALYTICS_REBUILD_CHUNK_SIZE = 5;
 const CUSTOMER_SNAPSHOT_MAX_DAYS = 365;
 
@@ -122,7 +121,6 @@ const ORG_SCOPED_TABLES = [
   "variantCosts",
   "dashboards",
   "gdprRequests",
-  "notifications",
   "billing",
 ] as const;
 
@@ -191,77 +189,6 @@ export const deleteOrgRecordsBatch = internalMutation({
       deleted: page.page.length,
       hasMore: !page.isDone,
       cursor: page.isDone ? undefined : page.continueCursor,
-    };
-  },
-});
-
-export const deleteTicketsBatch = internalMutation({
-  args: {
-    organizationId: v.id("organizations"),
-    cursor: v.optional(v.string()),
-    batchSize: v.optional(v.number()),
-  },
-  returns: v.object({
-    deletedTickets: v.number(),
-    deletedResponses: v.number(),
-    hasMore: v.boolean(),
-    cursor: v.optional(v.string()),
-  }),
-  handler: async (ctx, args) => {
-    const batchSize = normalizeBatchSize(
-      args.batchSize,
-      RESET_TICKET_BATCH_SIZE,
-      RESET_MAX_BATCH_SIZE,
-    );
-
-    let cursor: string | null = args.cursor ?? null;
-    let deletedTickets = 0;
-    let deletedResponses = 0;
-
-    while (true) {
-      const page = await ctx.db
-        .query("tickets")
-        .withIndex("by_created", (q) => q.gte("createdAt", 0))
-        .paginate({
-          numItems: batchSize,
-          cursor,
-        });
-
-      cursor = page.isDone ? null : page.continueCursor;
-
-      for (const ticket of page.page) {
-        if (ticket.organizationId !== args.organizationId) {
-          continue;
-        }
-
-        const responses = await ctx.db
-          .query("ticketResponses")
-          .withIndex("by_ticket", (q) => q.eq("ticketId", ticket._id))
-          .collect();
-
-        for (const response of responses) {
-          await ctx.db.delete(response._id);
-          deletedResponses++;
-        }
-
-        await ctx.db.delete(ticket._id);
-        deletedTickets++;
-
-        if (deletedTickets >= batchSize) {
-          break;
-        }
-      }
-
-      if (deletedTickets >= batchSize || page.isDone) {
-        break;
-      }
-    }
-
-    return {
-      deletedTickets,
-      deletedResponses,
-      hasMore: cursor !== null,
-      cursor: cursor ?? undefined,
     };
   },
 });
@@ -1178,26 +1105,6 @@ export const resetEverything = action({
       }
     };
 
-    const deleteTickets = async () => {
-      let hasMore = true;
-      let cursor: string | undefined;
-
-      while (hasMore) {
-        const result = await ctx.runMutation(
-          internal.meyoo.admin.deleteTicketsBatch,
-          {
-            organizationId: args.organizationId,
-            cursor,
-            batchSize: RESET_TICKET_BATCH_SIZE,
-          },
-        );
-
-        deleted += result.deletedTickets + result.deletedResponses;
-        hasMore = result.hasMore;
-        cursor = result.cursor;
-      }
-    };
-
     const resetMembers = async () => {
       let hasMore = true;
       let cursor: string | undefined;
@@ -1268,12 +1175,8 @@ export const resetEverything = action({
       await deleteTable(table);
     }
 
-    // Notifications and billing history
-    await deleteTable("notifications");
+    // Billing history
     await deleteTable("billing");
-
-    // Tickets and responses
-    await deleteTickets();
 
     // Reset users and onboarding state
     await resetMembers();

@@ -8,8 +8,6 @@ import { Icon } from "@iconify/react";
 import type React from "react";
 import { useState } from "react";
 
-import { useTickets } from "@/hooks";
-
 const contactReasons = [
   { value: "sales", label: "Sales Inquiry" },
   { value: "support", label: "Technical Support" },
@@ -18,8 +16,9 @@ const contactReasons = [
   { value: "other", label: "Other" },
 ];
 
+const CONTACT_EMAIL = "hey@meyoo.io";
+
 export default function ContactForm() {
-  const { createTicket } = useTickets();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -35,24 +34,23 @@ export default function ContactForm() {
     setIsSubmitting(true);
 
     try {
-      await createTicket({
-        name: formData.name,
-        email: formData.email,
-        company: formData.company,
-        type: formData.reason as
-          | "sales"
-          | "support"
-          | "partnership"
-          | "feedback"
-          | "other",
-        subject: `Contact form: ${formData.reason}`,
-        message: formData.message,
-      });
+      const body = [
+        `Name: ${formData.name}`,
+        `Email: ${formData.email}`,
+        formData.company ? `Company: ${formData.company}` : null,
+        "",
+        formData.message,
+      ]
+        .filter(Boolean)
+        .join("\n");
 
+      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+        `Contact form: ${formData.reason}`,
+      )}&body=${encodeURIComponent(body)}`;
       setIsSubmitted(true);
       addToast({
-        title: "Message sent!",
-        description: "We'll get back to you within 24 hours.",
+        title: "Message ready",
+        description: "Your email app should open with the message.",
         color: "default",
         timeout: 5000,
       });

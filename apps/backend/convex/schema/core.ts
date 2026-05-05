@@ -582,32 +582,6 @@ export const invoices = defineTable({
   .index("by_organization_and_status", ["organizationId", "status"])
   .index("by_issued_date", ["issuedAt"]);
 
-// Notifications table for system-wide notifications
-export const notifications = defineTable({
-  title: v.string(),
-  message: v.string(),
-  type: v.union(
-    v.literal("info"),
-    v.literal("warning"),
-    v.literal("success"),
-    v.literal("error"),
-    v.literal("system"),
-  ),
-
-  // Status and actions
-  isRead: v.optional(v.boolean()),
-  // System-wide notifications (when true, applies to all users)
-  isSystem: v.optional(v.boolean()),
-  organizationId: v.optional(v.id("organizations")),
-
-  // Timestamps
-  createdAt: v.number(),
-})
-  .index("by_type", ["type"])
-  .index("by_organization", ["organizationId"])
-  .index("by_system", ["isSystem"])
-  .index("by_created", ["createdAt"]);
-
 export const integrationRequests = defineTable({
   // Platform details
   platformName: v.string(),
