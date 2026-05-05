@@ -1,8 +1,6 @@
 import "@/styles/globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { ToastProvider } from "@heroui/toast";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 
@@ -75,8 +73,6 @@ export default function RootLayout({
           <Providers>
             <main className={`h-dvh w-full antialiased ${inter.className}`}>
               <ToastProvider />
-              <SpeedInsights />
-              <Analytics />
               {children}
             </main>
           </Providers>

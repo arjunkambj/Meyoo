@@ -74,7 +74,6 @@ function useOnboardingInternal() {
     organizationName?: string;
     mobileNumber?: string;
     mobileCountryCode?: string;
-    referralSource?: string;
   }) => {
     try {
       const result = await updateProfileMutation(data);

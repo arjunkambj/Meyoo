@@ -379,7 +379,6 @@ export const onboarding = defineTable({
   // Onboarding metadata
   onboardingData: v.optional(
     v.object({
-      referralSource: v.optional(v.string()),
       mobileCountryCode: v.optional(v.string()),
       setupDate: v.optional(v.string()),
       completedSteps: v.optional(v.array(v.string())),

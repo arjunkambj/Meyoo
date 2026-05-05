@@ -18,7 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import IntegrationCard from "@/components/onboarding/IntegrationCard";
 import SimpleNavigationButtons from "@/components/onboarding/SimpleNavigationButtons";
 import StepLoadingState from "@/components/onboarding/StepLoadingState";
-import { useOnboarding, useUser } from "@/hooks";
+import { useUser } from "@/hooks";
 import { trackOnboardingAction, trackOnboardingView } from "@/libs/analytics";
 import { api } from "@/libs/convexApi";
 import { useSetAtom } from "jotai";
@@ -28,7 +28,6 @@ type Props = { installUri?: string | null };
 
 export default function ShopifyOnboardingClient({ installUri }: Props) {
   const user = useUser();
-  const { status: onboardingStatus } = useOnboarding();
   const router = useRouter();
   const [connecting, setConnecting] = useState(false);
   const joinDemoOrganization = useMutation(
@@ -38,7 +37,6 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
   const [joiningDemo, setJoiningDemo] = useState(false);
   const [demoError, setDemoError] = useState<string | null>(null);
   const suppressCancelTracking = useRef(false);
-  const signupEventSentRef = useRef(false);
   const setNavigationPending = useSetAtom(setNavigationPendingAtom);
   // Pending installation claim flow removed
 
@@ -53,36 +51,6 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
   useEffect(() => {
     trackOnboardingView("shopify");
   }, []);
-
-  useEffect(() => {
-    if (signupEventSentRef.current) return;
-    if (!onboardingStatus) return;
-    if (onboardingStatus.hasShopifySubscription) return;
-
-    let cancelled = false;
-
-    (async () => {
-      try {
-        await fetch("/api/v1/tracking", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            eventType: "signup.created",
-          }),
-        });
-      } catch {
-        // Swallow tracking errors to avoid interrupting onboarding.
-      } finally {
-        if (!cancelled) {
-          signupEventSentRef.current = true;
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [onboardingStatus]);
 
   const handleOpenDemoModal = () => {
     trackOnboardingAction("shopify", "join_demo_open");

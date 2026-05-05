@@ -36,7 +36,6 @@ export interface User {
 }
 
 export interface OnboardingData {
-  referralSource?: string;
   setupDate?: string;
   completedSteps?: string[];
   syncPendingPlatforms?: string[];
@@ -78,7 +77,6 @@ export interface Onboarding {
 export interface BusinessProfile {
   mobileNumber?: string;
   mobileCountryCode?: string;
-  referralSource?: string;
 }
 
 // Organization types

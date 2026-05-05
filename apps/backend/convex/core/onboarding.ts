@@ -227,7 +227,6 @@ export const getOnboardingStatus = query({
         onboarding.onboardingData?.analyticsTriggeredAt || undefined,
       lastSyncCheckAt: onboarding.onboardingData?.lastSyncCheckAt || undefined,
       syncCheckAttempts: onboarding.onboardingData?.syncCheckAttempts || undefined,
-      referralSource: onboarding.onboardingData?.referralSource || undefined,
       syncStatus: {
         shopify: latestShopifySession
           ? {
@@ -308,7 +307,6 @@ export const updateBusinessProfile = mutation({
     organizationName: v.optional(v.string()),
     mobileNumber: v.optional(v.string()),
     mobileCountryCode: v.optional(v.string()),
-    referralSource: v.optional(v.string()),
   },
   returns: v.object({ success: v.boolean() }),
   handler: async (ctx, args) => {
@@ -341,19 +339,21 @@ export const updateBusinessProfile = mutation({
       user.organizationId,
     );
 
-    if (onboarding && args.referralSource) {
-      await ctx.db.patch(onboarding._id, {
-        onboardingData: {
-          ...onboarding.onboardingData,
-          referralSource: args.referralSource,
-          setupDate:
-            onboarding.onboardingData?.setupDate || new Date().toISOString(),
-          completedSteps: onboarding.onboardingData?.completedSteps || [],
-          mobileCountryCode: args.mobileCountryCode ?? onboarding.onboardingData?.mobileCountryCode,
-        },
-        updatedAt: Date.now(),
-      });
+    if (!onboarding) {
+      throw new Error("Failed to get onboarding record");
     }
+
+    await ctx.db.patch(onboarding._id, {
+      onboardingData: {
+        ...onboarding.onboardingData,
+        setupDate:
+          onboarding.onboardingData?.setupDate || new Date().toISOString(),
+        completedSteps: onboarding.onboardingData?.completedSteps || [],
+        mobileCountryCode:
+          args.mobileCountryCode ?? onboarding.onboardingData?.mobileCountryCode,
+      },
+      updatedAt: Date.now(),
+    });
 
     await ctx.db.patch(user._id, userUpdates);
 
@@ -402,7 +402,6 @@ export const updateOnboardingState = mutation({
       onboardingData?: {
         completedSteps?: string[];
         setupDate?: string;
-        referralSource?: string;
       };
       isCompleted?: boolean;
     }
@@ -1929,7 +1928,6 @@ export const connectShopifyStore = mutation({
       onboardingData: {
         completedSteps: string[];
         setupDate?: string;
-        referralSource?: string;
       };
       updatedAt: number;
     }

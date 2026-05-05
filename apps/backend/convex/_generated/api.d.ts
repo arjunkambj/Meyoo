@@ -8,12 +8,6 @@
  * @module
  */
 
-import type {
-  ApiFromModules,
-  AnyComponents,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
 import type * as ResendOTP from "../ResendOTP.js";
 import type * as auth from "../auth.js";
 import type * as authFinalize from "../authFinalize.js";
@@ -121,7 +115,6 @@ import type * as utils_org from "../utils/org.js";
 import type * as utils_orgDateRange from "../utils/orgDateRange.js";
 import type * as utils_shop from "../utils/shop.js";
 import type * as utils_shopify from "../utils/shopify.js";
-import type * as utils_tracking from "../utils/tracking.js";
 import type * as web_analytics from "../web/analytics.js";
 import type * as web_analyticsShared from "../web/analyticsShared.js";
 import type * as web_dashboard from "../web/dashboard.js";
@@ -135,14 +128,12 @@ import type * as webhooks_gdpr from "../webhooks/gdpr.js";
 import type * as webhooks_processor from "../webhooks/processor.js";
 import type * as webhooks_shopify from "../webhooks/shopify.js";
 
-/**
- * A utility for referencing Convex functions in your app's API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
- * ```
- */
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
+
 declare const fullApi: ApiFromModules<{
   ResendOTP: typeof ResendOTP;
   auth: typeof auth;
@@ -251,7 +242,6 @@ declare const fullApi: ApiFromModules<{
   "utils/orgDateRange": typeof utils_orgDateRange;
   "utils/shop": typeof utils_shop;
   "utils/shopify": typeof utils_shopify;
-  "utils/tracking": typeof utils_tracking;
   "web/analytics": typeof web_analytics;
   "web/analyticsShared": typeof web_analyticsShared;
   "web/dashboard": typeof web_dashboard;
@@ -265,12 +255,35 @@ declare const fullApi: ApiFromModules<{
   "webhooks/processor": typeof webhooks_processor;
   "webhooks/shopify": typeof webhooks_shopify;
 }>;
+
+/**
+ * A utility for referencing Convex functions in your app's public API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
 >;
-export declare const components: AnyComponents;
+
+export declare const components: {
+  mainWorkpool: import("@convex-dev/workpool/_generated/component.js").ComponentApi<"mainWorkpool">;
+  actionRetrier: import("@convex-dev/action-retrier/_generated/component.js").ComponentApi<"actionRetrier">;
+  resend: import("@convex-dev/resend/_generated/component.js").ComponentApi<"resend">;
+};

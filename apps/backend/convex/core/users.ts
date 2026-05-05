@@ -40,7 +40,6 @@ const _userValidator = v.object({
   isOnboarded: v.optional(v.boolean()),
   onboardingData: v.optional(
     v.object({
-      referralSource: v.optional(v.string()),
       setupDate: v.optional(v.string()),
       completedSteps: v.optional(v.array(v.string())),
     }),

@@ -26,50 +26,6 @@ export default convexAuthNextjsMiddleware(
     const pathname = url.pathname;
     const method = request.method;
 
-    const ref = url.searchParams.get("ref");
-    const join = url.searchParams.get("join");
-    const inv = url.searchParams.get("inv");
-
-    const slug = ref || join || inv;
-
-    if (slug) {
-      const existingReferral = request.cookies.get("meyoo_ref")?.value;
-      const res = NextResponse.next();
-
-      res.cookies.set({
-        name: "meyoo_ref",
-        value: slug,
-        path: "/",
-        maxAge: 30 * 24 * 60 * 60,
-        sameSite: "lax",
-      });
-
-      // Only fire the tracking event when we do not already have the same referral cookie set.
-      if (existingReferral === slug) {
-        return res;
-      }
-
-      const trackingEndpoint =
-        process.env.NEXT_PUBLIC_TRACKING_URL ?? process.env.TRACKING_URL;
-
-      if (trackingEndpoint) {
-        try {
-          await fetch(trackingEndpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              type: "link.click",
-              slug,
-            }),
-          });
-        } catch (error) {
-          console.error("Link click tracking failed", error);
-        }
-      }
-
-      return res;
-    }
-
     // Simple logging for all API routes without affecting behavior
     if (pathname.startsWith("/api/")) {
       try {
