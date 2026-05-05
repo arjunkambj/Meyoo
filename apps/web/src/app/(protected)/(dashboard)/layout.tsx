@@ -1,6 +1,5 @@
 import Header from "@/components/dashboard/layouts/DashBoardHeader";
 import DashboardSidebar from "@/components/dashboard/layouts/DashboardSidebar";
-import AgentSidebar from "@/components/agent/AgentSidebar";
 import { UserProvider } from "@/contexts/UserContext";
 
 export default async function AppLayout({
@@ -24,7 +23,6 @@ export default async function AppLayout({
             </section>
           </main>
         </div>
-        <AgentSidebar />
       </div>
     </UserProvider>
   );

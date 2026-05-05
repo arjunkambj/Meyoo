@@ -27,7 +27,7 @@ import {
   customerDailyActivities,
   customerDailySummaries,
 } from "./schema/metrics";
-import { gdprRequests, auditLogs, webhookReceipts, apiKeys } from "./schema/security";
+import { gdprRequests, auditLogs, webhookReceipts } from "./schema/security";
 import { tickets, ticketResponses } from "./schema/tickets";
 import {
   shopifyCustomers,
@@ -111,9 +111,6 @@ export default defineSchema({
   gdprRequests,
   tickets,
   ticketResponses,
-
-  // Security tables
-  apiKeys,
 
   // Cost management tables (simplified)
   globalCosts,

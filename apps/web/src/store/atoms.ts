@@ -3,7 +3,6 @@ import { atomWithStorage } from 'jotai/utils';
 import type { AnalyticsDateRange } from '@repo/types';
 
 export const sidebarOpenAtom = atomWithStorage('sidebar-open', true);
-export const agentSidebarOpenAtom = atomWithStorage('agent-sidebar-open', false);
 export const devToolsVisibleAtom = atomWithStorage('dev-tools-visible', false);
 
 export type AnalyticsDateRangeState = Record<string, AnalyticsDateRange>;

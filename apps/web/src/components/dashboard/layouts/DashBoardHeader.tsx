@@ -3,13 +3,8 @@
 import { useEffect } from "react";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@heroui/button";
-import { Tooltip } from "@heroui/tooltip";
-import { Icon } from "@iconify/react";
-import { useAtom } from "jotai";
 import UserProfile from "../../shared/UserProfile";
 import { useUserContext } from "@/contexts/UserContext";
-import { agentSidebarOpenAtom } from "@/store/atoms";
 
 import SidebarToggle from "./SidebarToggle";
 
@@ -17,7 +12,6 @@ export default function DashBoardHeader({ className }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useUserContext();
-  const [isAgentOpen, setIsAgentOpen] = useAtom(agentSidebarOpenAtom);
 
   // Fast redirect for non-onboarded users
   const isOnboardingRoute = pathname?.startsWith("/onboarding");
@@ -75,31 +69,6 @@ export default function DashBoardHeader({ className }: { className?: string }) {
 
       {/* Right side - Actions */}
       <div className="flex items-center gap-2 min-w-0">
-        {/* AI Agent Toggle */}
-        <Tooltip
-          content={isAgentOpen ? "Close AI Assistant" : "Open AI Assistant"}
-          placement="bottom"
-          delay={300}
-        >
-          <Button
-            isIconOnly
-            variant="light"
-            size="sm"
-            onPress={() => setIsAgentOpen(!isAgentOpen)}
-            className={`transition-colors ${
-              isAgentOpen
-                ? "text-primary"
-                : "text-default-600 hover:text-primary"
-            }`}
-          >
-            <Icon icon="solar:atom-bold-duotone" width={20} />
-          </Button>
-        </Tooltip>
-
-        {/* Divider */}
-        <div aria-hidden className="h-6 mx-2 w-px bg-default-200" />
-
-        {/* User Profile */}
         <UserProfile />
       </div>
     </header>

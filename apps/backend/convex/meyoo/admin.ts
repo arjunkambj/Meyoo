@@ -342,12 +342,6 @@ export const resetMembersBatch = internalMutation({
       const onboardingResetData = {
         completedSteps: [],
         setupDate: new Date(resetTimestamp).toISOString(),
-        firecrawlSeededAt: undefined,
-        firecrawlSeededUrl: undefined,
-        firecrawlSummary: undefined,
-        firecrawlPageCount: undefined,
-        firecrawlSeedingStatus: undefined,
-        firecrawlLastAttemptAt: undefined,
       };
 
       // Mark any existing memberships as removed so the user leaves the organization

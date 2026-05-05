@@ -22,7 +22,5 @@
     "apps/*",
     "packages/*"
   ],
-  "dependencies": {
-    "expo-linear-gradient": "^15.0.7"
-  }
+  "dependencies": {}
 }

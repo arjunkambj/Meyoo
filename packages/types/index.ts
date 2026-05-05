@@ -3,7 +3,6 @@
 export * from "./analytics";
 export * from "./src/dashboard";
 export * from "./src/onboarding";
-export * from "./src/agentToolsMetadata";
 // API types
 export * from "./api/responses";
 export * from "./core";
@@ -25,6 +24,5 @@ export * from "./shared/utilities";
 export * from "./ui/charts";
 // UI types
 export * from "./ui/components";
-export * from "./ui/agent";
 export * from "./ui/forms";
 export * from "./ui/notifications";

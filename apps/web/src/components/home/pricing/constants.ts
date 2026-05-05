@@ -82,7 +82,6 @@ export const tiers: Array<Tier> = [
     },
     features: [
       "Advanced Analytics",
-      "MCP Support",
       "3 Free Team Members",
       "Email Support",
       "$0.10 Per Extra Order",
@@ -146,11 +145,10 @@ export const seatPricing = {
       "View analytics",
       "Basic reports",
       "Email support",
-      "Option to add AI for $10/month",
+      "Advanced reports",
     ],
     freeWithAI: [
       "Everything in free tier",
-      "AI Agent: 5 messages/day (50/month)",
       "AI-powered insights",
       "Predictive analytics",
       "Custom recommendations",
@@ -158,7 +156,6 @@ export const seatPricing = {
     ],
     paid: [
       "Everything in free tier",
-      "AI Agent: 1,000 messages/month",
       "AI-powered insights (included)",
       "Predictive analytics",
       "Custom recommendations",

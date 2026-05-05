@@ -9,7 +9,6 @@ import BillingSettingsView from "./billing/BillingSettingsView";
 import GeneralSettingsView from "./general/GeneralSettingsView";
 import HelpSettingsView from "./help/HelpSettingsView";
 import TeamSettingsView from "./team/TeamSettingsView";
-import SecuritySettingsView from "./security/SecuritySettingsView";
 
 export default function SettingsView() {
   return (
@@ -64,18 +63,6 @@ export default function SettingsView() {
             }
           >
             <TeamSettingsView />
-          </Tab>
-
-          <Tab
-            key="security"
-            title={
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:lock-keyhole-bold-duotone" width={18} />
-                <span>MCP &amp; Security</span>
-              </div>
-            }
-          >
-            <SecuritySettingsView />
           </Tab>
 
           <Tab

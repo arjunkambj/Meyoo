@@ -24,10 +24,6 @@ import {
  * Handles the 5-step onboarding process and triggers initial 60-day sync
  */
 
-const FIRECRAWL_SEED_URL = null;
-const IS_PRODUCTION_ENVIRONMENT = process.env.NODE_ENV === "production";
-const DEV_FIRECRAWL_TEST_URL = "https://shopcelestia.in/";
-
 type SyncSessionStatus = Doc<"syncSessions">["status"];
 
 const ACTIVE_SYNC_STATUSES = new Set<SyncSessionStatus>([
@@ -1953,62 +1949,6 @@ export const connectShopifyStore = mutation({
     console.log(
       `[ONBOARDING] Successfully connected Shopify store for ${user.email}. Sync will be triggered by callback.`,
     );
-
-    const seedUrl = FIRECRAWL_SEED_URL
-      ? FIRECRAWL_SEED_URL
-      : IS_PRODUCTION_ENVIRONMENT
-        ? domain.startsWith("http")
-          ? domain
-          : `https://${domain}`
-        : DEV_FIRECRAWL_TEST_URL;
-
-    const firecrawlStatus = onboarding.onboardingData?.firecrawlSeedingStatus;
-    const hasAttemptedFirecrawl = Boolean(
-      onboarding.onboardingData?.firecrawlLastAttemptAt,
-    );
-    const hasSeededFirecrawl = Boolean(
-      onboarding.onboardingData?.firecrawlSeededAt,
-    );
-    const firecrawlBusy =
-      firecrawlStatus?.status === "scheduled" ||
-      firecrawlStatus?.status === "in_progress";
-
-    if (!hasSeededFirecrawl && !firecrawlBusy && !hasAttemptedFirecrawl && seedUrl) {
-      try {
-        await ctx.db.patch(onboarding._id, {
-          onboardingData: {
-            ...onboarding.onboardingData,
-            firecrawlSeedingStatus: {
-              status: "scheduled",
-              startedAt: Date.now(),
-            },
-          },
-          updatedAt: Date.now(),
-        });
-
-        await ctx.scheduler.runAfter(
-          0,
-          api.agent.firecrawlSeed.seedDocsFromFirecrawl,
-          {
-            url: seedUrl,
-            organizationId: user.organizationId as Id<"organizations">,
-            shopDomain: domain,
-          },
-        );
-        await ctx.scheduler.runAfter(
-          0,
-          api.agent.brandSummary.upsertBrandSummary,
-          {
-            organizationId: user.organizationId as Id<"organizations">,
-          },
-        );
-      } catch (error) {
-        console.error(
-          "[ONBOARDING] Firecrawl documentation seeding failed",
-          error,
-        );
-      }
-    }
 
     return {
       success: true,

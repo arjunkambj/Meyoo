@@ -73,12 +73,6 @@ export const handleAppUninstalled = internalMutation({
           const onboardingResetData = {
             completedSteps: [],
             setupDate: new Date(uninstallTimestamp).toISOString(),
-            firecrawlSeededAt: undefined,
-            firecrawlSeededUrl: undefined,
-            firecrawlSummary: undefined,
-            firecrawlPageCount: undefined,
-            firecrawlSeedingStatus: undefined,
-            firecrawlLastAttemptAt: undefined,
           };
 
         try {

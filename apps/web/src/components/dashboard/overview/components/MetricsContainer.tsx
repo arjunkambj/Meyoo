@@ -5,9 +5,6 @@ import React from "react";
 import KPI from "@/components/shared/cards/KPI";
 import { PinnedMetricsGridSkeleton } from "@/components/shared/skeletons";
 import { formatMetricValue, METRICS } from "../metrics/registry";
-import { useAtomValue } from "jotai";
-import { agentSidebarOpenAtom } from "@/store/atoms";
-import { cn } from "@heroui/theme";
 
 type OverviewMetricView = { value: number; change?: number };
 type OverviewMetricsView = Record<string, OverviewMetricView>;
@@ -41,8 +38,6 @@ export function MetricsContainer({
   primaryCurrency,
   isLoading,
 }: MetricsContainerProps) {
-  const isAgentSidebarOpen = useAtomValue(agentSidebarOpenAtom);
-
   // Use provided metrics or default metrics if none provided
   const displayMetrics = React.useMemo(() => {
     if (metrics.length === 0) {
@@ -96,12 +91,7 @@ export function MetricsContainer({
 
   return (
     <div className="space-y-4">
-      <div className={cn(
-        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
-        isAgentSidebarOpen
-          ? "xl:grid-cols-3 2xl:grid-cols-4"
-          : "xl:grid-cols-4 2xl:grid-cols-5"
-      )}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
         {displayMetrics.map((metricId, index) =>
           renderMetricCard(metricId, index)
         )}

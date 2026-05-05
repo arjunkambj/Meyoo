@@ -9,8 +9,6 @@
 - Register backend components in this exact order:
   - `app.use(workpool, { name: "mainWorkpool" })`
   - `app.use(actionRetrier)`
-  - `app.use(rag)`
-  - `app.use(agent)`
   - `app.use(resend)`
 - Always fetch the latest Context7 docs before touching these components or their wiring.
 
@@ -19,7 +17,6 @@
 
 ### Apps
 - `apps/web` – Next.js dashboard. Routes live in `src/app`, shared UI in `src/components`, helpers in `src/libs`, state in `src/store`, and static assets in `public/`.
-- `apps/mobile` – Expo + React Native client. Screens under `app/`, shared pieces in `components/`, contexts in `contexts/`, state in `store/`, and styles in `styles/`.
 - `apps/backend` – Convex backend runtime. Business logic under `convex/` with shared helpers in `libs/`.
 
 ### Packages
@@ -30,7 +27,6 @@
 - `@repo/typescript-config` – Shared tsconfig presets.
 
 ### Backend Convex Map
-- `agent/` – Agent flows, chat actions, and MCP tooling.
 - `core/` – Core domain logic: orgs, users, onboarding, costs, usage.
 - `engine/` – Scheduling, analytics, events, rate limiting, workpool jobs.
 - `jobs/` – Background jobs triggered by workpool or cron.
@@ -42,7 +38,7 @@
 - `utils/` – Shared backend utilities.
 - `web/` – Customer-facing storefront APIs.
 - `webhooks/` – HTTP handlers for Shopify + GDPR flows.
-- Root files: `auth*.ts`, `http.ts`, `httpSync.ts`, `rag.ts`, `ResendOTP.ts`, `installations.ts`.
+- Root files: `auth*.ts`, `http.ts`, `httpSync.ts`, `ResendOTP.ts`, `installations.ts`.
 - `_generated/` and `schema.ts` come from Convex codegen—do not edit.
 
 ### Backend Shared Libraries
@@ -51,14 +47,14 @@
 
 ## Development Commands
 - Install everything once with `bun install` from the repo root.
-- Run all apps via `bun run dev`. Use `bun run dev --filter=web`, `--filter=backend`, or `--filter=mobile` to target one workspace.
+- Run all apps via `bun run dev`. Use `bun run dev --filter=web` or `--filter=backend` to target one workspace.
 - Build with `bun run build`; add `--filter=<workspace>` for a single target.
 - Quality checks: `bun run lint` and `bun run check-types`.
 - Formatting: `bun run format` keeps markdown and ts/tsx tidy.
 - Only use Bun (no npm/pnpm/yarn). Node 18+ and Bun 1.2.18+ are required.
 
 ## Frontend Conventions
-- Use HeroUI on web and HeroUI Native on mobile.
+- Use HeroUI on web.
 - Tailwind CSS 4 powers styling—stick to semantic utility classes and keep config files in sync.
 - Icons come from `@iconify/react`.
 - Tables and charts rely on TanStack Table and Recharts.
@@ -76,11 +72,9 @@
 
 ## Environment and Secrets
 - Keep secrets per app in `*.env.local`; never commit them.
-- Common keys: `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_CONVEX_URL`, Shopify (`SHOPIFY_*`), Meta (`META_*`), Google (`GOOGLE_*`), `RESEND_API_KEY`, `CONVEX_DEPLOY_KEY`, `CONVEX_*_SITE_URL`, and MCP-related keys.
+- Common keys: `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_CONVEX_URL`, Shopify (`SHOPIFY_*`), Meta (`META_*`), Google (`GOOGLE_*`), `RESEND_API_KEY`, `CONVEX_DEPLOY_KEY`, and `CONVEX_*_SITE_URL`.
 
-## Tools and MCP Usage
-- Use Convex MCP helpers to inspect or run one-off data queries. Add temporary MCP code in its own folder and remove it after use.
-- Use Shopify MCP to study webhook payloads when needed.
+## Tools
 - Pull the latest Context7 docs before editing Shopify components or related docs.
 
 ## Reference Files

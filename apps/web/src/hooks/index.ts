@@ -9,5 +9,3 @@ export * from "./mainapp";
 export * from "./onboarding";
 // ============ UTIL HOOKS ============
 export * from "./usePassword";
-export * from "./useApiKeys";
-export * from "./useAgent";

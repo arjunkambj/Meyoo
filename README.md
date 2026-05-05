@@ -31,12 +31,6 @@
 - **Recharts** - Data visualization
 - **TypeScript** - Type-safe development
 
-### Mobile
-
-- **Expo + React Native** - Cross-platform mobile foundation (Expo Router)
-- **NativeWind** - Tailwind-class styling for React Native screens
-- **HeroUI Native** - HeroUI's React Native component library for consistent mobile UI
-
 ### Backend
 
 - **Convex** - Real-time serverless database
@@ -67,7 +61,6 @@ meyoo-better/
 ├── apps/
 │   ├── web/                 # Customer-facing dashboard (Port 3000)
 │   ├── admin/               # Admin backoffice app (Port 3001)
-│   ├── mobile/              # Expo Router mobile client
 │   └── backend/             # Convex serverless backend
 ├── packages/
 │   ├── @repo/types/         # Shared TypeScript types
@@ -166,16 +159,7 @@ bun run dev --filter=meyoo
 # Backend only
 bun run dev --filter=backend
 
-# Mobile (Expo)
-bun run dev --filter=mobile
 ```
-
-### Mobile Setup (NativeWind + HeroUI Native)
-
-1. Install dependencies from the repository root with `bun install` so Expo, NativeWind, and HeroUI Native stay in sync across workspaces.
-2. Start the Expo development server via `bun run dev --filter=mobile` (or run `bun run dev` inside `apps/mobile`) and choose your target platform in the Expo CLI.
-3. When you add new screens or component directories, update the `content` globs in `apps/mobile/tailwind.config.js` so NativeWind sees your class usage.
-4. After modifying Tailwind or NativeWind config files, restart the Expo server to ensure the generated styles include your changes.
 
 ### Build
 
@@ -245,7 +229,6 @@ convex/
 
 - **`/apps/web`**: Customer dashboard for viewing profits and analytics
 - **`/apps/admin`**: Internal admin dashboard for system management
-- **`/apps/mobile`**: Expo Router mobile client using NativeWind styling and HeroUI Native components
 
 ### Shared Packages
 
