@@ -21,7 +21,7 @@
     "@repo/types": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "ai": "^5.0.71",
-    "convex": "^1.28.0",
+    "convex": "^1.37.0",
     "graphql-request": "^7.2.0",
     "zod": "^4.1.11"
   },

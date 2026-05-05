@@ -10,6 +10,7 @@
 
 import type {
   ApiFromModules,
+  AnyComponents,
   FilterApi,
   FunctionReference,
 } from "convex/server";
@@ -272,3 +273,4 @@ export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
 >;
+export declare const components: AnyComponents;
