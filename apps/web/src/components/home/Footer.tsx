@@ -43,11 +43,11 @@ const socialLinks = [
 const Footer = () => {
   return (
     <section className={`relative pt-20 pb-16 sm:pt-24`}>
-      <div className={designSystem.spacing.container}>
+      <div className={`${designSystem.spacing.container} mx-auto max-w-7xl`}>
         <footer>
           {/* CTA Section */}
           <div
-            className={`mb-16 sm:mb-24 rounded-2xl max-w-7xl mx-auto p-8 sm:p-10 md:p-12 lg:p-16 transition-all duration-300 ${designSystem.card.base}`}
+            className="mb-16 sm:mb-24 rounded-2xl max-w-6xl mx-auto bg-content1 p-8 sm:p-10 md:p-12 lg:p-16 transition-all duration-300"
           >
             <div className="flex flex-col items-center text-center gap-5">
               <h2 className="max-w-[700px] text-2xl leading-tight font-semibold tracking-tight text-balance sm:text-3xl lg:text-4xl text-foreground">
@@ -88,7 +88,7 @@ const Footer = () => {
           </div>
 
           {/* Navigation Section */}
-          <nav className="border-default-200 grid grid-cols-1 gap-y-8 border-b border-t py-10 sm:gap-y-10 lg:grid-cols-[0.4fr_0.6fr] lg:gap-x-16 lg:py-16">
+          <nav className="grid grid-cols-1 gap-y-8 py-10 sm:gap-y-10 lg:grid-cols-[0.4fr_0.6fr] lg:gap-x-16 lg:py-16">
             <div className="max-w-sm">
               <Logo href="/" size="md" />
               <p className="mt-4 text-sm sm:text-base text-muted-foreground">

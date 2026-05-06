@@ -43,7 +43,7 @@ const Faq = () => {
       id="faq"
       className={`relative pt-12 sm:pt-16 lg:pt-20 2xl:pt-24 pb-12 sm:pb-16 lg:pb-20 2xl:pb-24 ${designSystem.background.gradient} w-full scroll-mt-24`}
     >
-      <div className={`${designSystem.spacing.container} max-w-7xl`}>
+      <div className={`${designSystem.spacing.container} mx-auto max-w-7xl`}>
         <div className="text-center mb-12">
           <div className={designSystem.typography.sectionChip}>
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">

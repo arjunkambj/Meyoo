@@ -39,6 +39,8 @@ const parsePrice = (price: string): number => {
 const showcasedTiers = tiers.filter(
   (tier) => tier.key !== TiersEnum.Enterprise
 );
+const freeTier = tiers.find((tier) => tier.key === TiersEnum.Free);
+const paidTiers = showcasedTiers.filter((tier) => tier.key !== TiersEnum.Free);
 
 const Pricing = () => {
   const defaultFrequency = frequencies[0];
@@ -65,7 +67,7 @@ const Pricing = () => {
       className={`relative ${designSystem.spacing.section} ${designSystem.background.gradient} w-full`}
     >
       <div
-        className={`${designSystem.spacing.container} flex flex-col gap-8 sm:gap-10`}
+        className={`${designSystem.spacing.container} mx-auto max-w-7xl flex flex-col gap-8 sm:gap-10`}
       >
         <div className="flex flex-col items-center text-center">
           <div className={designSystem.typography.sectionChip}>
@@ -110,8 +112,44 @@ const Pricing = () => {
           </div>
         </div>
 
-        <div className="grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {showcasedTiers.map((tier) => {
+        {freeTier ? (
+          <Card
+            className={`mx-auto w-full max-w-3xl ${designSystem.card.base} rounded-3xl p-1.5 shadow-none`}
+          >
+            <CardBody className="flex flex-col gap-2 rounded-[20px] bg-background px-6 py-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-2.5">
+                <Icon
+                  icon="solar:bolt-bold"
+                  className="size-10 shrink-0 text-primary"
+                />
+                <div className="space-y-0.5">
+                  <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                    Start free with your first 300 orders
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {freeTier.description}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 items-center">
+                <Button
+                  as={Link}
+                  className="h-10 font-semibold transition-all duration-200 active:scale-100"
+                  color={freeTier.buttonColor}
+                  href={freeTier.href}
+                  variant={freeTier.buttonVariant}
+                  size="md"
+                >
+                  {freeTier.buttonText}
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+        ) : null}
+
+        <div className="grid items-stretch gap-6 md:grid-cols-3">
+          {paidTiers.map((tier) => {
             const price = getTierPrice(tier, billingCycle);
             const previousPrice = getTierPrice(
               tier,

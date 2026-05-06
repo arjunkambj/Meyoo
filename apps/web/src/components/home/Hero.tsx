@@ -59,7 +59,7 @@ const Hero = () => {
               <Button
                 as={Link}
                 href="/signin"
-                className="w-auto font-semibold h-11 sm:h-12 transition-all duration-200 active:scale-100 text-sm sm:text-base"
+                className="w-auto font-semibold h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
                 color="primary"
                 endContent={<Icon icon="solar:arrow-right-linear" width={18} />}
                 size="lg"
@@ -71,7 +71,7 @@ const Hero = () => {
                 href="#pricing"
                 variant="flat"
                 size="lg"
-                className="w-auto h-11 sm:h-12 transition-all duration-200 active:scale-100 text-sm sm:text-base"
+                className="w-auto h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
               >
                 View pricing
               </Button>
@@ -79,15 +79,11 @@ const Hero = () => {
 
             {/* Trust line */}
             <div className="mt-8 sm:mt-10">
-              <div className="inline-flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm text-default-600">
-                <Icon
-                  icon="solar:shield-check-bold"
-                  width={16}
-                  className="text-success sm:w-[18px]"
-                />
-                <span className="font-medium">
-                  Fast setup · 28-day free trial · Free for 300
-                  orders/month/store
+              <div className="inline-flex items-center text-xs sm:text-sm text-default-600">
+                <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 font-medium sm:justify-start sm:gap-x-4">
+                  <span>Fast setup</span>
+                  <span>28-day free trial</span>
+                  <span>Free for 300 orders/month/store</span>
                 </span>
               </div>
             </div>
@@ -130,9 +126,6 @@ const Hero = () => {
 
         <div className="mt-20">
           <div className="mx-auto w-full max-w-7xl px-2 sm:px-4">
-            <p className="text-center text-xs sm:text-sm text-muted-foreground mb-6 sm:mb-8">
-              Trusted by data‑driven D2C teams.
-            </p>
             <div className="grid grid-cols-3 sm:flex sm:flex-nowrap items-center justify-between gap-6 sm:gap-8 lg:gap-12 text-default-400">
               {d2cBrands.map((brand) => (
                 <div

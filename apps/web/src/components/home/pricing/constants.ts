@@ -34,7 +34,7 @@ export const tiers: Array<Tier> = [
       "Email Support",
       "$0.30 per extra order",
     ],
-    buttonText: "Start 28-day trial",
+    buttonText: "Start for free",
     buttonColor: "default",
     buttonVariant: "flat",
   },
