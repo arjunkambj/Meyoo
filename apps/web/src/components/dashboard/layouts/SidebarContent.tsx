@@ -30,7 +30,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
           ? "w-66 px-5 py-6 opacity-100 overflow-visible ml-6"
           : "w-0 p-0 opacity-0 overflow-hidden"
       }`,
-    [isOpen]
+    [isOpen],
   );
 
   const scrollShadowClasses = useMemo(
@@ -38,7 +38,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
       `h-full max-h-full transition-all duration-300 ${
         isOpen ? "-mx-4 px-4 opacity-100" : "opacity-0"
       }`,
-    [isOpen]
+    [isOpen],
   );
 
   const handleCloseClick = useCallback(() => {
@@ -48,7 +48,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
   const logoSection = useMemo(
     () => (
       <div className="flex items-center justify-between px-3 py-3">
-        <Logo />
+        <Logo href="/overview" />
         {/* Close button - only visible on mobile */}
         <Button
           isIconOnly
@@ -63,7 +63,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
         </Button>
       </div>
     ),
-    [handleCloseClick]
+    [handleCloseClick],
   );
 
   const overviewItem = useMemo(
@@ -75,7 +75,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
           "no-underline w-full group",
           pathname === "/overview"
             ? "bg-primary/20 text-primary-600 font-semibold"
-            : "text-default-700 hover:text-foreground hover:bg-default-200/70"
+            : "text-default-700 hover:text-foreground hover:bg-default-200/70",
         )}
         href="/overview"
         prefetch={true}
@@ -86,14 +86,14 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
             "shrink-0 transition-all w-5 h-5",
             pathname === "/overview"
               ? "text-primary-600"
-              : "text-default-700 group-hover:text-foreground"
+              : "text-default-700 group-hover:text-foreground",
           )}
           icon="solar:home-2-bold-duotone"
         />
         <span className="text-sm font-medium truncate">Overview</span>
       </Link>
     ),
-    [pathname]
+    [pathname],
   );
 
   const sidebarMenuContent = useMemo(
@@ -111,7 +111,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
         }))}
       />
     ),
-    []
+    [],
   );
 
   const footerItemsContent = useMemo(() => <FooterItems />, []);

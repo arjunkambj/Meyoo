@@ -42,9 +42,7 @@ const socialLinks = [
 
 const Footer = () => {
   return (
-    <section
-      className={`relative pt-20 pb-16 sm:pt-24`}
-    >
+    <section className={`relative pt-20 pb-16 sm:pt-24`}>
       <div className={designSystem.spacing.container}>
         <footer>
           {/* CTA Section */}
@@ -92,7 +90,7 @@ const Footer = () => {
           {/* Navigation Section */}
           <nav className="border-default-200 grid grid-cols-1 gap-y-8 border-b border-t py-10 sm:gap-y-10 lg:grid-cols-[0.4fr_0.6fr] lg:gap-x-16 lg:py-16">
             <div className="max-w-sm">
-              <Logo size="md" />
+              <Logo href="/" size="md" />
               <p className="mt-4 text-sm sm:text-base text-muted-foreground">
                 Meyoo centralizes your eCommerce insights so you can act on
                 accurate, real-time profitability.

@@ -66,34 +66,35 @@ const Testimonial = () => {
         {testimonials.map((testimonial) => (
           <article
             key={testimonial.id}
-            className={`${designSystem.card.base} group relative flex h-full flex-col rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02]`}
+            className={`${designSystem.card.base} group relative flex h-full min-h-[22rem] flex-col rounded-3xl p-1.5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/20`}
           >
-            <div className="relative flex h-full flex-col p-6 sm:p-8">
-              <div className="mb-5 inline-flex size-10 items-center justify-center rounded-full text-primary/70">
-                <Icon icon="ri:double-quotes-l" width={26} />
+            <div className="relative flex h-full flex-col rounded-[20px] px-6 py-5 sm:px-7 sm:py-6">
+              <div className="mb-4">
+                <div className="inline-flex text-primary">
+                  <Icon icon="ri:double-quotes-l" width={40} />
+                </div>
               </div>
 
-              <h3 className="mb-3 text-xl font-semibold tracking-tight leading-tight">
+              <h3 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                 {testimonial.title}
               </h3>
 
-              <div className="mb-8 flex-1">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {testimonial.description}
-                </p>
-              </div>
+              <p className="mt-3 flex-1 text-sm leading-7 text-muted-foreground">
+                {testimonial.description}
+              </p>
 
-              <div className="flex items-center gap-3">
+              <div className="mt-6 flex items-center gap-3 border-t border-foreground/10 pt-4">
                 <Avatar
                   size="md"
                   src={testimonial.user.avatar}
+                  className="ring-2 ring-background"
                   name={testimonial.user.name}
                 />
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">
                     {testimonial.user.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="truncate text-xs text-muted-foreground">
                     {testimonial.user.location}
                   </p>
                 </div>

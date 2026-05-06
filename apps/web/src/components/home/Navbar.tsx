@@ -88,12 +88,7 @@ export default function CenteredNavbar() {
           {/* Left side - Logo */}
           <NavbarContent className="shrink-0" justify="start">
             <NavbarBrand className="gap-0">
-              <Link
-                className="flex items-center gap-1 sm:gap-2 hover:opacity-80 transition-opacity"
-                href="/"
-              >
-                <Logo />
-              </Link>
+              <Logo href="/" />
             </NavbarBrand>
           </NavbarContent>
 
@@ -177,7 +172,7 @@ export default function CenteredNavbar() {
                 <div className="flex flex-col h-full min-h-[calc(100vh-2rem)]">
                   {/* Mobile Header */}
                   <div className="flex items-center justify-between pb-4 sm:pb-6">
-                    <Logo />
+                    <Logo href="/" />
                     <Button
                       isIconOnly
                       className="text-muted-foreground hover:bg-muted/50 transition-all duration-300 w-9 h-9 min-w-9"

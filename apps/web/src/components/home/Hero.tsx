@@ -23,7 +23,7 @@ const d2cBrands = [
 const Hero = () => {
   return (
     <section
-      className={`relative w-full min-h-[calc(90vh)] flex items-center justify-center overflow-hidden mt-13 ${designSystem.background.gradient} pb-16 sm:pb-20 lg:pb-24 2xl:pb-28`}
+      className={`relative w-full min-h-[calc(90vh)] flex items-center justify-center overflow-hidden mt-13 ${designSystem.background.gradient} pb-16 sm:pb-20 lg:pb-24`}
     >
       <div className={`${designSystem.spacing.container} relative z-10`}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-14 lg:gap-16 items-center">
@@ -37,25 +37,21 @@ const Hero = () => {
               Built for D2C brands
             </Chip>
             {/* Header  */}
-            <h1 className="flex flex-col gap-4 font-semibold tracking-tight  text-pretty text-7xl mb-6">
-              <span className="block text-balance text-default-900">
-                See, Measure
+            <h1 className="mb-6 flex max-w-3xl flex-col text-pretty font-semibold leading-[1.02] tracking-normal text-default-900">
+              <span className="block text-balance text-5xl sm:text-6xl lg:text-7xl">
+                Make Better Decisions
               </span>
 
-              <span className="block text-balance text-default-900">
-                <span>and{` `}</span>
-                <span className="text-primary">Grow Profit</span>
-              </span>
-              <span className="block text-5xl mt-2 text-default-900 font-playfair italic ">
-                For every order. Every ad.
+              <span className="block text-balance text-4xl font-medium leading-[1.08] text-default-800 sm:text-5xl lg:text-6xl">
+                For your <span className="text-primary">Shopify store</span>
               </span>
             </h1>
 
             {/* Professional info */}
-            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed text-pretty text-center sm:text-left max-w-xl mx-auto sm:mx-0 mb-0">
-              Meyoo pulls sales, ad spend, product costs, shipping, discounts,
-              and fees into one simple view—so you can see real profit by order
-              and SKU.
+            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed text-pretty text-center sm:text-left max-w-2xl mx-auto sm:mx-0 mb-0">
+              Meyoo tracks sales, ad spend, product costs, shipping, discounts,
+              and fees in one dashboard, so you know what each order, ad, and
+              SKU actually makes.
             </p>
 
             {/* CTA Buttons */}
@@ -90,7 +86,8 @@ const Hero = () => {
                   className="text-success sm:w-[18px]"
                 />
                 <span className="font-medium">
-                  Fast setup · 28-day free trial · Free for 300 orders/month/store
+                  Fast setup · 28-day free trial · Free for 300
+                  orders/month/store
                 </span>
               </div>
             </div>

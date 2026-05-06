@@ -1,9 +1,9 @@
 "use client";
 
-import { BadgeCheck } from "lucide-react";
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
+import { Icon } from "@iconify/react";
 import type { ComponentProps } from "react";
 
 import type { Frequency, Tier } from "@/components/home/pricing/types";
@@ -105,7 +105,10 @@ export function PricingTierCard({
             <ul className="space-y-3">
               {tier.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-3">
-                  <BadgeCheck className="mt-0.5 size-5 text-primary/60" />
+                  <Icon
+                    icon="hugeicons:tick-02"
+                    className="mt-0.5 size-5 text-primary/60"
+                  />
                   <span className="text-sm leading-relaxed text-default-600">
                     {feature}
                   </span>

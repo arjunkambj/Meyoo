@@ -1,4 +1,9 @@
+import { Spinner } from "@heroui/spinner";
+
 export default function Loading() {
-  // You can use any loading indicator here
-  return <>Loading...</>;
+  return (
+    <div className="flex h-dvh w-full items-center justify-center">
+      <Spinner color="primary" size="lg" />
+    </div>
+  );
 }

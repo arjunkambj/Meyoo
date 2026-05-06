@@ -1,28 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import type { Route } from "next";
 
-import { useTheme } from "@/components/theme/ThemeProvider";
+import { cn } from "@/libs/utils";
 
 interface LogoProps {
   variant?: "full" | "icon";
   size?: "sm" | "md" | "lg";
   spacing?: "sm" | "md" | "lg";
   className?: string;
+  href?: Route;
+  ariaLabel?: string;
   mobileStacked?: boolean;
 }
 
 const SIZES = {
-  sm: { full: { width: 100, height: 30 }, icon: { width: 30, height: 30 } },
-  md: { full: { width: 120, height: 36 }, icon: { width: 36, height: 36 } },
-  lg: { full: { width: 150, height: 45 }, icon: { width: 45, height: 45 } },
-} as const;
-
-const TEXT_SIZES = {
-  sm: "text-lg",
-  md: "text-xl",
-  lg: "text-2xl",
+  sm: { image: 28, text: "text-lg", touch: "min-h-10 px-2 -mx-2" },
+  md: { image: 34, text: "text-xl", touch: "min-h-11 px-2.5 -mx-2.5" },
+  lg: { image: 42, text: "text-2xl", touch: "min-h-12 px-3 -mx-3" },
 } as const;
 
 const SPACING = {
@@ -36,50 +33,76 @@ export function Logo({
   size = "md",
   spacing = "md",
   className = "",
+  href,
+  ariaLabel,
   mobileStacked = false,
 }: LogoProps) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const { width, height } = SIZES[size][variant];
-
-  // Prevent hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Use fallback during hydration
-  const logoSrc =
-    mounted && resolvedTheme === "dark" ? "/logo-white.svg" : "/logo-black.svg";
-
-  const textSizeClass = mobileStacked ? "text-sm sm:text-xl" : TEXT_SIZES[size];
+  const { image, text, touch } = SIZES[size];
+  const textSizeClass = mobileStacked ? "text-sm sm:text-xl" : text;
   const containerClass = mobileStacked
     ? "flex-col items-start gap-0.5 sm:flex-row sm:items-center"
     : "items-center";
 
-  return (
-    <div className={`inline-flex items-center ${className}`}>
+  const mark = (
+    <>
+      <Image
+        alt={variant === "icon" ? "Meyoo" : ""}
+        aria-hidden={variant === "full" ? true : undefined}
+        className="block shrink-0 object-contain dark:hidden"
+        height={image}
+        src="/logo-black.svg"
+        width={image}
+      />
+      <Image
+        alt={variant === "icon" ? "Meyoo" : ""}
+        aria-hidden={variant === "full" ? true : undefined}
+        className="hidden shrink-0 object-contain dark:block"
+        height={image}
+        src="/logo-white.svg"
+        width={image}
+      />
+    </>
+  );
+
+  const content = (
+    <span
+      className={cn(
+        "inline-flex max-w-full shrink-0 select-none rounded-lg",
+        variant === "full" ? cn("flex", containerClass, SPACING[spacing]) : "",
+        href ? cn(touch, "items-center transition-colors") : "items-center",
+        className,
+      )}
+    >
       {variant === "full" ? (
-        <div className={`flex ${containerClass} ${SPACING[spacing]}`}>
-          <Image
-            alt="Meyoo"
-            className="object-contain"
-            height={height}
-            src={logoSrc}
-            width={height}
-          />
-          <span className={`font-bold text-foreground ${textSizeClass}`}>
+        <>
+          {mark}
+          <span
+            className={cn(
+              "font-bold leading-none text-foreground transition-colors group-hover:text-primary",
+              textSizeClass,
+            )}
+          >
             Meyoo
           </span>
-        </div>
+        </>
       ) : (
-        <Image
-          alt="Meyoo"
-          className="object-contain"
-          height={height}
-          src={logoSrc}
-          width={width}
-        />
+        mark
       )}
-    </div>
+    </span>
+  );
+
+  return href ? (
+    <Link
+      aria-label={
+        ariaLabel ??
+        (href === "/overview" ? "Go to overview" : "Go to Meyoo home")
+      }
+      className="group inline-flex rounded-lg no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      href={href}
+    >
+      {content}
+    </Link>
+  ) : (
+    content
   );
 }

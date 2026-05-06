@@ -1,5 +1,4 @@
 import type React from "react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Logo } from "@/components/shared/Logo";
@@ -25,7 +24,7 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
 
           <footer className="flex items-center justify-between border-t border-foreground/10 pt-6">
             <p className="text-sm text-foreground/56">
-              The Ecommerce Profit annalitics app
+              #1 Net Profit Analytics For Shopify
             </p>
             <div className="flex items-end gap-2 text-foreground/44"></div>
           </footer>
@@ -46,9 +45,5 @@ export default async function AuthLayout({ children }: AuthLayoutProps) {
 }
 
 function HomeLink() {
-  return (
-    <Link href="/">
-      <Logo />
-    </Link>
-  );
+  return <Logo href="/" />;
 }

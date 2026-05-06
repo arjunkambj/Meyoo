@@ -1,12 +1,12 @@
 "use client";
 
-import { BadgeCheck } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 import { Button } from "@heroui/button";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Divider } from "@heroui/divider";
 import { Switch } from "@heroui/switch";
+import { Icon } from "@iconify/react";
 import { frequencies, tiers } from "./pricing/constants";
 import { type Frequency, FrequencyEnum, TiersEnum } from "./pricing/types";
 import { designSystem } from "@/libs/design-system";
@@ -110,7 +110,7 @@ const Pricing = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-stretch justify-center gap-6 sm:flex-row sm:items-stretch">
+        <div className="grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-4">
           {showcasedTiers.map((tier) => {
             const price = getTierPrice(tier, billingCycle);
             const previousPrice = getTierPrice(
@@ -130,7 +130,7 @@ const Pricing = () => {
             return (
               <Card
                 key={tier.key}
-                className={`h-full w-full ${designSystem.card.base} rounded-3xl p-1.5 transition-all duration-300 shadow-none sm:w-96 overflow-hidden`}
+                className={`flex h-full w-full flex-col ${designSystem.card.base} rounded-3xl p-1.5 transition-all duration-300 shadow-none overflow-hidden`}
               >
                 <CardHeader className="flex flex-col gap-3 py-5 px-6 bg-background rounded-[20px]">
                   <div className="text-center space-y-1.5">
@@ -180,12 +180,15 @@ const Pricing = () => {
 
                 <Divider className="my-0 bg-default-100" />
 
-                <CardBody className="flex flex-col px-6 pb-8 pt-4">
+                <CardBody className="flex flex-1 flex-col px-6 pb-8 pt-4">
                   <div className="flex-1">
                     <ul className="space-y-4">
                       {tier.features?.map((feature) => (
                         <li key={feature} className="flex items-start gap-3">
-                          <BadgeCheck className="mt-0.5 size-5 shrink-0 text-primary" />
+                          <Icon
+                            icon="hugeicons:tick-02"
+                            className="mt-0.5 size-5 shrink-0 text-primary"
+                          />
                           <span className="text-sm leading-relaxed text-muted-foreground">
                             {feature}
                           </span>
