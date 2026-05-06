@@ -1,64 +1,61 @@
 "use client";
 
-import { Icon } from "@iconify/react";
+import Image from "next/image";
 import { designSystem } from "@/libs/design-system";
 
 type FeatureCard = {
   id: number;
-  icon: string;
+  image: string;
   title: string;
   description: string;
-  badge: string;
 };
 
 const featureData: FeatureCard[] = [
   {
     id: 1,
-    icon: "solar:chart-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNEIl86KqUOgHlR2fA8GZXSot4LNkiFe9jWVQs",
     title: "Real Profit Dashboard",
     description:
       "See revenue, costs, ad spend, and profit in one place.",
-    badge: "Live Insights",
   },
   {
     id: 2,
-    icon: "solar:graph-new-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNeBFkfFiIzwo6svuTP13JYgDA9LpSlXh0QGUq",
     title: "60+ Analytics Metrics",
     description:
       "Track AOV, CAC, margins, LTV, returns, and more.",
-    badge: "Deep Analytics",
   },
   {
     id: 3,
-    icon: "solar:chat-round-line-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLN0U7nTMrJ3gLK5EO8wvzZDWiNxQdRrukVjFAo",
     title: "Meyoo AI Copilot",
     description:
       "Ask questions about your store and get clear answers.",
-    badge: "AI Powered",
   },
   {
     id: 4,
-    icon: "solar:box-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNXACwtg5ELvwaj49AUkyIYz5JTWnZ32FVrB7f",
     title: "Inventory & Orders",
     description:
       "Monitor stock, orders, returns, and backorders.",
-    badge: "Smart Stock",
   },
   {
     id: 5,
-    icon: "solar:link-circle-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNNlMOrOLL71m9hQqztgu2kvUVSlxYjHCasEAc",
     title: "Integrations & Imports",
     description:
       "Connect your tools or upload costs and shipping rules.",
-    badge: "Plug & Play",
   },
 ];
 
 const featureCardSpan = (index: number) =>
   index < 2 ? "lg:col-span-3" : "lg:col-span-2";
 
-const featureIconArea = (index: number) =>
-  index < 2 ? "aspect-[4/3] lg:aspect-[16/7]" : "aspect-[4/3]";
+const featureImageArea = (index: number) =>
+  index < 2 ? "aspect-[4/3] lg:aspect-[16/9]" : "aspect-[4/3]";
+
+const featureImageScale = (index: number) =>
+  index < 2 ? "" : "scale-110";
 
 const Feature = () => {
   return (
@@ -84,23 +81,20 @@ const Feature = () => {
           {featureData.map((item, index) => (
             <article
               key={item.id}
-              className={`${designSystem.card.base} group relative flex h-full flex-col rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02] ${featureCardSpan(index)}`}
+              className={`${designSystem.card.base} group relative flex h-full flex-col overflow-hidden rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02] ${featureCardSpan(index)}`}
             >
-              <div className={`relative ${featureIconArea(index)} overflow-hidden rounded-[20px] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent flex items-center justify-center`}>
-                <Icon
-                  icon={item.icon}
-                  className="text-primary/40 group-hover:text-primary/60 transition-colors duration-300"
-                  width={120}
-                  height={120}
+              <div className={`relative ${featureImageArea(index)} overflow-hidden rounded-[20px] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent`}>
+                <Image
+                  src={item.image}
+                  alt=""
+                  fill
+                  sizes={index < 2 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
+                  className={`object-cover ${featureImageScale(index)}`}
                 />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
               </div>
-              <div className="mt-5 w-full space-y-3 p-4">
-                <div className="inline-block rounded-full bg-primary/10 px-3 py-1">
-                  <p className="text-xs uppercase tracking-[0.15em] text-primary font-semibold">
-                    {item.badge}
-                  </p>
-                </div>
-                <h3 className="text-xl font-semibold tracking-tight leading-tight">
+              <div className="mt-5 w-full flex-1 p-4">
+                <h3 className="mb-3 text-xl font-semibold tracking-tight leading-tight">
                   {item.title}
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">

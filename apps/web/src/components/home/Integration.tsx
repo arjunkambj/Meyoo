@@ -5,7 +5,6 @@ import React from "react";
 import { cn } from "@/libs/utils";
 import { designSystem } from "@/libs/design-system";
 import Image from "next/image";
-import { Marquee } from "@/components/ui/marquee";
 import { Icon } from "@iconify/react";
 
 type IntegrationLogo =
@@ -19,6 +18,7 @@ const howItWorks = [
     description:
       "Link Shopify in a few clicks. We’ll import orders, refunds, discounts, and fees automatically.",
     icon: "solar:shop-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLN51FsJANNnCB10JKLaEDMTSIoxHbtPY2WeFZr",
     imageOrder: "order-1",
     contentOrder: "order-2",
   },
@@ -26,8 +26,9 @@ const howItWorks = [
     number: "02",
     title: "Link your ad channels",
     description:
-      "Sync Meta Ads, Google Ads, TikTok Ads, Snapchat, and Google Analytics to see spend right next to revenue.",
+      "Sync Meta Ads, Google Ads, TikTok Ads, and Snapchat to see spend right next to revenue.",
     icon: "solar:graph-up-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLN9il3bgYZC4ekwYD5RjMGWca2d7vLIsxfbXrU",
     imageOrder: "order-2",
     contentOrder: "order-1",
   },
@@ -37,6 +38,7 @@ const howItWorks = [
     description:
       "See true profit by order, SKU, and campaign—updated throughout the day. Spot trends, anomalies, and waste before they snowball.",
     icon: "solar:wallet-money-bold-duotone",
+    image: "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNEkflsWqUOgHlR2fA8GZXSot4LNkiFe9jWVQs",
     imageOrder: "order-1",
     contentOrder: "order-2",
   },
@@ -49,8 +51,6 @@ const Integration = () => {
     { icon: "logos:google-ads", name: "Google Ads", className: "" },
     { icon: "logos:tiktok-icon", name: "TikTok Ads", className: "" },
     { icon: "ri:snapchat-fill", name: "Snapchat Ads", className: "text-[#FFFC00]" },
-    { icon: "logos:twitter", name: "Twitter Ads", className: "" },
-    { icon: "logos:google-analytics", name: "Google Analytics", className: "" },
   ];
 
   return (
@@ -71,33 +71,40 @@ const Integration = () => {
         </p>
 
         <div className="relative mt-16">
-          <Marquee pauseOnHover className="[--duration:25s]">
-            {logos.map((logo, index) => (
+          <div className="flex overflow-hidden p-2 [--duration:25s] [--gap:1rem] [gap:var(--gap)]">
+            {Array.from({ length: 4 }).map((_, groupIndex) => (
               <div
-                key={index}
-                className="flex items-center justify-center gap-3.5 rounded-full bg-gradient-to-br from-muted/60 to-muted/40 px-6 py-3 backdrop-blur-md ring-1 ring-default-100 transition-all duration-200 hover:scale-105 hover:ring-primary/30"
+                key={groupIndex}
+                className="flex shrink-0 animate-marquee justify-around [gap:var(--gap)]"
               >
-                {"image" in logo ? (
-                  <Image
-                    alt={logo.name}
-                    className={cn("size-6", logo.className)}
-                    height={24}
-                    src={logo.image as string}
-                    unoptimized
-                    width={24}
-                  />
-                ) : (
-                  <Icon
-                    icon={logo.icon}
-                    width={24}
-                    height={24}
-                    className={cn(logo.className)}
-                  />
-                )}
-                <p className="text-base font-medium">{logo.name}</p>
+                {logos.map((logo) => (
+                  <div
+                    key={`${groupIndex}-${logo.name}`}
+                    className="flex items-center justify-center gap-3.5 rounded-full bg-gradient-to-br from-muted/60 to-muted/40 px-6 py-3 backdrop-blur-md ring-1 ring-default-100 transition-all duration-200 hover:scale-105 hover:ring-primary/30"
+                  >
+                    {"image" in logo ? (
+                      <Image
+                        alt={logo.name}
+                        className={cn("size-6", logo.className)}
+                        height={24}
+                        src={logo.image as string}
+                        unoptimized
+                        width={24}
+                      />
+                    ) : (
+                      <Icon
+                        icon={logo.icon}
+                        width={24}
+                        height={24}
+                        className={cn(logo.className)}
+                      />
+                    )}
+                    <p className="text-base font-medium">{logo.name}</p>
+                  </div>
+                ))}
               </div>
             ))}
-          </Marquee>
+          </div>
           <div className="pointer-events-none absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
           <div className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-background via-background/80 to-transparent"></div>
         </div>
@@ -110,15 +117,16 @@ const Integration = () => {
           >
             <div className="flex flex-col h-full">
               <div className={cn("relative overflow-hidden rounded-[20px] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent", feature.imageOrder)}>
-                <div className="h-64 w-full sm:h-72 flex items-center justify-center">
-                  <Icon
-                    icon={feature.icon}
-                    className="text-primary/40 group-hover:text-primary/60 transition-all duration-500 ease-out group-hover:scale-110"
-                    width={120}
-                    height={120}
+                <div className="relative h-64 w-full sm:h-72">
+                  <Image
+                    src={feature.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/24 via-transparent to-transparent" />
                 <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm rounded-full px-4 py-1.5">
                   <p className="text-xs uppercase tracking-[0.15em] text-primary font-semibold">
                     Step {feature.number}

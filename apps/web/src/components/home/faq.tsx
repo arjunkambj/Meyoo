@@ -19,7 +19,7 @@ const faqs = [
   {
     question: "Which integrations are available?",
     answer:
-      "Shopify, Meta Ads, Google Ads, TikTok Ads, Snapchat, and Google Analytics—with more coming soon.",
+      "Shopify, Meta Ads, Google Ads, TikTok Ads, and Snapchat—with more coming soon.",
   },
   {
     question: "Can I export my data?",
