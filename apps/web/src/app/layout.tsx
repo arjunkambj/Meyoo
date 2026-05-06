@@ -9,6 +9,10 @@ import { stackServerApp } from "@/stack/server";
 import { Providers } from "@/components/Providers";
 import { siteConfig } from "@/constants/config/site";
 
+const description =
+  "Meyoo gives D2C teams one clean view of revenue, ad spend, costs, and true profit.";
+const ogImageUrl = "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNnKyY0SOVxEvhuNrTFGK39MspOgHXizj2kSPl";
+
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -22,22 +26,21 @@ export const metadata: Metadata = {
     default: "Meyoo — Profit Analytics for D2C Brands",
     template: `%s - ${siteConfig.name}`,
   },
-  description: siteConfig.description,
+  description,
   icons: {
     icon: "/favicon.svg",
   },
   openGraph: {
-    title: "Know your true profit.",
-    description:
-      "One clean view of revenue, costs, spend, and profit—so you can grow with confidence.",
+    title: "Meyoo - Profit Analytics for D2C Brands",
+    description,
     url: "/",
     siteName: siteConfig.name,
     images: [
       {
-        url: "/dark-meyoo.png",
+        url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: "Meyoo dashboard preview",
+        alt: "Meyoo profit analytics dashboard preview",
       },
     ],
     locale: "en_US",
@@ -45,10 +48,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Know your true profit.",
-    description:
-      "One clean view of revenue, costs, spend, and profit—so you can grow with confidence.",
-    images: ["/dark-meyoo.png"],
+    title: "Meyoo - Profit Analytics for D2C Brands",
+    description,
+    images: [ogImageUrl],
   },
   alternates: {
     canonical: "/",
