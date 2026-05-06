@@ -125,10 +125,7 @@ export function FilterBar({
 
         return (
           <Dropdown>
-            <Button
-              size={isInline ? "sm" : "md"}
-              variant="tertiary"
-            >
+            <Button size={isInline ? "sm" : "md"} variant="tertiary">
               {selectedValues && selectedValues.length > 0
                 ? `${filter.label} (${selectedValues.length})`
                 : filter.label}

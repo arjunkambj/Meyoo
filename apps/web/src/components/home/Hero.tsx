@@ -96,6 +96,7 @@ const Hero = () => {
                   className="block dark:hidden size-full rounded-xl sm:rounded-2xl object-cover object-left-top transition-transform duration-300 scale-[1.02]  hover:scale-[1.03]"
                   fill
                   priority
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   src="/light.png"
                 />
                 {/* Dark mode preview */}
@@ -104,6 +105,7 @@ const Hero = () => {
                   className="hidden dark:block size-full rounded-xl sm:rounded-2xl object-cover object-left-top transition-transform duration-300 scale-[1.02] hover:scale-[1.03]"
                   fill
                   priority
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   src="/dark.png"
                 />
               </Card.Content>

@@ -7,10 +7,13 @@ import { track as vercelTrack } from "@vercel/analytics";
 type AllowedValue = string | number | boolean | null;
 type Props = Record<string, AllowedValue> | undefined;
 
+const analyticsEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === "true" ||
+  process.env.NEXT_PUBLIC_VERCEL_ANALYTICS === "true";
+
 export function trackEvent(name: string, props?: Props) {
   try {
-    // Only attempt tracking in the browser
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !analyticsEnabled) return;
     vercelTrack(name, props);
   } catch {
     // Avoid throwing if analytics is unavailable
@@ -25,4 +28,3 @@ export function trackOnboardingView(step: string, props?: Props) {
 export function trackOnboardingAction(step: string, action: string, props?: Props) {
   trackEvent(`onboarding_${step}_${action}`, props);
 }
-

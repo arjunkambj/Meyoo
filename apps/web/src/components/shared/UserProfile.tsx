@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Dropdown, Label } from "@heroui/react";
+import { Avatar, Button, Dropdown, Label } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import type { Route } from "next";
 import Link from "next/link";
@@ -135,17 +135,20 @@ const UserProfile = React.memo(
 
     return (
       <Dropdown>
-        <Dropdown.Trigger>
-          <span className="inline-flex rounded-full">
-            <Avatar
-              className="border-2 border-background transition-transform hover:scale-105"
-              size="sm"
-            >
-              <Avatar.Image src={userData.image || undefined} alt={userData.name} />
-              <Avatar.Fallback>{userData.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
-            </Avatar>
-          </span>
-        </Dropdown.Trigger>
+        <Button
+          isIconOnly
+          aria-label="Open user menu"
+          className="h-8 min-w-8 rounded-full bg-transparent p-0 hover:bg-transparent"
+          variant="tertiary"
+        >
+          <Avatar
+            className="border-2 border-background transition-transform hover:scale-105"
+            size="sm"
+          >
+            <Avatar.Image src={userData.image || undefined} alt={userData.name} />
+            <Avatar.Fallback>{userData.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
+          </Avatar>
+        </Button>
         <Dropdown.Popover placement="bottom end">
           {dropdownContent}
         </Dropdown.Popover>
