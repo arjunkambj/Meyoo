@@ -50,11 +50,11 @@ const Footer = () => {
             className="mb-16 sm:mb-24 rounded-2xl max-w-6xl mx-auto bg-content1 p-8 sm:p-10 md:p-12 lg:p-16 transition-all duration-300"
           >
             <div className="flex flex-col items-center text-center gap-5">
-              <h2 className="max-w-[700px] text-2xl leading-tight font-semibold tracking-tight text-balance sm:text-3xl lg:text-4xl text-foreground">
-                Revolutionize decision‑making for your D2C brand with Meyoo.
+              <h2 className="max-w-[640px] text-xl leading-tight font-semibold tracking-tight text-balance sm:text-2xl lg:text-3xl text-foreground">
+                See how much profit your store actually makes.
               </h2>
-              <p className="max-w-[600px] text-base text-muted-foreground sm:text-lg">
-                Know your profit. Move faster. Grow smarter.
+              <p className="max-w-[520px] text-sm text-muted-foreground sm:text-base">
+                Connect Shopify, add costs, and track profit without the spreadsheet mess.
               </p>
               <div className="mt-6 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-4">
                 <Button
@@ -96,13 +96,13 @@ const Footer = () => {
                 accurate, real-time profitability.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-3 sm:gap-x-12 lg:gap-x-14">
+            <div className="grid w-fit grid-cols-2 gap-x-14 gap-y-6 sm:grid-cols-[repeat(3,max-content)] sm:gap-x-32 sm:gap-y-8 lg:justify-self-end">
               {navigationSections.map((section) => (
                 <div key={section.title}>
-                  <h3 className="mb-3 sm:mb-5 text-base sm:text-lg font-semibold text-foreground">
+                  <h3 className="mb-3 text-base sm:text-lg font-semibold text-foreground">
                     {section.title}
                   </h3>
-                  <ul className="space-y-2 sm:space-y-4">
+                  <ul className="space-y-2 sm:space-y-2.5">
                     {section.links.map((link) => (
                       <li key={link.name}>
                         {link.href?.startsWith("/") ? (
@@ -129,7 +129,7 @@ const Footer = () => {
           </nav>
 
           {/* Bottom Section */}
-          <div className="mx-auto mt-4 pt-8">
+          <div className="mx-auto mt-4 border-t border-default-200/70 pt-8">
             <div className="flex flex-col items-center justify-between gap-6 text-center sm:flex-row sm:text-left">
               <p className="text-sm sm:text-base text-muted-foreground">
                 © 2025 Meyoo Inc. All rights reserved.
