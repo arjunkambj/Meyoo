@@ -47,7 +47,7 @@ export function TableSkeleton({
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div
             key={`skeleton-row-${rowIndex + 1}`}
-            className="grid gap-2 py-2 border-b border-surface-tertiary last:border-0"
+            className="grid gap-2 py-2 border-b last:border-0"
             style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
           >
             {Array.from({ length: columns }).map((_, colIndex) => (
@@ -63,7 +63,7 @@ export function TableSkeleton({
 
       {/* Pagination */}
       {showPagination && (
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-surface-tertiary">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t">
           <Skeleton className="h-5 w-32 rounded-lg" />
           <div className="flex gap-1">
             {Array.from({ length: 5 }).map((_, i) => (

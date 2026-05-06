@@ -31,14 +31,14 @@ export default function AboutPage() {
   return (
     <div className={`min-h-screen ${designSystem.background.gradient}`}>
       {/* Hero Section */}
-      <section className={`relative ${designSystem.spacing.section} px-4`}>
+      <section className="relative px-4 pb-8 pt-14 sm:pt-16 lg:pt-20">
         <div className="max-w-4xl mx-auto text-center">
-          <div className={designSystem.typography.sectionChip}>
+          <div className={`${designSystem.typography.sectionChip} mb-4`}>
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               About
             </span>
           </div>
-          <h1 className={`${designSystem.typography.sectionTitle} mb-6`}>
+          <h1 className={`${designSystem.typography.sectionTitle} mb-3`}>
             Real Profit Intelligence
           </h1>
           <p className={designSystem.typography.sectionSubtitle}>
@@ -50,14 +50,14 @@ export default function AboutPage() {
       </section>
 
       {/* Content */}
-      <section className="px-4">
+      <section className="px-4 pb-14">
         <div className="max-w-4xl mx-auto">
           {/* Our Story */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">Our Story</h2>
-            <Card className={`${designSystem.card.base} rounded-3xl p-1.5`}>
-              <Card.Content className="p-8">
-                <div className="space-y-4 text-muted-foreground leading-relaxed">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-6 text-foreground">Our Story</h2>
+            <Card className="rounded-[2rem] bg-surface shadow-none">
+              <Card.Content className="p-6 sm:p-8">
+                <div className="space-y-4 text-muted leading-relaxed">
                   <p>
                     We spent years in spreadsheets trying to calculate real
                     profit after ad spend, shipping, and fees.
@@ -75,29 +75,29 @@ export default function AboutPage() {
             </Card>
           </div>
 
-          <Separator className="my-12 bg-surface-secondary" />
+          <Separator className="my-8 bg-surface-secondary" />
 
           {/* Our Values */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">Values</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-6 text-foreground">Values</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {values.map((value) => (
                 <Card
                   key={value.title}
-                  className={`${designSystem.card.base} rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02]`}
+                  className="rounded-[2rem] bg-surface shadow-none transition-all duration-300 hover:scale-[1.02]"
                 >
                   <Card.Content className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
+                    <div className="w-11 h-11 rounded-xl bg-surface-secondary flex items-center justify-center mb-4">
                       <Icon
-                        className="text-accent"
+                        className="text-foreground"
                         icon={value.icon}
                         width={24}
                       />
                     </div>
-                    <h3 className="font-semibold text-foreground mb-2">
+                    <h3 className="font-medium text-foreground mb-2">
                       {value.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted leading-relaxed">
                       {value.description}
                     </p>
                   </Card.Content>
@@ -106,35 +106,35 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <Separator className="my-12 bg-surface-secondary" />
+          <Separator className="my-8 bg-surface-secondary" />
 
           {/* Timeline */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">Timeline</h2>
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-6 text-foreground">Timeline</h2>
             <div className="space-y-4">
               {milestones.map((milestone) => (
                 <div
                   key={`${milestone.year}-${milestone.event}`}
-                  className={`${designSystem.card.base} flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 hover:scale-[1.01]`}
+                  className="flex items-center gap-4 rounded-[2rem] bg-surface p-4 shadow-none transition-all duration-300 hover:scale-[1.01]"
                 >
                   <div className="w-16 text-accent font-bold">
                     {milestone.year}
                   </div>
                   <Separator className="h-6 bg-surface-secondary" orientation="vertical" />
-                  <p className="text-muted-foreground">{milestone.event}</p>
+                  <p className="text-muted">{milestone.event}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <Separator className="my-12 bg-surface-secondary" />
+          <Separator className="my-8 bg-surface-secondary" />
 
           {/* Company Info */}
-          <div className="mb-12">
-            <Card className={`${designSystem.card.base} rounded-3xl p-1.5`}>
-              <Card.Content className="p-8">
-                <h3 className="font-semibold text-foreground mb-4">Company</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
+          <div className="mb-8">
+            <Card className="rounded-[2rem] bg-surface shadow-none">
+              <Card.Content className="p-6 sm:p-8">
+                <h3 className="font-medium text-foreground mb-4">Company</h3>
+                <p className="text-muted text-sm leading-relaxed">
                   Pyro Labs Private Limited
                   <br />
                   Operating as Meyoo
@@ -147,15 +147,15 @@ export default function AboutPage() {
 
           {/* CTA */}
           <div className="text-center">
-            <Card className={`${designSystem.card.base} rounded-3xl p-1.5`}>
-              <Card.Content className="p-8">
-                <h3 className="text-2xl font-bold mb-3 text-foreground">
+            <Card className="rounded-[2rem] bg-surface p-6 text-center shadow-none sm:p-8">
+              <Card.Content className="p-0">
+                <h3 className="text-2xl font-medium mb-3 text-foreground">
                   Be first to try Meyoo
                 </h3>
-                <p className="text-muted-foreground mb-6">
+                <p className="text-muted mb-6">
                   Launching October 2025 — join the waitlist and we’ll notify you when we open access.
                 </p>
-                <CTAButton endIcon="solar:arrow-right-bold" href="/signup">
+                <CTAButton endIcon="solar:alt-arrow-right-linear" href="/signup">
                   Join the waitlist
                 </CTAButton>
               </Card.Content>

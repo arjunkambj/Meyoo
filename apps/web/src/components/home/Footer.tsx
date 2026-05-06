@@ -26,18 +26,7 @@ const navigationSections = [
 ];
 
 const socialLinks = [
-  { icon: "ri:twitter-x-line", href: "https://x.com/meyoo", label: "X" },
-  {
-    icon: "mdi:linkedin",
-    href: "https://linkedin.com/company/meyoo",
-    label: "LinkedIn",
-  },
-  {
-    icon: "ic:baseline-discord",
-    href: "https://discord.gg/meyoo",
-    label: "Discord",
-  },
-  { icon: "mdi:youtube", href: "https://youtube.com/@meyoo", label: "YouTube" },
+  { icon: "ri:twitter-x-line", href: "https://x.com/arjunkambj", label: "X" },
 ];
 
 const Footer = () => {
@@ -47,16 +36,15 @@ const Footer = () => {
         <footer>
           {/* CTA Section */}
           <div
-            className="mb-16 sm:mb-24 rounded-2xl max-w-6xl mx-auto bg-surface p-8 sm:p-10 md:p-12 lg:p-16 transition-all duration-300"
+            className="mx-auto mb-16 flex max-w-5xl flex-col items-center gap-4 rounded-[2rem] bg-surface p-6 text-center transition-all duration-300 sm:mb-24 sm:p-8 md:p-10 lg:p-12"
           >
-            <div className="flex flex-col items-center text-center gap-5">
-              <h2 className="max-w-[640px] text-xl leading-tight font-semibold tracking-tight text-balance sm:text-2xl lg:text-3xl text-foreground">
+              <h2 className="max-w-[640px] text-xl leading-tight font-bold tracking-tight text-balance sm:text-2xl lg:text-3xl text-foreground">
                 See how much profit your store actually makes.
               </h2>
-              <p className="max-w-[520px] text-sm text-muted-foreground sm:text-base">
+              <p className="max-w-[520px] text-sm text-muted sm:text-base">
                 Connect Shopify, add costs, and track profit without the spreadsheet mess.
               </p>
-              <div className="mt-6 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-4">
+              <div className="mt-4 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-4">
                 <Link href="/sign-in">
                   <Button
                     size="lg"
@@ -67,24 +55,13 @@ const Footer = () => {
                     <span className="flex items-center gap-2">
                       Start 28-day trial
                       <Icon
-                        icon="solar:arrow-right-linear"
+                        icon="solar:alt-arrow-right-linear"
                         className="h-4 w-4 transition-transform group-hover:translate-x-1"
                       />
                     </span>
                   </Button>
                 </Link>
-                <a href="mailto:hey@meyoo.io">
-                  <Button
-                    size="lg"
-                    className="w-full sm:w-auto font-medium"
-                    variant="outline"
-                   
-                  >
-                    Email hey@meyoo.io
-                  </Button>
-                </a>
               </div>
-            </div>
           </div>
 
           {/* Navigation Section */}

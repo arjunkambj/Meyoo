@@ -50,7 +50,7 @@ export const OrdersTable = React.memo(function OrdersTable({
         case "order":
           return (
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-muted">
+              <p className="truncate text-sm font-medium text-foreground">
                 #{item.orderNumber}
               </p>
               {item.tags && item.tags.length > 0 ? (
@@ -71,7 +71,7 @@ export const OrdersTable = React.memo(function OrdersTable({
               ? item.customer.email
               : "Guest Checkout";
           return (
-            <div className="min-w-0 truncate text-sm text-muted">
+            <div className="min-w-0 truncate text-sm text-foreground">
               {email}
             </div>
           );
@@ -90,7 +90,7 @@ export const OrdersTable = React.memo(function OrdersTable({
           return (
             <div>
               <p className="font-medium">{formatCurrency(item.totalPrice)}</p>
-              <p className="text-xs text-muted">{item.items} items</p>
+              <p className="text-xs text-foreground">{item.items} items</p>
             </div>
           );
 
@@ -119,7 +119,7 @@ export const OrdersTable = React.memo(function OrdersTable({
           return (
             <div className="text-sm">
               <p>{item.shippingAddress.city}</p>
-              <p className="text-xs text-muted">
+              <p className="text-xs text-foreground">
                 {item.shippingAddress.country}
               </p>
             </div>
@@ -180,11 +180,11 @@ export const OrdersTable = React.memo(function OrdersTable({
                 <Table.Cell colSpan={columns.length}>
                   <div className="py-10 text-center">
                     <Icon
-                      className="mx-auto mb-4 text-muted"
+                      className="mx-auto mb-4 text-foreground"
                       icon="solar:cart-large-minimalistic-outline"
                       width={48}
                     />
-                    <p className="text-muted">
+                    <p className="text-foreground">
                       No orders found. Orders will sync from Shopify.
                     </p>
                   </div>
@@ -198,7 +198,7 @@ export const OrdersTable = React.memo(function OrdersTable({
                   <Table.Row
                     key={item.id}
                     id={item.id}
-                    className={`${stripe ? "bg-surface-secondary dark:bg-surface/50" : "bg-background"} border-t border-default-border`}
+                    className={`${stripe ? "bg-surface-secondary" : "bg-background"} border-t border-default-border`}
                   >
                     {columns.map((column) => (
                       <Table.Cell key={column.uid}>

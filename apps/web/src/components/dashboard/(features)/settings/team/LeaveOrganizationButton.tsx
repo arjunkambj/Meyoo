@@ -67,7 +67,7 @@ export default function LeaveOrganizationButton() {
                 <span>Leave Organization</span>
               </Modal.Header>
               <Modal.Body>
-                <p className="text-sm text-muted">
+                <p className="text-sm text-foreground">
                   Are you sure you want to leave this organization? You will
                   lose access to its data. A new personal organization will be
                   created for you, like a fresh signup.

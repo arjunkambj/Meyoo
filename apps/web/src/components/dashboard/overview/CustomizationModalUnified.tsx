@@ -214,10 +214,10 @@ export function CustomizationModalUnified({
               <div className="w-full">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h2 className="text-xl font-bold text-muted">
+                    <h2 className="text-xl font-bold text-foreground">
                       Customize Dashboard
                     </h2>
-                    <p className="text-xs text-muted mt-1">
+                    <p className="text-xs text-foreground mt-1">
                       Select and organize{" "}
                       {activeTab === "kpi" ? "KPI metrics" : "widgets"} for your
                       dashboard

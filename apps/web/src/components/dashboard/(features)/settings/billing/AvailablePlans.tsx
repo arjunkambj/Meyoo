@@ -93,7 +93,7 @@ export default function AvailablePlans() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-muted">
+        <h3 className="text-base font-semibold text-foreground">
           Upgrade Plan
         </h3>
         {/* Frequency Toggle - Inline */}
@@ -218,7 +218,7 @@ export default function AvailablePlans() {
             icon="solar:gift-bold-duotone"
             width={16}
           />
-          <p className="text-xs text-muted">
+          <p className="text-xs text-foreground">
             <span className="font-medium text-foreground">
               Free for small stores:
             </span>{" "}

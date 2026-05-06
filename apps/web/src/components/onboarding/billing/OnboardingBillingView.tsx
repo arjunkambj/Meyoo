@@ -150,6 +150,7 @@ export default function OnboardingBillingView() {
       <div className="flex items-center justify-center gap-3 text-sm text-muted">
         <span className="font-medium text-foreground">Monthly</span>
         <Switch
+          aria-label="Toggle yearly billing"
           isSelected={selectedFrequency.key === FrequencyEnum.Yearly}
           onChange={(isSelected) => {
             onFrequencyChange(
@@ -157,7 +158,11 @@ export default function OnboardingBillingView() {
             );
           }}
           size="sm"
-        />
+        >
+          <Switch.Control>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Switch>
         <div className="flex items-center gap-1">
           <span className="font-medium text-foreground">Yearly</span>
           <Chip color="success" size="sm" variant="soft">

@@ -71,7 +71,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
       style={style}
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-muted">
+        <h3 className="text-sm font-semibold text-foreground">
           {type === "kpi" ? "Selected KPIs" : "Selected Widgets"}
         </h3>
         <Chip
@@ -95,7 +95,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
               <>
                 {type === "kpi" && pinnedItems.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-xs text-muted font-medium mb-2 px-1">
+                    <div className="text-xs text-foreground font-medium mb-2 px-1">
                       Pinned Metrics
                     </div>
                     <div className="space-y-0">
@@ -121,7 +121,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
 
                 {type === "kpi" && additionalItems.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-surface-tertiary">
-                    <div className="text-xs text-muted font-medium mb-2 px-1">
+                    <div className="text-xs text-foreground font-medium mb-2 px-1">
                       Additional ({additionalItems.length})
                     </div>
                     <div className="space-y-0">
@@ -173,7 +173,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
 
 function EmptyState({ type }: { type: "kpi" | "widget" }) {
   return (
-    <div className="flex flex-col items-center justify-center h-32 text-muted">
+    <div className="flex flex-col items-center justify-center h-32 text-foreground">
       <Icon
         className="mb-2"
         icon={type === "kpi" ? "solar:chart-2-linear" : "solar:widget-linear"}

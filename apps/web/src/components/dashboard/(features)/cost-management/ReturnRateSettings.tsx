@@ -92,7 +92,7 @@ export default function ReturnRateSettings() {
       {topContent}
       <div className="space-y-6 max-w-2xl">
         <div>
-          <p className="text-sm text-muted">
+          <p className="text-sm text-foreground">
             Use this percentage to estimate revenue lost to undetected returns/RTO. Leave the
             field empty to disable the manual adjustment.
           </p>
@@ -109,7 +109,7 @@ export default function ReturnRateSettings() {
                         value={rateInput}
                                     onChange={(event) => { const value = event.currentTarget.value; setRateInput(sanitizePercentage(value))}}
           />
-          <span className="text-xs text-muted">
+          <span className="text-xs text-foreground">
             Leave empty and save to clear the manual override.
           </span>
         </div>

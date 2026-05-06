@@ -83,12 +83,6 @@ export const footerNavigation = {
       activeIcon: "solar:widget-2-bold",
     },
     {
-      name: "API Docs",
-      href: "/docs/api",
-      icon: "solar:code-square-linear",
-      activeIcon: "solar:code-square-bold",
-    },
-    {
       name: "Pricing",
       href: "#pricing",
       icon: "solar:tag-price-linear",
@@ -189,12 +183,6 @@ export const footerNavigation = {
       href: "/blog",
       icon: "solar:document-linear",
       activeIcon: "solar:document-bold",
-    },
-    {
-      name: "Press Kit",
-      href: "/press",
-      icon: "solar:bag-music-linear",
-      activeIcon: "solar:bag-music-bold",
     },
     {
       name: "Contact",

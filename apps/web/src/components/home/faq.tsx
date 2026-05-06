@@ -40,10 +40,10 @@ const Faq = () => {
   return (
     <section
       id="faq"
-      className={`relative pt-12 sm:pt-16 lg:pt-20 2xl:pt-24 pb-12 sm:pb-16 lg:pb-20 2xl:pb-24 ${designSystem.background.gradient} w-full scroll-mt-24`}
+      className={`relative pt-16 sm:pt-20 lg:pt-24 2xl:pt-28 pb-16 sm:pb-20 lg:pb-24 2xl:pb-28 ${designSystem.background.gradient} w-full scroll-mt-24`}
     >
       <div className={`${designSystem.spacing.container} mx-auto max-w-7xl`}>
-        <div className="text-center mb-12">
+        <div className="text-center mb-16">
           <div className={designSystem.typography.sectionChip}>
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               FAQ
@@ -54,32 +54,36 @@ const Faq = () => {
             We&apos;re here to help you get the most out of Meyoo.
           </p>
         </div>
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="flex flex-col gap-6">
-            <h3 className="text-2xl font-semibold tracking-tight">
-              Need personalized help?
-            </h3>
-            <p className="text-base text-muted-foreground">
-              Drop a note to our
-              <a
-                href="mailto:hey@meyoo.io"
-                className="mx-1 whitespace-nowrap underline text-accent hover:text-accent/80 transition-colors"
-              >
-                support team
+        <div className="grid gap-10 md:grid-cols-2 lg:gap-14">
+          <div className="flex flex-col justify-center gap-4">
+              <h3 className="text-2xl font-medium tracking-tight">
+                Need personalized help?
+              </h3>
+              <p className="text-base leading-relaxed text-muted">
+                Drop a note to our
+                <a
+                  href="mailto:hey@meyoo.io"
+                  className="mx-1 whitespace-nowrap underline text-accent hover:text-accent/80 transition-colors"
+                >
+                  support team
+                </a>
+                and we&apos;ll point you in the right direction.
+              </p>
+              <a href="mailto:hey@meyoo.io" className="w-full sm:w-fit">
+                <Button variant="primary" size="lg" className="w-full sm:w-fit">
+                  Email hey@meyoo.io
+                </Button>
               </a>
-              and we&apos;ll point you in the right direction.
-            </p>
-            <a href="mailto:hey@meyoo.io" className="w-full sm:w-fit">
-              <Button variant="primary" size="lg" className="w-full sm:w-fit">
-                Email hey@meyoo.io
-              </Button>
-            </a>
           </div>
           <Accordion hideSeparator className="w-full">
             {faqs.map((faq) => (
-              <Accordion.Item key={faq.question} id={faq.question} className="border-none">
+              <Accordion.Item
+                key={faq.question}
+                id={faq.question}
+                className="border-none"
+              >
                 <Accordion.Heading>
-                  <Accordion.Trigger className="text-lg sm:text-xl">
+                  <Accordion.Trigger className="py-4 text-lg font-medium sm:text-xl">
                     {faq.question}
                     <Accordion.Indicator>
                       <Icon icon="solar:alt-arrow-down-outline" />
@@ -87,8 +91,8 @@ const Faq = () => {
                   </Accordion.Trigger>
                 </Accordion.Heading>
                 <Accordion.Panel>
-                  <Accordion.Body>
-                    <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  <Accordion.Body className="px-5 pb-5 pt-3">
+                    <p className="text-base leading-relaxed text-muted sm:text-lg">
                       {faq.answer}
                     </p>
                   </Accordion.Body>

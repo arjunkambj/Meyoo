@@ -66,7 +66,7 @@ export function ItemSelector({
                     </span>
                   </div>
                   {item.description && (
-                    <span className="text-xs text-muted ml-6">
+                    <span className="text-xs text-foreground ml-6">
                       {item.description}
                     </span>
                   )}

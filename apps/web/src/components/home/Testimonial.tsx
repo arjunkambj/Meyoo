@@ -47,7 +47,7 @@ const testimonials = [
 const Testimonial = () => {
   return (
     <section
-      className={`relative flex w-full flex-col items-center justify-center ${designSystem.spacing.section} ${designSystem.background.gradient}`}
+      className={`relative flex w-full flex-col items-center justify-center py-16 sm:py-20 lg:py-24 ${designSystem.background.gradient}`}
     >
       <div className={designSystem.spacing.container}>
         <div className="text-center">
@@ -61,25 +61,24 @@ const Testimonial = () => {
         <p className={designSystem.typography.sectionSubtitle}>Loved by operators and teams.</p>
       </div>
       <div
-        className={`relative mx-auto mt-16 grid w-full max-w-7xl items-stretch gap-8 px-4 sm:px-6 lg:px-8 md:grid-cols-2 lg:grid-cols-3`}
+        className={`relative mx-auto mt-16 grid w-full max-w-7xl items-stretch gap-5 px-4 sm:px-6 lg:px-8 md:grid-cols-2 lg:grid-cols-3`}
       >
         {testimonials.map((testimonial) => (
           <article
             key={testimonial.id}
-            className={`${designSystem.card.base} group relative flex h-full min-h-[22rem] flex-col rounded-3xl p-1.5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/20`}
+            className="group relative flex h-full min-h-[22rem] flex-col rounded-[2rem] bg-surface px-6 py-5 transition-all duration-300 hover:-translate-y-1 sm:px-7 sm:py-6"
           >
-            <div className="relative flex h-full flex-col rounded-[20px] px-6 py-5 sm:px-7 sm:py-6">
               <div className="mb-4">
                 <div className="inline-flex text-accent">
                   <Icon icon="ri:double-quotes-l" width={40} />
                 </div>
               </div>
 
-              <h3 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+              <h3 className="text-xl font-medium leading-tight tracking-tight text-foreground">
                 {testimonial.title}
               </h3>
 
-              <p className="mt-3 flex-1 text-sm leading-7 text-muted-foreground">
+              <p className="mt-3 flex-1 text-sm leading-7 text-muted">
                 {testimonial.description}
               </p>
 
@@ -92,15 +91,14 @@ const Testimonial = () => {
                   <Avatar.Fallback>{testimonial.user.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
                 </Avatar>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">
+                  <p className="truncate text-sm font-medium">
                     {testimonial.user.name}
                   </p>
-                  <p className="truncate text-xs text-muted-foreground">
+                  <p className="truncate text-xs text-muted">
                     {testimonial.user.location}
                   </p>
                 </div>
               </div>
-            </div>
           </article>
         ))}
       </div>

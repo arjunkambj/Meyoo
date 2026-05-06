@@ -24,6 +24,7 @@ export default function SignInPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const isAuthLoading = isEmailLoading || isVerifying || isGoogleLoading;
 
   const handleSendMagicLink = async (
     source: "initial" | "resend" = "initial",
@@ -109,15 +110,21 @@ export default function SignInPage() {
           }}
         >
           <Input
+            className="h-10 w-full"
+            isDisabled={isAuthLoading}
             placeholder="you@example.com"
             type="email"
+            variant="secondary"
             value={email}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setEmail(e.target.value)
             }
           />
 
-          <Button variant="primary"
+          <Button
+            variant="primary"
+            className="h-10 w-full"
+            isDisabled={isGoogleLoading || isVerifying}
             isPending={isEmailLoading}
             type="submit"
           >
@@ -146,16 +153,20 @@ export default function SignInPage() {
                 ? `Resend available in ${resendCooldown}s`
                 : "Didn't get the code?"}
             </p>
-            <button
-              className="text-muted transition-colors hover:text-foreground disabled:opacity-50"
-              disabled={isEmailLoading || resendCooldown > 0}
+            <Button
+              className="h-8 px-2 text-muted hover:text-foreground"
+              isDisabled={isGoogleLoading || isVerifying || resendCooldown > 0}
+              isPending={isEmailLoading}
+              size="sm"
               type="button"
-              onClick={() => void handleSendMagicLink("resend")}
+              variant="tertiary"
+              onPress={() => void handleSendMagicLink("resend")}
             >
               {isEmailLoading ? "Sending..." : "Resend code"}
-            </button>
+            </Button>
             <button
               className="text-muted transition-colors hover:text-foreground"
+              disabled={isAuthLoading}
               type="button"
               onClick={() => {
                 setStep("email");
@@ -178,12 +189,16 @@ export default function SignInPage() {
 
       <Button
         isPending={isGoogleLoading}
-       
-        variant="ghost"
+        isDisabled={isEmailLoading || isVerifying}
+        className="h-10 w-full"
+        variant="tertiary"
         onPress={async () => {
-          setIsGoogleLoading(true);
-          await app.signInWithOAuth("google");
-          setIsGoogleLoading(false);
+          try {
+            setIsGoogleLoading(true);
+            await app.signInWithOAuth("google");
+          } finally {
+            setIsGoogleLoading(false);
+          }
         }}
       >
         {!isGoogleLoading && <Icon icon="logos:google-icon" width={18} />}

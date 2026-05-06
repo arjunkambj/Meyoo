@@ -80,10 +80,10 @@ const openPositions = [
 
 export default function CareersPage() {
   return (
-    <div className="min-h-screen bg-background pt-28">
+    <div className="min-h-screen bg-background">
       <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
+      <section className="relative px-4 py-10 sm:py-12 lg:py-14">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-4 py-2 mb-6">
             <Icon
@@ -91,12 +91,12 @@ export default function CareersPage() {
               icon="solar:case-round-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-muted">
+            <span className="text-sm font-medium text-muted">
               Careers
             </span>
           </div>
-          <h1 className="text-5xl font-bold mb-4">Join Our Mission</h1>
-          <p className="text-xl text-muted max-w-2xl mx-auto">
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Join Our Mission</h1>
+          <p className="text-base text-muted sm:text-lg max-w-2xl mx-auto">
             Help us empower e-commerce businesses with profit intelligence.
             We&apos;re building the future of financial analytics for online
             merchants.
@@ -105,22 +105,22 @@ export default function CareersPage() {
       </section>
 
       {/* Why Join Us */}
-      <section className="py-12 px-4">
+      <section className="px-4 py-8 sm:py-10">
         <div className="max-w-6xl mx-auto">
           {/* Open Positions */}
-          <div className="mb-16">
+          <div className="mb-10">
             <div className="space-y-6">
               {openPositions.map((position) => (
                 <Card
                   key={position.id}
-                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface rounded-[2rem] shadow-none transition-transform hover:-translate-y-0.5"
                 >
                   <Card.Content className="p-6 md:p-8">
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-4">
                           <div>
-                            <h3 className="text-xl font-bold mb-3">
+                            <h3 className="text-xl font-medium mb-3">
                               {position.title}
                             </h3>
                             <div className="flex flex-wrap gap-2 mb-5">
@@ -167,7 +167,7 @@ export default function CareersPage() {
 
                         <div className="space-y-4">
                           <div>
-                            <h4 className="font-semibold mb-2">
+                            <h4 className="font-medium mb-2">
                               Requirements:
                             </h4>
                             <ul className="space-y-1.5">
@@ -187,7 +187,7 @@ export default function CareersPage() {
                           </div>
 
                           <div>
-                            <h4 className="font-semibold mb-2">
+                            <h4 className="font-medium mb-2">
                               Nice to Have:
                             </h4>
                             <ul className="space-y-1.5">
@@ -223,8 +223,8 @@ export default function CareersPage() {
           <Separator className="my-16" />
 
           {/* Application Process */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold mb-10 text-center">
+          <div className="mb-10">
+            <h2 className="text-3xl font-medium mb-10 text-center">
               Our Hiring Process
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -258,7 +258,7 @@ export default function CareersPage() {
                   <div className="w-16 h-16 rounded-full bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary flex items-center justify-center mx-auto mb-3">
                     <Icon className="w-8 h-8 text-accent" icon={item.icon} />
                   </div>
-                  <h3 className="font-semibold mb-1.5">{item.title}</h3>
+                  <h3 className="font-medium mb-1.5">{item.title}</h3>
                   <p className="text-sm text-muted">{item.description}</p>
                 </div>
               ))}
@@ -266,9 +266,9 @@ export default function CareersPage() {
           </div>
 
           {/* CTA */}
-          <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
+          <Card className="bg-surface rounded-[2rem] shadow-none">
             <Card.Content className="p-6 md:p-8 text-center">
-              <h2 className="text-2xl font-bold mb-4">
+              <h2 className="text-2xl font-medium mb-4">
                 Don&apos;t See Your Role?
               </h2>
               <p className="text-muted mb-6 max-w-2xl mx-auto">

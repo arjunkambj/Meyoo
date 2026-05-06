@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, Separator, Switch } from "@heroui/react";
+import { Button, Card, Switch } from "@heroui/react";
 import React, { useMemo, useState } from "react";
 
 import { Icon } from "@iconify/react";
@@ -62,12 +62,12 @@ const Pricing = () => {
   return (
     <section
       id="pricing"
-      className={`relative ${designSystem.spacing.section} ${designSystem.background.gradient} w-full`}
+      className={`relative py-16 sm:py-20 lg:py-24 ${designSystem.background.gradient} w-full`}
     >
       <div
-        className={`${designSystem.spacing.container} mx-auto max-w-7xl flex flex-col gap-8 sm:gap-10`}
+        className={`${designSystem.spacing.container} mx-auto max-w-7xl flex flex-col gap-4 sm:gap-5`}
       >
-        <div className="flex flex-col items-center text-center">
+        <div className="mb-8 flex flex-col items-center text-center">
           <div className={designSystem.typography.sectionChip}>
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Plans
@@ -90,6 +90,7 @@ const Pricing = () => {
             Monthly
           </span>
           <Switch
+            aria-label="Toggle yearly billing"
             isSelected={billingCycle === FrequencyEnum.Yearly}
             onChange={(isSelected) => {
               setBillingCycle(
@@ -97,14 +98,18 @@ const Pricing = () => {
               );
             }}
             size="lg"
-          />
+          >
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+          </Switch>
           <div className="flex items-center gap-2">
             <span
               className={`font-medium transition-colors ${billingCycle === FrequencyEnum.Yearly ? "text-foreground" : "text-muted-foreground"}`}
             >
               Yearly
             </span>
-            <span className="text-xs font-semibold text-success bg-success/10 px-2 py-0.5 rounded-full">
+            <span className="rounded-md bg-surface-secondary px-2 py-0.5 text-xs font-medium text-success">
               Save 20%
             </span>
           </div>
@@ -112,19 +117,19 @@ const Pricing = () => {
 
         {freeTier ? (
           <Card
-            className={`mx-auto w-full max-w-3xl ${designSystem.card.base} rounded-3xl p-1.5 shadow-none`}
+            className="mx-auto w-full max-w-3xl rounded-3xl bg-surface-secondary p-1.5 shadow-none"
           >
-            <Card.Content className="flex flex-col gap-2 rounded-[20px] bg-background px-6 py-3 md:flex-row md:items-center md:justify-between">
+            <Card.Content className="flex flex-col gap-2 rounded-2xl bg-surface px-6 py-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-2.5">
                 <Icon
                   icon="solar:bolt-bold"
                   className="size-10 shrink-0 text-accent"
                 />
                 <div className="space-y-0.5">
-                  <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                  <h3 className="text-lg font-medium tracking-tight text-foreground">
                     Start free with your first 300 orders
                   </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted">
                     {freeTier.description}
                   </p>
                 </div>
@@ -145,7 +150,7 @@ const Pricing = () => {
           </Card>
         ) : null}
 
-        <div className="grid items-stretch gap-6 md:grid-cols-3">
+        <div className="grid items-stretch gap-5 md:grid-cols-3">
           {paidTiers.map((tier) => {
             const price = getTierPrice(tier, billingCycle);
             const periodCopy =
@@ -156,63 +161,67 @@ const Pricing = () => {
             return (
               <Card
                 key={tier.key}
-                className={`flex h-full w-full flex-col ${designSystem.card.base} rounded-3xl p-1.5 transition-all duration-300 shadow-none overflow-hidden`}
+                className="flex h-full w-full flex-col rounded-[2rem] bg-surface px-5 py-5 shadow-none transition-all duration-300"
               >
-                <Card.Header className="flex flex-col gap-3 py-5 px-6 bg-background rounded-[20px]">
-                  <div className="text-center space-y-1.5">
-                    <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                      {tier.title}
-                    </h3>
-                    <p className="text-xs leading-relaxed text-muted-foreground">
-                      {tier.description}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 py-2">
-                    <div className="flex items-end gap-1.5 text-4xl font-bold tracking-tight text-foreground">
-                      {shouldAnimate ? (
-                        <>
-                          <span className="text-2xl font-semibold text-muted-foreground">
-                            $
+                <Card.Content className="flex h-full flex-col p-0">
+                  <div className="flex flex-col gap-2">
+                    <div className="space-y-1.5">
+                      <h3 className="text-xl font-medium tracking-tight text-foreground">
+                        {tier.title}
+                      </h3>
+                    </div>
+                    <div>
+                      <div className="flex items-end gap-1.5 text-4xl font-bold tracking-tight text-foreground">
+                        {shouldAnimate ? (
+                          <>
+                            <span className="text-2xl font-medium text-muted">
+                              $
+                            </span>
+                            <NumberTicker
+                              value={currentPriceValue}
+                              decimalPlaces={0}
+                            />
+                          </>
+                        ) : (
+                          <span className="text-2xl font-medium text-muted">
+                            {price}
                           </span>
-                          <NumberTicker
-                            value={currentPriceValue}
-                            decimalPlaces={0}
-                          />
-                        </>
-                      ) : (
-                        <span className="text-2xl font-semibold text-muted-foreground">
-                          {price}
-                        </span>
-                      )}
+                        )}
+                      </div>
+                      <div className="mt-1 text-xs text-muted font-medium">
+                        {periodCopy}
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted">
+                        {tier.description}
+                      </p>
                     </div>
-                    <div className="text-xs text-muted-foreground font-medium">
-                      {periodCopy}
-                    </div>
+
+                    <Link href={tier.href as Route} className="w-full">
+                      <Button
+                        className="w-full h-10 font-semibold transition-all duration-200 active:scale-100"
+                        variant={tier.buttonVariant}
+                        size="md"
+                      >
+                        {tier.buttonText}
+                      </Button>
+                    </Link>
                   </div>
 
-                  <Link href={tier.href as Route} className="w-full">
-                    <Button
-                      className="w-full h-10 font-semibold transition-all duration-200 active:scale-100"
-                      variant={tier.buttonVariant}
-                      size="md"
-                    >
-                      {tier.buttonText}
-                    </Button>
-                  </Link>
-                </Card.Header>
-
-                <Separator className="my-0 bg-surface-secondary" />
-
-                <Card.Content className="flex flex-1 flex-col px-6 pb-8 pt-4">
-                  <div className="flex-1">
-                    <ul className="space-y-4">
+                  <div className="mt-6 flex-1">
+                    <p className="mb-3 text-xs font-medium uppercase tracking-[0.08em] text-muted">
+                      Included
+                    </p>
+                    <ul className="space-y-3">
                       {tier.features?.map((feature) => (
-                        <li key={feature} className="flex items-start gap-3">
+                        <li
+                          key={feature}
+                          className="flex items-start gap-2"
+                        >
                           <Icon
                             icon="hugeicons:tick-02"
-                            className="mt-0.5 size-5 shrink-0 text-accent"
+                            className="mt-0.5 size-4 shrink-0 text-foreground"
                           />
-                          <span className="text-sm leading-relaxed text-muted-foreground">
+                          <span className="text-sm leading-relaxed text-muted">
                             {feature}
                           </span>
                         </li>

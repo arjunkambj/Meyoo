@@ -309,7 +309,7 @@ export default function ProductCostTable() {
           ) : variants.length === 0 ? (
             <TableRow id="empty">
               <TableCell colSpan={6}>
-                <div className="p-4 text-center text-muted text-sm">
+                <div className="p-4 text-center text-foreground text-sm">
                   No variants found
                 </div>
               </TableCell>
@@ -382,7 +382,7 @@ export default function ProductCostTable() {
                     <div className="min-w-0 flex items-center gap-3 py-1">
                       <button
                         type="button"
-                        className="flex-none text-muted hover:text-muted transition"
+                        className="flex-none text-foreground hover:text-foreground transition"
                         onClick={() => {
                           setExpandedGroups((prev) => {
                             const next = new Set(prev);
@@ -408,15 +408,15 @@ export default function ProductCostTable() {
                           className="w-8 h-8 rounded object-cover flex-none"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-muted flex-none">
+                        <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-foreground flex-none">
                           <Icon icon="solar:box-outline" width={16} />
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-muted">
+                        <div className="truncate text-sm font-medium text-foreground">
                           {grp.productName}
                         </div>
-                        <div className="text-xs text-muted">
+                        <div className="text-xs text-foreground">
                           {count} variant{count === 1 ? "" : "s"}
                         </div>
                       </div>
@@ -554,10 +554,10 @@ export default function ProductCostTable() {
                     >
                       <TableCell>
                         <div className="min-w-0">
-                          <div className="truncate text-sm text-muted">
+                          <div className="truncate text-sm text-foreground">
                             {v.title || "Variant"}
                           </div>
-                          <div className="text-xs text-muted truncate">
+                          <div className="text-xs text-foreground truncate">
                             {v.sku || ""}
                           </div>
                         </div>

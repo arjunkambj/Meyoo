@@ -164,11 +164,11 @@ export function RequestIntegrationModal({
 
               <div className="bg-surface-secondary rounded-lg p-3 flex items-start gap-2">
                 <Icon
-                  className="text-muted mt-0.5"
+                  className="text-foreground mt-0.5"
                   icon="solar:info-circle-bold"
                   width={18}
                 />
-                <div className="text-xs text-muted">
+                <div className="text-xs text-foreground">
                   <p className="font-medium mb-1">What happens next?</p>
                   <ul className="space-y-0.5">
                     <li>• We&apos;ll review your request within 48 hours</li>

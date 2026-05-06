@@ -81,25 +81,34 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
+      <section className="relative px-4 py-10 sm:py-12 lg:py-14">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-bold mb-4">Privacy Policy</h1>
-          <p className="text-xl text-muted">
+          <div className="inline-flex items-center gap-2 rounded-xl bg-surface-secondary px-3 py-1.5 mb-3">
+            <Icon
+              className="text-foreground"
+              icon="solar:shield-check-bold-duotone"
+              width={16}
+            />
+            <span className="text-sm font-medium text-muted">
+              Legal
+            </span>
+          </div>
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Privacy Policy</h1>
+          <p className="text-base text-muted sm:text-lg">
             Last updated: {lastUpdated}
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-12 px-4">
+      <section className="px-4 py-8 sm:py-10">
         <div className="max-w-4xl mx-auto">
           {/* Table of Contents */}
-          <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-12">
+          <Card className="bg-surface rounded-[2rem] shadow-none mb-8">
             <Card.Content className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Table of Contents</h2>
+              <h2 className="text-xl font-medium mb-3">Table of Contents</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {sections.map((section) => (
                   <Link
@@ -116,10 +125,10 @@ export default function PrivacyPage() {
           </Card>
 
           {/* Privacy Policy Content */}
-          <div className="space-y-12">
+          <div className="space-y-8">
             {/* Overview */}
             <section id="overview">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:shield-check-bold-duotone"
@@ -127,7 +136,7 @@ export default function PrivacyPage() {
                 Overview
               </h2>
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <p className="text-muted mb-4">
+                <p className="text-muted mb-3">
                   Meyoo (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;),
                   operated by Pyro Labs Private Limited, is committed to
                   protecting your privacy. This Privacy Policy explains how we
@@ -135,7 +144,7 @@ export default function PrivacyPage() {
                   you use our profit intelligence platform for e-commerce
                   businesses.
                 </p>
-                <p className="text-muted mb-4">
+                <p className="text-muted mb-3">
                   By using Meyoo, you agree to the collection and use of
                   information in accordance with this policy. If you do not
                   agree with the terms of this privacy policy, please do not
@@ -148,7 +157,7 @@ export default function PrivacyPage() {
 
             {/* Information We Collect */}
             <section id="information-we-collect">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:database-bold-duotone"
@@ -156,9 +165,9 @@ export default function PrivacyPage() {
                 Information We Collect
               </h2>
               <div className="space-y-4">
-                <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Account Information</h3>
+                    <h3 className="font-medium mb-3">Account Information</h3>
                     <ul className="space-y-2 text-muted text-sm">
                       <li>• Name, email address, and password</li>
                       <li>• Business name and industry</li>
@@ -168,9 +177,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Business Data</h3>
+                    <h3 className="font-medium mb-3">Business Data</h3>
                     <ul className="space-y-2 text-muted text-sm">
                       <li>
                         • Shopify store data (products, orders, customers,
@@ -186,9 +195,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Usage Data</h3>
+                    <h3 className="font-medium mb-3">Usage Data</h3>
                     <ul className="space-y-2 text-muted text-sm">
                       <li>
                         • Log data (IP address, browser type, pages visited)
@@ -206,7 +215,7 @@ export default function PrivacyPage() {
 
             {/* How We Use Your Information */}
             <section id="how-we-use">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:settings-bold-duotone"
@@ -254,7 +263,7 @@ export default function PrivacyPage() {
 
             {/* Data Sharing & Disclosure */}
             <section id="data-sharing">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:share-bold-duotone"
@@ -268,9 +277,9 @@ export default function PrivacyPage() {
                   circumstances:
                 </p>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Service Providers</h3>
+                    <h3 className="font-medium mb-3">Service Providers</h3>
                     <p className="text-sm">
                       We share data with trusted third-party service providers
                       who assist us in operating our platform, including:
@@ -284,9 +293,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Legal Requirements</h3>
+                    <h3 className="font-medium mb-3">Legal Requirements</h3>
                     <p className="text-sm">
                       We may disclose information if required by law, court
                       order, or government regulation, or if we believe
@@ -296,9 +305,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Business Transfers</h3>
+                    <h3 className="font-medium mb-3">Business Transfers</h3>
                     <p className="text-sm">
                       In the event of a merger, acquisition, or sale of assets,
                       your information may be transferred to the successor
@@ -313,7 +322,7 @@ export default function PrivacyPage() {
 
             {/* Third-Party Integrations */}
             <section id="third-party">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:link-bold-duotone"
@@ -327,9 +336,9 @@ export default function PrivacyPage() {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3">Shopify</h3>
+                      <h3 className="font-medium mb-3">Shopify</h3>
                       <p className="text-sm mb-2">We access:</p>
                       <ul className="space-y-1 text-sm ml-4">
                         <li>• Store information</li>
@@ -341,9 +350,9 @@ export default function PrivacyPage() {
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3">Meta (Facebook)</h3>
+                      <h3 className="font-medium mb-3">Meta (Facebook)</h3>
                       <p className="text-sm mb-2">We access:</p>
                       <ul className="space-y-1 text-sm ml-4">
                         <li>• Ad account information</li>
@@ -367,7 +376,7 @@ export default function PrivacyPage() {
 
             {/* Data Security */}
             <section id="data-security">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:lock-keyhole-bold-duotone"
@@ -381,9 +390,9 @@ export default function PrivacyPage() {
                 </p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3">
+                      <h3 className="font-medium mb-3">
                         Technical Safeguards
                       </h3>
                       <ul className="space-y-1 text-sm">
@@ -395,9 +404,9 @@ export default function PrivacyPage() {
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3">
+                      <h3 className="font-medium mb-3">
                         Operational Security
                       </h3>
                       <ul className="space-y-1 text-sm">
@@ -416,7 +425,7 @@ export default function PrivacyPage() {
 
             {/* Your Rights */}
             <section id="your-rights">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:user-check-bold-duotone"
@@ -430,9 +439,9 @@ export default function PrivacyPage() {
                 </p>
 
                 <div className="space-y-3 transition-transform">
-                  <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-4">
-                      <h3 className="font-semibold mb-2">
+                      <h3 className="font-medium mb-2">
                         Access & Portability
                       </h3>
                       <p className="text-sm">
@@ -442,18 +451,18 @@ export default function PrivacyPage() {
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-4">
-                      <h3 className="font-semibold mb-2">Correction</h3>
+                      <h3 className="font-medium mb-2">Correction</h3>
                       <p className="text-sm">
                         Update or correct inaccurate personal information.
                       </p>
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-4">
-                      <h3 className="font-semibold mb-2">Deletion</h3>
+                      <h3 className="font-medium mb-2">Deletion</h3>
                       <p className="text-sm">
                         Request deletion of your personal data, subject to legal
                         retention requirements.
@@ -461,18 +470,18 @@ export default function PrivacyPage() {
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-4">
-                      <h3 className="font-semibold mb-2">Restriction</h3>
+                      <h3 className="font-medium mb-2">Restriction</h3>
                       <p className="text-sm">
                         Limit how we process your personal information.
                       </p>
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-4">
-                      <h3 className="font-semibold mb-2">Objection</h3>
+                      <h3 className="font-medium mb-2">Objection</h3>
                       <p className="text-sm">
                         Object to certain processing activities, including
                         marketing communications.
@@ -487,7 +496,7 @@ export default function PrivacyPage() {
 
             {/* Shopify App Compliance */}
             <section id="shopify-compliance">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:shop-bold-duotone"
@@ -500,9 +509,9 @@ export default function PrivacyPage() {
                   and Terms of Use:
                 </p>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Data Usage Limitations
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -523,9 +532,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Mandatory Webhooks</h3>
+                    <h3 className="font-medium mb-3">Mandatory Webhooks</h3>
                     <p className="text-sm mb-2">
                       We support Shopify&apos;s mandatory GDPR webhooks:
                     </p>
@@ -543,7 +552,7 @@ export default function PrivacyPage() {
 
             {/* Meta Platform Compliance */}
             <section id="meta-compliance">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="logos:meta-icon"
@@ -556,9 +565,9 @@ export default function PrivacyPage() {
                   and Marketing API requirements:
                 </p>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Facebook Marketing API Compliance
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -585,9 +594,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Instagram Data Handling
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -611,9 +620,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Prohibited Uses</h3>
+                    <h3 className="font-medium mb-3">Prohibited Uses</h3>
                     <ul className="space-y-2 text-sm">
                       <li>
                         • We do not sell or transfer Meta data to third
@@ -634,9 +643,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Policy Violation Handling
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -666,7 +675,7 @@ export default function PrivacyPage() {
 
             {/* GDPR & CCPA Compliance */}
             <section id="gdpr-ccpa">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:document-text-bold-duotone"
@@ -674,9 +683,9 @@ export default function PrivacyPage() {
                 GDPR & CCPA Compliance
               </h2>
               <div className="space-y-4">
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       GDPR (European Users)
                     </h3>
                     <ul className="space-y-2 text-sm text-muted">
@@ -703,9 +712,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       CCPA (California Residents)
                     </h3>
                     <ul className="space-y-2 text-sm text-muted">
@@ -735,7 +744,7 @@ export default function PrivacyPage() {
 
             {/* Google Ads API Compliance */}
             <section id="google-ads-compliance">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:verified-check-bold-duotone"
@@ -749,9 +758,9 @@ export default function PrivacyPage() {
                   requirements:
                 </p>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Google Ads API Data Usage
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -778,9 +787,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Customer Data Upload Policies
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -808,9 +817,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Data Retention & Deletion
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -834,9 +843,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Policy Exemptions & Violations
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -866,7 +875,7 @@ export default function PrivacyPage() {
 
             {/* Shopify Partner Program Compliance */}
             <section id="shopify-compliance-enhanced">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:shop-bold-duotone"
@@ -879,9 +888,9 @@ export default function PrivacyPage() {
                   policies, and merchant data protection standards:
                 </p>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Merchant Data Protection
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -908,9 +917,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       App Review & Audit Procedures
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -938,9 +947,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Webhook & API Compliance
                     </h3>
                     <ul className="space-y-2 text-sm">
@@ -970,7 +979,7 @@ export default function PrivacyPage() {
 
             {/* Cookies & Tracking */}
             <section id="cookies">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:cookie-bold-duotone"
@@ -981,9 +990,9 @@ export default function PrivacyPage() {
                 <p>We use cookies and similar technologies to:</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3">Essential Cookies</h3>
+                      <h3 className="font-medium mb-3">Essential Cookies</h3>
                       <ul className="space-y-1 text-sm">
                         <li>• Authentication and security</li>
                         <li>• User preferences</li>
@@ -992,9 +1001,9 @@ export default function PrivacyPage() {
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3">Analytics Cookies</h3>
+                      <h3 className="font-medium mb-3">Analytics Cookies</h3>
                       <ul className="space-y-1 text-sm">
                         <li>• Usage patterns (anonymized)</li>
                         <li>• Performance monitoring</li>
@@ -1015,7 +1024,7 @@ export default function PrivacyPage() {
 
             {/* Contact Information */}
             <section id="contact">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:phone-bold-duotone"
@@ -1023,9 +1032,9 @@ export default function PrivacyPage() {
                 Contact Information
               </h2>
               <div className="space-y-4">
-                <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <p className="text-muted mb-4">
+                    <p className="text-muted mb-3">
                       For privacy-related questions, requests, or complaints,
                       please contact us:
                     </p>
@@ -1063,9 +1072,9 @@ export default function PrivacyPage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <h3 className="font-medium mb-2 flex items-center gap-2">
                       <Icon
                         className="w-5 h-5 text-warning"
                         icon="solar:info-circle-bold-duotone"

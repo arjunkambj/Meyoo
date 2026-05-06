@@ -60,7 +60,7 @@ const featureImageScale = (index: number) =>
 const Feature = () => {
   return (
     <section
-      className={`relative flex w-full items-center justify-center overflow-hidden ${designSystem.spacing.section} ${designSystem.background.gradient}`}
+      className={`relative flex w-full items-center justify-center overflow-hidden py-16 sm:py-20 lg:py-24 ${designSystem.background.gradient}`}
     >
       <div
         className={`${designSystem.spacing.container} flex w-full flex-col items-center justify-center`}
@@ -77,29 +77,31 @@ const Feature = () => {
           Powerful features designed specifically for D2C brands. Track every metric that matters and make data-driven decisions with confidence.
         </p>
 
-        <div className="mx-auto mt-16 grid w-full max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-6">
+        <div className="mx-auto mt-16 grid w-full max-w-7xl grid-cols-1 gap-5 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-6">
           {featureData.map((item, index) => (
             <article
               key={item.id}
-              className={`${designSystem.card.base} group relative flex h-full flex-col overflow-hidden rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02] ${featureCardSpan(index)}`}
+              className={`group relative flex h-full flex-col rounded-[2rem] bg-surface-secondary p-1.5 transition-all duration-300 hover:scale-[1.02] ${featureCardSpan(index)}`}
             >
-              <div className={`relative ${featureImageArea(index)} overflow-hidden rounded-[20px] bg-gradient-to-br from-accent/10 via-accent/5 to-transparent`}>
-                <Image
-                  src={item.image}
-                  alt=""
-                  fill
-                  sizes={index < 2 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
-                  className={`object-cover ${featureImageScale(index)}`}
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-              </div>
-              <div className="mt-5 w-full flex-1 p-4">
-                <h3 className="mb-3 text-xl font-semibold tracking-tight leading-tight">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {item.description}
-                </p>
+              <div className="flex h-full flex-col rounded-[2rem] bg-surface p-1.5">
+                <div className={`relative ${featureImageArea(index)} overflow-hidden rounded-[2rem] bg-gradient-to-br from-accent/5 via-accent/[0.025] to-transparent`}>
+                  <Image
+                    src={item.image}
+                    alt=""
+                    fill
+                    sizes={index < 2 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
+                    className={`object-cover ${featureImageScale(index)}`}
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
+                </div>
+                <div className="mt-5 w-full flex-1 p-4">
+                  <h3 className="mb-3 text-xl font-medium tracking-tight leading-tight">
+                    {item.title}
+                  </h3>
+                  <p className="text-sm text-muted leading-relaxed">
+                    {item.description}
+                  </p>
+                </div>
               </div>
             </article>
           ))}

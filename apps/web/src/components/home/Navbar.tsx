@@ -83,7 +83,7 @@ export default function CenteredNavbar() {
               onPress={() => router.push("/sign-in")}
             >
               Get started
-              <Icon className="ml-2" icon="mdi:arrow-right" />
+              <Icon className="ml-1" icon="solar:alt-arrow-right-linear" />
             </Button>
           </div>
 
@@ -154,7 +154,10 @@ export default function CenteredNavbar() {
                               }}
                             >
                               Start 28-day trial
-                              <Icon className="ml-2" icon="mdi:arrow-right" />
+                              <Icon
+                                className="ml-1"
+                                icon="solar:alt-arrow-right-linear"
+                              />
                             </Button>
                           </div>
                         </div>

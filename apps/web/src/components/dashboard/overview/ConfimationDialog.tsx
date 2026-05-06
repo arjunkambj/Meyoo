@@ -31,7 +31,7 @@ export function ConfirmationDialog({
               <>
                 <Modal.Header className="flex flex-col gap-1">{title}</Modal.Header>
                 <Modal.Body className="bg-surface-secondary gap-6">
-                  <p className="text-muted">{description}</p>
+                  <p className="text-foreground">{description}</p>
                 </Modal.Body>
                 <Modal.Footer>
                   <Button variant="tertiary" onPress={close}>

@@ -71,35 +71,34 @@ const sections = [
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
+      <section className="relative px-4 py-10 sm:py-12 lg:py-14">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2.5 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-5 py-2.5 mb-6">
+          <div className="inline-flex items-center gap-2 rounded-xl bg-surface-secondary px-3 py-1.5 mb-3">
             <Icon
-              className="text-accent"
+              className="text-foreground"
               icon="solar:document-text-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-muted">
+            <span className="text-sm font-medium text-muted">
               Legal Agreement
             </span>
           </div>
-          <h1 className="text-5xl font-bold mb-4">Terms of Service</h1>
-          <p className="text-xl text-muted">
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Terms of Service</h1>
+          <p className="text-base text-muted sm:text-lg">
             Last updated: {lastUpdated}
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-12 px-4">
+      <section className="px-4 py-8 sm:py-10">
         <div className="max-w-4xl mx-auto">
           {/* Table of Contents */}
-          <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-12">
+          <Card className="bg-surface rounded-[2rem] shadow-none mb-8">
             <Card.Content className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Table of Contents</h2>
+              <h2 className="text-xl font-medium mb-3">Table of Contents</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {sections.map((section) => (
                   <Link
@@ -116,10 +115,10 @@ export default function TermsOfServicePage() {
           </Card>
 
           {/* Terms Content */}
-          <div className="space-y-12">
+          <div className="space-y-8">
             {/* Acceptance of Terms */}
             <section id="acceptance">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:document-text-bold-duotone"
@@ -139,9 +138,9 @@ export default function TermsOfServicePage() {
                   access or use the Service, including but not limited to
                   Shopify merchants who install our application.
                 </p>
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-2">Important Note</h3>
+                    <h3 className="font-medium mb-2">Important Note</h3>
                     <p className="text-sm text-muted">
                       By using Meyoo, you also agree to comply with
                       Shopify&apos;s Terms of Service, Meta&apos;s Terms of
@@ -158,7 +157,7 @@ export default function TermsOfServicePage() {
 
             {/* Service Description */}
             <section id="description">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:info-square-bold-duotone"
@@ -216,7 +215,7 @@ export default function TermsOfServicePage() {
 
             {/* Account Terms */}
             <section id="account">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:user-circle-bold-duotone"
@@ -224,9 +223,9 @@ export default function TermsOfServicePage() {
                 Account Terms
               </h2>
               <div className="space-y-4">
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Account Registration</h3>
+                    <h3 className="font-medium mb-3">Account Registration</h3>
                     <ul className="space-y-2 text-sm text-muted">
                       <li>
                         • You must provide accurate and complete information
@@ -247,9 +246,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Account Responsibilities
                     </h3>
                     <p className="text-muted text-sm mb-3">
@@ -275,7 +274,7 @@ export default function TermsOfServicePage() {
 
             {/* Payment & Billing */}
             <section id="payment">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:wallet-bold-duotone"
@@ -283,9 +282,9 @@ export default function TermsOfServicePage() {
                 Payment & Billing
               </h2>
               <div className="space-y-4">
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Subscription Terms</h3>
+                    <h3 className="font-medium mb-3">Subscription Terms</h3>
                     <ul className="space-y-2 text-sm text-muted">
                       <li>• 28-day free trial for new users</li>
                       <li>• Monthly or annual subscription plans available</li>
@@ -296,9 +295,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Billing via Shopify</h3>
+                    <h3 className="font-medium mb-3">Billing via Shopify</h3>
                     <p className="text-muted text-sm mb-3">
                       For Shopify App Store users:
                     </p>
@@ -313,9 +312,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <h3 className="font-medium mb-2 flex items-center gap-2">
                       <Icon
                         className="w-5 h-5 text-warning"
                         icon="solar:info-circle-bold-duotone"
@@ -336,7 +335,7 @@ export default function TermsOfServicePage() {
 
             {/* Acceptable Use */}
             <section id="usage">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:shield-check-bold-duotone"
@@ -346,9 +345,9 @@ export default function TermsOfServicePage() {
               <div className="space-y-4 text-muted">
                 <p>You agree not to use the Service to:</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3 text-danger">
+                      <h3 className="font-medium mb-3 text-danger">
                         Prohibited Activities
                       </h3>
                       <ul className="space-y-2 text-sm text-muted">
@@ -362,9 +361,9 @@ export default function TermsOfServicePage() {
                     </Card.Content>
                   </Card>
 
-                  <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                  <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-semibold mb-3 text-danger">
+                      <h3 className="font-medium mb-3 text-danger">
                         Data Misuse
                       </h3>
                       <ul className="space-y-2 text-sm text-muted">
@@ -385,7 +384,7 @@ export default function TermsOfServicePage() {
 
             {/* Third-Party Integrations */}
             <section id="integrations">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:link-bold-duotone"
@@ -397,7 +396,7 @@ export default function TermsOfServicePage() {
                   Meyoo integrates with third-party services. You acknowledge
                   and agree that:
                 </p>
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
                     <ul className="space-y-3 text-sm">
                       <li className="flex items-start gap-2">
@@ -462,7 +461,7 @@ export default function TermsOfServicePage() {
 
             {/* Platform API Compliance */}
             <section id="platform-api-compliance">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:verified-check-bold-duotone"
@@ -475,9 +474,9 @@ export default function TermsOfServicePage() {
                   to their respective API terms and policies:
                 </p>
 
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3 text-accent">
+                    <h3 className="font-medium mb-3 text-accent">
                       Shopify Partner Program Compliance
                     </h3>
                     <ul className="space-y-2 text-sm text-muted">
@@ -505,9 +504,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3 text-accent">
+                    <h3 className="font-medium mb-3 text-accent">
                       Meta Platform Terms Compliance
                     </h3>
                     <ul className="space-y-2 text-sm text-muted">
@@ -537,9 +536,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3 text-accent">
+                    <h3 className="font-medium mb-3 text-accent">
                       Google Ads API Terms Compliance
                     </h3>
                     <ul className="space-y-2 text-sm text-muted">
@@ -574,7 +573,7 @@ export default function TermsOfServicePage() {
 
             {/* Policy Violations & Exemptions */}
             <section id="policy-violations">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:shield-warning-bold-duotone"
@@ -588,9 +587,9 @@ export default function TermsOfServicePage() {
                   requirements:
                 </p>
 
-                <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <h3 className="font-medium mb-3 flex items-center gap-2">
                       <Icon
                         className="w-5 h-5 text-warning"
                         icon="solar:danger-triangle-bold-duotone"
@@ -618,9 +617,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Our Policy Violation Handling
                     </h3>
                     <ul className="space-y-2 text-sm text-muted">
@@ -654,7 +653,7 @@ export default function TermsOfServicePage() {
 
             {/* Intellectual Property */}
             <section id="intellectual-property">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:copyright-bold-duotone"
@@ -662,9 +661,9 @@ export default function TermsOfServicePage() {
                 Intellectual Property
               </h2>
               <div className="space-y-4">
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Our Property</h3>
+                    <h3 className="font-medium mb-3">Our Property</h3>
                     <p className="text-muted text-sm mb-3">
                       The Service, including all content, features, and
                       functionality, is owned by Pyro Labs Private Limited and
@@ -684,9 +683,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Your Content</h3>
+                    <h3 className="font-medium mb-3">Your Content</h3>
                     <p className="text-muted text-sm mb-3">
                       You retain ownership of data you upload to the Service. By
                       using Meyoo, you grant us:
@@ -711,16 +710,16 @@ export default function TermsOfServicePage() {
 
             {/* Privacy & Data */}
             <section id="privacy">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:lock-keyhole-bold-duotone"
                 />
                 Privacy & Data
               </h2>
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <p className="text-muted mb-4">
+                  <p className="text-muted mb-3">
                     Your use of our Service is also governed by our Privacy
                     Policy. Please review our Privacy Policy, which also governs
                     the Site and informs users of our data collection practices.
@@ -740,16 +739,16 @@ export default function TermsOfServicePage() {
 
             {/* Warranties & Disclaimers */}
             <section id="warranties">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:danger-triangle-bold-duotone"
                 />
                 Warranties & Disclaimers
               </h2>
-              <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3">
+                  <h3 className="font-medium mb-3">
                     Service Provided &quot;AS IS&quot;
                   </h3>
                   <p className="text-muted text-sm mb-3">
@@ -773,16 +772,16 @@ export default function TermsOfServicePage() {
 
             {/* Limitation of Liability */}
             <section id="liability">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:shield-warning-bold-duotone"
                 />
                 Limitation of Liability
               </h2>
-              <Card className="bg-danger dark:bg-danger/10 border border-danger dark:border-danger/20 rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <p className="text-muted font-semibold mb-3">
+                  <p className="text-muted font-medium mb-3">
                     TO THE MAXIMUM EXTENT PERMITTED BY LAW:
                   </p>
                   <ul className="space-y-3 text-sm text-muted">
@@ -809,7 +808,7 @@ export default function TermsOfServicePage() {
 
             {/* Termination */}
             <section id="termination">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:close-circle-bold-duotone"
@@ -817,9 +816,9 @@ export default function TermsOfServicePage() {
                 Termination
               </h2>
               <div className="space-y-4">
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Termination by You</h3>
+                    <h3 className="font-medium mb-3">Termination by You</h3>
                     <p className="text-muted text-sm">
                       You may terminate your account at any time by:
                     </p>
@@ -833,9 +832,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Termination by Us</h3>
+                    <h3 className="font-medium mb-3">Termination by Us</h3>
                     <p className="text-muted text-sm">
                       We may terminate or suspend your account immediately if:
                     </p>
@@ -848,9 +847,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">
+                    <h3 className="font-medium mb-3">
                       Effect of Termination
                     </h3>
                     <p className="text-muted text-sm">
@@ -875,7 +874,7 @@ export default function TermsOfServicePage() {
 
             {/* General Provisions */}
             <section id="general">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:document-bold-duotone"
@@ -883,9 +882,9 @@ export default function TermsOfServicePage() {
                 General Provisions
               </h2>
               <div className="space-y-4">
-                <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Governing Law</h3>
+                    <h3 className="font-medium mb-3">Governing Law</h3>
                     <p className="text-muted text-sm">
                       These Terms shall be governed by and construed in
                       accordance with the laws of India, without regard to its
@@ -896,9 +895,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Changes to Terms</h3>
+                    <h3 className="font-medium mb-3">Changes to Terms</h3>
                     <p className="text-muted text-sm">
                       We reserve the right to modify these Terms at any time. We
                       will notify users of any material changes via email or
@@ -908,9 +907,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Severability</h3>
+                    <h3 className="font-medium mb-3">Severability</h3>
                     <p className="text-muted text-sm">
                       If any provision of these Terms is held to be invalid or
                       unenforceable, the remaining provisions shall continue in
@@ -919,9 +918,9 @@ export default function TermsOfServicePage() {
                   </Card.Content>
                 </Card>
 
-                <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-semibold mb-3">Entire Agreement</h3>
+                    <h3 className="font-medium mb-3">Entire Agreement</h3>
                     <p className="text-muted text-sm">
                       These Terms, together with our Privacy Policy and any
                       other legal notices published by us on the Service,
@@ -936,16 +935,16 @@ export default function TermsOfServicePage() {
             <Separator />
 
             {/* Contact Information */}
-            <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
-              <Card.Content className="p-8">
-                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Card className="bg-surface rounded-[2rem] shadow-none">
+              <Card.Content className="p-6">
+                <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                   <Icon
                     className="w-6 h-6 text-accent"
                     icon="solar:phone-bold-duotone"
                   />
                   Contact Us
                 </h2>
-                <p className="text-muted mb-6">
+                <p className="text-muted mb-3">
                   If you have any questions about these Terms of Service, please
                   contact us:
                 </p>

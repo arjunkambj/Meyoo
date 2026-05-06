@@ -8,7 +8,7 @@ export default function ReportView() {
     <div className="flex flex-col space-y-6 pb-20">
       <div className="h-2" />
       <div className="h-full w-full">
-        <Card className="w-full px-4 py-3 bg-surface-secondary dark:bg-surface border border-surface-tertiary/50 rounded-2xl">
+        <Card className="w-full px-4 py-3 bg-surface-secondary border border-surface-tertiary/50 rounded-2xl">
           <Card.Content>
             <div className="space-y-4">
               <div className="flex items-center gap-3 mb-4">
@@ -17,20 +17,20 @@ export default function ReportView() {
                 </div>
                 <div>
                   <p className="text-md font-semibold">Coming Soon</p>
-                  <p className="text-sm text-muted">
+                  <p className="text-sm text-foreground">
                     Custom report builder in development
                   </p>
                 </div>
               </div>
-              <p className="text-muted">Report builder coming soon.</p>
-              <ul className="list-disc list-inside space-y-2 text-muted">
+              <p className="text-foreground">Report builder coming soon.</p>
+              <ul className="list-disc list-inside space-y-2 text-foreground">
                 <li>Custom reports</li>
                 <li>Scheduled delivery</li>
                 <li>Export to PDF, Excel, CSV</li>
                 <li>Team sharing</li>
               </ul>
               <div className="mt-6 p-4 bg-surface-secondary rounded-xl">
-                <p className="text-sm text-muted flex items-center gap-2">
+                <p className="text-sm text-foreground flex items-center gap-2">
                   <Icon icon="solar:info-circle-bold" width={16} />
                   Available Q4 2025.
                 </p>

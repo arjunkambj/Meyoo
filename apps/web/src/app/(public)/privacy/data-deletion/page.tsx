@@ -69,37 +69,36 @@ const deletionSteps = [
 
 export default function DataDeletionPage() {
   return (
-    <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
+      <section className="relative px-4 py-10 sm:py-12 lg:py-14">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2.5 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-5 py-2.5 mb-6">
+          <div className="inline-flex items-center gap-2 rounded-xl bg-surface-secondary px-3 py-1.5 mb-3">
             <Icon
-              className="text-danger"
+              className="text-foreground"
               icon="solar:trash-bin-trash-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-muted">
+            <span className="text-sm font-medium text-muted">
               Data Deletion
             </span>
           </div>
-          <h1 className="text-5xl font-bold mb-4">
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">
             Data Deletion Instructions
           </h1>
-          <p className="text-xl text-muted">
+          <p className="text-base text-muted sm:text-lg">
             Control your data. Delete it anytime.
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-12 px-4">
+      <section className="px-4 py-8 sm:py-10">
         <div className="max-w-4xl mx-auto">
           {/* Introduction */}
-          <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-12">
-            <Card.Content className="p-8">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Card className="bg-surface rounded-[2rem] shadow-none mb-8">
+            <Card.Content className="p-6">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:shield-check-bold-duotone"
@@ -122,22 +121,22 @@ export default function DataDeletionPage() {
           </Card>
 
           {/* What Data We Collect */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">What Data We Collect</h2>
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">What Data We Collect</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {dataWeCollect.map((category) => (
                 <Card
                   key={category.title}
-                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface rounded-[2rem] shadow-none transition-transform hover:-translate-y-0.5"
                 >
                   <Card.Content className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-3">
                       <Icon
                         className="w-6 h-6 text-accent"
                         icon={category.icon}
                       />
                     </div>
-                    <h3 className="font-semibold mb-3">{category.title}</h3>
+                    <h3 className="font-medium mb-3">{category.title}</h3>
                     <ul className="space-y-2">
                       {category.items.map((item) => (
                         <li
@@ -156,7 +155,7 @@ export default function DataDeletionPage() {
                 </Card>
               ))}
             </div>
-            <Card className="bg-success-50 dark:bg-success-100/10 border border-success-200 dark:border-success-200/20 rounded-2xl shadow-none mt-6">
+            <Card className="bg-surface rounded-[2rem] shadow-none mt-6">
               <Card.Content className="p-6">
                 <div className="flex gap-3">
                   <Icon
@@ -164,7 +163,7 @@ export default function DataDeletionPage() {
                     icon="solar:shield-user-bold-duotone"
                   />
                   <div>
-                    <h4 className="font-semibold mb-2">Privacy First</h4>
+                    <h4 className="font-medium mb-2">Privacy First</h4>
                     <p className="text-sm text-muted">
                       We never store personal customer information. All customer
                       data is aggregated and anonymized for analytics purposes
@@ -176,28 +175,28 @@ export default function DataDeletionPage() {
             </Card>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* How to Request Data Deletion */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">
               How to Request Data Deletion
             </h2>
-            <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none mb-8">
-              <Card.Content className="p-8">
-                <p className="text-muted mb-6">
+            <Card className="bg-surface rounded-[2rem] shadow-none mb-8">
+              <Card.Content className="p-6">
+                <p className="text-muted mb-3">
                   To request complete deletion of your data from Meyoo, follow
                   these simple steps:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {deletionSteps.map((step) => (
                     <div key={step.number} className="text-center">
-                      <div className="w-16 h-16 rounded-full bg-surface/80 dark:bg-surface/70 backdrop-blur-md border border-surface-tertiary flex items-center justify-center mx-auto mb-3">
-                        <span className="text-2xl font-bold text-accent">
+                      <div className="w-16 h-16 rounded-full bg-surface-secondary flex items-center justify-center mx-auto mb-3">
+                        <span className="text-2xl font-medium text-accent">
                           {step.number}
                         </span>
                       </div>
-                      <h3 className="font-semibold mb-1">{step.title}</h3>
+                      <h3 className="font-medium mb-1">{step.title}</h3>
                       <p className="text-sm text-muted">
                         {step.description}
                       </p>
@@ -208,16 +207,16 @@ export default function DataDeletionPage() {
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="solar:letter-bold-duotone"
                     />
                     Email Template
                   </h3>
-                  <div className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-lg p-4 font-mono text-sm">
+                  <div className="bg-surface-secondary rounded-xl p-4 font-mono text-sm">
                     <p className="text-muted">To: hey@meyoo.io</p>
                     <p className="text-muted">
                       Subject: Data Deletion Request
@@ -239,9 +238,9 @@ export default function DataDeletionPage() {
                 </Card.Content>
               </Card>
 
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="solar:clock-circle-bold-duotone"
@@ -291,19 +290,19 @@ export default function DataDeletionPage() {
             </div>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* What Gets Deleted */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">What Gets Deleted</h2>
-            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
-              <Card.Content className="p-8">
-                <p className="text-muted mb-6">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">What Gets Deleted</h2>
+            <Card className="bg-surface rounded-[2rem] shadow-none">
+              <Card.Content className="p-6">
+                <p className="text-muted mb-3">
                   When you request data deletion, we remove:
                 </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <h3 className="font-medium mb-3 flex items-center gap-2">
                       <Icon
                         className="w-5 h-5 text-danger"
                         icon="solar:trash-bin-trash-bold-duotone"
@@ -349,7 +348,7 @@ export default function DataDeletionPage() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <h3 className="font-medium mb-3 flex items-center gap-2">
                       <Icon
                         className="w-5 h-5 text-warning"
                         icon="solar:calendar-bold-duotone"
@@ -357,7 +356,7 @@ export default function DataDeletionPage() {
                       Retention Period
                     </h3>
                     <div className="space-y-4">
-                      <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none">
+                      <Card className="bg-surface rounded-[2rem] shadow-none">
                         <Card.Content className="p-4">
                           <p className="text-sm text-muted">
                             <strong>Backup retention:</strong> Data may remain
@@ -366,7 +365,7 @@ export default function DataDeletionPage() {
                           </p>
                         </Card.Content>
                       </Card>
-                      <Card className="bg-info-50 dark:bg-info-100/10 border border-info-200 dark:border-info-200/20 rounded-2xl shadow-none">
+                      <Card className="bg-surface rounded-[2rem] shadow-none">
                         <Card.Content className="p-4">
                           <p className="text-sm text-muted">
                             <strong>Immediate removal:</strong> Your data is
@@ -382,17 +381,17 @@ export default function DataDeletionPage() {
             </Card>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* Platform-Specific Data Deletion Procedures */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">
               Platform-Specific Data Deletion Procedures
             </h2>
             <div className="space-y-6">
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="solar:shop-bold-duotone"
@@ -427,9 +426,9 @@ export default function DataDeletionPage() {
                 </Card.Content>
               </Card>
 
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="logos:meta-icon"
@@ -463,9 +462,9 @@ export default function DataDeletionPage() {
                 </Card.Content>
               </Card>
 
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="solar:verified-check-bold-duotone"
@@ -502,15 +501,15 @@ export default function DataDeletionPage() {
             </div>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* Compliance */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Legal Compliance</h2>
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">Legal Compliance</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="tabler:brand-europa"
@@ -546,9 +545,9 @@ export default function DataDeletionPage() {
                 </Card.Content>
               </Card>
 
-              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="solar:document-text-bold-duotone"
@@ -587,18 +586,18 @@ export default function DataDeletionPage() {
           </div>
 
           {/* Contact Information */}
-          <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
-            <Card.Content className="p-8">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Card className="bg-surface rounded-[2rem] shadow-none">
+            <Card.Content className="p-6">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:phone-bold-duotone"
                 />
                 Contact Information
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3">Quick Contact</h3>
+                  <h3 className="font-medium mb-3">Quick Contact</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <Icon
@@ -632,7 +631,7 @@ export default function DataDeletionPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-3">Legal Entity</h3>
+                  <h3 className="font-medium mb-3">Legal Entity</h3>
                   <p className="text-muted">
                     Pyro Labs Private Limited
                     <br />

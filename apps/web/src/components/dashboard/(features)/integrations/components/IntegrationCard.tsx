@@ -36,7 +36,7 @@ export function IntegrationCard({
 }: IntegrationCardProps) {
   return (
     <Card
-      className="relative shadow-none overflow-hidden bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 transition-colors hover:border-accent/30"
+      className="relative shadow-none overflow-hidden bg-surface-secondary rounded-2xl border border-surface-tertiary/50 transition-colors hover:border-accent/30"
     >
       {/* Connection Status Indicator */}
       {isConnected && (
@@ -65,7 +65,7 @@ export function IntegrationCard({
                 {name}
               </h3>
             </div>
-            <p className="text-xs text-muted line-clamp-2 mt-1.5 leading-relaxed">
+            <p className="text-xs text-foreground line-clamp-2 mt-1.5 leading-relaxed">
               {description}
             </p>
           </div>

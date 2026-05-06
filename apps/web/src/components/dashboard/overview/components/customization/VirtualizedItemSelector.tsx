@@ -67,7 +67,7 @@ const ItemRow = React.memo(
               className={
                 isSelected
                   ? "text-accent-600 dark:text-accent-400"
-                  : item.iconColor || "text-muted"
+                  : item.iconColor || "text-foreground"
               }
               icon={item.icon}
               width={14}
@@ -76,7 +76,7 @@ const ItemRow = React.memo(
               className={`text-xs font-medium flex-1 truncate leading-tight ${
                 isSelected
                   ? "text-accent-700 dark:text-accent-400"
-                  : "text-muted"
+                  : "text-foreground"
               }`}
             >
               {item.label || item.name}
@@ -169,12 +169,12 @@ export function VirtualizedItemSelector({
                         icon={section.icon}
                         width={14}
                       />
-                      <span className="text-xs font-semibold text-muted">
+                      <span className="text-xs font-semibold text-foreground">
                         {section.label}
                       </span>
                     </div>
                     {section.count && (
-                      <span className="text-xs font-medium text-muted bg-surface-tertiary/50 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-medium text-foreground bg-surface-tertiary/50 px-2 py-0.5 rounded-full">
                         {section.count}
                       </span>
                     )}

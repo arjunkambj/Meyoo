@@ -70,35 +70,34 @@ const thirdPartyCookies = [
 
 export default function CookiesPage() {
   return (
-    <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
+      <section className="relative px-4 py-10 sm:py-12 lg:py-14">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2.5 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-5 py-2.5 mb-6">
+          <div className="inline-flex items-center gap-2 rounded-xl bg-surface-secondary px-3 py-1.5 mb-3">
             <Icon
-              className="text-accent"
+              className="text-foreground"
               icon="solar:cookie-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-muted">
+            <span className="text-sm font-medium text-muted">
               Cookie Policy
             </span>
           </div>
-          <h1 className="text-5xl font-bold mb-4">Cookie Policy</h1>
-          <p className="text-xl text-muted">
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Cookie Policy</h1>
+          <p className="text-base text-muted sm:text-lg">
             Last updated: {lastUpdated}
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section className="py-12 px-4">
+      <section className="px-4 py-8 sm:py-10">
         <div className="max-w-4xl mx-auto">
           {/* Introduction */}
-          <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-12">
-            <Card.Content className="p-8">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Card className="bg-surface rounded-[2rem] shadow-none mb-8">
+            <Card.Content className="p-6">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:info-circle-bold-duotone"
@@ -122,11 +121,11 @@ export default function CookiesPage() {
           </Card>
 
           {/* What Are Cookies */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">What Are Cookies?</h2>
-            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">What Are Cookies?</h2>
+            <Card className="bg-surface rounded-[2rem] shadow-none">
               <Card.Content className="p-6">
-                <p className="text-muted mb-4">
+                <p className="text-muted mb-3">
                   Cookies are small data files that are placed on your computer
                   or mobile device when you visit a website. Cookies are widely
                   used by website owners to make their websites work, or to work
@@ -144,16 +143,16 @@ export default function CookiesPage() {
             </Card>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* Types of Cookies */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Types of Cookies We Use</h2>
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">Types of Cookies We Use</h2>
             <div className="space-y-6">
               {cookieTypes.map((type) => (
                 <Card
                   key={type.title}
-                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface rounded-[2rem] shadow-none transition-transform hover:-translate-y-0.5"
                 >
                   <Card.Content className="p-6">
                     <div className="flex items-start gap-4">
@@ -165,7 +164,7 @@ export default function CookiesPage() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-semibold">
+                          <h3 className="text-lg font-medium">
                             {type.title}
                           </h3>
                           {type.canDisable ? (
@@ -181,7 +180,7 @@ export default function CookiesPage() {
                         <p className="text-muted mb-3">
                           {type.description}
                         </p>
-                        <div className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-lg p-4">
+                        <div className="bg-surface-secondary rounded-xl p-4">
                           <p className="text-sm font-medium mb-2">Examples:</p>
                           <ul className="space-y-1">
                             {type.examples.map((example) => (
@@ -206,14 +205,14 @@ export default function CookiesPage() {
             </div>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* Third-Party Cookies */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Third-Party Cookies</h2>
-            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-6">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">Third-Party Cookies</h2>
+            <Card className="bg-surface rounded-[2rem] shadow-none mb-3">
               <Card.Content className="p-6">
-                <p className="text-muted mb-6">
+                <p className="text-muted mb-3">
                   We use cookies from trusted third-party services to provide
                   core functionality and integrations. These cookies are
                   essential for connecting your e-commerce platforms and
@@ -223,13 +222,13 @@ export default function CookiesPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-surface-tertiary">
-                        <th className="text-left py-3 px-4 font-semibold">
+                        <th className="text-left py-3 px-4 font-medium">
                           Service
                         </th>
-                        <th className="text-left py-3 px-4 font-semibold">
+                        <th className="text-left py-3 px-4 font-medium">
                           Purpose
                         </th>
-                        <th className="text-left py-3 px-4 font-semibold">
+                        <th className="text-left py-3 px-4 font-medium">
                           Retention
                         </th>
                       </tr>
@@ -258,17 +257,17 @@ export default function CookiesPage() {
             </Card>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* Managing Cookies */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">
               Managing Your Cookie Preferences
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="solar:settings-bold-duotone"
@@ -288,9 +287,9 @@ export default function CookiesPage() {
                 </Card.Content>
               </Card>
 
-              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Icon
                       className="w-5 h-5 text-accent"
                       icon="solar:shield-check-bold-duotone"
@@ -310,7 +309,7 @@ export default function CookiesPage() {
               </Card>
             </div>
 
-            <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none mt-6">
+            <Card className="bg-surface rounded-[2rem] shadow-none mt-6">
               <Card.Content className="p-6">
                 <div className="flex gap-3">
                   <Icon
@@ -318,7 +317,7 @@ export default function CookiesPage() {
                     icon="solar:danger-triangle-bold"
                   />
                   <div>
-                    <h4 className="font-semibold mb-2">Important Note</h4>
+                    <h4 className="font-medium mb-2">Important Note</h4>
                     <p className="text-sm text-muted">
                       Disabling certain cookies may impact the functionality of
                       Meyoo. Essential cookies are required for core features
@@ -331,17 +330,17 @@ export default function CookiesPage() {
             </Card>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* Compliance */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">
               Compliance & Legal Basis
             </h2>
             <div className="space-y-6">
-              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3">
+                  <h3 className="font-medium mb-3">
                     GDPR Compliance (EU Users)
                   </h3>
                   <p className="text-muted text-sm mb-3">
@@ -362,9 +361,9 @@ export default function CookiesPage() {
                 </Card.Content>
               </Card>
 
-              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+              <Card className="bg-surface rounded-[2rem] shadow-none">
                 <Card.Content className="p-6">
-                  <h3 className="font-semibold mb-3">Platform Compliance</h3>
+                  <h3 className="font-medium mb-3">Platform Compliance</h3>
                   <p className="text-muted text-sm mb-3">
                     Our cookie usage complies with platform requirements:
                   </p>
@@ -387,14 +386,14 @@ export default function CookiesPage() {
             </div>
           </div>
 
-          <Separator className="my-12" />
+          <Separator className="my-8" />
 
           {/* Updates & Contact */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Updates to This Policy</h2>
-            <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none mb-6">
+          <div className="mb-8">
+            <h2 className="text-2xl font-medium mb-3">Updates to This Policy</h2>
+            <Card className="bg-surface rounded-[2rem] shadow-none mb-3">
               <Card.Content className="p-6">
-                <p className="text-muted mb-4">
+                <p className="text-muted mb-3">
                   We may update this Cookie Policy from time to time to reflect
                   changes in our practices or for operational, legal, or
                   regulatory reasons. When we make material changes, we will:
@@ -433,16 +432,16 @@ export default function CookiesPage() {
           </div>
 
           {/* Contact Information */}
-          <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
-            <Card.Content className="p-8">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <Card className="bg-surface rounded-[2rem] shadow-none">
+            <Card.Content className="p-6">
+              <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
                 <Icon
                   className="w-6 h-6 text-accent"
                   icon="solar:phone-bold-duotone"
                 />
                 Questions About Cookies?
               </h2>
-              <p className="text-muted mb-6">
+              <p className="text-muted mb-3">
                 If you have questions about our use of cookies or this Cookie
                 Policy, please contact our data protection team:
               </p>

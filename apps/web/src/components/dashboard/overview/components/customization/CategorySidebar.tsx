@@ -24,7 +24,7 @@ export const CategorySidebar = React.memo(function CategorySidebar({
 
   return (
     <div className="col-span-3 border-r pr-4 flex flex-col">
-      <h3 className="text-sm font-semibold mb-3 text-muted">
+      <h3 className="text-sm font-semibold mb-3 text-foreground">
         Categories
       </h3>
       <ScrollShadow hideScrollBar className="h-[400px]" visibility="none">
@@ -37,7 +37,7 @@ export const CategorySidebar = React.memo(function CategorySidebar({
             variant={activeCategory === "all" ? "secondary" : "tertiary"}
             onPress={() => handleCategoryChange("all")}
           >
-            <span className="text-left flex-1 text-muted">All Metrics</span>
+            <span className="text-left flex-1 text-foreground">All Metrics</span>
             <Chip className="h-5 text-xs" size="sm" variant="soft">
               {Object.keys(METRICS).length}
             </Chip>
@@ -58,7 +58,7 @@ export const CategorySidebar = React.memo(function CategorySidebar({
                 variant={isActive ? "secondary" : "tertiary"}
                 onPress={() => handleCategoryChange(category.id)}
               >
-                <span className="text-left flex-1 text-muted">
+                <span className="text-left flex-1 text-foreground">
                   {category.name}
                 </span>
                 <Chip className="h-5 text-xs" size="sm" variant="soft">

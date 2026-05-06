@@ -27,7 +27,7 @@ export const FooterItems = () => {
             "no-underline w-full",
             active
               ? "bg-accent/20 text-accent font-medium"
-              : "text-muted hover:text-muted hover:bg-surface-tertiary"
+              : "text-foreground hover:text-foreground hover:bg-surface-tertiary"
           )}
           href={item.href}
           prefetch={true}

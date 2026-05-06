@@ -54,13 +54,13 @@ export function SortableItem({
           className="cursor-grab active:cursor-grabbing p-0.5 flex-shrink-0"
         >
           <Icon
-            className="text-muted"
+            className="text-foreground"
             icon="solar:hamburger-menu-linear"
             width={16}
           />
         </div>
         <Icon className="flex-shrink-0" icon={icon} width={14} />
-        <span className="text-xs truncate text-muted">{label}</span>
+        <span className="text-xs truncate text-foreground">{label}</span>
         {isPinned && (
           <Badge
             className="flex-shrink-0"

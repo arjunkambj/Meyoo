@@ -70,7 +70,7 @@ export default function PlanOverview() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-base font-semibold text-muted">
+          <h3 className="text-base font-semibold text-foreground">
             Current Plan
           </h3>
           <Chip
@@ -82,15 +82,15 @@ export default function PlanOverview() {
           </Chip>
         </div>
         <div className="text-right">
-          <p className="text-sm font-semibold text-muted">{planPrice}</p>
-          <p className="text-xs text-muted">Status: {statusLabel}</p>
+          <p className="text-sm font-semibold text-foreground">{planPrice}</p>
+          <p className="text-xs text-foreground">Status: {statusLabel}</p>
         </div>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-muted">Plan Usage (Last 30 Days)</p>
-          <p className="text-sm text-muted">
+          <p className="text-sm font-medium text-foreground">Plan Usage (Last 30 Days)</p>
+          <p className="text-sm text-foreground">
             {ordersLast30Days.toLocaleString()} / {orderLimit.toLocaleString()} orders
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function PlanOverview() {
           className="w-full"
           size="sm"
         />
-        <p className="text-xs text-muted">
+        <p className="text-xs text-foreground">
           Track up to {orderLimit.toLocaleString()} orders per month with your {currentTier?.title || planLabel.replace(" Plan", "")} plan
         </p>
       </div>

@@ -110,7 +110,7 @@ export const ProductsTable = React.memo(function ProductsTable({
               </Avatar>
               <div>
                 <p className="font-medium text-sm">{item.name}</p>
-                <p className="text-xs text-muted">{variantLabel}</p>
+                <p className="text-xs text-foreground">{variantLabel}</p>
               </div>
             </div>
           );
@@ -147,7 +147,7 @@ export const ProductsTable = React.memo(function ProductsTable({
                 {currencySymbol}
                 {item.cost.toFixed(2)}
               </p>
-              <p className="text-xs text-muted">
+              <p className="text-xs text-foreground">
                 Total: {currencySymbol}
                 {(item.cost * item.stock).toFixed(2)}
               </p>
@@ -260,11 +260,11 @@ export const ProductsTable = React.memo(function ProductsTable({
                   <TableCell colSpan={columns.length}>
                     <div className="py-10 text-center">
                       <Icon
-                        className="mx-auto mb-4 text-muted"
+                        className="mx-auto mb-4 text-foreground"
                         icon="solar:box-outline"
                         width={48}
                       />
-                      <p className="text-muted">
+                      <p className="text-foreground">
                         No products found. Products will sync from Shopify.
                       </p>
                     </div>
@@ -297,7 +297,7 @@ export const ProductsTable = React.memo(function ProductsTable({
                         <div className="min-w-0 flex items-center gap-3 py-1">
                           <button
                             type="button"
-                            className="flex-none text-muted transition hover:text-muted"
+                            className="flex-none text-foreground transition hover:text-foreground"
                             onClick={() => {
                               setExpanded((prev) => {
                                 const next = new Set(prev);
@@ -320,10 +320,10 @@ export const ProductsTable = React.memo(function ProductsTable({
                             <Avatar.Fallback>{item.name.substring(0, 2).toUpperCase()}</Avatar.Fallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-muted">
+                            <p className="truncate text-sm font-medium text-foreground">
                               {item.name}
                             </p>
-                            <p className="truncate text-xs text-muted">
+                            <p className="truncate text-xs text-foreground">
                               {formatVariantLabel(item)}
                             </p>
                           </div>
@@ -365,16 +365,16 @@ export const ProductsTable = React.memo(function ProductsTable({
                     >
                       <TableCell>
                         <div className="min-w-0">
-                          <div className="truncate text-sm text-muted">
+                          <div className="truncate text-sm text-foreground">
                             {v.title || "Variant"}
                           </div>
-                          <div className="truncate text-xs text-muted">
+                          <div className="truncate text-xs text-foreground">
                             {v.sku || ""}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-muted">
+                        <span className="text-sm text-foreground">
                           {item.category}
                         </span>
                       </TableCell>

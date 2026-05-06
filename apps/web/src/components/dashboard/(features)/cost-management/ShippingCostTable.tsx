@@ -118,7 +118,7 @@ export default function ShippingCostTable() {
         return (
           <div className="flex flex-col">
             <span className="font-medium">{item.name}</span>
-            <span className="text-xs text-muted">
+            <span className="text-xs text-foreground">
               {typeof item.value === "number"
                 ? `Rate: ${getCurrencySymbol(currency)}${item.value.toFixed(2)}`
                 : typeof item.baseRate === "number"
@@ -177,7 +177,6 @@ export default function ShippingCostTable() {
               columns={2}
               showHeader={false}
               showPagination={false}
-              className="border border-surface-tertiary/60"
             />
           </div>
         ) : (
@@ -216,10 +215,10 @@ export default function ShippingCostTable() {
             <Modal.Dialog>
           {({ close }) => (
             <>
-              <Modal.Header className="dark:bg-surface-secondary mb-3">
+              <Modal.Header className="mb-3">
                 {formData._id ? "Edit Shipping Rate" : "Set Shipping Rate"}
               </Modal.Header>
-              <Modal.Body className="dark:bg-surface-secondary gap-6">
+              <Modal.Body className="gap-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                     required
@@ -241,7 +240,7 @@ export default function ShippingCostTable() {
                   />
                 </div>
               </Modal.Body>
-              <Modal.Footer className="dark:bg-surface-secondary">
+              <Modal.Footer className="">
                 <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>

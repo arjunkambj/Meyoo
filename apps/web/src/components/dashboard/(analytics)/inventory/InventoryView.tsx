@@ -127,7 +127,7 @@ export function InventoryView() {
   );
 
   const headerRight = useMemo(() => (
-    <div className="flex flex-col items-end text-sm text-muted">
+    <div className="flex flex-col items-end text-sm text-foreground">
       <span>Last updated: {lastUpdatedLabel}</span>
       {isRefreshing && <span className="text-accent-500">Refreshing…</span>}
     </div>

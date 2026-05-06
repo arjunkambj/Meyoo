@@ -87,8 +87,8 @@ export function DevTools() {
 
   if (!user) {
     return (
-      <div className="bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 p-6">
-        <p className="text-sm text-muted">Loading user authentication...</p>
+      <div className="bg-surface-secondary rounded-2xl border border-surface-tertiary/50 p-6">
+        <p className="text-sm text-foreground">Loading user authentication...</p>
       </div>
     );
   }
@@ -116,7 +116,7 @@ export function DevTools() {
   };
 
   return (
-    <div className="bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 p-6">
+    <div className="bg-surface-secondary rounded-2xl border border-surface-tertiary/50 p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -127,7 +127,7 @@ export function DevTools() {
             />
             Developer Tools
           </h3>
-          <p className="text-sm text-muted">Dangerous operations for development only</p>
+          <p className="text-sm text-foreground">Dangerous operations for development only</p>
         </div>
         <Chip color="warning" size="sm" variant="soft">
           Dev Only
@@ -256,7 +256,7 @@ export function DevTools() {
         {deleteMetricsError && <p className="text-danger">{deleteMetricsError}</p>}
         {error && <p className="text-danger">{error}</p>}
         {globalLoading && !Object.values(buttonLoading).some(Boolean) && (
-          <p className="text-muted">Running requested operation…</p>
+          <p className="text-foreground">Running requested operation…</p>
         )}
       </div>
 

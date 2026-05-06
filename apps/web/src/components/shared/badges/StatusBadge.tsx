@@ -317,7 +317,7 @@ export function StatusBadge({
       className={cn(
         "capitalize",
         isFulfilledOrUnfulfilled &&
-          "bg-surface-tertiary text-muted dark:text-muted",
+          "bg-surface-tertiary text-foreground dark:text-foreground",
         className
       )}
       color={isFulfilledOrUnfulfilled ? "default" : getColor(statusConfig.type)}

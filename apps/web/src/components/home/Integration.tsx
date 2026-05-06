@@ -55,7 +55,7 @@ const Integration = () => {
 
   return (
     <section
-      className={`relative flex w-full flex-col items-center justify-center ${designSystem.spacing.section} ${designSystem.background.gradient}`}
+      className={`relative flex w-full flex-col items-center justify-center py-16 sm:py-20 lg:py-24 ${designSystem.background.gradient}`}
     >
       <div className={designSystem.spacing.container}>
         <div className="text-center">
@@ -80,7 +80,7 @@ const Integration = () => {
                 {logos.map((logo) => (
                   <div
                     key={`${groupIndex}-${logo.name}`}
-                    className="flex items-center justify-center gap-3.5 rounded-full bg-gradient-to-br from-muted/60 to-muted/40 px-6 py-3 backdrop-blur-md ring-1 ring-surface-tertiary transition-all duration-200 hover:scale-105 hover:ring-accent/30"
+                    className="flex items-center justify-center gap-3.5 rounded-xl bg-surface-secondary px-6 py-2 backdrop-blur-md ring-1 ring-surface-tertiary transition-all duration-200 hover:scale-105 hover:ring-accent/30"
                   >
                     {"image" in logo ? (
                       <Image
@@ -109,14 +109,14 @@ const Integration = () => {
           <div className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-background via-background/80 to-transparent"></div>
         </div>
       </div>
-      <div className="relative mx-auto mt-20 grid min-h-[28rem] w-full max-w-7xl items-stretch gap-8 px-4 sm:px-6 lg:px-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="relative mx-auto mt-16 grid min-h-[28rem] w-full max-w-7xl items-stretch gap-5 px-4 sm:px-6 lg:px-8 md:grid-cols-2 lg:grid-cols-3">
         {howItWorks.map((feature, index) => (
           <PinContainer
             key={index}
-            className={`${designSystem.card.base} group w-full rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02]`}
+            className="group w-full rounded-[2rem] bg-surface-secondary p-1.5 transition-all duration-300 hover:scale-[1.02]"
           >
-            <div className="flex flex-col h-full">
-              <div className={cn("relative overflow-hidden rounded-[20px] bg-gradient-to-br from-accent/10 via-accent/5 to-transparent", feature.imageOrder)}>
+            <div className="flex h-full flex-col rounded-[2rem] bg-surface p-1.5">
+              <div className={cn("relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-accent/5 via-accent/[0.025] to-transparent", feature.imageOrder)}>
                 <div className="relative h-64 w-full sm:h-72">
                   <Image
                     src={feature.image}
@@ -126,18 +126,18 @@ const Integration = () => {
                     className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/24 via-transparent to-transparent" />
-                <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm rounded-full px-4 py-1.5">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
+                <div className="absolute top-4 left-4 bg-surface backdrop-blur-sm rounded-lg px-4 py-1.5">
                   <p className="text-xs uppercase tracking-[0.15em] text-accent font-semibold">
                     Step {feature.number}
                   </p>
                 </div>
               </div>
               <div className={`mt-5 w-full p-4 flex-1 ${feature.contentOrder}`}>
-                <h2 className="mb-3 text-xl font-semibold tracking-tight leading-tight">
+                <h2 className="mb-3 text-xl font-medium tracking-tight leading-tight">
                   {feature.title}
                 </h2>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted leading-relaxed">
                   {feature.description}
                 </p>
               </div>

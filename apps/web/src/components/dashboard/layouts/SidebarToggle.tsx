@@ -35,7 +35,7 @@ export default function SidebarToggle() {
     <Tooltip closeDelay={0} delay={300}>
       <Tooltip.Trigger>
         <Button
-          isIconOnly           className="text-muted hover:text-foreground transition-colors"
+          isIconOnly           className="text-foreground hover:text-foreground transition-colors"
           size="sm"
           variant="tertiary"
           onPress={handleToggle}

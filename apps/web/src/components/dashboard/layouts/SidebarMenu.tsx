@@ -50,11 +50,11 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
           key={item.key}
           aria-current={active ? "page" : undefined}
           className={cn(
-            "flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200",
+            "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
             "no-underline group",
             active
               ? "bg-accent/20 text-accent-600 font-semibold"
-              : "text-muted hover:text-foreground hover:bg-surface-tertiary/70"
+              : "text-foreground hover:text-foreground hover:bg-surface-tertiary/70"
           )}
           href={item.href}
           prefetch={true}
@@ -66,7 +66,7 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
                 "shrink-0 transition-all w-5 h-5",
                 active
                   ? "text-accent-600"
-                  : "text-muted group-hover:text-foreground"
+                  : "text-foreground group-hover:text-foreground"
               )}
               icon={item.icon}
             />
@@ -80,19 +80,27 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
 
   const renderCategory = useCallback(
     (category: SidebarItem) => (
-      <Accordion.Item key={category.key} id={category.key}>
+      <Accordion.Item
+        key={category.key}
+        className="border-none"
+        classNames={{
+          base: "!border-none bg-transparent shadow-none",
+          heading: "!border-none bg-transparent",
+        }}
+        id={category.key}
+      >
         <Accordion.Heading>
-          <Accordion.Trigger className="flex h-10 w-full items-center justify-between gap-2.5">
+          <Accordion.Trigger className="flex h-10 w-full items-center justify-between gap-2.5 px-3">
             <div className="flex items-center gap-2.5">
             {category.icon && (
               <Icon
                 aria-hidden
-                className="text-muted"
+                className="text-foreground"
                 icon={category.icon}
                 width={18}
               />
             )}
-            <span className="text-xs font-bold text-muted uppercase tracking-wider">
+            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
               {category.title}
             </span>
             </div>
@@ -107,8 +115,8 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
           </Accordion.Trigger>
         </Accordion.Heading>
         <Accordion.Panel>
-          <Accordion.Body>
-            <div className="px-1 space-y-1 overflow-hidden mt-1">
+          <Accordion.Body className="p-0">
+            <div className="space-y-1 overflow-hidden mt-1">
               {category.items?.map(renderMenuItem)}
             </div>
           </Accordion.Body>
@@ -121,10 +129,17 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
   const accordionContent = useMemo(
     () => (
       <Accordion
-        className="px-0 gap-4"
+        className="gap-4 divide-y-0 bg-transparent px-0 [&_[role=separator]]:hidden"
         allowsMultipleExpanded
         defaultExpandedKeys={defaultExpandedKeys}
-        variant="surface"
+        dividerProps={{ className: "hidden" }}
+        itemClasses={{
+          base: "!border-none bg-transparent shadow-none",
+          content: "bg-transparent p-0",
+          heading: "!border-none bg-transparent",
+          trigger: "bg-transparent hover:bg-transparent",
+        }}
+        showDivider={false}
       >
         {items.map(renderCategory)}
       </Accordion>

@@ -9,7 +9,7 @@ export const DATA_TABLE_CONTAINER_CLASS =
   "rounded-3xl bg-surface-secondary dark:bg-surface backdrop-blur-md";
 export const DATA_TABLE_INNER_CLASS = "space-y-4 p-5 sm:p-6";
 export const DATA_TABLE_TABLE_CLASS =
-  "rounded-2xl border border-surface-tertiary/60 bg-surface overflow-hidden";
+  "overflow-hidden rounded-2xl border bg-surface";
 export const DATA_TABLE_HEADER_CLASS =
   "bg-transparent text-muted font-semibold uppercase tracking-wide text-[11px]";
 export const DATA_TABLE_GROUP_ROW_BORDER_CLASS =

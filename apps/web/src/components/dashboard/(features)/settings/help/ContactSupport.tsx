@@ -115,7 +115,7 @@ export default function ContactSupport() {
               />
 
               <div className="flex flex-col items-center justify-between gap-3 pt-2 sm:flex-row">
-                <div className="flex items-center gap-3 text-xs text-muted">
+                <div className="flex items-center gap-3 text-xs text-foreground">
                   <div className="flex items-center gap-1">
                     <Icon
                       className="text-success"
@@ -149,15 +149,15 @@ export default function ContactSupport() {
           </Card.Content>
         </Card>
 
-        <Card className="rounded-2xl bg-surface-secondary shadow-none dark:bg-surface">
+        <Card className="rounded-2xl bg-surface-secondary shadow-none">
           <Card.Content className="space-y-4 px-5 py-5">
             <div className="flex items-start gap-3">
               <span className="rounded-md bg-success/10 p-2">
                 <Icon className="text-success" icon="solar:clock-circle-bold" width={18} />
               </span>
               <div>
-                <p className="text-sm font-semibold text-muted">Response Time</p>
-                <p className="text-xs text-muted">Typically 2-4 hours (Mon-Fri)</p>
+                <p className="text-sm font-semibold text-foreground">Response Time</p>
+                <p className="text-xs text-foreground">Typically 2-4 hours (Mon-Fri)</p>
               </div>
             </div>
 
@@ -173,7 +173,7 @@ export default function ContactSupport() {
                 />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-muted">Email Support</p>
+                <p className="text-sm font-semibold text-foreground">Email Support</p>
                 <p className="truncate text-xs text-accent">{SUPPORT_EMAIL}</p>
               </div>
             </a>
@@ -187,8 +187,8 @@ export default function ContactSupport() {
                 />
               </span>
               <div>
-                <p className="text-sm font-semibold text-muted">Support Hours</p>
-                <p className="text-xs text-muted">9AM-6PM EST, Monday-Friday</p>
+                <p className="text-sm font-semibold text-foreground">Support Hours</p>
+                <p className="text-xs text-foreground">9AM-6PM EST, Monday-Friday</p>
               </div>
             </div>
           </Card.Content>

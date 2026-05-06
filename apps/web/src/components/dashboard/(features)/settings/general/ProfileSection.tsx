@@ -257,10 +257,10 @@ export default function ProfileSection() {
           </Avatar>
         </div>
         <div className="space-y-2">
-          <p className="text-sm text-muted">
+          <p className="text-sm text-foreground">
             Profile picture synced from your authentication provider
           </p>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-foreground">
             Sign in with Google to use your Google profile picture
           </p>
         </div>

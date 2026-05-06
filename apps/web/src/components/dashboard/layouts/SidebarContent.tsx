@@ -23,7 +23,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
 
   const containerClasses = useMemo(
     () =>
-      `relative flex h-full max-w-66 flex-1 flex-col bg-surface-secondary/95 dark:bg-surface rounded-3xl  transition-all duration-300 ease-in-out ${
+      `relative flex h-full max-w-66 flex-1 flex-col bg-surface-secondary/95 rounded-3xl  transition-all duration-300 ease-in-out ${
         isOpen
           ? "w-66 px-5 py-6 opacity-100 overflow-visible ml-6"
           : "w-0 p-0 opacity-0 overflow-hidden"
@@ -70,7 +70,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
           "no-underline w-full group",
           pathname === "/overview"
             ? "bg-accent/20 text-accent-600 font-semibold"
-            : "text-muted hover:text-foreground hover:bg-surface-tertiary/70",
+            : "text-foreground hover:text-foreground hover:bg-surface-tertiary/70",
         )}
         href="/overview"
         prefetch={true}
@@ -81,7 +81,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
             "shrink-0 transition-all w-5 h-5",
             pathname === "/overview"
               ? "text-accent-600"
-              : "text-muted group-hover:text-foreground",
+              : "text-foreground group-hover:text-foreground",
           )}
           icon="solar:home-2-bold-duotone"
         />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Card, Chip } from "@heroui/react";
+import { Icon } from "@iconify/react";
 import React from "react";
 
 import Image from "next/image";
@@ -19,32 +20,38 @@ const d2cBrands = [
 const Hero = () => {
   return (
     <section
-      className={`relative w-full min-h-[calc(90vh)] flex items-center justify-center overflow-hidden mt-13 ${designSystem.background.gradient} pb-16 sm:pb-20 lg:pb-24`}
+      className={`relative w-full min-h-[calc(90vh)] flex items-center justify-center overflow-hidden mt-13 ${designSystem.background.gradient} pb-10 sm:pb-14 lg:pb-16`}
     >
       <div className={`${designSystem.spacing.container} relative z-10`}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-14 lg:gap-16 items-center">
           {/* Left Column - Text Content */}
           <div className="text-center sm:text-left flex flex-col items-center sm:items-start px-2 sm:px-0">
             {/* Category Chip */}
-            <Chip
-              className="mb-6 text-xs  uppercase tracking-[0.05em] font-medium px-2"
-              variant="soft"
-            >
-              Built for D2C brands
-            </Chip>
+            <div className="group mb-6 cursor-pointer rounded-xl bg-surface-secondary px-1 py-1">
+              <Chip
+                className="rounded-lg bg-surface px-1.5 text-xs uppercase tracking-[0.05em] font-medium"
+                variant="flat"
+              >
+                Built for D2C brands
+                <Icon
+                  className="ml-1 transition-transform duration-200 group-hover:translate-x-0.5"
+                  icon="solar:alt-arrow-right-linear"
+                />
+              </Chip>
+            </div>
             {/* Header  */}
-            <h1 className="mb-6 flex max-w-3xl flex-col text-pretty font-semibold leading-[1.02] tracking-normal text-muted">
+            <h1 className="mb-6 flex max-w-3xl flex-col text-pretty font-semibold leading-[1.02] tracking-normal">
               <span className="block text-balance text-5xl sm:text-6xl lg:text-7xl">
                 Make Better Decisions
               </span>
 
-              <span className="block text-balance text-4xl font-medium leading-[1.08] text-muted sm:text-5xl lg:text-6xl">
+              <span className="block text-balance text-4xl font-medium leading-[1.08] sm:text-5xl lg:text-6xl">
                 For your <span className="text-accent">Shopify store</span>
               </span>
             </h1>
 
             {/* Professional info */}
-            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed text-pretty text-center sm:text-left max-w-2xl mx-auto sm:mx-0 mb-0">
+            <p className="text-sm sm:text-base lg:text-lg text-muted leading-relaxed text-pretty text-center sm:text-left max-w-2xl mx-auto sm:mx-0 mb-0">
               Meyoo tracks sales, ad spend, product costs, shipping, discounts,
               and fees in one dashboard, so you know what each order, ad, and
               SKU actually makes.
@@ -54,19 +61,20 @@ const Hero = () => {
             <div className="mt-10 sm:mt-12 flex flex-row flex-wrap justify-center sm:justify-start items-center gap-4">
               <Link href="/sign-in">
                 <Button variant="primary"
-                  className="w-auto font-semibold h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
+                  className="w-auto h-10 sm:h-11 transition-all duration-200 active:scale-100"
                  
                  
                   size="lg"
                 >
                   Start 28-day Trial
+                  <Icon className="ml-1" icon="solar:alt-arrow-right-linear" />
                 </Button>
               </Link>
               <Link href="#pricing">
                 <Button
                   variant="tertiary"
                   size="lg"
-                  className="w-auto h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
+                  className="w-auto h-10 sm:h-11 transition-all duration-200 active:scale-100"
                 >
                   View pricing
                 </Button>
@@ -74,11 +82,9 @@ const Hero = () => {
             </div>
 
             {/* Trust line */}
-            <div className="mt-8 sm:mt-10">
+            <div className="mt-3 sm:mt-4">
               <div className="inline-flex items-center text-xs sm:text-sm text-muted">
-                <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 font-medium sm:justify-start sm:gap-x-4">
-                  <span>Fast setup</span>
-                  <span>28-day free trial</span>
+                <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0 font-medium sm:justify-start sm:gap-x-3">
                   <span>Free for 300 orders/month/store</span>
                 </span>
               </div>
@@ -87,13 +93,12 @@ const Hero = () => {
 
           {/* Right Column - Dashboard Preview */}
           <div className="relative flex justify-center lg:justify-end px-2 sm:px-0 animate-in fade-in slide-in-from-bottom-5 duration-700">
-            <Card className="relative h-[320px] shadow-none w-full max-w-[720px] rounded-2xl sm:rounded-3xl bg-gradient-to-br from-muted/40 to-muted/20 p-1 sm:p-1.5 backdrop-blur-sm sm:h-[420px] md:h-[560px] lg:h-[640px] ring-1 ring-surface-tertiary">
-              <Card.Content className="relative size-full rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-background via-background to-muted/10 overflow-hidden p-0">
-                <div className="absolute inset-0 bg-gradient-to-tr from-accent/5 via-transparent to-accent/5 pointer-events-none z-10" />
+            <Card className="relative h-[320px] shadow-none w-full max-w-[720px] rounded-2xl sm:rounded-3xl bg-surface-secondary p-1 sm:p-1.5 backdrop-blur-sm sm:h-[420px] md:h-[560px] lg:h-[640px] ring-1 ring-surface-tertiary">
+              <Card.Content className="relative size-full rounded-[16px] sm:rounded-[20px] bg-surface-secondary overflow-hidden p-0">
                 {/* Light mode preview */}
                 <Image
                   alt="Meyoo dashboard preview (light)"
-                  className="block dark:hidden size-full rounded-xl sm:rounded-2xl object-cover object-left-top transition-transform duration-300 scale-[1.02]  hover:scale-[1.03]"
+                  className="block dark:hidden size-full rounded-[16px] sm:rounded-[20px] object-cover object-left-top transition-transform duration-300 scale-[1.02]  hover:scale-[1.03]"
                   fill
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"
@@ -102,7 +107,7 @@ const Hero = () => {
                 {/* Dark mode preview */}
                 <Image
                   alt="Meyoo dashboard preview (dark)"
-                  className="hidden dark:block size-full rounded-xl sm:rounded-2xl object-cover object-left-top transition-transform duration-300 scale-[1.02] hover:scale-[1.03]"
+                  className="hidden dark:block size-full rounded-[16px] sm:rounded-[20px] object-cover object-left-top transition-transform duration-300 scale-[1.02] hover:scale-[1.03]"
                   fill
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"

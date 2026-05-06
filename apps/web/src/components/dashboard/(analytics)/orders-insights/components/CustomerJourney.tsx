@@ -74,21 +74,21 @@ export const CustomerJourney = memo(function CustomerJourney({
   const safeReturnRate = Number.isFinite(returnRate) ? returnRate : 0;
 
   return (
-    <Card className="p-6 rounded-2xl border border-surface-tertiary/60 bg-surface-secondary dark:bg-surface shadow-none backdrop-blur-sm">
+    <Card className="p-6 rounded-2xl border border-surface-tertiary/60 bg-surface-secondary shadow-none backdrop-blur-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-medium text-muted">
+          <h3 className="text-lg font-medium text-foreground">
             Customer Journey
           </h3>
-          <p className="text-sm text-muted mt-0.5">
+          <p className="text-sm text-foreground mt-0.5">
             Track customer progression through your sales funnel
           </p>
         </div>
-        <div className="text-sm bg-background border border-surface-tertiary rounded-full px-4 py-2 text-muted">
+        <div className="text-sm bg-background border border-surface-tertiary rounded-full px-4 py-2 text-foreground">
           <span className="font-medium">
             {formatNumber(safeVisitors)}
           </span>
-          <span className="text-muted ml-1">visitors</span>
+          <span className="text-foreground ml-1">visitors</span>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export const CustomerJourney = memo(function CustomerJourney({
                       <div>
                         <Tooltip closeDelay={0}>
                           <Tooltip.Trigger>
-                            <p className="font-medium text-sm text-muted mb-1">
+                            <p className="font-medium text-sm text-foreground mb-1">
                               {stage.stage}
                             </p>
                           </Tooltip.Trigger>
@@ -126,15 +126,15 @@ export const CustomerJourney = memo(function CustomerJourney({
                             {stageDescriptions[stage.stage] || stage.stage}
                           </Tooltip.Content>
                         </Tooltip>
-                        <p className="text-xs text-muted">
+                        <p className="text-xs text-foreground">
                           {formatNumber(stage.customers)}
                         </p>
                       </div>
                       <div className="w-full pt-2 border-t border-surface-tertiary/70">
-                        <p className="text-xs text-muted mb-1">
+                        <p className="text-xs text-foreground mb-1">
                           Conversion
                         </p>
-                        <p className="text-sm font-medium text-muted">
+                        <p className="text-sm font-medium text-foreground">
                           {formatPercentValue(stage.conversionRate)}%
                         </p>
                       </div>
@@ -144,7 +144,7 @@ export const CustomerJourney = memo(function CustomerJourney({
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-surface-tertiary/70 bg-background p-6 text-center text-sm text-muted">
+            <div className="rounded-xl border border-surface-tertiary/70 bg-background p-6 text-center text-sm text-foreground">
               No customer journey data is available for the selected period yet.
             </div>
           )}
@@ -153,49 +153,49 @@ export const CustomerJourney = memo(function CustomerJourney({
         {/* Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
-            <p className="text-xs font-medium text-muted mb-2">
+            <p className="text-xs font-medium text-foreground mb-2">
               Overall Conversion
             </p>
-            <p className="text-xl font-semibold text-muted">
+            <p className="text-xl font-semibold text-foreground">
               {formatPercentValue(
                 retentionStage?.conversionRate ?? purchaseStage?.conversionRate ?? 0,
               )}
               %
             </p>
-            <p className="text-xs text-muted mt-1">
+            <p className="text-xs text-foreground mt-1">
               From awareness to purchase
             </p>
           </div>
           <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
-            <p className="text-xs font-medium text-muted mb-2">
+            <p className="text-xs font-medium text-foreground mb-2">
               Meta Conversion
             </p>
-            <p className="text-xl font-semibold text-muted">
+            <p className="text-xl font-semibold text-foreground">
               {formatPercentValue(metaConversionRateValue)}%
             </p>
-            <p className="text-xs text-muted mt-1">
+            <p className="text-xs text-foreground mt-1">
               Landing page conversion from ads
             </p>
           </div>
           <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
-            <p className="text-xs font-medium text-muted mb-2">
+            <p className="text-xs font-medium text-foreground mb-2">
               Cancel Rate
             </p>
-            <p className="text-xl font-semibold text-muted">
+            <p className="text-xl font-semibold text-foreground">
               {formatPercentValue(safeCancelRate)}%
             </p>
-            <p className="text-xs text-muted mt-1">
+            <p className="text-xs text-foreground mt-1">
               Orders cancelled before fulfillment
             </p>
           </div>
           <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
-            <p className="text-xs font-medium text-muted mb-2">
+            <p className="text-xs font-medium text-foreground mb-2">
               Return / RTO Rate
             </p>
-            <p className="text-xl font-semibold text-muted">
+            <p className="text-xl font-semibold text-foreground">
               {formatPercentValue(safeReturnRate)}%
             </p>
-            <p className="text-xs text-muted mt-1">
+            <p className="text-xs text-foreground mt-1">
               Deliveries that resulted in returns or RTO
             </p>
           </div>

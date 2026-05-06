@@ -136,7 +136,7 @@ export function IntegrationsView() {
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 p-5"
+          className="bg-surface-secondary rounded-2xl border border-surface-tertiary/50 p-5"
         >
           <div className="flex items-start gap-3 mb-4">
             <Skeleton className="w-10 h-10 rounded-lg" />
@@ -262,11 +262,11 @@ export function IntegrationsView() {
                 ) : (
                   <div className="col-span-full text-center py-12">
                     <Icon
-                      className="text-muted mx-auto mb-4"
+                      className="text-foreground mx-auto mb-4"
                       icon="solar:link-broken-bold-duotone"
                       width={64}
                     />
-                    <p className="text-muted mb-4">
+                    <p className="text-foreground mb-4">
                       No integrations connected yet
                     </p>
                     <Button
@@ -316,10 +316,10 @@ export function IntegrationsView() {
                       icon="solar:check-circle-bold-duotone"
                       width={64}
                     />
-                    <p className="text-muted">
+                    <p className="text-foreground">
                       All available integrations are connected!
                     </p>
-                    <p className="text-sm text-muted mt-2">
+                    <p className="text-sm text-foreground mt-2">
                       Use the button below to request new integrations
                     </p>
                   </div>
@@ -335,7 +335,7 @@ export function IntegrationsView() {
         {/* Request Integration Button */}
         <div className="md:mt-20 mt-8 flex flex-col items-center gap-3">
           <div className="text-center">
-            <p className="text-sm text-muted ">
+            <p className="text-sm text-foreground ">
               Can&apos;t find the integration you need?
             </p>
           </div>

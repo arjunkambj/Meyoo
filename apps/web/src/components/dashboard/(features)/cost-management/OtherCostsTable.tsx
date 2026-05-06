@@ -376,7 +376,6 @@ export default function OtherCostsTable() {
               columns={4}
               showHeader={false}
               showPagination={false}
-              className="border border-surface-tertiary/60"
             />
           </div>
         ) : (
@@ -415,11 +414,11 @@ export default function OtherCostsTable() {
             <Modal.Dialog>
           {({ close }) => (
             <>
-              <Modal.Header className="flex flex-col dark:bg-surface-secondary gap-1 border-b border-surface-tertiary pb-3">
+              <Modal.Header className="flex flex-col gap-1 border-b pb-3">
                 <h2 className="text-lg font-semibold">
                   {formData._id ? "Edit Operating Cost" : "Add Operating Cost"}
                 </h2>
-                <p className="text-sm text-muted">
+                <p className="text-sm text-foreground">
                   Track operational costs for better P&L visibility
                 </p>
               </Modal.Header>
@@ -484,7 +483,7 @@ export default function OtherCostsTable() {
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-muted">
+                    <span className="text-sm font-medium text-foreground">
                       Effective From
                     </span>
                     <Popover
@@ -520,7 +519,7 @@ export default function OtherCostsTable() {
                   </div>
                 </div>
               </Modal.Body>
-              <Modal.Footer className="dark:bg-surface-secondary">
+              <Modal.Footer className="">
                 <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>

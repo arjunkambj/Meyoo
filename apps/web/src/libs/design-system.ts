@@ -28,7 +28,7 @@ export const designSystem = {
 
   // Card styling
   card: {
-    base: "bg-gradient-to-br from-surface-secondary to-surface-secondary/50 border border-surface-tertiary/20",
+    base: "bg-surface border border-surface-tertiary/20",
   },
 
   // Background patterns

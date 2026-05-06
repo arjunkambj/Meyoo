@@ -35,7 +35,7 @@ export const tiers: Array<Tier> = [
       "$0.30 per extra order",
     ],
     buttonText: "Start for free",
-    buttonVariant: "secondary",
+    buttonVariant: "tertiary",
   },
   {
     key: TiersEnum.Pro,
@@ -61,7 +61,7 @@ export const tiers: Array<Tier> = [
       "Max $299 Overage Charge",
     ],
     buttonText: "Start 28-day trial",
-    buttonVariant: "secondary",
+    buttonVariant: "tertiary",
   },
   {
     key: TiersEnum.Team,
@@ -112,7 +112,7 @@ export const tiers: Array<Tier> = [
       "Priority Support",
     ],
     buttonText: "Talk to our team",
-    buttonVariant: "secondary",
+    buttonVariant: "tertiary",
   },
 ];
 

@@ -1,11 +1,13 @@
 "use client";
 
-import { Avatar, Button, Dropdown, Label } from "@heroui/react";
+import { Avatar, Button, Dropdown, Label, Switch } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import type { Route } from "next";
 import Link from "next/link";
 import React, { useCallback, useMemo } from "react";
 import { useUser } from "@stackframe/stack";
+
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 type UserProfileProps = {
   showNavigationLinks?: boolean;
@@ -14,6 +16,7 @@ type UserProfileProps = {
 const UserProfile = React.memo(
   ({ showNavigationLinks = true }: UserProfileProps) => {
     const user = useUser();
+    const { theme, setTheme } = useTheme();
 
     const handleLogout = useCallback(() => {
       void user?.signOut();
@@ -90,7 +93,28 @@ const UserProfile = React.memo(
               className="gap-2 py-2"
               textValue="Appearance"
             >
-              <Label>Appearance</Label>
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <Icon
+                    icon={theme === "dark" ? "solar:moon-bold" : "solar:sun-bold"}
+                    width={18}
+                    className="text-foreground"
+                  />
+                  <Label className="text-sm font-medium">Dark mode</Label>
+                </div>
+                <Switch
+                  aria-label="Toggle dark mode"
+                  isSelected={theme === "dark"}
+                  size="sm"
+                  onChange={(isSelected) => {
+                    setTheme(isSelected ? "dark" : "light");
+                  }}
+                >
+                  <Switch.Control>
+                    <Switch.Thumb />
+                  </Switch.Control>
+                </Switch>
+              </div>
             </Dropdown.Item>
           </Dropdown.Section>
           {showNavigationLinks ? (
@@ -120,7 +144,10 @@ const UserProfile = React.memo(
               textValue="Log Out"
               onPress={handleLogout}
             >
-              <Label className="text-sm font-semibold">Log Out</Label>
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:logout-2-bold-duotone" width={20} />
+                <Label className="text-sm font-semibold">Log Out</Label>
+              </div>
             </Dropdown.Item>
           </Dropdown.Section>
         </Dropdown.Menu>
@@ -130,6 +157,8 @@ const UserProfile = React.memo(
         userData,
         navigationItems,
         showNavigationLinks,
+        setTheme,
+        theme,
       ]
     );
 

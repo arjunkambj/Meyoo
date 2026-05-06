@@ -34,7 +34,7 @@ export interface KPISkeletonProps {
 }
 
 const KPI_CARD_BASE_CLASS =
-  "bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary w-full overflow-hidden shadow-none";
+  "bg-surface-secondary rounded-2xl w-full overflow-hidden shadow-none";
 const KPI_CARD_PADDING = "py-4 px-5";
 const KPI_SIZE_CLASSES: Record<KPISize, string> = {
   small: "col-span-1",
@@ -150,7 +150,7 @@ const KPI = React.memo(function KPI({
   change,
   changeType,
   icon,
-  iconColor = "text-muted",
+  iconColor = "text-foreground",
   loading = false,
   className,
   size = "small",
@@ -226,7 +226,7 @@ const KPI = React.memo(function KPI({
       <div className="flex h-full min-w-0 flex-col justify-between">
         {/* Header with title and icon */}
         <div className="flex items-start justify-between mb-3 gap-3">
-          <span className="text-sm font-semibold text-muted truncate flex-1">
+          <span className="text-sm font-semibold text-foreground truncate flex-1">
             {title}
           </span>
           {icon && (
@@ -240,7 +240,7 @@ const KPI = React.memo(function KPI({
         <div className="flex-1 min-w-0 mb-3">
           <div
             className={cn(
-              "font-bold tracking-tight tabular-nums text-muted truncate",
+              "font-bold tracking-tight tabular-nums text-foreground truncate",
               KPI_VALUE_TEXT_CLASSES[size]
             )}
           >
@@ -258,7 +258,7 @@ const KPI = React.memo(function KPI({
           <>
             <Separator className="mb-2 bg-surface-tertiary" />
             <div className="flex items-center justify-between">
-              <div className="text-xs font-medium text-muted">
+              <div className="text-xs font-medium text-foreground">
                 vs last period
               </div>
               <div

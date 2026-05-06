@@ -188,7 +188,7 @@ export function CostBreakdownWidget({
       <Card
         aria-busy="true"
         aria-live="polite"
-        className="p-6 bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50"
+        className="p-6 bg-surface-secondary rounded-2xl border border-surface-tertiary/50"
         role="status"
       >
         <span className="sr-only">Loading cost breakdown…</span>
@@ -224,7 +224,7 @@ export function CostBreakdownWidget({
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="bg-background border border-surface-tertiary rounded-xl p-3.5"
+                    className="bg-surface border border-surface-tertiary rounded-xl p-3.5"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
@@ -255,16 +255,16 @@ export function CostBreakdownWidget({
   }
 
   return (
-    <Card className="p-6 bg-surface-secondary dark:bg-surface shadow-none border border-surface-tertiary rounded-2xl h-full">
+    <Card className="p-6 bg-surface-secondary shadow-none border border-surface-tertiary rounded-2xl h-full">
       {/* Header Section */}
       <div className="mb-4 pb-4 border-b border-surface-tertiary flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div className="flex items-center gap-2.5">
           <Icon
             icon="solar:wallet-bold-duotone"
             width={20}
-            className="text-muted"
+            className="text-foreground"
           />
-          <h3 className="text-lg font-semibold text-muted">
+          <h3 className="text-lg font-semibold text-foreground">
             Cost Breakdown
           </h3>
         </div>
@@ -309,10 +309,10 @@ export function CostBreakdownWidget({
               </ResponsiveContainer>
               {/* Center label */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-6">
-                <div className="text-[10px] font-bold text-muted uppercase tracking-wide mb-0.5">
+                <div className="text-[10px] font-bold text-foreground uppercase tracking-wide mb-0.5">
                   Total Costs
                 </div>
-                <div className="font-bold text-muted break-all text-center leading-tight max-w-[120px]">
+                <div className="font-bold text-foreground break-all text-center leading-tight max-w-[120px]">
                   {(() => {
                     const total = chartData.reduce(
                       (sum, item) => sum + item.value,
@@ -323,7 +323,7 @@ export function CostBreakdownWidget({
                       : formatCurrency(total, currency);
                   })()}
                 </div>
-                <div className="text-[10px] text-muted mt-0.5">
+                <div className="text-[10px] text-foreground mt-0.5">
                   {chartData.length}{" "}
                   {chartData.length === 1 ? "category" : "categories"}
                 </div>
@@ -333,15 +333,15 @@ export function CostBreakdownWidget({
             <div className="flex flex-col items-center justify-center h-full min-h-[220px] text-center">
               <div className="w-16 h-16 rounded-2xl bg-surface-secondary flex items-center justify-center mb-4">
                 <Icon
-                  className="text-muted"
+                  className="text-foreground"
                   icon="solar:pie-chart-3-bold-duotone"
                   width={32}
                 />
               </div>
-              <p className="text-sm font-semibold text-muted mb-1">
+              <p className="text-sm font-semibold text-foreground mb-1">
                 No cost data available
               </p>
-              <p className="text-xs text-muted">
+              <p className="text-xs text-foreground">
                 Add cost data to see breakdown
               </p>
             </div>
@@ -355,7 +355,7 @@ export function CostBreakdownWidget({
             {costBreakdown.map((item) => (
               <div
                 key={item.key}
-                className="bg-background border border-surface-tertiary rounded-xl p-3.5 hover:bg-surface-secondary transition-colors"
+                className="bg-surface border border-surface-tertiary rounded-xl p-3.5 hover:bg-surface-secondary transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5 flex-1">
@@ -370,12 +370,12 @@ export function CostBreakdownWidget({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-xs font-semibold text-muted truncate">
+                        <p className="text-xs font-semibold text-foreground truncate">
                           {item.label}
                         </p>
                         <Tooltip delay={200}>
                           <Tooltip.Trigger>
-                            <span className="text-muted cursor-help hover:text-muted transition-colors">
+                            <span className="text-foreground cursor-help hover:text-foreground transition-colors">
                               <Icon
                                 icon="solar:info-circle-bold-duotone"
                                 width={14}
@@ -388,7 +388,7 @@ export function CostBreakdownWidget({
                         </Tooltip>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs font-medium text-muted">
+                        <span className="text-xs font-medium text-foreground">
                           {item.value > 0
                             ? `${item.percentage.toFixed(1)}%`
                             : "No costs"}
@@ -419,7 +419,7 @@ export function CostBreakdownWidget({
                   <div className="text-right shrink-0">
                     <p
                       className={`text-xs font-bold ${
-                        item.value > 0 ? "text-muted" : "text-muted"
+                        item.value > 0 ? "text-foreground" : "text-foreground"
                       }`}
                     >
                       {item.value > 0

@@ -64,7 +64,7 @@ function Metric({
 
   const changeBadgeClasses =
     change === undefined
-      ? "bg-surface-secondary/80 dark:bg-surface-secondary/10 text-muted"
+      ? "bg-surface-secondary/80 text-foreground"
       : change === 0
         ? "bg-warning-100/60 dark:bg-warning-500/20 text-warning-700"
         : isGood
@@ -81,14 +81,14 @@ function Metric({
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <span
-            className={`${isPrimary ? "text-sm font-semibold" : "text-xs font-medium"} text-muted`}
+            className={`${isPrimary ? "text-sm font-semibold" : "text-xs font-medium"} text-foreground`}
           >
             {label}
           </span>
           {hint && (
             <Tooltip delay={200} closeDelay={50}>
               <Tooltip.Trigger>
-                <span className="text-muted cursor-help hover:text-muted transition-colors">
+                <span className="text-foreground cursor-help hover:text-foreground transition-colors">
                 <Icon icon="solar:info-circle-bold-duotone" width={16} />
               </span>
               </Tooltip.Trigger>
@@ -98,7 +98,7 @@ function Metric({
         </div>
         <div className="flex items-center gap-2.5">
           <span
-            className={`${isPrimary ? "text-xl font-bold" : "text-sm font-bold"} text-muted`}
+            className={`${isPrimary ? "text-xl font-bold" : "text-sm font-bold"} text-foreground`}
           >
             {formatValue()}
           </span>
@@ -149,7 +149,7 @@ export function OrderSummaryWidget({
   if (loading) {
     return (
       <Card
-        className="p-6 bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50"
+        className="p-6 bg-surface-secondary rounded-2xl border border-surface-tertiary/50"
       >
         <div className="animate-pulse">
           <div className="h-4 bg-surface-tertiary rounded w-1/3 mb-4" />
@@ -165,16 +165,16 @@ export function OrderSummaryWidget({
 
   return (
     <Card
-      className="p-5 bg-surface-secondary dark:bg-surface border border-surface-tertiary rounded-2xl h-full"
+      className="p-5 bg-surface-secondary border border-surface-tertiary rounded-2xl h-full"
     >
       <div className="mb-4 pb-4 border-b border-surface-tertiary">
         <div className="flex items-center gap-2.5">
           <Icon
             icon="solar:bag-check-bold-duotone"
             width={24}
-            className="text-muted"
+            className="text-foreground"
           />
-          <h3 className="text-lg font-semibold text-muted">
+          <h3 className="text-lg font-semibold text-foreground">
             Order Summary
           </h3>
         </div>

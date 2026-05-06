@@ -92,12 +92,12 @@ export function SyncStatusCard({ isLoading, data }: Props) {
                           >
               {stateMeta.label}
             </Chip>
-            <p className="text-sm font-medium text-muted">
+            <p className="text-sm font-medium text-foreground">
               {data.message}
             </p>
           </div>
           {lastUpdated && (
-            <p className="text-xs text-muted">{lastUpdated}</p>
+            <p className="text-xs text-foreground">{lastUpdated}</p>
           )}
         </div>
 

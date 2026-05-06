@@ -86,11 +86,11 @@ export default function PaymentFeesTable() {
       case "name":
         return (
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-muted">
+            <p className="truncate text-sm font-medium text-foreground">
               {item.name || "Payment Processor"}
             </p>
             {item.description ? (
-              <p className="truncate text-xs text-muted">
+              <p className="truncate text-xs text-foreground">
                 {item.description}
               </p>
             ) : null}
@@ -158,7 +158,6 @@ export default function PaymentFeesTable() {
               columns={3}
               showHeader={false}
               showPagination={false}
-              className="border border-surface-tertiary/60"
             />
           </div>
         ) : (
@@ -197,10 +196,10 @@ export default function PaymentFeesTable() {
             <Modal.Dialog>
           {({ close }) => (
             <>
-              <Modal.Header className="dark:bg-surface-secondary">
+              <Modal.Header className="">
                 {formData._id ? "Edit Payment Fee" : "Set Payment Fee"}
               </Modal.Header>
-              <Modal.Body className="dark:bg-surface-secondary gap-6">
+              <Modal.Body className="gap-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                     required
@@ -225,7 +224,7 @@ export default function PaymentFeesTable() {
                   />
                 </div>
               </Modal.Body>
-              <Modal.Footer className="dark:bg-surface-secondary">
+              <Modal.Footer className="">
                 <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>

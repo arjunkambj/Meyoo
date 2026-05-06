@@ -79,7 +79,7 @@ export function OrdersInsightsKPICards({
         value: formatPercent(normalizedKpis.fulfillmentRate.value),
         change: normalizedKpis.fulfillmentRate.change,
         icon: "solar:delivery-bold-duotone",
-        iconColor: "text-muted",
+        iconColor: "text-foreground",
         tooltip: "Percentage of orders successfully fulfilled.",
       },
     ];

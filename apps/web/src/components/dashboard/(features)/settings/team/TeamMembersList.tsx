@@ -117,7 +117,7 @@ export default function TeamMembersList() {
           <p className="text-lg font-medium text-foreground">
             No team members yet
           </p>
-          <p className="text-sm text-muted">
+          <p className="text-sm text-foreground">
             Invite team members to collaborate on your store. They will have
             access to all features except billing and team management.
           </p>
@@ -154,7 +154,7 @@ export default function TeamMembersList() {
                   <p className="text-sm font-medium">
                     {member.name || "Unnamed"}
                   </p>
-                  <p className="text-xs text-muted">{member.email}</p>
+                  <p className="text-xs text-foreground">{member.email}</p>
                 </div>
               </div>
             </TableCell>
@@ -179,7 +179,7 @@ export default function TeamMembersList() {
               </div>
             </TableCell>
             <TableCell>
-              <p className="text-sm text-muted">
+              <p className="text-sm text-foreground">
                 {member.createdAt ? formatDate(member.createdAt) : "—"}
               </p>
             </TableCell>
@@ -198,7 +198,7 @@ export default function TeamMembersList() {
                   Remove
                 </Button>
               ) : (
-                <span className="text-xs text-muted">—</span>
+                <span className="text-xs text-foreground">—</span>
               )}
             </TableCell>
           </TableRow>
