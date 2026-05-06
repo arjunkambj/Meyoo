@@ -78,7 +78,7 @@ export function Logo({
           {mark}
           <span
             className={cn(
-              "font-bold leading-none text-foreground transition-colors group-hover:text-primary",
+              "font-bold leading-none text-foreground transition-colors",
               textSizeClass,
             )}
           >
