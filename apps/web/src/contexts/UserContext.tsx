@@ -3,7 +3,6 @@
 import React, {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   type ReactNode,
 } from "react";
@@ -49,6 +48,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const membership = useQuery(api.core.memberships.getCurrentMembership);
   const organization = useQuery(api.core.organizations.getCurrentOrganization);
   const userLoading = stackUser === undefined;
+  const stackOnboarded = getOnboarded(stackUser?.clientReadOnlyMetadata);
   const error = !stackUser && !userLoading ? "User not found" : null;
   const user = useMemo(
     () =>
@@ -60,10 +60,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
             email: stackUser.primaryEmail ?? undefined,
             image: stackUser.profileImageUrl ?? undefined,
             organizationId: organization?.id,
-            isOnboarded: getOnboarded(stackUser.clientReadOnlyMetadata),
+            isOnboarded: stackOnboarded,
           }
         : null,
-    [organization?.id, stackUser],
+    [organization?.id, stackOnboarded, stackUser],
   );
 
   const userContextValue: UserContextValue = {
@@ -75,26 +75,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     organizationId: organization?.id,
     primaryCurrency: organization?.primaryCurrency ?? "USD",
   };
-
-  useEffect(() => {
-    console.log("[auth-debug] UserProvider state", {
-      stackUserLoading: userLoading,
-      stackUserId: stackUser?.id,
-      email: stackUser?.primaryEmail,
-      membershipLoaded: membership !== undefined,
-      membershipRole: membership?.role ?? null,
-      organizationLoaded: organization !== undefined,
-      organizationId: organization?.id ?? null,
-      userContextUser: user,
-    });
-  }, [
-    membership,
-    organization,
-    stackUser?.id,
-    stackUser?.primaryEmail,
-    user,
-    userLoading,
-  ]);
 
   return (
     <UserContext.Provider value={userContextValue}>{children}</UserContext.Provider>

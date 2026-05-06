@@ -59,14 +59,12 @@ const useOnboardingData = () => {
 
   const isLoading =
     userLoading || (onboardingLoading && !didOnboardingLoadTimeout);
-  const isCompleted = status?.completed ?? false;
-
-  // Redirect to the dashboard once onboarding is marked complete server-side.
+  // Stack metadata is the only source of truth for gating dashboard access.
   useEffect(() => {
-    if (!isLoading && isCompleted) {
-      router.replace('/overview');
+    if (!isLoading && user?.isOnboarded) {
+      router.replace("/overview");
     }
-  }, [isCompleted, isLoading, router]);
+  }, [isLoading, router, user?.isOnboarded]);
 
   // Update Jotai store when data changes
   useEffect(() => {
@@ -110,7 +108,7 @@ const useOnboardingData = () => {
 
   // Prefetch next route for instant navigation
   useEffect(() => {
-    if (!isLoading && !isCompleted && status?.currentStep) {
+    if (!isLoading && !user?.isOnboarded && status?.currentStep) {
       const nextStep = getNextStep(
         status.currentStep,
         typeof window !== "undefined" ? window.location.pathname : undefined
@@ -120,7 +118,7 @@ const useOnboardingData = () => {
         prefetchRoute(nextStep.route);
       }
     }
-  }, [isCompleted, isLoading, prefetchRoute, router, status?.currentStep]);
+  }, [isLoading, prefetchRoute, router, status?.currentStep, user?.isOnboarded]);
 
   return { isLoading };
 };

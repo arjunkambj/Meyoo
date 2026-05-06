@@ -1,16 +1,21 @@
 import { v } from "convex/values";
 import { internal, api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
-import type { MutationCtx } from "../_generated/server";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { internalMutation, internalQuery, mutation, query } from "../_generated/server";
-import { ensureActiveMembership } from "../authHelpers";
+import { ensureActiveMembership } from "./membershipHelpers";
+import { getIntegrationStatusForOrg } from "./status";
 import { createJob, PRIORITY } from "../engine/workpool";
 import { findShopifyStoreByDomain, normalizeShopDomain } from "../utils/shop";
-import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
+import { getUserAndOrg, requireUserAndOrg, type UserAndOrg } from "../utils/auth";
 import { buildDateSpan } from "../utils/date";
 import { getOrgTimeInfo } from "../utils/orgDateRange";
 import { optionalEnv } from "../utils/env";
 import { onboardingStatusValidator } from "../utils/onboardingValidators";
+import {
+  emptyIntegrationStatus,
+  integrationStatusValidator,
+} from "../utils/integrationStatus";
 import { isIanaTimeZone } from "@repo/time";
 import {
   ONBOARDING_STEP_KEYS,
@@ -116,139 +121,158 @@ const deriveOverallState = (sessions: Doc<"syncSessions">[]): OverallState => {
 
 // ============ QUERIES ============
 
+const getOnboardingStatusForAuth = async (ctx: QueryCtx, auth: UserAndOrg) => {
+  const { user, orgId } = auth;
+
+  const onboarding = await ctx.db
+    .query("onboarding")
+    .withIndex("by_user_organization", (q) =>
+      q.eq("userId", user._id).eq("organizationId", orgId),
+    )
+    .first();
+
+  if (!onboarding) return null;
+
+  const connections = {
+    shopify: onboarding.hasShopifyConnection || false,
+    meta: onboarding.hasMetaConnection || false,
+  };
+
+  // Prefer a small recent window for sync insight to keep the payload light.
+  const shopifySessions = await ctx.db
+    .query("syncSessions")
+    .withIndex("by_org_platform_and_date", (q) =>
+      q.eq("organizationId", orgId).eq("platform", "shopify"),
+    )
+    .order("desc")
+    .take(5);
+  const metaSessions = await ctx.db
+    .query("syncSessions")
+    .withIndex("by_org_platform_and_date", (q) =>
+      q.eq("organizationId", orgId).eq("platform", "meta"),
+    )
+    .order("desc")
+    .take(5);
+
+  const latestShopifySession = shopifySessions[0];
+  const latestMetaSession = metaSessions[0];
+
+  let initialShopifySession = shopifySessions.find((session) =>
+    isInitialSyncSession(session),
+  );
+
+  if (!initialShopifySession) {
+    const oldestShopifySession = await ctx.db
+      .query("syncSessions")
+      .withIndex("by_org_platform_and_date", (q) =>
+        q.eq("organizationId", orgId).eq("platform", "shopify"),
+      )
+      .order("asc")
+      .first();
+
+    if (oldestShopifySession && isInitialSyncSession(oldestShopifySession)) {
+      initialShopifySession = oldestShopifySession;
+    }
+  }
+
+  const shopifySessionsForStatus = initialShopifySession
+    ? shopifySessions.some((session) => session._id === initialShopifySession._id)
+      ? shopifySessions
+      : [...shopifySessions, initialShopifySession]
+    : shopifySessions;
+
+  const shopifyMetadata = (
+    initialShopifySession?.metadata ??
+    latestShopifySession?.metadata ??
+    {}
+  ) as Record<string, unknown> | undefined;
+  const shopifyStages = extractStageFlags(shopifyMetadata);
+
+  const shopifyOverall = deriveOverallState(shopifySessionsForStatus);
+  const metaOverall = deriveOverallState(metaSessions);
+
+  const rawCurrentStep = onboarding.onboardingStep ?? ONBOARDING_STEPS.SHOPIFY;
+  const currentStep: OnboardingStepNumber = isOnboardingStepNumber(rawCurrentStep)
+    ? rawCurrentStep
+    : ONBOARDING_STEPS.SHOPIFY;
+
+  const completedStepsRaw = onboarding.onboardingData?.completedSteps ?? [];
+  const completedSteps: OnboardingStepKey[] = completedStepsRaw.filter(isOnboardingStepKey);
+
+  return {
+    completed: onboarding.isCompleted || false,
+    currentStep,
+    completedSteps,
+    connections,
+    hasShopifySubscription: onboarding.hasShopifySubscription || false,
+    isProductCostSetup: onboarding.isProductCostSetup || false,
+    isExtraCostSetup: onboarding.isExtraCostSetup || false,
+    isInitialSyncComplete: onboarding.isInitialSyncComplete || false,
+    pendingSyncPlatforms:
+      onboarding.onboardingData?.syncPendingPlatforms || undefined,
+    analyticsTriggeredAt:
+      onboarding.onboardingData?.analyticsTriggeredAt || undefined,
+    lastSyncCheckAt: onboarding.onboardingData?.lastSyncCheckAt || undefined,
+    syncCheckAttempts: onboarding.onboardingData?.syncCheckAttempts || undefined,
+    syncStatus: {
+      shopify: latestShopifySession
+        ? {
+            status: latestShopifySession.status,
+            overallState: shopifyOverall,
+            stages: shopifyStages,
+            startedAt: latestShopifySession.startedAt,
+            completedAt: latestShopifySession.completedAt,
+            lastError: latestShopifySession.error,
+          }
+        : undefined,
+      meta: latestMetaSession
+        ? {
+            status: latestMetaSession.status,
+            overallState: metaOverall,
+            recordsProcessed: latestMetaSession.recordsProcessed,
+            startedAt: latestMetaSession.startedAt,
+            completedAt: latestMetaSession.completedAt,
+            lastError: latestMetaSession.error,
+          }
+        : undefined,
+    },
+  };
+};
+
 /**
- * Get current onboarding status
+ * Get current onboarding status.
  */
 export const getOnboardingStatus = query({
   args: {},
   returns: onboardingStatusValidator,
   handler: async (ctx) => {
     const auth = await getUserAndOrg(ctx);
-    if (!auth) return null;
-    const { user, orgId } = auth;
+    return auth ? await getOnboardingStatusForAuth(ctx, auth) : null;
+  },
+});
 
-    const onboarding = await ctx.db
-      .query("onboarding")
-      .withIndex("by_user_organization", (q) =>
-        q.eq("userId", user._id).eq("organizationId", orgId),
-      )
-      .first();
+/**
+ * Get all status needed by onboarding UI with a single authenticated read.
+ */
+export const getOnboardingSnapshot = query({
+  args: {},
+  returns: v.object({
+    status: onboardingStatusValidator,
+    integrationStatus: integrationStatusValidator,
+  }),
+  handler: async (ctx) => {
+    const auth = await getUserAndOrg(ctx);
 
-    if (!onboarding) return null;
-
-    // Check connected platforms from onboarding record
-    const connections = {
-      shopify: onboarding.hasShopifyConnection || false,
-      meta: onboarding.hasMetaConnection || false,
-    };
-
-    // Prefer a small recent window for sync insight to keep the payload light
-    const shopifySessions = await ctx.db
-      .query("syncSessions")
-      .withIndex("by_org_platform_and_date", (q) =>
-        q
-          .eq("organizationId", orgId)
-          .eq("platform", "shopify"),
-      )
-      .order("desc")
-      .take(5);
-    const metaSessions = await ctx.db
-      .query("syncSessions")
-      .withIndex("by_org_platform_and_date", (q) =>
-        q
-          .eq("organizationId", orgId)
-          .eq("platform", "meta"),
-      )
-      .order("desc")
-      .take(5);
-
-    const latestShopifySession = shopifySessions[0];
-    const latestMetaSession = metaSessions[0];
-
-    let initialShopifySession = shopifySessions.find((session) =>
-      isInitialSyncSession(session),
-    );
-
-    if (!initialShopifySession) {
-      // Pull the oldest session so stage flags keep the first full import metadata.
-      const oldestShopifySession = await ctx.db
-        .query("syncSessions")
-        .withIndex("by_org_platform_and_date", (q) =>
-          q
-            .eq("organizationId", orgId)
-            .eq("platform", "shopify"),
-        )
-        .order("asc")
-        .first();
-
-      if (oldestShopifySession && isInitialSyncSession(oldestShopifySession)) {
-        initialShopifySession = oldestShopifySession;
-      }
+    if (!auth) {
+      return {
+        status: null,
+        integrationStatus: emptyIntegrationStatus(),
+      };
     }
 
-    const shopifySessionsForStatus = initialShopifySession
-      ? shopifySessions.some(
-          (session) => session._id === initialShopifySession._id,
-        )
-        ? shopifySessions
-        : [...shopifySessions, initialShopifySession]
-      : shopifySessions;
-
-    const shopifyMetadata = (
-      initialShopifySession?.metadata ??
-      latestShopifySession?.metadata ??
-      {}
-    ) as Record<string, unknown> | undefined;
-    const shopifyStages = extractStageFlags(shopifyMetadata);
-
-    const shopifyOverall = deriveOverallState(shopifySessionsForStatus);
-    const metaOverall = deriveOverallState(metaSessions);
-
-    const rawCurrentStep = onboarding.onboardingStep ?? ONBOARDING_STEPS.SHOPIFY;
-    const currentStep: OnboardingStepNumber = isOnboardingStepNumber(rawCurrentStep)
-      ? rawCurrentStep
-      : ONBOARDING_STEPS.SHOPIFY;
-
-    const completedStepsRaw = onboarding.onboardingData?.completedSteps ?? [];
-    const completedSteps: OnboardingStepKey[] = completedStepsRaw.filter(isOnboardingStepKey);
-
     return {
-      completed: onboarding.isCompleted || false,
-      currentStep,
-      completedSteps,
-      connections,
-      hasShopifySubscription: onboarding.hasShopifySubscription || false,
-      isProductCostSetup: onboarding.isProductCostSetup || false,
-      isExtraCostSetup: onboarding.isExtraCostSetup || false,
-      isInitialSyncComplete: onboarding.isInitialSyncComplete || false,
-      pendingSyncPlatforms:
-        onboarding.onboardingData?.syncPendingPlatforms || undefined,
-      analyticsTriggeredAt:
-        onboarding.onboardingData?.analyticsTriggeredAt || undefined,
-      lastSyncCheckAt: onboarding.onboardingData?.lastSyncCheckAt || undefined,
-      syncCheckAttempts: onboarding.onboardingData?.syncCheckAttempts || undefined,
-      syncStatus: {
-        shopify: latestShopifySession
-          ? {
-              status: latestShopifySession.status,
-              overallState: shopifyOverall,
-              stages: shopifyStages,
-              startedAt: latestShopifySession.startedAt,
-              completedAt: latestShopifySession.completedAt,
-              lastError: latestShopifySession.error,
-            }
-          : undefined,
-        meta: latestMetaSession
-          ? {
-              status: latestMetaSession.status,
-              overallState: metaOverall,
-              recordsProcessed: latestMetaSession.recordsProcessed,
-              startedAt: latestMetaSession.startedAt,
-              completedAt: latestMetaSession.completedAt,
-              lastError: latestMetaSession.error,
-            }
-          : undefined,
-      },
+      status: await getOnboardingStatusForAuth(ctx, auth),
+      integrationStatus: await getIntegrationStatusForOrg(ctx, auth.orgId),
     };
   },
 });
@@ -608,8 +632,6 @@ type CompleteOnboardingResult = {
   success: boolean;
   analyticsScheduled: boolean;
   platformsSyncing: string[];
-  syncJobs?: { platform: string; jobId: string }[];
-  syncErrors?: { platform: string; error: string }[];
 };
 
 export const completeOnboarding = mutation({
@@ -618,223 +640,36 @@ export const completeOnboarding = mutation({
     success: v.boolean(),
     analyticsScheduled: v.boolean(),
     platformsSyncing: v.array(v.string()),
-    syncJobs: v.optional(
-      v.array(
-        v.object({
-          platform: v.string(),
-          jobId: v.string(),
-        }),
-      ),
-    ),
-    syncErrors: v.optional(
-      v.array(
-        v.object({
-          platform: v.string(),
-          error: v.string(),
-        }),
-      ),
-    ),
   }),
   handler: async (ctx): Promise<CompleteOnboardingResult> => {
-    const { user } = await requireUserAndOrg(ctx);
+    const { user, orgId } = await requireUserAndOrg(ctx);
+    const onboarding = await getOrCreateOnboarding(ctx, user._id, orgId);
+    if (!onboarding) throw new Error("Failed to get onboarding record");
 
-    // production: avoid noisy onboarding logs
+    const platforms: Array<"shopify" | "meta"> = [];
+    if (onboarding.hasShopifyConnection) platforms.push("shopify");
+    if (onboarding.hasMetaConnection) platforms.push("meta");
 
-    // Get or create onboarding record and mark as complete
-    if (!user.organizationId) {
-      throw new Error("User has no organization");
-    }
+    const syncStates = await Promise.all(
+      platforms.map(async (platform) => {
+        const latestSync = await ctx.db
+          .query("syncSessions")
+          .withIndex("by_org_platform_and_date", (q) =>
+            q.eq("organizationId", orgId).eq("platform", platform),
+          )
+          .order("desc")
+          .first();
 
-    const onboarding = await getOrCreateOnboarding(ctx, user._id, user.organizationId);
-
-    if (!onboarding) {
-      throw new Error("Failed to get onboarding record");
-    }
-
-    // Get connected platforms for response (but don't trigger syncs)
-    const platforms: string[] = [];
-
-    const shopifyStore = await ctx.db
-      .query("shopifyStores")
-      .withIndex("by_organization_and_active", (q) =>
-        q
-          .eq("organizationId", user.organizationId as Id<"organizations">)
-          .eq("isActive", true),
-      )
-      .first();
-
-    if (shopifyStore) platforms.push("shopify");
-
-    const metaSession = await ctx.db
-      .query("integrationSessions")
-      .withIndex("by_org_platform_and_status", (q) =>
-        q
-          .eq("organizationId", user.organizationId as Id<"organizations">)
-          .eq("platform", "meta")
-          .eq("isActive", true),
-      )
-      .first();
-
-    if (metaSession) platforms.push("meta");
-
-    // Check sync status for all connected platforms
-    const completedSyncs = [];
-    const pendingSyncs = [];
-    const notStartedSyncs = [];
-    for (const platform of platforms) {
-      // Get the latest sync session for this platform using index ordering
-      const latestSync = await ctx.db
-        .query("syncSessions")
-        .withIndex("by_org_platform_and_date", (q) =>
-          q
-            .eq("organizationId", user.organizationId as Id<"organizations">)
-            .eq("platform", platform as "shopify" | "meta"),
-        )
-        .order("desc")
-        .first();
-
-      if (!latestSync) {
-        notStartedSyncs.push(platform);
-      } else if (latestSync.status === "completed") {
-        completedSyncs.push(platform);
-      } else if (
-        latestSync.status === "syncing" ||
-        latestSync.status === "pending"
-      ) {
-        pendingSyncs.push(platform);
-      } else if (latestSync.status === "failed") {
-        // Treat failed syncs as not started for retry
-        notStartedSyncs.push(platform);
-      }
-    }
-
-    // Trigger syncs for platforms that haven't started
-    const syncJobs = [];
-    const syncErrors = [];
-
-    for (const platform of notStartedSyncs) {
-      try {
-
-        // Get account ID for Meta if needed
-        let accountId: string | undefined;
-
-        if (platform === "meta") {
-          const primaryAccount = await ctx.db
-            .query("metaAdAccounts")
-            .withIndex("by_organization_and_isPrimary", (q) =>
-              q
-                .eq(
-                  "organizationId",
-                  user.organizationId as Id<"organizations">,
-                )
-                .eq("isPrimary", true),
-            )
-            .first();
-          accountId = primaryAccount?.accountId;
-        }
-
-        if (platform === "shopify") {
-          const ensure = (await ctx.runMutation(
-            internal.engine.syncJobs.ensureInitialSync,
-            {
-              organizationId: user.organizationId as Id<"organizations">,
-              platform: "shopify",
-              dateRange: { daysBack: 60 },
-            },
-          )) as {
-            enqueued: boolean;
-            sessionId: Id<"syncSessions">;
-            status: string;
-            jobId?: string;
-          };
-
-          if (ensure.jobId) {
-            syncJobs.push({ platform, jobId: ensure.jobId });
-          }
-        } else {
-          const jobId = await createJob(
-            ctx,
-            "sync:initial",
-            PRIORITY.HIGH,
-            {
-              organizationId: user.organizationId as Id<"organizations">,
-              platform: platform as "shopify" | "meta",
-              accountId,
-              dateRange: { daysBack: 60 },
-            },
-            {
-              onComplete:
-                internal.engine.syncJobs.onInitialSyncComplete as unknown,
-              context: {
-                organizationId: user.organizationId as Id<"organizations">,
-                platform,
-              },
-            },
-          );
-
-          syncJobs.push({ platform, jobId });
-        }
-      } catch (error) {
-        console.error(
-          `[ONBOARDING] Failed to trigger sync for ${platform}:`,
-          error,
-        );
-        syncErrors.push({ platform, error: String(error) });
-      }
-    }
-
-    // Check if all syncs are complete
-    const allSyncsComplete =
-      completedSyncs.length === platforms.length &&
-      pendingSyncs.length === 0 &&
-      notStartedSyncs.length === 0;
-
-    // production: avoid verbose onboarding logs
-
-    // production: avoid PII in logs
-
-    // Ensure a sync profile exists so ongoing cadence starts immediately
-    try {
-      const existingProfile = await ctx.db
-        .query("syncProfiles")
-        .withIndex("by_organization", (q) =>
-          q.eq("organizationId", user.organizationId as Id<"organizations">),
-        )
-        .first();
-
-      if (!existingProfile) {
-        await ctx.db.insert("syncProfiles", {
-          organizationId: user.organizationId as Id<"organizations">,
-          activityScore: 20,
-          lastActivityAt: Date.now(),
-          activityHistory: [],
-          syncFrequency: 4,
-          syncInterval: 21600000, // 6 hours
-          syncTier: "low",
-          lastSync: undefined,
-          nextScheduledSync: Date.now() + 10 * 60 * 1000, // 10 minutes after onboarding
-          businessHoursEnabled: true,
-          timezone: undefined,
-          platformSettings: undefined,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-        });
-      } else {
-        await ctx.db.patch(existingProfile._id, {
-          // kickstart cadence shortly after onboarding
-          nextScheduledSync: Date.now() + 10 * 60 * 1000, // 10 minutes
-          updatedAt: Date.now(),
-        });
-      }
-    } catch (e) {
-      console.warn("[ONBOARDING] Failed to upsert sync profile", e);
-    }
-
-    const now = Date.now();
-    const pendingPlatformsList = Array.from(
-      new Set([...pendingSyncs, ...notStartedSyncs]),
+        return { platform, latestSync };
+      }),
     );
 
+    const pendingPlatformsList = syncStates
+      .filter(({ latestSync }) => latestSync?.status !== "completed")
+      .map(({ platform }) => platform);
+    const allSyncsComplete =
+      platforms.length > 0 && pendingPlatformsList.length === 0;
+    const now = Date.now();
     const onboardingData: Record<string, any> = {
       ...onboarding.onboardingData,
       syncCheckAttempts: 0,
@@ -847,66 +682,175 @@ export const completeOnboarding = mutation({
       delete onboardingData.syncPendingPlatforms;
     }
 
-    await ctx.db.patch(onboarding._id, {
-      isCompleted: true,
-      onboardingStep: ONBOARDING_STEPS.COMPLETE,
-      isInitialSyncComplete: allSyncsComplete,
-      onboardingData,
-      updatedAt: now,
-    });
+    const onboardingPatch: Partial<Doc<"onboarding">> = {};
+    if (!onboarding.isCompleted) onboardingPatch.isCompleted = true;
+    if (onboarding.onboardingStep !== ONBOARDING_STEPS.COMPLETE) {
+      onboardingPatch.onboardingStep = ONBOARDING_STEPS.COMPLETE;
+    }
+    if (onboarding.isInitialSyncComplete !== allSyncsComplete) {
+      onboardingPatch.isInitialSyncComplete = allSyncsComplete;
+    }
+    onboardingPatch.onboardingData = onboardingData as Doc<"onboarding">["onboardingData"];
+    onboardingPatch.updatedAt = now;
 
-    // Start per-org monitoring if syncs are pending
-    if (pendingPlatformsList.length > 0) {
-      console.log(
-        `[ONBOARDING] Starting per-org monitoring for ${user.organizationId} - ${pendingPlatformsList.length} platform(s) syncing`,
-      );
+    await ctx.db.patch(onboarding._id, onboardingPatch);
+
+    if (!user.isOnboarded) {
+      await ctx.db.patch(user._id, { isOnboarded: true, updatedAt: now });
+    }
+
+    if (!onboarding.isCompleted) {
       await ctx.scheduler.runAfter(
-        10000, // Check in 10 seconds
-        internal.core.onboarding.monitorInitialSyncs,
-        { organizationId: user.organizationId as Id<"organizations"> },
-      );
-    } else {
-      console.log(`[ONBOARDING] All syncs already complete for ${user.organizationId}, no monitoring needed`);
-    }
-
-    // Always kick off a monitoring pass immediately so analytics can trigger
-    try {
-      await ctx.runMutation(
-        internal.core.onboarding.triggerMonitorIfOnboardingComplete,
-        {
-          organizationId: user.organizationId as Id<"organizations">,
-          limit: 1,
-          reason: "onboarding_complete",
-        },
-      );
-    } catch (monitorError) {
-      console.warn(
-        `[ONBOARDING] monitorInitialSyncs immediate run failed for ${user.organizationId}`,
-        monitorError,
+        0,
+        internal.core.onboarding.finishOnboardingInBackground,
+        { organizationId: orgId },
       );
     }
-
-    // Update integration status snapshot (best-effort)
-    try {
-      await ctx.runMutation(internal.core.status.refreshIntegrationStatus, {
-        organizationId: user.organizationId as Id<"organizations">,
-      });
-    } catch (_error) {
-      // non-fatal
-    }
-
-    await ctx.db.patch(user._id, {
-      isOnboarded: true,
-      updatedAt: now,
-    });
 
     return {
       success: true,
       analyticsScheduled: false,
       platformsSyncing: pendingPlatformsList,
-      syncJobs: syncJobs.length > 0 ? syncJobs : undefined,
-      syncErrors: syncErrors.length > 0 ? syncErrors : undefined,
     };
+  },
+});
+
+export const finishOnboardingInBackground = internalMutation({
+  args: {
+    organizationId: v.id("organizations"),
+  },
+  returns: v.object({
+    syncJobs: v.number(),
+    syncErrors: v.number(),
+  }),
+  handler: async (ctx, args) => {
+    const now = Date.now();
+    const kickstartAt = now + 10 * 60 * 1000;
+    const existingProfile = await ctx.db
+      .query("syncProfiles")
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .first();
+
+    if (!existingProfile) {
+      await ctx.db.insert("syncProfiles", {
+        organizationId: args.organizationId,
+        activityScore: 20,
+        lastActivityAt: now,
+        activityHistory: [],
+        syncFrequency: 4,
+        syncInterval: 21600000,
+        syncTier: "low",
+        lastSync: undefined,
+        nextScheduledSync: kickstartAt,
+        businessHoursEnabled: true,
+        timezone: undefined,
+        platformSettings: undefined,
+        createdAt: now,
+        updatedAt: now,
+      });
+    } else if (
+      !existingProfile.nextScheduledSync ||
+      existingProfile.nextScheduledSync > kickstartAt
+    ) {
+      await ctx.db.patch(existingProfile._id, {
+        nextScheduledSync: kickstartAt,
+        updatedAt: now,
+      });
+    }
+
+    const onboarding = await ctx.db
+      .query("onboarding")
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .first();
+    const platforms: Array<"shopify" | "meta"> = [];
+    if (onboarding?.hasShopifyConnection) platforms.push("shopify");
+    if (onboarding?.hasMetaConnection) platforms.push("meta");
+
+    let syncJobs = 0;
+    let syncErrors = 0;
+    for (const platform of platforms) {
+      const latestSync = await ctx.db
+        .query("syncSessions")
+        .withIndex("by_org_platform_and_date", (q) =>
+          q.eq("organizationId", args.organizationId).eq("platform", platform),
+        )
+        .order("desc")
+        .first();
+
+      if (
+        latestSync &&
+        latestSync.status !== "failed" &&
+        latestSync.status !== "cancelled"
+      ) {
+        continue;
+      }
+
+      try {
+        if (platform === "shopify") {
+          const ensure = (await ctx.runMutation(
+            internal.engine.syncJobs.ensureInitialSync,
+            {
+              organizationId: args.organizationId,
+              platform: "shopify",
+              dateRange: { daysBack: 60 },
+            },
+          )) as { jobId?: string };
+          if (ensure.jobId) syncJobs += 1;
+          continue;
+        }
+
+        const primaryAccount = await ctx.db
+          .query("metaAdAccounts")
+          .withIndex("by_organization_and_isPrimary", (q) =>
+            q.eq("organizationId", args.organizationId).eq("isPrimary", true),
+          )
+          .first();
+        await createJob(
+          ctx,
+          "sync:initial",
+          PRIORITY.HIGH,
+          {
+            organizationId: args.organizationId,
+            platform,
+            accountId: primaryAccount?.accountId,
+            dateRange: { daysBack: 60 },
+          },
+          {
+            onComplete: internal.engine.syncJobs.onInitialSyncComplete as unknown,
+            context: {
+              organizationId: args.organizationId,
+              platform,
+            },
+          },
+        );
+        syncJobs += 1;
+      } catch (error) {
+        console.warn("[ONBOARDING] Background sync kickoff failed", {
+          organizationId: args.organizationId,
+          platform,
+          error,
+        });
+        syncErrors += 1;
+      }
+    }
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.core.onboarding.triggerMonitorIfOnboardingComplete,
+      {
+        organizationId: args.organizationId,
+        reason: "onboarding_complete",
+      },
+    );
+    await ctx.scheduler.runAfter(0, internal.core.status.refreshIntegrationStatus, {
+      organizationId: args.organizationId,
+    });
+
+    return { syncJobs, syncErrors };
   },
 });
 
@@ -918,7 +862,6 @@ export const completeOnboarding = mutation({
 export const triggerMonitorIfOnboardingComplete = internalMutation({
   args: {
     organizationId: v.id("organizations"),
-    limit: v.optional(v.number()),
     reason: v.optional(v.string()),
   },
   returns: v.object({
@@ -949,7 +892,6 @@ export const triggerMonitorIfOnboardingComplete = internalMutation({
 
     await ctx.runMutation(internal.core.onboarding.monitorInitialSyncs, {
       organizationId: args.organizationId,
-      limit: args.limit ?? 1,
     });
 
     return {
@@ -961,8 +903,7 @@ export const triggerMonitorIfOnboardingComplete = internalMutation({
 
 export const monitorInitialSyncs = internalMutation({
   args: {
-    limit: v.optional(v.number()),
-    organizationId: v.optional(v.id("organizations")),
+    organizationId: v.id("organizations"),
   },
   returns: v.object({
     checked: v.number(),
@@ -972,39 +913,12 @@ export const monitorInitialSyncs = internalMutation({
     skipped: v.number(),
   }),
   handler: async (ctx, args) => {
-    const limitArg = args.limit ?? 25;
-    const limit = Math.min(Math.max(limitArg, 1), 100);
-
-    // Only query orgs that need monitoring (analytics not yet calculated)
-    const candidates = await (async () => {
-      if (args.organizationId) {
-        const records = await ctx.db
-          .query("onboarding")
-          .withIndex("by_organization", (q) =>
-            q.eq("organizationId", args.organizationId as Id<"organizations">),
-          )
-          .take(limit);
-
-        console.log(`[MONITOR_CRON] Specific org query returned ${records.length} records`);
-        return records;
-      }
-
-      // Query only orgs that haven't completed analytics calculation
-      const allRecords = await ctx.db
-        .query("onboarding")
-        .withIndex("by_completed", (q) => q.eq("isCompleted", true))
-        .take(limit * 3);
-
-      const needsMonitoring = allRecords.filter((record) => {
-        const status = record.analyticsCalculationStatus;
-        return !status || status === "not_started" || status === "pending" || status === "failed";
-      });
-
-      console.log(`[MONITOR_CRON] Found ${allRecords.length} completed onboardings, ${needsMonitoring.length} need monitoring`);
-      return needsMonitoring.slice(0, limit);
-    })();
-
-    console.log(`[MONITOR_CRON] Starting monitoring check for ${candidates.length} orgs`);
+    const onboarding = await ctx.db
+      .query("onboarding")
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .first();
 
     let processed = 0;
     let completedCount = 0;
@@ -1195,23 +1109,25 @@ export const monitorInitialSyncs = internalMutation({
       return { finalized: true, normalizedOrdersProcessed };
     };
 
-    for (const onboarding of candidates) {
-      if (processed >= limit) break;
-      if (!onboarding.organizationId) continue;
+    if (!onboarding) {
+      return {
+        checked: 0,
+        completed: 0,
+        analyticsTriggered: 0,
+        pending: 0,
+        skipped: 1,
+      };
+    }
 
-      const orgId = onboarding.organizationId as Id<"organizations">;
+    for (const currentOnboarding of [onboarding]) {
+      const onboarding = currentOnboarding;
+      const orgId = args.organizationId;
       const checkCount = (onboarding.monitorCheckCount ?? 0) + 1;
-
-      console.log(`[MONITOR_CRON] Checking org ${orgId} (check #${checkCount})`);
 
       processed += 1;
 
       try {
         if (!onboarding.isCompleted) {
-          console.log(
-            `[MONITOR_CRON] Org ${orgId}: Onboarding not completed yet, skipping analytics trigger`,
-          );
-
           const skipUpdate: Record<string, any> = {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
@@ -1228,21 +1144,18 @@ export const monitorInitialSyncs = internalMutation({
 
         // Skip if analytics already calculated
         if (onboarding.analyticsCalculationStatus === "completed") {
-          console.log(`[MONITOR_CRON] Org ${orgId}: SKIPPED - Analytics already completed`);
           skippedCount += 1;
           continue;
         }
 
         // Skip if currently calculating (another process might be handling it)
         if (onboarding.analyticsCalculationStatus === "calculating") {
-          console.log(`[MONITOR_CRON] Org ${orgId}: SKIPPED - Analytics calculation in progress`);
           skippedCount += 1;
           continue;
         }
 
         // Check Shopify connection and sync status
         if (!onboarding.hasShopifyConnection) {
-          console.log(`[MONITOR_CRON] Org ${orgId}: Waiting for Shopify connection`);
           await ctx.db.patch(onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
@@ -1254,25 +1167,18 @@ export const monitorInitialSyncs = internalMutation({
 
         const shopifySession = await getLatestSyncSession(orgId, "shopify");
         const shopifyStatus = shopifySession?.status || "none";
-        console.log(`[MONITOR_CRON] Org ${orgId}: Shopify sync status = ${shopifyStatus}`);
 
         // Try to finalize Shopify session if needed
         let shopifyCompleted = shopifyStatus === "completed";
         let sessionStuckOrFailed = false;
 
         if (!shopifyCompleted && shopifySession) {
-          console.log(`[MONITOR_CRON] Org ${orgId}: Attempting to finalize Shopify session...`);
           const finalizeResult = await attemptFinalizeSession(shopifySession);
 
           if (finalizeResult.finalized) {
             shopifyCompleted = true;
-            console.log(`[MONITOR_CRON] Org ${orgId}: ✅ Shopify session finalized successfully`);
           } else if (finalizeResult.shouldFail) {
             // Session is stuck - mark as failed and trigger analytics anyway
-            console.log(`[MONITOR_CRON] Org ${orgId}: 🚨 Session stuck/failed: ${finalizeResult.reason}`);
-            console.log(`[MONITOR_CRON] Org ${orgId}: Marking session as failed and triggering analytics with partial data`);
-
-            // Mark session as failed
             await ctx.db.patch(shopifySession._id, {
               status: "failed",
               completedAt: now,
@@ -1285,14 +1191,11 @@ export const monitorInitialSyncs = internalMutation({
 
             sessionStuckOrFailed = true;
             shopifyCompleted = true; // Treat as "completed" for analytics trigger
-          } else {
-            console.log(`[MONITOR_CRON] Org ${orgId}: Session not ready to finalize - still processing`);
           }
         }
 
         // Check if Shopify is still syncing (after finalization attempt)
         if (!shopifyCompleted && !sessionStuckOrFailed && ACTIVE_SYNC_STATUSES.has(shopifyStatus as any)) {
-          console.log(`[MONITOR_CRON] Org ${orgId}: Shopify sync in progress...`);
           await ctx.db.patch(onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
@@ -1304,7 +1207,6 @@ export const monitorInitialSyncs = internalMutation({
 
         // Check if Shopify failed
         if (shopifyStatus === "failed" && !shopifyCompleted) {
-          console.log(`[MONITOR_CRON] Org ${orgId}: ERROR - Shopify sync failed`);
           await ctx.db.patch(onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
@@ -1315,7 +1217,6 @@ export const monitorInitialSyncs = internalMutation({
 
         // Shopify must be completed at this point
         if (!shopifyCompleted) {
-          console.log(`[MONITOR_CRON] Org ${orgId}: Shopify sync not yet complete`);
           await ctx.db.patch(onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
@@ -1341,12 +1242,10 @@ export const monitorInitialSyncs = internalMutation({
           if (metaIntegrationSession) {
             const metaSession = await getLatestSyncSession(orgId, "meta");
             const metaStatus = metaSession?.status || "none";
-            console.log(`[MONITOR_CRON] Org ${orgId}: Meta sync status = ${metaStatus}`);
 
             metaCompleted = metaStatus === "completed";
 
             if (ACTIVE_SYNC_STATUSES.has(metaStatus as any)) {
-              console.log(`[MONITOR_CRON] Org ${orgId}: Meta sync in progress...`);
               await ctx.db.patch(onboarding._id, {
                 lastMonitorCheckAt: now,
                 monitorCheckCount: checkCount,
@@ -1357,18 +1256,13 @@ export const monitorInitialSyncs = internalMutation({
             }
 
             if (metaStatus === "failed") {
-              console.log(`[MONITOR_CRON] Org ${orgId}: WARNING - Meta sync failed, continuing with Shopify data only`);
               metaCompleted = true; // Continue anyway
             }
-          } else {
-            console.log(`[MONITOR_CRON] Org ${orgId}: Meta connected but no active session found`);
           }
         }
 
         // All syncs complete - trigger analytics calculation
         if (shopifyCompleted && metaCompleted) {
-          console.log(`[MONITOR_CRON] Org ${orgId}: ✅ ALL SYNCS COMPLETE - Triggering analytics calculation`);
-
           // Mark as calculating
           await ctx.db.patch(onboarding._id, {
             analyticsCalculationStatus: "calculating",
@@ -1393,9 +1287,6 @@ export const monitorInitialSyncs = internalMutation({
             undefined,
             dateOptions,
           );
-
-          const totalJobs = Math.ceil(dates.length / ONBOARDING_ANALYTICS_REBUILD_CHUNK_SIZE);
-          console.log(`[MONITOR_CRON] Org ${orgId}: Creating ${totalJobs} analytics jobs for ${dates.length} days`);
 
           for (let index = 0; index < dates.length; index += ONBOARDING_ANALYTICS_REBUILD_CHUNK_SIZE) {
             const chunk = dates.slice(
@@ -1426,14 +1317,9 @@ export const monitorInitialSyncs = internalMutation({
             analyticsCount += 1;
           }
 
-          // Mark as completed immediately
-          // Jobs will populate dailyMetrics, then dashboard can read from it
           await ctx.db.patch(onboarding._id, {
             analyticsCalculationStatus: "completed",
           });
-
-          console.log(`[MONITOR_CRON] Org ${orgId}: ✅ Analytics calculation initiated successfully`);
-          console.log(`[MONITOR_CRON] Org ${orgId}: Will no longer be monitored`);
 
           completedCount += 1;
 
@@ -1468,18 +1354,13 @@ export const monitorInitialSyncs = internalMutation({
       }
     }
 
-    console.log(`[MONITOR_CRON] Monitoring complete - checked: ${processed}, completed: ${completedCount}, pending: ${pendingCount}, skipped: ${skippedCount}, analytics jobs: ${analyticsCount}`);
-
     // Self-scheduling: If monitoring a specific org and still pending, reschedule
-    if (args.organizationId && pendingCount > 0) {
-      console.log(`[MONITOR_CRON] Org ${args.organizationId}: Still pending, rescheduling check in 10 seconds`);
+    if (pendingCount > 0) {
       await ctx.scheduler.runAfter(
-        10000, // 10 seconds
+        10000,
         internal.core.onboarding.monitorInitialSyncs,
         { organizationId: args.organizationId },
       );
-    } else if (args.organizationId) {
-      console.log(`[MONITOR_CRON] Org ${args.organizationId}: Monitoring complete, will not reschedule`);
     }
 
     return {
@@ -1747,14 +1628,6 @@ export const saveInitialCosts = mutation({
     };
   },
 });
-
-/**
- * Skip initial cost setup
- */
-
-/**
- * Get products for cost mapping with pagination
- */
 
 /**
  * Connect Shopify store during onboarding

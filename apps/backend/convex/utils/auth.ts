@@ -20,10 +20,7 @@ function firstString(...values: unknown[]) {
 
 export async function getStackIdentity(ctx: AnyCtx): Promise<StackIdentity | null> {
   const identity = await ctx.auth.getUserIdentity();
-  if (!identity) {
-    console.log('[auth-debug] Convex auth identity missing');
-    return null;
-  }
+  if (!identity) return null;
 
   const claims = identity as unknown as Record<string, unknown>;
   const stackId = firstString(
@@ -41,16 +38,6 @@ export async function getStackIdentity(ctx: AnyCtx): Promise<StackIdentity | nul
     claims.selected_team_id,
     claims['https://stack-auth.com/team_id'],
   );
-
-  console.log('[auth-debug] Convex auth identity resolved', {
-    subject: identity.subject,
-    tokenIdentifier: identity.tokenIdentifier,
-    issuer: identity.issuer,
-    stackId,
-    teamId: teamId ?? stackId,
-    email: firstString(claims.email, claims.primaryEmail, claims.primary_email),
-    claimKeys: Object.keys(claims).sort(),
-  });
 
   if (!stackId) return null;
   return { stackId, teamId: teamId ?? stackId };

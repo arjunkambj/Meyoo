@@ -81,7 +81,6 @@ export const storeProductsInternal = internalMutation({
           internal.core.onboarding.triggerMonitorIfOnboardingComplete,
           {
             organizationId: args.organizationId,
-            limit: 1,
             reason: "shopify_store_inactive",
           },
         );

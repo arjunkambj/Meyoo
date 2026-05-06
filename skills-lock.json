@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "convex-performance-audit": {
+      "source": "get-convex/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/convex-performance-audit/SKILL.md",
+      "computedHash": "d4f372ad6bed01b3a83983f5e8386017606e1bf8a97833c016af07f277157f96"
+    },
     "heroui-react": {
       "source": "heroui-inc/heroui",
       "sourceType": "github",

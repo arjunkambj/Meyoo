@@ -1,14 +1,16 @@
+"use client";
+
 import { useMutation } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { api } from "@/libs/convexApi";
 import type { OnboardingStatus } from "@repo/types";
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
 
 function useOnboardingInternal() {
-  const rawStatus = useQuery(api.core.onboarding.getOnboardingStatus);
-  const status = rawStatus as OnboardingStatus | null | undefined;
-  const integrationStatus = useQuery(api.core.status.getIntegrationStatus);
+  const snapshot = useQuery(api.core.onboarding.getOnboardingSnapshot);
+  const status = snapshot?.status as OnboardingStatus | null | undefined;
+  const integrationStatus = snapshot?.integrationStatus;
   type Overall = "unsynced" | "syncing" | "complete" | "failed";
   const syncStatus = status?.syncStatus;
   const updateStateMutation = useMutation(
@@ -18,15 +20,6 @@ function useOnboardingInternal() {
     api.core.onboarding.updateBusinessProfile
   );
   const completeMutation = useMutation(api.core.onboarding.completeOnboarding);
-
-  useEffect(() => {
-    console.log("[auth-debug] Onboarding query state", {
-      rawStatus,
-      loading: rawStatus === undefined,
-      status,
-      integrationStatus,
-    });
-  }, [integrationStatus, rawStatus, status]);
 
   const shopifyOverall = syncStatus?.shopify?.overallState as
     | Overall
@@ -110,9 +103,9 @@ function useOnboardingInternal() {
 
   return {
     status,
-    loading: rawStatus === undefined,
+    loading: snapshot === undefined,
     error:
-      status === null && rawStatus !== undefined
+      status === null && snapshot !== undefined
         ? "Failed to load onboarding status"
         : null,
     isCompleted: status?.completed || false,

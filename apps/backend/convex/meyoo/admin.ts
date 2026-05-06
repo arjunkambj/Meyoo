@@ -3,7 +3,7 @@ import { internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { ActionCtx, MutationCtx, QueryCtx } from "../_generated/server";
 import { action, internalMutation, internalQuery } from "../_generated/server";
-import { createNewUserData } from "../authHelpers";
+import { createNewUserData } from "../core/workspaceProvisioning";
 import { createJob, PRIORITY } from "../engine/workpool";
 import { optionalEnv } from "../utils/env";
 import { buildDateSpan } from "../utils/date";

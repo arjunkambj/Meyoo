@@ -337,7 +337,6 @@ export const initializeSyncSessionBatches = internalMutation({
         internal.core.onboarding.triggerMonitorIfOnboardingComplete,
         {
           organizationId: session.organizationId as Id<"organizations">,
-          limit: 1,
           reason: "sync_session_completed",
         },
       );

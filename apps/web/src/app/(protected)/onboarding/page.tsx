@@ -36,11 +36,6 @@ export default async function OnboardingIndexPage() {
     status = null;
   }
 
-  // Completed setup -> Overview
-  if (status?.completed) {
-    redirect("/overview");
-  }
-
   // No Shopify connection yet -> Shopify connect
   if (!status?.connections?.shopify) {
     redirect("/onboarding/shopify");

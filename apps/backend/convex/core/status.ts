@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 
+import type { Id } from "../_generated/dataModel";
+import type { QueryCtx } from "../_generated/server";
 import { query, internalMutation } from "../_generated/server";
 import { getUserAndOrg } from "../utils/auth";
 import {
@@ -7,6 +9,28 @@ import {
   emptyIntegrationStatus,
   integrationStatusValidator,
 } from "../utils/integrationStatus";
+
+const SNAPSHOT_TTL_MS = 60 * 1000; // 1 minute freshness is enough for UI
+
+export const getIntegrationStatusForOrg = async (
+  ctx: QueryCtx,
+  organizationId: Id<"organizations">,
+) => {
+  const existing = await ctx.db
+    .query("integrationStatus")
+    .withIndex("by_organization", (q) => q.eq("organizationId", organizationId))
+    .first();
+
+  if (existing && Date.now() - (existing.updatedAt ?? 0) < SNAPSHOT_TTL_MS) {
+    return {
+      shopify: existing.shopify,
+      meta: existing.meta,
+      analytics: existing.analytics,
+    };
+  }
+
+  return await computeIntegrationStatus(ctx, organizationId);
+};
 
 export const getIntegrationStatus = query({
   args: {},
@@ -17,23 +41,7 @@ export const getIntegrationStatus = query({
       return emptyIntegrationStatus();
     }
 
-    // Prefer lightweight snapshot when available and fresh
-    const SNAPSHOT_TTL_MS = 60 * 1000; // 1 minute freshness is enough for UI
-    const existing = await ctx.db
-      .query("integrationStatus")
-      .withIndex("by_organization", (q) => q.eq("organizationId", auth.orgId))
-      .first();
-
-    if (existing && Date.now() - (existing.updatedAt ?? 0) < SNAPSHOT_TTL_MS) {
-      return {
-        shopify: existing.shopify,
-        meta: existing.meta,
-        analytics: existing.analytics,
-      };
-    }
-
-    // Fallback to computing on the fly (now lightweight)
-    return await computeIntegrationStatus(ctx, auth.orgId);
+    return await getIntegrationStatusForOrg(ctx, auth.orgId);
   },
 });
 

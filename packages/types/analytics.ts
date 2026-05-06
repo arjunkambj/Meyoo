@@ -324,7 +324,6 @@ export interface OrdersInsightsKPIs {
 
 export interface OrdersInsightsPayload {
   kpis: OrdersInsightsKPIs | null;
-  fulfillment: OrdersFulfillmentMetrics | null;
   journey: OrdersJourneyStage[];
   cancelRate: number;
   returnRate: number;

@@ -5,8 +5,8 @@ import type { Id } from "../_generated/dataModel";
 import { internalMutation, type MutationCtx } from "../_generated/server";
 import { logger } from "./shared";
 import { findShopifyStoreByDomain } from "../utils/shop";
-import { DELETE_BATCH_SIZE, ORGANIZATION_TABLES, STORE_TABLES } from "./cleanup";
-import { createNewUserData } from "../authHelpers";
+import { DELETE_BATCH_SIZE, ORGANIZATION_TABLES } from "./cleanup";
+import { createNewUserData } from "../core/workspaceProvisioning";
 
 export const handleAppUninstallInternal = internalMutation({
   args: {
@@ -202,31 +202,19 @@ export const handleAppUninstalled = internalMutation({
       let storeCleanupJobs = 0;
 
       for (const store of stores) {
-        for (const table of STORE_TABLES) {
-          await ctx.scheduler.runAfter(
-            0,
-            internal.shopify.cleanup.deleteStoreDataBatch,
-            {
-              table,
-              storeId: store._id,
-              batchSize: DELETE_BATCH_SIZE,
-            },
-          );
-
-          storeCleanupJobs += 1;
-          storeJobsPerTable[table] = (storeJobsPerTable[table] ?? 0) + 1;
-        }
-
         await ctx.scheduler.runAfter(
           0,
-          internal.shopify.cleanup.deleteShopifyStoreIfEmpty,
+          internal.shopify.cleanup.cleanupStoreDataSequentially,
           {
             storeId: store._id,
             organizationId,
+            tableIndex: 0,
+            batchSize: DELETE_BATCH_SIZE,
           },
         );
 
         storeCleanupJobs += 1;
+        storeJobsPerTable.sequential = (storeJobsPerTable.sequential ?? 0) + 1;
       }
 
       let organizationCleanupJobs = 0;

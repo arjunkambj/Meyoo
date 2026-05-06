@@ -8,7 +8,6 @@ import { dateRangeToUtcWithShopPreference } from "@/libs/dateRange";
 import { useShopifyTime } from "./useShopifyTime";
 import type { JourneyStage } from "@/components/dashboard/(analytics)/orders-insights/components/CustomerJourney";
 import type {
-  OrdersFulfillmentMetrics,
   OrdersInsightsKPIs,
   OrdersInsightsPayload,
   OrdersJourneyStage,
@@ -23,7 +22,6 @@ interface UseOrdersInsightsParams {
 
 interface OrdersInsightsResult {
   kpis: OrdersInsightsKPIs | null;
-  fulfillment: OrdersFulfillmentMetrics | null;
   journey: JourneyStage[];
   cancelRate: number;
   returnRate: number;
@@ -115,7 +113,6 @@ export function useOrdersInsights(
     queryArgs === "skip" || insightsResult === undefined;
 
   const kpis = insightsResult?.kpis ?? null;
-  const fulfillment = insightsResult?.fulfillment ?? null;
   const journeySource = insightsResult?.journey;
   const journey = useMemo(
     () => normalizeJourneyStages(journeySource),
@@ -127,7 +124,6 @@ export function useOrdersInsights(
 
   return {
     kpis,
-    fulfillment,
     journey,
     cancelRate,
     returnRate,

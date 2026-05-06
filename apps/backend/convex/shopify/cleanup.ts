@@ -106,6 +106,10 @@ type BatchDeleteResult = {
   hasMore: boolean;
 };
 
+type StoreTablePageResult = BatchDeleteResult & {
+  continueCursor?: string;
+};
+
 const normalizeBatchSize = (size?: number): number => {
   if (typeof size !== "number" || Number.isNaN(size) || size <= 0) {
     return DELETE_BATCH_SIZE;
@@ -154,6 +158,59 @@ const scheduleStoreBatch = async (
       batchSize: args.batchSize,
     },
   );
+};
+
+const scheduleStoreCleanupCoordinator = async (
+  ctx: any,
+  args: {
+    storeId: Id<"shopifyStores">;
+    organizationId: Id<"organizations">;
+    tableIndex: number;
+    cursor?: string | null;
+    batchSize: number;
+  },
+) => {
+  await ctx.scheduler.runAfter(
+    0,
+    internal.shopify.cleanup.cleanupStoreDataSequentially,
+    {
+      storeId: args.storeId,
+      organizationId: args.organizationId,
+      tableIndex: args.tableIndex,
+      cursor: args.cursor ?? undefined,
+      batchSize: args.batchSize,
+    },
+  );
+};
+
+const deleteStoreTablePage = async (
+  ctx: any,
+  args: {
+    table: StoreDataTable;
+    storeId: Id<"shopifyStores">;
+    cursor?: string | null;
+    batchSize: number;
+  },
+): Promise<StoreTablePageResult> => {
+  const query = (ctx.db.query(args.table) as any).withIndex(
+    "by_store" as any,
+    (q: any) => q.eq("storeId", args.storeId),
+  );
+
+  const page = await query.paginate({
+    numItems: args.batchSize,
+    cursor: args.cursor ?? null,
+  });
+
+  for (const record of page.page) {
+    await ctx.db.delete(record._id);
+  }
+
+  return {
+    deleted: page.page.length,
+    hasMore: !page.isDone,
+    continueCursor: page.isDone ? undefined : page.continueCursor,
+  };
 };
 
 export const deleteOrganizationDataBatch = internalMutation({
@@ -219,32 +276,79 @@ export const deleteStoreDataBatch = internalMutation({
     const batchSize = normalizeBatchSize(args.batchSize);
     const table = args.table as StoreDataTable;
 
-    const query = (ctx.db.query(table) as any).withIndex(
-      "by_store" as any,
-      (q: any) => q.eq("storeId", args.storeId),
-    );
-
-    const page = await query.paginate({
-      numItems: batchSize,
-      cursor: args.cursor ?? null,
+    const result = await deleteStoreTablePage(ctx, {
+      table,
+      storeId: args.storeId,
+      cursor: args.cursor,
+      batchSize,
     });
 
-    for (const record of page.page) {
-      await ctx.db.delete(record._id);
-    }
-
-    if (!page.isDone) {
+    if (result.hasMore) {
       await scheduleStoreBatch(ctx, {
         table,
         storeId: args.storeId,
-        cursor: page.continueCursor,
+        cursor: result.continueCursor,
         batchSize,
       });
     }
 
     return {
-      deleted: page.page.length,
-      hasMore: !page.isDone,
+      deleted: result.deleted,
+      hasMore: result.hasMore,
+    };
+  },
+});
+
+export const cleanupStoreDataSequentially = internalMutation({
+  args: {
+    storeId: v.id("shopifyStores"),
+    organizationId: v.id("organizations"),
+    tableIndex: v.number(),
+    cursor: v.optional(v.string()),
+    batchSize: v.optional(v.number()),
+  },
+  returns: v.object({
+    deleted: v.number(),
+    hasMore: v.boolean(),
+    done: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    const batchSize = normalizeBatchSize(args.batchSize);
+    const tableIndex = Math.max(0, Math.floor(args.tableIndex));
+
+    if (tableIndex >= STORE_TABLES.length) {
+      await ctx.scheduler.runAfter(
+        0,
+        internal.shopify.cleanup.deleteShopifyStoreIfEmpty,
+        {
+          storeId: args.storeId,
+          organizationId: args.organizationId,
+        },
+      );
+
+      return { deleted: 0, hasMore: false, done: true };
+    }
+
+    const table = STORE_TABLES[tableIndex] as StoreDataTable;
+    const result = await deleteStoreTablePage(ctx, {
+      table,
+      storeId: args.storeId,
+      cursor: args.cursor,
+      batchSize,
+    });
+
+    await scheduleStoreCleanupCoordinator(ctx, {
+      storeId: args.storeId,
+      organizationId: args.organizationId,
+      tableIndex: result.hasMore ? tableIndex : tableIndex + 1,
+      cursor: result.continueCursor,
+      batchSize,
+    });
+
+    return {
+      deleted: result.deleted,
+      hasMore: result.hasMore,
+      done: false,
     };
   },
 });

@@ -4,7 +4,8 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { normalizeShopDomain, findShopifyStoreByDomain } from "./utils/shop";
 import { verifyShopProvisionSignature } from "./utils/crypto";
-import { ensureActiveMembership, findExistingUser, normalizeEmail } from "./authHelpers";
+import { ensureActiveMembership } from "./core/membershipHelpers";
+import { findExistingUser, normalizeEmail } from "./core/userLookup";
 import { ensureShopifyOnboarding } from "./utils/onboarding";
 import { isIanaTimeZone } from "@repo/time";
 import { optionalEnv } from "./utils/env";
@@ -79,7 +80,7 @@ export const createOrAttachFromShopifyOAuth = mutation({
         ? normalizeEmail(args.shopData.email)
         : undefined;
       if (email) {
-        user = await findExistingUser(ctx as any, email);
+        user = await findExistingUser(ctx, email);
       }
       if (!user) {
         const fallbackEmail = email || `owner@${shop}`;

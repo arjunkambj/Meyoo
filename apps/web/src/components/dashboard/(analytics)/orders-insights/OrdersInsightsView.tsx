@@ -8,7 +8,6 @@ import GlobalDateRangePicker from "@/components/shared/GlobalDateRangePicker";
 import { useAnalyticsDateRange, useOrdersInsights } from "@/hooks";
 import { OrdersInsightsKPICards } from "./components/OrdersInsightsKPICards";
 import { CustomerJourney } from "./components/CustomerJourney";
-import { FulfillmentAnalysis } from "./components/FulfillmentAnalysis";
 
 export const OrdersInsightsView = memo(function OrdersInsightsView() {
   const {
@@ -20,7 +19,6 @@ export const OrdersInsightsView = memo(function OrdersInsightsView() {
 
   const {
     kpis,
-    fulfillment,
     journey,
     cancelRate,
     returnRate,
@@ -53,11 +51,6 @@ export const OrdersInsightsView = memo(function OrdersInsightsView() {
         <CustomerJourney cancelRate={cancelRate} data={journey} returnRate={returnRate} />
       )}
 
-      {loading ? (
-        <Skeleton className="h-[360px] rounded-2xl" />
-      ) : (
-        <FulfillmentAnalysis metrics={fulfillment ?? undefined} />
-      )}
     </div>
   );
 });

@@ -156,10 +156,6 @@ export async function getRedirectUrl(
       { token },
     );
 
-    if (status?.completed) {
-      return `${baseUrl}/overview`;
-    }
-
     if (status?.connections?.shopify && status?.hasShopifySubscription) {
       return `${baseUrl}/onboarding/marketing`;
     }

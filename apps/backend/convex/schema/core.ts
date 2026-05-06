@@ -367,8 +367,6 @@ export const onboarding = defineTable({
   .index("by_user", ["userId"])
   .index("by_organization", ["organizationId"])
   .index("by_user_organization", ["userId", "organizationId"])
-  .index("by_completed", ["isCompleted"])
-  .index("by_step", ["onboardingStep"])
   .index("by_analytics_status", ["analyticsCalculationStatus"]);
 
 export const billing = defineTable({

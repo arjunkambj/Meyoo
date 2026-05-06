@@ -14,7 +14,6 @@ import {
   useManualReturnRate,
   useOnboarding,
   useOnboardingCosts,
-  useUpdateOnboardingState,
   useUser,
 } from "@/hooks";
 import { getCurrencySymbol } from "@/libs/utils/format";
@@ -32,7 +31,6 @@ export default function SimpleCostsClient() {
     isShopifyInventorySynced,
   } = useOnboarding();
   const { saveInitialCosts } = useOnboardingCosts();
-  const updateOnboardingState = useUpdateOnboardingState();
   const { primaryCurrency } = useUser();
   const currencySymbol = useMemo(
     () => getCurrencySymbol(primaryCurrency),
@@ -197,10 +195,9 @@ export default function SimpleCostsClient() {
         paymentFeePercent: form.paymentFeePercent
           ? Number(form.paymentFeePercent)
           : 0,
-        manualReturnRate:
-          form.manualReturnRate !== ""
-            ? Number(form.manualReturnRate)
-            : undefined,
+        ...(form.manualReturnRate !== ""
+          ? { manualReturnRate: Number(form.manualReturnRate) }
+          : {}),
       };
       trackOnboardingAction("cost", "save", {
         operatingCosts: payload.operatingCosts,
@@ -212,17 +209,25 @@ export default function SimpleCostsClient() {
       if (result?.success) {
         // Success toast removed per onboarding policy
         // Handling is configured per product in Cost Management
-        // Advance server-side step to "complete" to satisfy guard
-        await updateOnboardingState({ step: 7 });
         trackOnboardingAction("cost", "continue");
-        router.push("/onboarding/complete");
+        router.replace("/onboarding/complete");
+      } else {
+        throw new Error("Cost setup did not complete");
       }
-    } catch (_e) {
-      addToast({ title: "Failed to save", color: "danger", timeout: 3500 });
+    } catch (error) {
+      addToast({
+        title: "Failed to save",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please try again in a moment.",
+        color: "danger",
+        timeout: 3500,
+      });
     } finally {
       setSaving(false);
     }
-  }, [form, saveInitialCosts, updateOnboardingState, router]);
+  }, [form, saveInitialCosts, router]);
 
   // Skip option removed to simplify UX
 

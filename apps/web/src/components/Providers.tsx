@@ -5,7 +5,6 @@ import { Provider as JotaiProvider } from "jotai";
 import React from "react";
 
 import { FeatureAccessProvider } from "@/hooks/mainapp/useFeatureAccess";
-import { OnboardingProvider } from "@/hooks/onboarding/useOnboarding";
 import ConvexClientProvider from "./ConvexClientProvider";
 import { ThemeProvider } from "./theme/ThemeProvider";
 
@@ -19,9 +18,7 @@ export function Providers({ children }: ProvidersProps) {
       <JotaiProvider>
         <HeroUIProvider>
           <ThemeProvider attribute="class" defaultTheme="light">
-            <OnboardingProvider>
-              <FeatureAccessProvider>{children}</FeatureAccessProvider>
-            </OnboardingProvider>
+            <FeatureAccessProvider>{children}</FeatureAccessProvider>
           </ThemeProvider>
         </HeroUIProvider>
       </JotaiProvider>

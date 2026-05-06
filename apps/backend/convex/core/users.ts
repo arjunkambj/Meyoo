@@ -3,7 +3,7 @@ import { DEFAULT_DASHBOARD_CONFIG } from "@repo/types";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import { internalMutation, internalQuery } from "../_generated/server";
-import { ensureActiveMembership } from "../authHelpers";
+import { ensureActiveMembership } from "./membershipHelpers";
 
 const ensureOnboarding = async (
   ctx: Parameters<typeof ensureActiveMembership>[0],

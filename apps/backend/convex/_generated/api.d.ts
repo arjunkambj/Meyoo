@@ -8,13 +8,12 @@
  * @module
  */
 
-import type * as authFinalize from "../authFinalize.js";
-import type * as authHelpers from "../authHelpers.js";
 import type * as core_costs from "../core/costs.js";
 import type * as core_currency from "../core/currency.js";
 import type * as core_dashboard from "../core/dashboard.js";
 import type * as core_integrationBase from "../core/integrationBase.js";
 import type * as core_integrationOverview from "../core/integrationOverview.js";
+import type * as core_membershipHelpers from "../core/membershipHelpers.js";
 import type * as core_memberships from "../core/memberships.js";
 import type * as core_onboarding from "../core/onboarding.js";
 import type * as core_organizationBilling from "../core/organizationBilling.js";
@@ -24,7 +23,9 @@ import type * as core_shopDomainHelper from "../core/shopDomainHelper.js";
 import type * as core_status from "../core/status.js";
 import type * as core_teams from "../core/teams.js";
 import type * as core_time from "../core/time.js";
+import type * as core_userLookup from "../core/userLookup.js";
 import type * as core_users from "../core/users.js";
+import type * as core_workspaceProvisioning from "../core/workspaceProvisioning.js";
 import type * as crons from "../crons.js";
 import type * as engine_analytics from "../engine/analytics.js";
 import type * as engine_customers from "../engine/customers.js";
@@ -44,7 +45,6 @@ import type * as jobs_helpers from "../jobs/helpers.js";
 import type * as jobs_maintenance from "../jobs/maintenance.js";
 import type * as jobs_maintenanceHandlers from "../jobs/maintenanceHandlers.js";
 import type * as jobs_syncHandlers from "../jobs/syncHandlers.js";
-import type * as lib_auth from "../lib/auth.js";
 import type * as meta_actions from "../meta/actions.js";
 import type * as meta_client from "../meta/client.js";
 import type * as meta_integration from "../meta/integration.js";
@@ -129,13 +129,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  authFinalize: typeof authFinalize;
-  authHelpers: typeof authHelpers;
   "core/costs": typeof core_costs;
   "core/currency": typeof core_currency;
   "core/dashboard": typeof core_dashboard;
   "core/integrationBase": typeof core_integrationBase;
   "core/integrationOverview": typeof core_integrationOverview;
+  "core/membershipHelpers": typeof core_membershipHelpers;
   "core/memberships": typeof core_memberships;
   "core/onboarding": typeof core_onboarding;
   "core/organizationBilling": typeof core_organizationBilling;
@@ -145,7 +144,9 @@ declare const fullApi: ApiFromModules<{
   "core/status": typeof core_status;
   "core/teams": typeof core_teams;
   "core/time": typeof core_time;
+  "core/userLookup": typeof core_userLookup;
   "core/users": typeof core_users;
+  "core/workspaceProvisioning": typeof core_workspaceProvisioning;
   crons: typeof crons;
   "engine/analytics": typeof engine_analytics;
   "engine/customers": typeof engine_customers;
@@ -165,7 +166,6 @@ declare const fullApi: ApiFromModules<{
   "jobs/maintenance": typeof jobs_maintenance;
   "jobs/maintenanceHandlers": typeof jobs_maintenanceHandlers;
   "jobs/syncHandlers": typeof jobs_syncHandlers;
-  "lib/auth": typeof lib_auth;
   "meta/actions": typeof meta_actions;
   "meta/client": typeof meta_client;
   "meta/integration": typeof meta_integration;

@@ -68,16 +68,6 @@ export default function OnboardingBillingView() {
     trackOnboardingView("billing");
   }, []);
 
-  // Auto-redirect only when onboarding status changes (after successful subscription)
-  useEffect(() => {
-    if (!onboardingStatus) return;
-
-    // Only redirect if onboarding is complete or subscription is active
-    if (onboardingStatus.completed) {
-      router.replace("/overview");
-    }
-  }, [onboardingStatus, router]);
-
   const handlePlanUpgrade = async (planName: string, tierKey: string) => {
     clearError();
     setLoadingPlan(tierKey);

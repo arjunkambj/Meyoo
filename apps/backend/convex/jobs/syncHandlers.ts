@@ -238,7 +238,6 @@ export const handleInitialSync = internalAction({
           internal.core.onboarding.triggerMonitorIfOnboardingComplete,
           {
             organizationId: args.organizationId,
-            limit: 1,
             reason: `sync_${args.platform}_completed`,
           },
         );
@@ -270,7 +269,6 @@ export const handleInitialSync = internalAction({
           internal.core.onboarding.triggerMonitorIfOnboardingComplete,
           {
             organizationId: args.organizationId,
-            limit: 1,
             reason: `sync_${args.platform}_error`,
           },
         );
@@ -417,7 +415,6 @@ export const handleShopifyOrdersBatch = internalAction({
             internal.core.onboarding.triggerMonitorIfOnboardingComplete,
             {
               organizationId: args.organizationId,
-              limit: 1,
               reason: "shopify_orders_batch_complete",
             },
           );

@@ -365,7 +365,6 @@ const ordersInsightsKpisValidator = v.object({
 
 const ordersInsightsResponseValidator = v.object({
   kpis: v.union(v.null(), ordersInsightsKpisValidator),
-  fulfillment: v.union(v.null(), fulfillmentMetricsValidator),
   journey: v.array(customerJourneyStageValidator),
   cancelRate: v.number(),
   returnRate: v.number(),
@@ -704,7 +703,6 @@ export const getOrdersInsights = query({
     if (!auth) {
       return {
         kpis: null,
-        fulfillment: null,
         journey: [...DEFAULT_JOURNEY_STAGES],
         cancelRate: 0,
         returnRate: 0,
@@ -723,17 +721,15 @@ export const getOrdersInsights = query({
     ]);
 
     const metrics = dailyOverview?.ordersOverview ?? null;
-    const fulfillmentMetrics = dailyOverview
-      ? computeFulfillmentMetricsFromOverview(dailyOverview)
-      : { ...ZERO_FULFILLMENT_METRICS };
-
     const kpis = buildInsightsKpis(metrics);
     const cancelRate = computeCancelRate(metrics);
-    const returnRate = safeNumber(fulfillmentMetrics.returnRate);
+    const returnRate =
+      dailyOverview && dailyOverview.aggregates.orders > 0
+        ? (dailyOverview.aggregates.returnedOrders / dailyOverview.aggregates.orders) * 100
+        : 0;
 
     return {
       kpis,
-      fulfillment: fulfillmentMetrics,
       journey,
       cancelRate,
       returnRate,

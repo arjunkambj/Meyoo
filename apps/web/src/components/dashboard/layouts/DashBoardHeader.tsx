@@ -11,12 +11,12 @@ import SidebarToggle from "./SidebarToggle";
 export default function DashBoardHeader({ className }: { className?: string }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useUserContext();
+  const { user, loading } = useUserContext();
 
   // Fast redirect for non-onboarded users
   const isOnboardingRoute = pathname?.startsWith("/onboarding");
   const shouldRedirectToOnboarding = Boolean(
-    user && user.isOnboarded === false && !isOnboardingRoute
+    !loading && user && user.isOnboarded === false && !isOnboardingRoute
   );
 
   useEffect(() => {

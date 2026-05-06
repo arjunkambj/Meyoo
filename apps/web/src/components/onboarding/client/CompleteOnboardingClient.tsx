@@ -22,18 +22,15 @@ export default function CompleteOnboardingClient() {
   const {
     finishOnboarding,
     hasShopify,
-   hasMeta,
-   status,
-   hasShopifySyncError,
-   shopifySyncStatus,
+    hasMeta,
+    status,
+    hasShopifySyncError,
+    shopifySyncStatus,
     isInitialSyncComplete,
-    pendingSyncPlatforms: _pendingSyncPlatforms,
     syncStatus,
     shopifySyncState,
     integrationStatus,
   } = useOnboarding();
-
-  // (features list removed; unused)
 
   // Check prerequisites: must have completed previous steps
   useEffect(() => {
@@ -57,7 +54,6 @@ export default function CompleteOnboardingClient() {
 
     // Validate Shopify connection is required
     if (!hasShopify) {
-      console.log("[ONBOARDING] Cannot complete - Shopify not connected");
       router.push("/onboarding/shopify");
 
       return;
@@ -66,9 +62,6 @@ export default function CompleteOnboardingClient() {
     setIsCompleting(true);
 
     try {
-      console.log("[ONBOARDING] Completing onboarding process");
-
-      // Complete onboarding - this will trigger analytics
       const result = await finishOnboarding();
 
       if (!result.success) {
@@ -78,17 +71,11 @@ export default function CompleteOnboardingClient() {
       await markOnboardingComplete();
       trackOnboardingAction("complete", "finish");
 
-      console.log("[ONBOARDING] Onboarding completed:", {
-        analyticsScheduled: result.analyticsScheduled,
-        platformsSyncing: result.platformsSyncing,
-      });
-
       // Mark as completed to prevent any further submissions
       setIsCompleted(true);
 
       // Redirect to dashboard immediately
       setTimeout(() => {
-        console.log("[ONBOARDING] Redirecting to dashboard");
         trackOnboardingAction("complete", "redirect_dashboard");
         router.push("/overview");
       }, 1200);
