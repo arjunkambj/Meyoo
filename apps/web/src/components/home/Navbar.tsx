@@ -8,7 +8,6 @@ import Link from "next/link";
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 
 import { Logo } from "@/components/shared/Logo";
 import { designSystem } from "@/libs/design-system";
@@ -131,32 +130,15 @@ export default function CenteredNavbar() {
             justify="end"
           >
             <NavbarItem>
-              <Unauthenticated>
-                <Button
-                  as={Link}
-                  className="w-full font-semibold"
-                  color="primary"
-                  href="/signin"
-                >
-                  Get started
-                  <Icon className="ml-2" icon="mdi:arrow-right" />
-                </Button>
-              </Unauthenticated>
-              <AuthLoading>
-                <Button as={Link} href="/signin" color="primary">
-                  Get started
-                </Button>
-              </AuthLoading>
-              <Authenticated>
-                <Button
-                  as={Link}
-                  className="px-8"
-                  href="/overview"
-                  color="primary"
-                >
-                  Dashboard
-                </Button>
-              </Authenticated>
+              <Button
+                as={Link}
+                className="w-full font-semibold"
+                color="primary"
+                href="/sign-in"
+              >
+                Get started
+                <Icon className="ml-2" icon="mdi:arrow-right" />
+              </Button>
             </NavbarItem>
           </NavbarContent>
 
@@ -225,41 +207,17 @@ export default function CenteredNavbar() {
 
                     {/* CTA buttons */}
                     <div className="pt-6 sm:pt-8 space-y-3 sm:space-y-4">
-                      <Unauthenticated>
-                        <Button
-                          as={Link}
-                          className="w-full font-semibold text-sm sm:text-base"
-                          color="primary"
-                          href="/signin"
-                          radius="full"
-                          size="lg"
-                        >
-                          Start 28-day trial
-                          <Icon className="ml-2" icon="mdi:arrow-right" />
-                        </Button>
-                      </Unauthenticated>
-                      <AuthLoading>
-                        <Button
-                          className="w-full font-semibold text-sm sm:text-base"
-                          color="primary"
-                          radius="full"
-                          size="lg"
-                        >
-                          Start 28-day trial
-                        </Button>
-                      </AuthLoading>
-                      <Authenticated>
-                        <Button
-                          as={Link}
-                          className="w-full font-semibold text-sm sm:text-base"
-                          color="primary"
-                          href="/overview"
-                          radius="full"
-                          size="lg"
-                        >
-                          Dashboard
-                        </Button>
-                      </Authenticated>
+                      <Button
+                        as={Link}
+                        className="w-full font-semibold text-sm sm:text-base"
+                        color="primary"
+                        href="/sign-in"
+                        radius="full"
+                        size="lg"
+                      >
+                        Start 28-day trial
+                        <Icon className="ml-2" icon="mdi:arrow-right" />
+                      </Button>
                     </div>
                   </div>
                 </div>

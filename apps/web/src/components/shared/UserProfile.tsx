@@ -1,14 +1,14 @@
 "use client";
 
-import { useAuthActions } from "@convex-dev/auth/react";
 import { Avatar } from "@heroui/avatar";
 import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from "@heroui/dropdown";
 import { Switch } from "@heroui/switch";
 import { Icon } from "@iconify/react";
-import { useTheme } from "next-themes";
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useUserContext } from "@/contexts/UserContext";
+import { useUser } from "@stackframe/stack";
+
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 type UserProfileProps = {
   showNavigationLinks?: boolean;
@@ -16,8 +16,7 @@ type UserProfileProps = {
 
 const UserProfile = React.memo(
   ({ showNavigationLinks = true }: UserProfileProps) => {
-    const { user } = useUserContext();
-    const { signOut } = useAuthActions();
+    const user = useUser();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -26,9 +25,9 @@ const UserProfile = React.memo(
     }, []);
 
     const handleLogout = useCallback(async () => {
-      await signOut();
-      window.location.href = "/signin";
-    }, [signOut]);
+      await user?.signOut();
+      window.location.href = "/sign-in";
+    }, [user]);
 
     const handleThemeChange = useCallback(
       (isSelected: boolean) => {
@@ -46,16 +45,16 @@ const UserProfile = React.memo(
 
     const userData = useMemo<UserProfileData>(() => {
       const name =
-        typeof user?.name === "string" && user.name.trim().length > 0
-          ? user.name
+        typeof user?.displayName === "string" && user.displayName.trim().length > 0
+          ? user.displayName
           : "User";
 
       const email =
-        typeof user?.email === "string" && user.email.trim().length > 0
-          ? user.email
+        typeof user?.primaryEmail === "string" && user.primaryEmail.trim().length > 0
+          ? user.primaryEmail
           : "";
 
-      const image = typeof user?.image === "string" ? user.image : undefined;
+      const image = typeof user?.profileImageUrl === "string" ? user.profileImageUrl : undefined;
 
       return {
         name,

@@ -1,9 +1,9 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import type { GenericMutationCtx } from "convex/server";
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { DataModel, Doc, Id } from "../_generated/dataModel";
 import { internalMutation, mutation } from "../_generated/server";
+import { requireUserAndOrg } from "../utils/auth";
 
 import { createJob, PRIORITY } from "./workpool";
 
@@ -28,20 +28,10 @@ export const triggerInitialSync = mutation({
     ctx,
     args,
   ): Promise<{ success: boolean; jobId: string }> => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const user = await ctx.db.get(userId);
-
-    if (!user?.organizationId) {
-      throw new Error("User or organization not found");
-    }
+    const auth = await requireUserAndOrg(ctx);
 
     // Verify the user has access to this organization
-    if (user.organizationId !== args.organizationId) {
+    if (auth.orgId !== args.organizationId) {
       throw new Error(
         "Unauthorized: Cannot trigger sync for this organization",
       );
@@ -54,7 +44,7 @@ export const triggerInitialSync = mutation({
           organizationId: args.organizationId,
           platform: args.platform,
           dateRange: args.dateRange || { daysBack: 60 },
-          triggeredBy: userId,
+          triggeredBy: auth.user._id,
         },
       );
 

@@ -1,9 +1,9 @@
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { type NextRequest, NextResponse } from "next/server";
 import { createLogger } from "@/libs/logging/Logger";
 import { getShopifySession } from "@/libs/shopify/sessionManager";
 import shopify from "@/libs/shopify/shopify";
 import { genRequestId, tagFromToken } from "@/libs/logging/trace";
+import { stackConvexToken } from "@/libs/stackConvex";
 
 const logger = createLogger("Billing.Subscriptions");
 
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   try {
     const requestId = genRequestId(req);
     // Check if user is authenticated
-    const token = await convexAuthNextjsToken();
+    const token = await stackConvexToken(req);
     const userTag = tagFromToken(token);
 
     if (!token) {

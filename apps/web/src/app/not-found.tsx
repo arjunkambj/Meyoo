@@ -16,7 +16,7 @@ export default function NotFound() {
         {/* Decorative accent */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -inset-x-10 -top-10 h-32 bg-gradient-to-b from-primary/10 to-transparent rounded-3xl blur-2xl"
+          className="pointer-events-none absolute -inset-x-10 -top-10 h-32 bg-linear-to-b from-primary/10 to-transparent rounded-3xl blur-2xl"
         />
 
         {/* 404 header */}

@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { useOnboarding } from "@/hooks";
+import { markOnboardingComplete } from "@/app/onboarding-functions";
 import { trackOnboardingAction, trackOnboardingView } from "@/libs/analytics";
 
 export default function CompleteOnboardingClient() {
@@ -69,6 +70,12 @@ export default function CompleteOnboardingClient() {
 
       // Complete onboarding - this will trigger analytics
       const result = await finishOnboarding();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to complete onboarding");
+      }
+
+      await markOnboardingComplete();
       trackOnboardingAction("complete", "finish");
 
       console.log("[ONBOARDING] Onboarding completed:", {

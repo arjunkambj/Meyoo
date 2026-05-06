@@ -2,7 +2,7 @@ import { useMutation } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { api } from "@/libs/convexApi";
 import type { OnboardingStatus } from "@repo/types";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
 
 function useOnboardingInternal() {
@@ -18,6 +18,15 @@ function useOnboardingInternal() {
     api.core.onboarding.updateBusinessProfile
   );
   const completeMutation = useMutation(api.core.onboarding.completeOnboarding);
+
+  useEffect(() => {
+    console.log("[auth-debug] Onboarding query state", {
+      rawStatus,
+      loading: rawStatus === undefined,
+      status,
+      integrationStatus,
+    });
+  }, [integrationStatus, rawStatus, status]);
 
   const shopifyOverall = syncStatus?.shopify?.overallState as
     | Overall

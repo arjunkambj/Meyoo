@@ -8,4 +8,3 @@ export * from "./mainapp";
 // ============ ONBOARDING HOOKS ============
 export * from "./onboarding";
 // ============ UTIL HOOKS ============
-export * from "./usePassword";

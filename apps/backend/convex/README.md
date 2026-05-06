@@ -27,5 +27,5 @@ HTTP + Crons
 Notes
 
 - Webhook payload bodies are not stored; lightweight idempotent receipts are
-- Use getAuthUserId(ctx) for auth in public APIs
+- Use Stack Auth identity via ctx.auth.getUserIdentity() for auth in public APIs
 - See ../../rules_convex.md for detailed patterns and examples

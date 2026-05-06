@@ -1,4 +1,3 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 import { createJob, PRIORITY, type SyncJobData } from "../engine/workpool";
@@ -7,6 +6,7 @@ import type { Id } from "../_generated/dataModel";
 import { mutation } from "../_generated/server";
 import { storeAdAccounts } from "./storage";
 import type { MetaAdAccount } from "./types";
+import { requireUserAndOrg } from "../utils/auth";
 
 export const connectMeta = mutation({
   args: {
@@ -19,18 +19,10 @@ export const connectMeta = mutation({
   },
   returns: v.object({ success: v.boolean() }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const user = await ctx.db.get(userId);
-    if (!user?.organizationId) {
-      throw new Error("User or organization not found");
-    }
+    const { user, orgId } = await requireUserAndOrg(ctx);
 
     await ctx.db.insert("integrationSessions", {
-      organizationId: user.organizationId,
+      organizationId: orgId,
       userId: user._id,
       platform: "meta",
       accessToken: args.accessToken,
@@ -54,7 +46,7 @@ export const connectMeta = mutation({
         0,
         internal.meta.tokenManager.getValidAccessToken,
         {
-          organizationId: user.organizationId as Id<"organizations">,
+          organizationId: orgId as Id<"organizations">,
           platform: "meta",
         },
       );
@@ -67,7 +59,7 @@ export const connectMeta = mutation({
       .withIndex("by_user_organization", (q) =>
         q
           .eq("userId", user._id)
-          .eq("organizationId", user.organizationId as Id<"organizations">),
+          .eq("organizationId", orgId as Id<"organizations">),
       )
       .first();
 
@@ -88,20 +80,12 @@ export const setPrimaryAdAccount = mutation({
   args: { accountId: v.string() },
   returns: v.object({ success: v.boolean(), jobScheduled: v.boolean() }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const user = await ctx.db.get(userId);
-    if (!user?.organizationId) {
-      throw new Error("User or organization not found");
-    }
+    const { user, orgId } = await requireUserAndOrg(ctx);
 
     const accounts = await ctx.db
       .query("metaAdAccounts")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", user.organizationId as Id<"organizations">),
+        q.eq("organizationId", orgId as Id<"organizations">),
       )
       .collect();
 
@@ -125,8 +109,8 @@ export const setPrimaryAdAccount = mutation({
       .query("onboarding")
       .withIndex("by_user_organization", (q) =>
         q
-          .eq("userId", userId)
-          .eq("organizationId", user.organizationId as Id<"organizations">),
+          .eq("userId", user._id)
+          .eq("organizationId", orgId as Id<"organizations">),
       )
       .first();
 
@@ -138,13 +122,13 @@ export const setPrimaryAdAccount = mutation({
     }
 
     let jobScheduled = false;
-    if (user.organizationId) {
+    if (orgId) {
       const recentSync = await ctx.db
         .query("metaAdAccounts")
         .withIndex("by_account_org", (q) =>
           q
             .eq("accountId", args.accountId)
-            .eq("organizationId", user.organizationId as Id<"organizations">),
+            .eq("organizationId", orgId as Id<"organizations">),
         )
         .first();
 
@@ -158,7 +142,7 @@ export const setPrimaryAdAccount = mutation({
             "sync:initial",
             PRIORITY.HIGH,
             {
-              organizationId: user.organizationId as Id<"organizations">,
+              organizationId: orgId as Id<"organizations">,
               platform: "meta",
               syncType: "initial",
               dateRange: { daysBack: 60 },
@@ -180,15 +164,7 @@ export const storeAdAccountsFromCallback = mutation({
   args: { accounts: v.array(v.any()) },
   returns: v.object({ success: v.boolean(), stored: v.number() }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const user = await ctx.db.get(userId);
-    if (!user?.organizationId) {
-      throw new Error("User or organization not found");
-    }
+    const { orgId } = await requireUserAndOrg(ctx);
 
     const normalized = (args.accounts as MetaAdAccount[]).map((account) => ({
       id: account.id,
@@ -204,7 +180,7 @@ export const storeAdAccountsFromCallback = mutation({
       disable_reason: account.disable_reason,
     } as MetaAdAccount));
 
-    await storeAdAccounts(ctx as any, user.organizationId as Id<"organizations">, normalized);
+    await storeAdAccounts(ctx as any, orgId as Id<"organizations">, normalized);
 
     try {
       await createJob(
@@ -212,7 +188,7 @@ export const storeAdAccountsFromCallback = mutation({
         "maintenance:dedupe_meta_accounts",
         PRIORITY.BACKGROUND,
         {
-          organizationId: user.organizationId as Id<"organizations">,
+          organizationId: orgId as Id<"organizations">,
         } as any,
       );
     } catch (error) {

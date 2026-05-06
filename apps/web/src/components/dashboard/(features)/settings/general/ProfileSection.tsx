@@ -5,19 +5,13 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { addToast } from "@heroui/toast";
-import { useDisclosure } from "@heroui/use-disclosure";
 import type { SharedSelection } from "@heroui/system";
 import { Icon } from "@iconify/react";
-import { useAction } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSetAtom } from "jotai";
 import { setSettingsPendingAtom } from "@/store/atoms";
 import { FormSkeleton } from "@/components/shared/skeletons";
-import { api } from "@/libs/convexApi";
 import { useUser, useOrganization } from "@/hooks";
-import { usePassword } from "@/hooks/usePassword";
-import EmailChangeModal from "./EmailChangeModal";
-import PasswordChangeModal from "./PasswordChangeModal";
 
 type Option = { label: string; value: string };
 
@@ -94,14 +88,6 @@ export default function ProfileSection() {
     updateOrganizationName,
     updateOrganization,
   } = useOrganization();
-  const { hasPassword, changePassword } = usePassword();
-  const changeEmailAction = useAction(api.core.users.changeEmail);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const {
-    isOpen: isEmailOpen,
-    onOpen: onEmailOpen,
-    onOpenChange: onEmailOpenChange,
-  } = useDisclosure();
   const [isLoading, setIsLoading] = useState(false);
   const setPending = useSetAtom(setSettingsPendingAtom);
 
@@ -150,28 +136,20 @@ export default function ProfileSection() {
         formData.firstName !== currentFirst ||
         formData.lastName !== currentLast;
       const phoneChanged = formData.phone !== (user?.phone || "");
-      const nextEmail = formData.email.trim().toLowerCase();
-      const currentEmail = (user?.email || "").trim().toLowerCase();
-      const emailChanged = nextEmail !== currentEmail;
       const orgNameChanged = formData.organizationName !== organizationName;
       const currentCurrency = organization?.primaryCurrency || "USD";
       const currencyChanged = formData.currency !== currentCurrency;
       const currentTimezone = organization?.timezone || "UTC";
       const timezoneChanged = formData.timezone !== currentTimezone;
 
-      if (nameChanged || phoneChanged || emailChanged) {
+      if (nameChanged || phoneChanged) {
         const updates: {
           name?: string;
-          email?: string;
           phone?: string;
         } = {};
 
         if (nameChanged) updates.name = fullName;
         if (phoneChanged) updates.phone = formData.phone;
-
-        if (emailChanged) {
-          updates.email = nextEmail;
-        }
 
         await updateProfile(updates);
       }
@@ -223,8 +201,6 @@ export default function ProfileSection() {
     return (
       formData.firstName !== firstName ||
       formData.lastName !== lastName ||
-      formData.email.trim().toLowerCase() !==
-        (user?.email || "").trim().toLowerCase() ||
       formData.phone !== (user?.phone || "") ||
       formData.organizationName !== organizationName ||
       formData.currency !== currentCurrency ||
@@ -436,32 +412,6 @@ export default function ProfileSection() {
             type="email"
             value={formData.email}
           />
-          <div className="flex gap-2 flex-wrap">
-            <Button
-              className="w-full sm:w-auto"
-              color="default"
-              size="sm"
-              startContent={
-                <Icon icon="solar:letter-bold-duotone" width={16} />
-              }
-              variant="flat"
-              onPress={onEmailOpen}
-            >
-              Change Email
-            </Button>
-            <Button
-              className="w-full sm:w-auto"
-              color="default"
-              size="sm"
-              startContent={
-                <Icon icon="solar:lock-keyhole-bold-duotone" width={16} />
-              }
-              variant="flat"
-              onPress={onOpen}
-            >
-              {hasPassword ? "Change Password" : "Set Password"}
-            </Button>
-          </div>
         </div>
         <div className="flex flex-col gap-2">
           <Input
@@ -491,26 +441,6 @@ export default function ProfileSection() {
         </Button>
       </div>
 
-      {/* Password Change Modal */}
-      <PasswordChangeModal
-        hasPassword={hasPassword}
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onPasswordChange={async (currentPassword, newPassword) => {
-          const result = await changePassword(currentPassword, newPassword);
-          return result;
-        }}
-      />
-      <EmailChangeModal
-        currentEmail={user?.email || ""}
-        hasPassword={hasPassword}
-        isOpen={isEmailOpen}
-        onOpenChange={onEmailOpenChange}
-        onChangeEmail={async (newEmail: string, currentPassword?: string) => {
-          await changeEmailAction({ newEmail, currentPassword });
-          setFormData((prev) => ({ ...prev, email: newEmail }));
-        }}
-      />
     </>
   );
 }

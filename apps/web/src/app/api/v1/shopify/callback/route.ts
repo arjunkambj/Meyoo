@@ -1,19 +1,18 @@
 import crypto from "node:crypto";
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
-import { fetchAction, fetchMutation } from "convex/nextjs";
+import { fetchMutation } from "convex/nextjs";
 import { type NextRequest, NextResponse } from "next/server";
 import { api } from "@/libs/convexApi";
 import { createLogger } from "@/libs/logging/Logger";
 import shopify, { configuredScopes } from "@/libs/shopify/shopify";
 import { genRequestId, tagFromToken } from "@/libs/logging/trace";
 import { optionalEnv, requireEnv } from "@/libs/env";
+import { stackConvexToken } from "@/libs/stackConvex";
 import {
   normalizeShopDomain,
   fetchShopData,
   createAuthSignature,
   registerStoreWebhooks,
   triggerInitialSync,
-  setAuthCookies,
   getRedirectUrl,
   withRetry,
 } from "./helpers";
@@ -23,6 +22,17 @@ const logger = createLogger("Shopify.Callback");
 export const runtime = "nodejs";
 const NEXT_PUBLIC_APP_URL = requireEnv("NEXT_PUBLIC_APP_URL");
 const SHOPIFY_WEBHOOK_DEBUG = optionalEnv("SHOPIFY_WEBHOOK_DEBUG") === "1";
+
+const errorData = (error: unknown) =>
+  error instanceof Error
+    ? {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        cause: error.cause,
+        data: "data" in error ? error.data : undefined,
+      }
+    : { message: String(error), raw: error };
 
 export async function GET(req: NextRequest) {
   try {
@@ -36,6 +46,13 @@ export async function GET(req: NextRequest) {
     });
 
     const session = response.session;
+
+    logger.info("OAuth callback session created", {
+      requestId,
+      shop: session.shop,
+      hasAccessToken: Boolean(session.accessToken),
+      scope: session.scope,
+    });
 
     // Parse granted scopes from session
     const grantedScopes = new Set(
@@ -91,7 +108,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Check if user is authenticated (coming from onboarding flow)
-    const token = await convexAuthNextjsToken();
+    const token = await stackConvexToken(req);
+
+    logger.info("OAuth callback Convex auth resolved", {
+      requestId,
+      hasToken: Boolean(token),
+      tokenTag: token ? tagFromToken(token) : undefined,
+    });
 
     if (token) {
       // Authenticated flow: User is logged in and connecting from onboarding
@@ -106,8 +129,8 @@ export async function GET(req: NextRequest) {
 
       try {
         const { fetchQuery } = await import("convex/nextjs");
-        const currentUser = await fetchQuery(
-          api.core.users.getCurrentUser,
+        const currentOrganization = await fetchQuery(
+          api.core.organizations.getCurrentOrganization,
           {},
           { token },
         );
@@ -120,8 +143,8 @@ export async function GET(req: NextRequest) {
 
         if (
           existing &&
-          currentUser?.organizationId &&
-          existing.organizationId !== currentUser.organizationId
+          currentOrganization?.id &&
+          existing.organizationId !== currentOrganization.id
         ) {
           logger.warn("Shopify store already linked to another organization", {
             requestId,
@@ -150,7 +173,13 @@ export async function GET(req: NextRequest) {
         {
           token,
         },
-      );
+      ).catch((error: unknown) => {
+        logger.error("connectShopifyStore mutation failed", error as Error, {
+          requestId,
+          details: errorData(error),
+        });
+        throw error;
+      });
 
       // Register webhooks for the store if not already registered
       if (connectionResult.success) {
@@ -203,77 +232,10 @@ export async function GET(req: NextRequest) {
         "provisioning user/org",
       );
 
-      // Set Convex Auth cookies for the newly provisioned user
-      try {
-        const attempt = async () =>
-          await fetchAction(
-            api.installations.issueTokensFromShopifyOAuth,
-            { shop: session.shop, nonce, sig },
-          );
+      await registerStoreWebhooks(session);
 
-        let tokens: { token: string; refreshToken: string } | null = null;
-        let lastError: unknown = null;
-        for (let i = 0; i < 3; i++) {
-          try {
-            tokens = await attempt();
-            break;
-          } catch (err) {
-            lastError = err;
-            // Exponential backoff: 200ms, 400ms
-            const delay = 200 * 2 ** i;
-            await new Promise((r) => setTimeout(r, delay));
-          }
-        }
-        if (!tokens) throw lastError ?? new Error("Token issuance failed");
-        // If onboarding is complete, redirect to overview, else to billing
-        // Decide redirect using Convex onboarding state
-        const overviewUrl = `${baseUrl}/overview`;
-        const costsUrl = `${baseUrl}/onboarding/marketing`;
-        const billingUrl = `${baseUrl}/onboarding/billing?shop=${encodeURIComponent(
-          session.shop,
-        )}`;
-
-        let target = billingUrl;
-        try {
-          const { fetchQuery } = await import("convex/nextjs");
-          const status = await fetchQuery(
-            api.core.onboarding.getOnboardingStatus,
-            {},
-            {
-              // Use freshly issued Convex token for accurate status
-              token: tokens.token,
-            },
-          );
-
-          if (status?.completed) target = overviewUrl;
-          else if (status?.connections?.shopify && status?.hasShopifySubscription)
-            target = costsUrl;
-          else target = billingUrl;
-        } catch (_) {
-          // fallback stays billingUrl
-        }
-
-        const redirect = NextResponse.redirect(target);
-        setAuthCookies(redirect, tokens);
-
-        // Register webhooks if not already registered
-        await registerStoreWebhooks(session);
-
-        redirect.headers.set("X-Request-Id", requestId);
-        return redirect;
-      } catch (e) {
-        logger.error(
-          "Failed setting auth cookies after provisioning",
-          e as Error,
-        );
-      }
-
-      // Fallback: if cookie set fails, still redirect
-      // Note: Webhook registration already handled above, no need to duplicate
-
-      // Redirect based on onboarding (fallback path without cookies)
       const res = NextResponse.redirect(
-        `${baseUrl}/onboarding/billing?shop=${encodeURIComponent(session.shop)}`,
+        `${baseUrl}/sign-in?returnUrl=${encodeURIComponent(`/onboarding/billing?shop=${session.shop}`)}`,
       );
       res.headers.set("X-Request-Id", requestId);
       return res;

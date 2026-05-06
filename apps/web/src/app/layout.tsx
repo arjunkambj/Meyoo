@@ -1,8 +1,10 @@
 import "@/styles/globals.css";
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { ToastProvider } from "@heroui/toast";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { StackProvider } from "@stackframe/stack";
+import { Suspense } from "react";
+import { stackServerApp } from "@/stack/server";
 
 import { Providers } from "@/components/Providers";
 import { siteConfig } from "@/constants/config/site";
@@ -66,18 +68,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ConvexAuthNextjsServerProvider>
-      <html lang="en" suppressHydrationWarning>
-        <head />
-        <body>
-          <Providers>
-            <main className={`h-dvh w-full antialiased ${inter.className}`}>
-              <ToastProvider />
-              {children}
-            </main>
-          </Providers>
-        </body>
-      </html>
-    </ConvexAuthNextjsServerProvider>
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      <body>
+        <StackProvider app={stackServerApp}>
+          <Suspense fallback={null}>
+            <Providers>
+              <main className={`h-dvh w-full antialiased ${inter.className}`}>
+                <ToastProvider />
+                {children}
+              </main>
+            </Providers>
+          </Suspense>
+        </StackProvider>
+      </body>
+    </html>
   );
 }

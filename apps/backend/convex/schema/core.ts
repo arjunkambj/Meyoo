@@ -10,10 +10,15 @@ const syncStageState = v.union(
 
 // Users table - simplified but with all necessary fields
 export const users = defineTable({
+  stackId: v.optional(v.string()),
+  teamIds: v.optional(v.array(v.string())),
+  selectedTeamId: v.optional(v.string()),
+
   // Basic info
   name: v.optional(v.string()),
   email: v.optional(v.string()),
   image: v.optional(v.string()),
+  imageUrl: v.optional(v.string()),
   emailVerificationTime: v.optional(v.number()),
   phone: v.optional(v.string()),
   phoneVerificationTime: v.optional(v.number()),
@@ -42,6 +47,8 @@ export const users = defineTable({
   createdAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 })
+  .index("by_stack_id", ["stackId"])
+  .index("by_selected_team", ["selectedTeamId"])
   .index("email", ["email"])
   .index("by_email_verification_time", ["emailVerificationTime"])
   .index("by_organization", ["organizationId"])
@@ -50,9 +57,11 @@ export const users = defineTable({
 
 // Simplified organizations table - store-centric
 export const organizations = defineTable({
+  stackTeamId: v.optional(v.string()),
+
   // Core fields
   name: v.string(),
-  ownerId: v.id("users"),
+  ownerId: v.optional(v.id("users")),
 
   // Business info (common for both)
   locale: v.optional(v.string()),
@@ -67,6 +76,7 @@ export const organizations = defineTable({
   createdAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 })
+  .index("by_stack_team", ["stackTeamId"])
   .index("by_owner", ["ownerId"]);
 
 // Memberships: user ↔ organization link with role + seat info
@@ -102,62 +112,6 @@ export const memberships = defineTable({
   .index("by_org_user", ["organizationId", "userId"])
   .index("by_org_status", ["organizationId", "status"])
   .index("by_org_role", ["organizationId", "role"]);
-
-// Unified invites table
-export const invites = defineTable({
-  // Organization context
-  organizationId: v.id("organizations"),
-
-  // Invitation type
-  type: v.union(
-    v.literal("team_member"), // Store owner inviting team member
-  ),
-
-  // Invitation details
-  email: v.string(),
-  role: v.optional(
-    v.union(
-      v.literal("StoreTeam"),
-    ),
-  ),
-
-  // Status
-  status: v.union(
-    v.literal("pending"),
-    v.literal("accepted"),
-    v.literal("rejected"),
-    v.literal("expired"),
-    v.literal("cancelled"),
-  ),
-
-  // Invitation metadata
-  invitedBy: v.object({
-    id: v.id("users"),
-    name: v.optional(v.string()),
-    email: v.string(),
-  }),
-  message: v.optional(v.string()),
-
-  // Security
-  invitationToken: v.string(),
-  expiresAt: v.number(),
-
-  // Response
-  acceptedAt: v.optional(v.number()),
-  acceptedBy: v.optional(v.id("users")),
-  responseMessage: v.optional(v.string()),
-
-  // Timestamps
-  createdAt: v.number(),
-  updatedAt: v.optional(v.number()),
-})
-  .index("by_organization", ["organizationId"])
-  .index("by_email", ["email"])
-  .index("by_status", ["status"])
-  .index("by_organization_status", ["organizationId", "status"])
-  .index("by_email_organization", ["email", "organizationId"])
-  .index("by_token", ["invitationToken"])
-  .index("by_expires", ["expiresAt"]);
 
 // Multi-dashboard support
 export const dashboards = defineTable({

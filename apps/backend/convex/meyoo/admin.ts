@@ -1,4 +1,3 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
@@ -9,6 +8,7 @@ import { createJob, PRIORITY } from "../engine/workpool";
 import { optionalEnv } from "../utils/env";
 import { buildDateSpan } from "../utils/date";
 import { getOrgTimeInfo } from "../utils/orgDateRange";
+import { requireUserAndOrg } from "../utils/auth";
 
 const CONVEX_CLOUD_URL = optionalEnv("CONVEX_CLOUD_URL");
 
@@ -18,14 +18,6 @@ const CONVEX_CLOUD_URL = optionalEnv("CONVEX_CLOUD_URL");
  */
 
 type AnyCtx = QueryCtx | MutationCtx | ActionCtx;
-
-async function loadUser(ctx: AnyCtx, userId: Id<"users">) {
-  if ("db" in ctx) {
-    return await ctx.db.get(userId);
-  }
-
-  return await ctx.runQuery(internal.meyoo.admin.getUserById, { userId });
-}
 
 async function loadMembership(
   ctx: AnyCtx,
@@ -60,19 +52,12 @@ async function ensureAdminAccess(
   ctx: AnyCtx,
   organizationId?: Id<"organizations">,
 ) {
-  const userId = await getAuthUserId(ctx);
-  if (!userId) {
-    throw new Error("Not authenticated");
-  }
-
-  const user = await loadUser(ctx, userId);
-  if (!user) {
-    throw new Error("User not found");
-  }
+  const auth = await requireUserAndOrg(ctx);
+  const user = auth.user;
 
   const targetOrgId =
     organizationId ??
-    (user.organizationId ? (user.organizationId as Id<"organizations">) : null);
+    auth.orgId;
 
   if (!targetOrgId) {
     throw new Error("Admin access required");

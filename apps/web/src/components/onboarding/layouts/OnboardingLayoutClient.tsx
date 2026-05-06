@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import type { Route } from "next";
 import type React from "react";
-import { memo, useEffect, useMemo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useSetAtom, useAtomValue } from "jotai";
 import {
   getStepByRoute,
@@ -37,12 +37,28 @@ const useOnboardingData = () => {
     status,
     loading: onboardingLoading,
   } = useOnboarding();
+  const [didOnboardingLoadTimeout, setDidOnboardingLoadTimeout] =
+    useState(false);
 
   const setOnboardingData = useSetAtom(setOnboardingDataAtom);
   const setLoading = useSetAtom(setOnboardingLoadingAtom);
   const prefetchRoute = useSetAtom(prefetchRouteAtom);
 
-  const isLoading = userLoading || onboardingLoading;
+  useEffect(() => {
+    if (!onboardingLoading || userLoading || !user) {
+      setDidOnboardingLoadTimeout(false);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setDidOnboardingLoadTimeout(true);
+    }, 2500);
+
+    return () => window.clearTimeout(timeout);
+  }, [onboardingLoading, user, userLoading]);
+
+  const isLoading =
+    userLoading || (onboardingLoading && !didOnboardingLoadTimeout);
   const isCompleted = status?.completed ?? false;
 
   // Redirect to the dashboard once onboarding is marked complete server-side.

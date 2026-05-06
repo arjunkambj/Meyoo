@@ -1,7 +1,6 @@
-import { useMutation } from "convex/react";
+import { useUser as useStackUser } from "@stackframe/stack";
 
 import { useUserContext } from "@/contexts/UserContext";
-import { api } from "@/libs/convexApi";
 import { useOnboarding } from "@/hooks/onboarding/useOnboarding";
 
 /**
@@ -20,6 +19,7 @@ export type UserProfile = {
 };
 
 export function useUser() {
+  const stackUser = useStackUser();
   const {
     user,
     loading,
@@ -28,33 +28,28 @@ export function useUser() {
     organizationId,
     primaryCurrency,
   } = useUserContext();
-  const updateBusinessProfileMutation = useMutation(
-    api.core.users.updateBusinessProfile
-  );
-  const updateProfileMutation = useMutation(api.core.users.updateProfile);
-
-  // Update profile function - for basic user info
+  const typedUser = user ? (user as UserProfile) : null;
+  const { status: onboardingStatus } = useOnboarding();
   const updateProfile = async (data: {
     name?: string;
     email?: string;
     phone?: string;
     timezone?: string;
-    notificationPreferences?: {
-      email: boolean;
-      push: boolean;
-      sms: boolean;
-    };
   }) => {
-    return await updateProfileMutation(data);
+    await stackUser?.update({
+      ...(data.name !== undefined ? { displayName: data.name } : {}),
+      ...(data.email !== undefined ? { primaryEmail: data.email } : {}),
+      ...(data.phone !== undefined || data.timezone !== undefined
+        ? {
+            clientMetadata: {
+              ...(data.phone !== undefined ? { phone: data.phone } : {}),
+              ...(data.timezone !== undefined ? { timezone: data.timezone } : {}),
+            },
+          }
+        : {}),
+    });
+    return { success: true };
   };
-
-  // Update business profile function - for business-specific info
-  const updateBusinessProfile = async (data: { mobileNumber?: string }) => {
-    return await updateBusinessProfileMutation(data);
-  };
-
-  const typedUser = user ? (user as UserProfile) : null;
-  const { status: onboardingStatus } = useOnboarding();
 
   return {
     user: typedUser,
@@ -69,7 +64,6 @@ export function useUser() {
     primaryCurrency,
     isLoading: loading,
     updateProfile,
-    updateBusinessProfile,
   };
 }
 

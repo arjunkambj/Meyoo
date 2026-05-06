@@ -1,9 +1,25 @@
-import {
-  convexAuthNextjsMiddleware,
-  createRouteMatcher,
-  nextjsMiddlewareRedirect,
-} from "@convex-dev/auth/nextjs/server";
 import { NextResponse } from "next/server";
+import { stackServerApp } from "@/stack/server";
+
+const createRouteMatcher =
+  (patterns: string[]) =>
+  (request: Request & { nextUrl: URL }) => {
+    const pathname = request.nextUrl.pathname;
+    return patterns.some((pattern) => {
+      const prefix = pattern.replace("(.*)", "");
+      return pathname === prefix || pathname.startsWith(prefix);
+    });
+  };
+
+const redirect = (request: Request, path: string) => {
+  const url = new URL(path, request.url);
+  return NextResponse.redirect(url);
+};
+
+const safeReturnPath = (value: string | null) => {
+  if (!value?.startsWith("/") || value.startsWith("//")) return null;
+  return value;
+};
 
 // Public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
@@ -18,10 +34,14 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 // Auth routes
-const isAuthRoute = createRouteMatcher(["/signin", "/signup"]);
+const isAuthRoute = createRouteMatcher([
+  "/sign-in",
+  "/signin",
+  "/signup",
+  "/handler(.*)",
+]);
 
-export default convexAuthNextjsMiddleware(
-  async (request, { convexAuth }) => {
+export default async function proxy(request: Request & { nextUrl: URL }) {
     const url = request.nextUrl;
     const pathname = url.pathname;
     const method = request.method;
@@ -64,28 +84,31 @@ export default convexAuthNextjsMiddleware(
     }
 
     // Check if user is authenticated only for non-public routes
-    const isAuthenticated = await convexAuth.isAuthenticated();
+    const user = await stackServerApp.getUser({ tokenStore: request });
+    const isAuthenticated = Boolean(user);
 
     if (!isAuthenticated) {
       // Allow auth routes when unauthenticated
       if (isAuthRoute(request)) {
+        if (pathname === "/signin") {
+          return redirect(request, "/sign-in");
+        }
+
         return;
       }
 
-      return nextjsMiddlewareRedirect(request, "/signin");
+      return redirect(request, "/sign-in");
     }
 
-    // Redirect to dashboard if user is authenticated and on auth route
     if (isAuthRoute(request)) {
-      return nextjsMiddlewareRedirect(request, "/overview");
+      const returnUrl = safeReturnPath(url.searchParams.get("returnUrl"));
+      if (returnUrl) {
+        return redirect(request, returnUrl);
+      }
     }
 
     return;
-  },
-  {
-    cookieConfig: { maxAge: 60 * 60 * 24 * 30 },
-  }
-);
+}
 
 export const config = {
   // The following matcher runs middleware on all routes

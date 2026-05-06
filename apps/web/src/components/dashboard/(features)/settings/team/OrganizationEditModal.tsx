@@ -24,7 +24,7 @@ export default function OrganizationEditModal({
   const [name, setName] = useState(currentName);
   const [isLoading, setIsLoading] = useState(false);
   const updateOrganizationName = useMutation(
-    api.core.users.updateOrganizationName,
+    api.core.organizations.updateOrganization,
   );
 
   const handleSave = async () => {
@@ -48,9 +48,7 @@ export default function OrganizationEditModal({
     setIsLoading(true);
     try {
       // Update organization name in Convex
-      await updateOrganizationName({
-        organizationName: name.trim(),
-      });
+      await updateOrganizationName({ name: name.trim() });
 
       addToast({
         title: "Organization updated",

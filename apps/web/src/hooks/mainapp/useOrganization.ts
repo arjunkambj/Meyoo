@@ -13,7 +13,7 @@ export function useOrganization() {
   const { user, membershipRole } = useUser();
   const organization = useQuery(api.core.organizations.getCurrentOrganization);
   const updateOrganizationNameMutation = useMutation(
-    api.core.users.updateOrganizationName,
+    api.core.organizations.updateOrganization,
   );
   const updateOrganizationMutation = useMutation(
     api.core.organizations.updateOrganization,
@@ -25,7 +25,7 @@ export function useOrganization() {
 
   // Update organization name
   const updateOrganizationName = async (name: string) => {
-    return await updateOrganizationNameMutation({ organizationName: name });
+    return await updateOrganizationNameMutation({ name });
   };
 
   // Update organization details
@@ -39,7 +39,7 @@ export function useOrganization() {
   };
 
   return {
-    organizationId: user?.organizationId || null,
+    organizationId: organization?.id || user?.organizationId || null,
     organizationName: organization?.name || "Default Organization",
     userRole: membershipRole,
     organization,

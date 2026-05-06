@@ -31,7 +31,6 @@ export const ORGANIZATION_TABLES = [
   "invoices",
   "integrationRequests",
   "gdprRequests",
-  "invites",
 ] as const;
 
 export type OrganizationDataTable = (typeof ORGANIZATION_TABLES)[number];
@@ -68,7 +67,6 @@ const organizationTableValidator = v.union(
   v.literal("invoices"),
   v.literal("integrationRequests"),
   v.literal("gdprRequests"),
-  v.literal("invites"),
 );
 
 const ORGANIZATION_TABLE_INDEXES: Record<OrganizationDataTable, string> = {
@@ -94,7 +92,6 @@ const ORGANIZATION_TABLE_INDEXES: Record<OrganizationDataTable, string> = {
   invoices: "by_organization",
   integrationRequests: "by_organization",
   gdprRequests: "by_organization",
-  invites: "by_organization",
 };
 
 const storeTableValidator = v.union(

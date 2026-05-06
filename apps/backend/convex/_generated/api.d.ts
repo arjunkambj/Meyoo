@@ -8,8 +8,6 @@
  * @module
  */
 
-import type * as ResendOTP from "../ResendOTP.js";
-import type * as auth from "../auth.js";
 import type * as authFinalize from "../authFinalize.js";
 import type * as authHelpers from "../authHelpers.js";
 import type * as core_costs from "../core/costs.js";
@@ -46,6 +44,7 @@ import type * as jobs_helpers from "../jobs/helpers.js";
 import type * as jobs_maintenance from "../jobs/maintenance.js";
 import type * as jobs_maintenanceHandlers from "../jobs/maintenanceHandlers.js";
 import type * as jobs_syncHandlers from "../jobs/syncHandlers.js";
+import type * as lib_auth from "../lib/auth.js";
 import type * as meta_actions from "../meta/actions.js";
 import type * as meta_client from "../meta/client.js";
 import type * as meta_integration from "../meta/integration.js";
@@ -58,9 +57,6 @@ import type * as meta_tokenManager from "../meta/tokenManager.js";
 import type * as meta_tokens from "../meta/tokens.js";
 import type * as meta_types from "../meta/types.js";
 import type * as meyoo_admin from "../meyoo/admin.js";
-import type * as resend_http from "../resend/http.js";
-import type * as resend_index from "../resend/index.js";
-import type * as resend_sendOtp from "../resend/sendOtp.js";
 import type * as schema_core from "../schema/core.js";
 import type * as schema_costs from "../schema/costs.js";
 import type * as schema_meta from "../schema/meta.js";
@@ -124,6 +120,7 @@ import type * as web_sync from "../web/sync.js";
 import type * as webhooks_gdpr from "../webhooks/gdpr.js";
 import type * as webhooks_processor from "../webhooks/processor.js";
 import type * as webhooks_shopify from "../webhooks/shopify.js";
+import type * as webhooks_stack from "../webhooks/stack.js";
 
 import type {
   ApiFromModules,
@@ -132,8 +129,6 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  ResendOTP: typeof ResendOTP;
-  auth: typeof auth;
   authFinalize: typeof authFinalize;
   authHelpers: typeof authHelpers;
   "core/costs": typeof core_costs;
@@ -170,6 +165,7 @@ declare const fullApi: ApiFromModules<{
   "jobs/maintenance": typeof jobs_maintenance;
   "jobs/maintenanceHandlers": typeof jobs_maintenanceHandlers;
   "jobs/syncHandlers": typeof jobs_syncHandlers;
+  "lib/auth": typeof lib_auth;
   "meta/actions": typeof meta_actions;
   "meta/client": typeof meta_client;
   "meta/integration": typeof meta_integration;
@@ -182,9 +178,6 @@ declare const fullApi: ApiFromModules<{
   "meta/tokens": typeof meta_tokens;
   "meta/types": typeof meta_types;
   "meyoo/admin": typeof meyoo_admin;
-  "resend/http": typeof resend_http;
-  "resend/index": typeof resend_index;
-  "resend/sendOtp": typeof resend_sendOtp;
   "schema/core": typeof schema_core;
   "schema/costs": typeof schema_costs;
   "schema/meta": typeof schema_meta;
@@ -248,6 +241,7 @@ declare const fullApi: ApiFromModules<{
   "webhooks/gdpr": typeof webhooks_gdpr;
   "webhooks/processor": typeof webhooks_processor;
   "webhooks/shopify": typeof webhooks_shopify;
+  "webhooks/stack": typeof webhooks_stack;
 }>;
 
 /**
@@ -279,5 +273,4 @@ export declare const internal: FilterApi<
 export declare const components: {
   mainWorkpool: import("@convex-dev/workpool/_generated/component.js").ComponentApi<"mainWorkpool">;
   actionRetrier: import("@convex-dev/action-retrier/_generated/component.js").ComponentApi<"actionRetrier">;
-  resend: import("@convex-dev/resend/_generated/component.js").ComponentApi<"resend">;
 };

@@ -1,7 +1,7 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 import { query } from "../_generated/server";
+import { getUserAndOrg } from "../utils/auth";
 
 const shopifyStoreValidator = v.object({
   id: v.id("shopifyStores"),
@@ -64,19 +64,9 @@ export const getOverview = query({
     disconnectedIntegrations: v.array(v.string()),
   }),
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) {
-      return DEFAULT_RESPONSE;
-    }
-
-    const user = await ctx.db.get(userId);
-
-    if (!user?.organizationId) {
-      return DEFAULT_RESPONSE;
-    }
-
-    const organizationId = user.organizationId;
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return DEFAULT_RESPONSE;
+    const organizationId = auth.orgId;
 
     const shopifyStore = await ctx.db
       .query("shopifyStores")

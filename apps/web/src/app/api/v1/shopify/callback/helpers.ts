@@ -1,5 +1,4 @@
 import { fetchMutation, fetchQuery } from "convex/nextjs";
-import { NextResponse } from "next/server";
 import { api } from "@/libs/convexApi";
 import { ShopifyGraphQLClient } from "@/libs/shopify/ShopifyGraphQLClient";
 import { registerWebhooks } from "@/libs/shopify/webhook-register";
@@ -15,6 +14,11 @@ const logger = createLogger("Shopify.Callback.Helpers");
 const NEXT_PUBLIC_APP_URL = requireEnv("NEXT_PUBLIC_APP_URL");
 const SHOPIFY_WEBHOOK_DEBUG = optionalEnv("SHOPIFY_WEBHOOK_DEBUG") === "1";
 
+const compactShopData = (data: Record<string, unknown>) =>
+  Object.fromEntries(
+    Object.entries(data).filter(([, value]) => value !== undefined && value !== null),
+  );
+
 /**
  * Fetches shop data from Shopify GraphQL API
  */
@@ -28,7 +32,7 @@ export async function fetchShopData(session: Session): Promise<Record<string, un
     const shopInfo = response.data?.shop;
 
     if (shopInfo) {
-      return {
+      return compactShopData({
         email: shopInfo.email,
         shopName: shopInfo.name,
         currency: shopInfo.currencyCode,
@@ -36,7 +40,7 @@ export async function fetchShopData(session: Session): Promise<Record<string, un
         timezoneAbbreviation: shopInfo.timezoneAbbreviation,
         timezoneOffsetMinutes: shopInfo.timezoneOffsetMinutes,
         country: shopInfo.billingAddress?.country,
-      };
+      });
     }
     return {};
   } catch (error) {
@@ -134,35 +138,6 @@ export async function triggerInitialSync(
   } catch (error) {
     logger.error("Initial sync scheduling check failed", error as Error);
   }
-}
-
-/**
- * Sets auth cookies for Convex session
- */
-export function setAuthCookies(
-  response: NextResponse,
-  tokens: { token: string; refreshToken: string },
-): void {
-  const prefix = "__Host-";
-  const common = {
-    httpOnly: true as const,
-    sameSite: "lax" as const,
-    secure: true,
-    path: "/",
-  };
-
-  response.cookies.set(`${prefix}__convexAuthJWT`, tokens.token, {
-    ...common,
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  response.cookies.set(`${prefix}__convexAuthRefreshToken`, tokens.refreshToken, {
-    ...common,
-    maxAge: 60 * 60 * 24 * 30,
-  });
-  response.cookies.set(`${prefix}__convexAuthOAuthVerifier`, "", {
-    ...common,
-    expires: new Date(0),
-  });
 }
 
 /**

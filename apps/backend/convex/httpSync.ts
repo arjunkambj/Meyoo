@@ -1,5 +1,5 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { httpAction } from "./_generated/server";
+import { getUserAndOrg } from "./utils/auth";
 
 /**
  * Sync HTTP Endpoints
@@ -136,9 +136,8 @@ function createSyncHandler(config: {
           );
         }
 
-        // Get user from token (using Convex Auth)
-        const userId = await getAuthUserId(ctx);
-        if (!userId) {
+        const auth = await getUserAndOrg(ctx);
+        if (!auth) {
           return new Response(
             JSON.stringify({
               success: false,

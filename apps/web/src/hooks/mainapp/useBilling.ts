@@ -91,7 +91,7 @@ export function useBilling() {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch billing metadata for the current organization
-  const billingInfo = useQuery(api.core.users.getUserBilling);
+  const billingInfo = useQuery(api.core.organizationBilling.getCurrentBilling);
   const organization = useQuery(
     api.core.organizationBilling.getOrganizationByUser,
   );

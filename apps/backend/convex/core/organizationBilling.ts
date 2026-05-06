@@ -1,7 +1,8 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internalMutation, mutation, query } from "../_generated/server";
 import { createMonthlyInvoiceIfMissing } from "../utils/billing";
+import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
+import { defaultOrgDateRange } from "../utils/orgDateRange";
 
 /**
  * Get organization by user
@@ -9,18 +10,119 @@ import { createMonthlyInvoiceIfMissing } from "../utils/billing";
 export const getOrganizationByUser = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) return null;
-
-    const user = await ctx.db.get(userId);
-
-    if (!user || !user.organizationId) return null;
-
-    // Get organization by ID
-    const organization = await ctx.db.get(user.organizationId);
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return null;
+    const organization = await ctx.db.get(auth.orgId);
 
     return organization;
+  },
+});
+
+export const getCurrentBilling = query({
+  args: {},
+  returns: v.union(
+    v.null(),
+    v.object({
+      plan: v.union(
+        v.literal("free"),
+        v.literal("starter"),
+        v.literal("growth"),
+        v.literal("business"),
+      ),
+      isPremium: v.boolean(),
+      status: v.optional(
+        v.union(
+          v.literal("active"),
+          v.literal("trial"),
+          v.literal("cancelled"),
+          v.literal("suspended"),
+        ),
+      ),
+      billingCycle: v.optional(
+        v.union(v.literal("monthly"), v.literal("yearly")),
+      ),
+      subscriptionId: v.optional(v.string()),
+      subscriptionStatus: v.optional(v.string()),
+    }),
+  ),
+  handler: async (ctx) => {
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return null;
+
+    const billing = await ctx.db
+      .query("billing")
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", auth.orgId),
+      )
+      .first();
+
+    if (!billing) {
+      return {
+        plan: "free" as const,
+        isPremium: false,
+        status: "active" as const,
+        billingCycle: "monthly" as const,
+        subscriptionId: undefined,
+        subscriptionStatus: undefined,
+      };
+    }
+
+    return {
+      plan: billing.shopifyBilling?.plan ?? "free",
+      isPremium: billing.isPremium,
+      status: billing.status,
+      billingCycle: billing.billingCycle,
+      subscriptionId: billing.shopifyBilling?.shopifySubscriptionId,
+      subscriptionStatus: billing.shopifyBilling?.status,
+    };
+  },
+});
+
+export const getCurrentUsage = query({
+  args: {},
+  returns: v.union(
+    v.null(),
+    v.object({
+      ordersLast30Days: v.number(),
+      orderLimit: v.number(),
+    }),
+  ),
+  handler: async (ctx) => {
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return null;
+
+    const range = await defaultOrgDateRange(ctx, auth.orgId, 30);
+    const dailyMetrics = await ctx.db
+      .query("dailyMetrics")
+      .withIndex("by_organization_date", (q) =>
+        q.eq("organizationId", auth.orgId).gte("date", range.startDate),
+      )
+      .collect();
+
+    const ordersLast30Days = dailyMetrics.reduce(
+      (sum, metric) => sum + (metric.totalOrders ?? 0),
+      0,
+    );
+
+    const billing = await ctx.db
+      .query("billing")
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", auth.orgId),
+      )
+      .first();
+
+    const plan = billing?.shopifyBilling?.plan ?? "free";
+    const planLimits: Record<string, number> = {
+      free: 300,
+      starter: 1200,
+      growth: 3000,
+      business: 7500,
+    };
+
+    return {
+      ordersLast30Days,
+      orderLimit: planLimits[plan] ?? 300,
+    };
   },
 });
 
@@ -312,15 +414,8 @@ export const updateOrganizationPlan = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    // Get the current user
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    // Verify the user has access to this organization
-    const user = await ctx.db.get(userId);
-    if (!user || user.organizationId !== args.organizationId) {
+    const auth = await requireUserAndOrg(ctx);
+    if (auth.orgId !== args.organizationId) {
       throw new Error("Unauthorized");
     }
 

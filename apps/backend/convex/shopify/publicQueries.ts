@@ -1,23 +1,17 @@
-
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { query } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 import { findShopifyStoreByDomain, normalizeShopDomain } from "../utils/shop";
 import { verifyShopProvisionSignature } from "../utils/crypto";
+import { getUserAndOrg } from "../utils/auth";
 
 export const getStore = query({
   args: {},
   returns: v.union(v.null(), v.any()),
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) return null;
-    const user = await ctx.db.get(userId);
-
-    if (!user?.organizationId) return null;
-
-    const orgId = user.organizationId;
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return null;
+    const orgId = auth.orgId;
 
     return await ctx.db
       .query("shopifyStores")
@@ -55,14 +49,9 @@ export const getProducts = query({
     })
   ),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) return [];
-    const user = await ctx.db.get(userId);
-
-    if (!user?.organizationId) return [];
-
-    const orgId = user.organizationId;
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return [];
+    const orgId = auth.orgId;
 
     return await ctx.db
       .query("shopifyProducts")
@@ -125,16 +114,10 @@ export const getProductVariantsPaginated = query({
     currentPage: v.number(),
   }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId)
+    const auth = await getUserAndOrg(ctx);
+    if (!auth)
       return { data: [], totalPages: 0, totalItems: 0, currentPage: 1 };
-    const user = await ctx.db.get(userId);
-
-    if (!user?.organizationId)
-      return { data: [], totalPages: 0, totalItems: 0, currentPage: 1 };
-
-    const orgId = user.organizationId;
+    const orgId = auth.orgId;
     const page = args.page || 1;
     const pageSize = Math.min(args.pageSize || 20, 1000); // Allow larger page sizes for bulk editing
 
@@ -300,14 +283,9 @@ export const getProductVariants = query({
     })
   ),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) return [];
-    const user = await ctx.db.get(userId);
-
-    if (!user?.organizationId) return [];
-
-    const orgId = user.organizationId;
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return [];
+    const orgId = auth.orgId;
 
     // Get variants
     const variants = await ctx.db

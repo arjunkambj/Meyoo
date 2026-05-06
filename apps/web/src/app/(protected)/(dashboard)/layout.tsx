@@ -1,12 +1,15 @@
 import Header from "@/components/dashboard/layouts/DashBoardHeader";
 import DashboardSidebar from "@/components/dashboard/layouts/DashboardSidebar";
 import { UserProvider } from "@/contexts/UserContext";
+import { ensureOnboarded } from "@/app/onboarding-functions";
 
 export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await ensureOnboarded();
+
   return (
     <UserProvider>
       <div className="flex h-full w-full bg-background border border-default-100">

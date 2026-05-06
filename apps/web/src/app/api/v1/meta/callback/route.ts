@@ -1,4 +1,3 @@
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import axios from "axios";
 import { genRequestId, tagFromToken } from "@/libs/logging/trace";
 import { fetchAction, fetchMutation } from "convex/nextjs";
@@ -8,6 +7,7 @@ import { api } from "@/libs/convexApi";
 import { META_CONFIG } from "@/config/integrations/meta.config";
 import { createLogger } from "@/libs/logging/Logger";
 import { optionalEnv, requireEnv } from "@/libs/env";
+import { stackConvexToken } from "@/libs/stackConvex";
 
 const logger = createLogger("Meta.Callback");
 
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Get Convex auth token for the authenticated user
-    const token = await convexAuthNextjsToken();
+    const token = await stackConvexToken(req);
     const userTag = tagFromToken(token) || "anon";
 
     if (!token) {

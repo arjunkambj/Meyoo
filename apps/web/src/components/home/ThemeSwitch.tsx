@@ -2,8 +2,9 @@
 
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 export function ThemeSwitch() {
   const { theme, setTheme } = useTheme();

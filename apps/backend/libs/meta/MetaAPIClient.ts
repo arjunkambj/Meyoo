@@ -565,7 +565,7 @@ export class MetaAPIClient {
       );
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as APIResponse<T>;
 
     // Log response structure
     logger.info("API response data structure", {

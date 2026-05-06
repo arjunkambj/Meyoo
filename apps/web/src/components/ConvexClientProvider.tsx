@@ -1,17 +1,21 @@
 "use client";
 
-import { ConvexAuthNextjsProvider } from "@convex-dev/auth/nextjs";
-import { ConvexReactClient } from "convex/react";
-import type { ReactNode } from "react";
-import { requireEnv } from "@/libs/env";
+import type React from "react";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { ConvexQueryCacheProvider } from "convex-helpers/react/cache/provider";
+import { stackClientApp } from "../stack/client";
 
-const convexUrl = requireEnv("NEXT_PUBLIC_CONVEX_URL");
-const convex = new ConvexReactClient(convexUrl);
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+convex.setAuth(stackClientApp.getConvexClientAuth({}));
 
-export function ConvexClientProvider({ children }: { children: ReactNode }) {
+export default function ConvexClientProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ConvexAuthNextjsProvider client={convex}>
-      {children}
-    </ConvexAuthNextjsProvider>
+    <ConvexProvider client={convex}>
+      <ConvexQueryCacheProvider>{children}</ConvexQueryCacheProvider>
+    </ConvexProvider>
   );
 }

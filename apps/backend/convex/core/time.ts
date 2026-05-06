@@ -1,9 +1,9 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { action, internalAction } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 import { getShopTimeInfo as fetchShopTimeInfo } from "../../libs/time/shopTime";
 import { internal } from "../_generated/api";
+import { getUserAndOrg } from "../utils/auth";
 
 export const getShopTimeInfo = action({
   args: {
@@ -20,13 +20,8 @@ export const getShopTimeInfo = action({
     > | undefined;
 
     if (!orgId) {
-      const userId = await getAuthUserId(ctx);
-      if (userId) {
-        const user = (await ctx.runQuery(internal.core.users.getById, {
-          userId,
-        })) as unknown as { organizationId?: Id<"organizations"> } | null;
-        if (user?.organizationId) orgId = user.organizationId as Id<"organizations">;
-      }
+      const auth = await getUserAndOrg(ctx);
+      orgId = auth?.orgId;
     }
 
     if (!orgId) {

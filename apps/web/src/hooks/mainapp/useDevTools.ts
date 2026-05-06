@@ -24,7 +24,8 @@ export function useDevTools() {
     );
   }, [expanded]);
 
-  const currentUser = useQuery(api.core.users.getCurrentUser);
+  const organization = useQuery(api.core.organizations.getCurrentOrganization);
+  const organizationId = organization?.id;
   const resetMeta = useAction(api.meyoo.admin.resetMetaData);
   const resetShopify = useAction(api.meyoo.admin.resetShopifyData);
   const resetAll = useAction(api.meyoo.admin.resetEverything);
@@ -36,25 +37,25 @@ export function useDevTools() {
 
   const resetEverything = async () => {
     console.log(
-      `[DevTools] Reset Everything triggered - Organization: ${currentUser?.organizationId} - Timestamp: ${new Date().toISOString()}`,
+      `[DevTools] Reset Everything triggered - Organization: ${organizationId} - Timestamp: ${new Date().toISOString()}`,
     );
     setLoading(true);
     setError(null);
     try {
-      if (!currentUser?.organizationId) {
+      if (!organizationId) {
         throw new Error("No organization found");
       }
 
-      const result = await resetAll({ organizationId: currentUser.organizationId });
+      const result = await resetAll({ organizationId: organizationId });
 
       console.log(
-        `[DevTools] Reset Everything completed - Organization: ${currentUser.organizationId} - Deleted: ${result.deleted} items, Users updated: ${result.usersUpdated} - Timestamp: ${new Date().toISOString()}`,
+        `[DevTools] Reset Everything completed - Organization: ${organizationId} - Deleted: ${result.deleted} items, Users updated: ${result.usersUpdated} - Timestamp: ${new Date().toISOString()}`,
       );
     } catch (err) {
       const errorMsg = String(err);
 
       console.error(
-        `[DevTools] Reset Everything failed - Organization: ${currentUser?.organizationId} - Error: ${errorMsg} - Timestamp: ${new Date().toISOString()}`,
+        `[DevTools] Reset Everything failed - Organization: ${organizationId} - Error: ${errorMsg} - Timestamp: ${new Date().toISOString()}`,
         err,
       );
       setError(errorMsg);
@@ -65,25 +66,25 @@ export function useDevTools() {
 
   const disconnectShopify = async () => {
     console.log(
-      `[DevTools] Disconnect Shopify triggered - Organization: ${currentUser?.organizationId} - Timestamp: ${new Date().toISOString()}`,
+      `[DevTools] Disconnect Shopify triggered - Organization: ${organizationId} - Timestamp: ${new Date().toISOString()}`,
     );
     setLoading(true);
     setError(null);
     try {
-      if (!currentUser?.organizationId) {
+      if (!organizationId) {
         throw new Error("No organization found");
       }
 
-      const result = await resetShopify({ organizationId: currentUser.organizationId });
+      const result = await resetShopify({ organizationId: organizationId });
 
       console.log(
-        `[DevTools] Disconnect Shopify completed - Organization: ${currentUser.organizationId} - Deleted counts: ${JSON.stringify(result.deletedCounts)} - Timestamp: ${new Date().toISOString()}`,
+        `[DevTools] Disconnect Shopify completed - Organization: ${organizationId} - Deleted counts: ${JSON.stringify(result.deletedCounts)} - Timestamp: ${new Date().toISOString()}`,
       );
     } catch (err) {
       const errorMsg = String(err);
 
       console.error(
-        `[DevTools] Disconnect Shopify failed - Organization: ${currentUser?.organizationId} - Error: ${errorMsg} - Timestamp: ${new Date().toISOString()}`,
+        `[DevTools] Disconnect Shopify failed - Organization: ${organizationId} - Error: ${errorMsg} - Timestamp: ${new Date().toISOString()}`,
         err,
       );
       setError(errorMsg);
@@ -94,25 +95,25 @@ export function useDevTools() {
 
   const disconnectMeta = async () => {
     console.log(
-      `[DevTools] Disconnect Meta triggered - Organization: ${currentUser?.organizationId} - Timestamp: ${new Date().toISOString()}`,
+      `[DevTools] Disconnect Meta triggered - Organization: ${organizationId} - Timestamp: ${new Date().toISOString()}`,
     );
     setLoading(true);
     setError(null);
     try {
-      if (!currentUser?.organizationId) {
+      if (!organizationId) {
         throw new Error("No organization found");
       }
 
-      const result = await resetMeta({ organizationId: currentUser.organizationId });
+      const result = await resetMeta({ organizationId: organizationId });
 
       console.log(
-        `[DevTools] Disconnect Meta completed - Organization: ${currentUser.organizationId} - Deleted counts: ${JSON.stringify(result.deletedCounts)} - Timestamp: ${new Date().toISOString()}`,
+        `[DevTools] Disconnect Meta completed - Organization: ${organizationId} - Deleted counts: ${JSON.stringify(result.deletedCounts)} - Timestamp: ${new Date().toISOString()}`,
       );
     } catch (err) {
       const errorMsg = String(err);
 
       console.error(
-        `[DevTools] Disconnect Meta failed - Organization: ${currentUser?.organizationId} - Error: ${errorMsg} - Timestamp: ${new Date().toISOString()}`,
+        `[DevTools] Disconnect Meta failed - Organization: ${organizationId} - Error: ${errorMsg} - Timestamp: ${new Date().toISOString()}`,
         err,
       );
       setError(errorMsg);
@@ -123,20 +124,20 @@ export function useDevTools() {
 
   const recalculateAnalytics = async (daysBack: number) => {
     console.log(
-      `[DevTools] Recalculate analytics triggered - Organization: ${currentUser?.organizationId} - Days back: ${daysBack} - Timestamp: ${new Date().toISOString()}`,
+      `[DevTools] Recalculate analytics triggered - Organization: ${organizationId} - Days back: ${daysBack} - Timestamp: ${new Date().toISOString()}`,
     );
 
-    if (!currentUser?.organizationId) {
+    if (!organizationId) {
       throw new Error("No organization found");
     }
 
     const result = await recalcAnalytics({
-      organizationId: currentUser.organizationId,
+      organizationId: organizationId,
       daysBack,
     });
 
     console.log(
-      `[DevTools] Recalculate analytics completed - Organization: ${currentUser.organizationId} - Processed: ${result.processed}, Updated: ${result.updated}, Skipped: ${result.skipped} - Timestamp: ${new Date().toISOString()}`,
+      `[DevTools] Recalculate analytics completed - Organization: ${organizationId} - Processed: ${result.processed}, Updated: ${result.updated}, Skipped: ${result.skipped} - Timestamp: ${new Date().toISOString()}`,
     );
 
     return result;
@@ -144,19 +145,19 @@ export function useDevTools() {
 
   const deleteAnalyticsMetrics = async () => {
     console.log(
-      `[DevTools] Delete analytics metrics triggered - Organization: ${currentUser?.organizationId} - Timestamp: ${new Date().toISOString()}`,
+      `[DevTools] Delete analytics metrics triggered - Organization: ${organizationId} - Timestamp: ${new Date().toISOString()}`,
     );
 
-    if (!currentUser?.organizationId) {
+    if (!organizationId) {
       throw new Error("No organization found");
     }
 
     const result = await deleteMetrics({
-      organizationId: currentUser.organizationId,
+      organizationId: organizationId,
     });
 
     console.log(
-      `[DevTools] Delete analytics metrics completed - Organization: ${currentUser.organizationId} - Deleted: ${result.deleted} - Tables: ${JSON.stringify(result.tables)} - Timestamp: ${new Date().toISOString()}`,
+      `[DevTools] Delete analytics metrics completed - Organization: ${organizationId} - Deleted: ${result.deleted} - Tables: ${JSON.stringify(result.tables)} - Timestamp: ${new Date().toISOString()}`,
     );
 
     return result;

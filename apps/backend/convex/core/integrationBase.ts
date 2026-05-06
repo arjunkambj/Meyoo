@@ -339,7 +339,13 @@ export const OAuthUtils = {
       throw new Error(`Token exchange failed: ${response.statusText}`);
     }
 
-    return response.json();
+    return (await response.json()) as {
+      access_token: string;
+      refresh_token?: string;
+      expires_in?: number;
+      token_type?: string;
+      scope?: string;
+    };
   },
 
   /**
@@ -374,7 +380,13 @@ export const OAuthUtils = {
       throw new Error(`Token refresh failed: ${response.statusText}`);
     }
 
-    return response.json();
+    return (await response.json()) as {
+      access_token: string;
+      refresh_token?: string;
+      expires_in?: number;
+      token_type?: string;
+      scope?: string;
+    };
   },
 };
 

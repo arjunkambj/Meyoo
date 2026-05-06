@@ -1,19 +1,15 @@
 import { httpRouter } from "convex/server";
 
-import { auth } from "./auth";
 import { syncGoogle, syncMeta, syncShopify } from "./httpSync";
 import {
   customerDataRequest,
   customerRedact,
   shopRedact,
 } from "./webhooks/gdpr";
+import { stackWebhookHandler } from "./webhooks/stack";
 import { shopifyWebhook, shopifyWebhookHealth } from "./webhooks/shopify";
-import { sendOtp } from "./resend/http";
 
 const http = httpRouter();
-
-// Auth routes
-auth.addHttpRoutes(http);
 
 // Shopify webhook routes
 http.route({
@@ -66,11 +62,11 @@ http.route({
   handler: syncGoogle,
 });
 
-// Email endpoints
+// Stack webhook routes
 http.route({
-  path: "/emails/send-otp",
+  path: "/webhook/stack",
   method: "POST",
-  handler: sendOtp,
+  handler: stackWebhookHandler,
 });
 
 export default http;

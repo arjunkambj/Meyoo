@@ -1,4 +1,3 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 import { api, internal } from "../_generated/api";
@@ -6,6 +5,7 @@ import type { Id } from "../_generated/dataModel";
 import { action } from "../_generated/server";
 import { META_CONFIG } from "../../libs/meta/meta.config";
 import type { MetaAdAccount } from "./types";
+import { requireUserAndOrg } from "../utils/auth";
 
 export const fetchMetaAccountsAction = action({
   args: {},
@@ -28,24 +28,12 @@ export const fetchMetaAccountsAction = action({
   }),
   handler: async (ctx) => {
     try {
-      const userId = await getAuthUserId(ctx);
-      if (!userId) {
-        return { success: false, accounts: [], error: "Not authenticated" };
-      }
-
-      const user = await ctx.runQuery(api.core.users.getCurrentUser);
-      if (!user?.organizationId) {
-        return {
-          success: false,
-          accounts: [],
-          error: "User or organization not found",
-        };
-      }
+      const auth = await requireUserAndOrg(ctx);
 
       const session = await ctx.runQuery(
         internal.meta.internal.getIntegrationSession,
         {
-          organizationId: user.organizationId,
+          organizationId: auth.orgId,
         },
       );
 
@@ -60,7 +48,7 @@ export const fetchMetaAccountsAction = action({
       const accessToken = await ctx.runAction(
         internal.meta.tokenManager.getValidAccessToken,
         {
-          organizationId: user.organizationId as Id<"organizations">,
+          organizationId: auth.orgId as Id<"organizations">,
           platform: "meta",
         },
       );
@@ -75,10 +63,13 @@ export const fetchMetaAccountsAction = action({
         ),
       ]);
 
-      const [adAccountsData, businessesData]: [
+      const [adAccountsData, businessesData] = (await Promise.all([
+        adAccountsRes.json(),
+        businessesRes.json(),
+      ])) as [
         { data?: Array<Record<string, unknown>> },
         { data?: Array<Record<string, unknown>> },
-      ] = await Promise.all([adAccountsRes.json(), businessesRes.json()]);
+      ];
 
       let adAccounts: MetaAdAccount[] = (adAccountsData.data || []).map(
         (acc: Record<string, any>) =>
@@ -106,7 +97,9 @@ export const fetchMetaAccountsAction = action({
           const businessRes = await fetch(
             `https://graph.facebook.com/${version}/${String(business.id)}/adaccounts?fields=id,name,currency,timezone_name,account_status,spend_cap,amount_spent&limit=100&access_token=${accessToken}`,
           );
-          const businessData = await businessRes.json();
+          const businessData = (await businessRes.json()) as {
+            data?: Array<Record<string, any>>;
+          };
 
           if (businessData.data) {
             allBusinessAdAccounts.push(...businessData.data);
@@ -172,4 +165,3 @@ export const fetchMetaAccountsAction = action({
     }
   },
 });
-

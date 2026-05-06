@@ -1,22 +1,19 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 import type { Doc, Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
+import { getUserAndOrg } from "../utils/auth";
 
 export const getAdAccounts = query({
   args: {},
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return [];
-
-    const user = await ctx.db.get(userId);
-    if (!user?.organizationId) return [];
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return [];
 
     const accounts = await ctx.db
       .query("metaAdAccounts")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", user.organizationId as Id<"organizations">),
+        q.eq("organizationId", auth.orgId as Id<"organizations">),
       )
       .collect();
 
@@ -42,11 +39,8 @@ export const getInsights = query({
     ),
   },
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return [];
-
-    const user = await ctx.db.get(userId);
-    if (!user?.organizationId) return [];
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return [];
 
     let insights: Doc<"metaInsights">[];
 
@@ -80,7 +74,7 @@ export const getInsights = query({
         .query("metaInsights")
         .withIndex("by_org_date", (q) =>
           q
-            .eq("organizationId", user.organizationId as Id<"organizations">)
+            .eq("organizationId", auth.orgId as Id<"organizations">)
             .gte("date", startDate)
             .lte("date", endDate),
         )
@@ -89,7 +83,7 @@ export const getInsights = query({
       insights = (await ctx.db
         .query("metaInsights")
         .withIndex("by_organization", (q) =>
-          q.eq("organizationId", user.organizationId as Id<"organizations">),
+          q.eq("organizationId", auth.orgId as Id<"organizations">),
         )
         .take(1000)) as Doc<"metaInsights">[];
     }
@@ -104,11 +98,8 @@ export const getCampaigns = query({
   },
   returns: v.array(v.any()),
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return [];
-
-    const user = await ctx.db.get(userId);
-    if (!user?.organizationId) return [];
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) return [];
 
     // Campaign storage not implemented yet
     return [];
@@ -120,4 +111,3 @@ export const metaQueries = {
   getInsights,
   getCampaigns,
 };
-

@@ -1,4 +1,3 @@
-import { convexAuthNextjsToken } from "@convex-dev/auth/nextjs/server";
 import { type NextRequest, NextResponse } from "next/server";
 import { api } from "@/libs/convexApi";
 import { createLogger } from "@/libs/logging/Logger";
@@ -6,6 +5,7 @@ import { createManagedPricingRedirectUrl } from "@/libs/shopify/billing";
 import shopify from "@/libs/shopify/shopify";
 import { genRequestId, tagFromToken } from "@/libs/logging/trace";
 import { requireEnv } from "@/libs/env";
+import { stackConvexToken } from "@/libs/stackConvex";
 
 const logger = createLogger("Billing.Request");
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   try {
     const requestId = genRequestId(req);
     // Check if user is authenticated
-    const token = await convexAuthNextjsToken();
+    const token = await stackConvexToken(req);
     const userTag = tagFromToken(token);
 
     if (!token) {

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { action, mutation } from "./_generated/server";
+import { mutation } from "./_generated/server";
 import { normalizeShopDomain, findShopifyStoreByDomain } from "./utils/shop";
 import { verifyShopProvisionSignature } from "./utils/crypto";
 import { ensureActiveMembership, findExistingUser, normalizeEmail } from "./authHelpers";
@@ -225,47 +225,5 @@ export const createOrAttachFromShopifyOAuth = mutation({
       userId: user._id as unknown as string,
       shop: shop,
     };
-  },
-});
-
-export const issueTokensFromShopifyOAuth = action({
-  args: {
-    shop: v.string(),
-    nonce: v.string(),
-    sig: v.string(),
-  },
-  returns: v.object({ token: v.string(), refreshToken: v.string() }),
-  handler: async (ctx, args) => {
-    const ok = await verifyShopProvisionSignature(
-      args.shop,
-      args.nonce,
-      args.sig,
-    );
-    if (!ok) throw new Error("Unauthorized");
-
-    const shop = normalizeShopDomain(args.shop);
-    const store = (await ctx.runQuery(
-      internal.shopify.internalQueries.getStoreByDomain,
-      { shopDomain: shop },
-    )) as { userId?: Id<"users"> } | null;
-    if (!store?.userId) throw new Error("Store not found");
-
-    const authResult = (await ctx.runMutation(internal.auth.store, {
-      args: {
-        type: "signIn",
-        userId: store.userId,
-        generateTokens: true,
-      },
-    })) as any;
-
-    const token = authResult?.token ?? authResult?.tokens?.token;
-    const refreshToken =
-      authResult?.refreshToken ?? authResult?.tokens?.refreshToken;
-
-    if (!token || !refreshToken) {
-      throw new Error("Failed to issue auth tokens");
-    }
-
-    return { token, refreshToken };
   },
 });

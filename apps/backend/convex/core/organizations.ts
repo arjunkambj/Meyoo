@@ -1,10 +1,8 @@
-import { getAuthUserId } from "@convex-dev/auth/server";
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
 import { internalMutation, internalQuery, mutation, query } from "../_generated/server";
-import type { Id } from "../_generated/dataModel";
-import { getUserAndOrg } from "../utils/auth";
+import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
 
 /**
  * Organization management
@@ -38,6 +36,27 @@ export const setOrganizationTimezoneInternal = internalMutation({
       timezone: args.timezone,
       updatedAt: Date.now(),
     });
+  },
+});
+
+export const getByStackTeamIdInternal = internalQuery({
+  args: {
+    stackTeamId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("organizations")
+      .withIndex("by_stack_team", (q) => q.eq("stackTeamId", args.stackTeamId))
+      .first();
+  },
+});
+
+export const getByIdInternal = internalQuery({
+  args: {
+    organizationId: v.id("organizations"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.organizationId);
   },
 });
 
@@ -129,7 +148,7 @@ export const getOrganization = query({
     const auth = await getUserAndOrg(ctx);
     if (!auth) return null;
     const user = auth.user;
-    if (user.organizationId !== args.organizationId) return null;
+    if (auth.orgId !== args.organizationId) return null;
 
     // Get the organization
     const organization = await ctx.db.get(args.organizationId);
@@ -187,36 +206,12 @@ export const updateOrganization = mutation({
   },
   returns: v.object({ success: v.boolean() }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId) {
-      throw new Error("Not authenticated");
-    }
-
-    const user = await ctx.db.get(userId);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // Check permissions via membership
-    if (!user.organizationId) throw new Error("Organization not found");
-    const acting = await ctx.db
-      .query("memberships")
-      .withIndex("by_org_user", (q) =>
-        q
-          .eq("organizationId", user.organizationId as Id<"organizations">)
-          .eq("userId", user._id),
-      )
-      .first();
-    const canUpdate = acting?.role === "StoreOwner";
-    if (!canUpdate) {
-      throw new Error("Insufficient permissions to update organization");
-    }
+    const auth = await requireUserAndOrg(ctx);
+    const organizationId = auth.orgId;
 
     // Get the organization record
     const organization = await ctx.db.get(
-      user.organizationId as Id<"organizations">,
+      organizationId,
     );
 
     if (!organization) {
@@ -241,7 +236,7 @@ export const updateOrganization = mutation({
     if (args.timezone !== undefined) orgUpdates.timezone = args.timezone;
 
     // Update the organization record
-    await ctx.db.patch(user.organizationId, orgUpdates);
+    await ctx.db.patch(organizationId, orgUpdates);
 
     return { success: true };
   },
@@ -280,18 +275,12 @@ export const getInvoices = query({
     isDone: v.boolean(),
   }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-
-    if (!userId)
-      return { page: [], continueCursor: "", isDone: true };
-
-    const user = await ctx.db.get(userId);
-
-    if (!user?.organizationId)
+    const auth = await getUserAndOrg(ctx);
+    if (!auth)
       return { page: [], continueCursor: "", isDone: true };
 
     // Query invoices for this organization using the index for pagination
-    const { organizationId } = user;
+    const organizationId = auth.orgId;
     const pagination = await ctx.db
       .query("invoices")
       .withIndex("by_organization", (q) =>
@@ -339,15 +328,7 @@ export const deleteInvoice = mutation({
     success: v.boolean(),
   }),
   handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) {
-      throw new ConvexError("Unauthorized");
-    }
-
-    const user = await ctx.db.get(userId);
-    if (!user?.organizationId) {
-      throw new ConvexError("User not part of an organization");
-    }
+    const auth = await requireUserAndOrg(ctx);
 
     // Get the invoice to verify ownership
     const invoice = await ctx.db.get(args.invoiceId);
@@ -356,7 +337,7 @@ export const deleteInvoice = mutation({
     }
 
     // Verify the invoice belongs to the user's organization
-    if (invoice.organizationId !== user.organizationId) {
+    if (invoice.organizationId !== auth.orgId) {
       throw new ConvexError("Unauthorized to delete this invoice");
     }
 

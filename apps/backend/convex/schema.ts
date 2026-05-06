@@ -1,11 +1,9 @@
-import { authTables } from "@convex-dev/auth/server";
 import { defineSchema } from "convex/server";
 import {
   billing,
   dashboards,
   integrationRequests,
   integrationSessions,
-  invites,
   invoices,
   onboarding,
   organizations,
@@ -52,11 +50,9 @@ import {
 
 export default defineSchema({
   // Core tables
-  ...authTables,
   users,
   organizations,
   memberships,
-  invites,
   dashboards,
   integrationSessions,
   syncSessions,

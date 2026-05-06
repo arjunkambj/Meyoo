@@ -1781,177 +1781,202 @@ export const connectShopifyStore = mutation({
     organizationId: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    const { user } = await requireUserAndOrg(ctx);
+    console.log("[ONBOARDING] connectShopifyStore started", {
+      domain: args.domain,
+      hasAccessToken: Boolean(args.accessToken),
+      scope: args.scope,
+    });
 
-    // Normalize the domain and check if store already exists
-    const domain = normalizeShopDomain(args.domain);
-    const existingStore = await findShopifyStoreByDomain(ctx.db, domain);
-
-    const storeName = args.shopData?.shopName || domain;
-    const currency = args.shopData?.currency || "USD";
-
-    if (existingStore) {
-      // Prevent reassigning a store connected to another organization
-      if (
-        existingStore.organizationId &&
-        user.organizationId &&
-        existingStore.organizationId !== (user.organizationId as Id<"organizations">)
-      ) {
-        throw new Error("This Shopify store is already connected to another organization.");
-      }
-      // Reactivate existing store
-      await ctx.db.patch(existingStore._id, {
-        organizationId: user.organizationId,
-        accessToken: args.accessToken,
-        scope: args.scope,
-        storeName: storeName,
-        primaryCurrency: currency,
-        operatingCountry: args.shopData?.country,
-        isActive: true,
-        updatedAt: Date.now(),
-      });
-    } else {
-      // Create new store
-      await ctx.db.insert("shopifyStores", {
-        organizationId: user.organizationId as Id<"organizations">,
-        userId: user._id,
-        shopDomain: domain,
-        storeName: storeName,
-        accessToken: args.accessToken,
-        scope: args.scope,
-        primaryCurrency: currency,
-        operatingCountry: args.shopData?.country,
-        isActive: true,
-      });
-    }
-
-    if (user.organizationId) {
-      const orgId = user.organizationId as Id<"organizations">;
-      const orgDoc = await ctx.db.get(orgId);
-      if (!orgDoc || orgDoc.primaryCurrency !== currency) {
-        await ctx.db.patch(orgId, {
-          primaryCurrency: currency,
-          updatedAt: Date.now(),
-        });
-      }
-    }
-
-    // Initialize trial for store organizations if needed
-    const billingRecord = await ctx.db
-      .query("billing")
-      .withIndex("by_organization", (q) =>
-        q.eq("organizationId", user.organizationId as Id<"organizations">),
-      )
-      .first();
-
-    if (billingRecord) {
-      const now = Date.now();
-      const needsTrialInit =
-        !billingRecord.trialStartDate ||
-        billingRecord.hasTrialExpired;
-
-      if (needsTrialInit) {
-        const trialEndDate = now + 28 * 24 * 60 * 60 * 1000;
-
-        await ctx.db.patch(billingRecord._id, {
-          trialStartDate: now,
-          trialEndDate,
-          trialEndsAt: trialEndDate,
-          isTrialActive: true,
-          hasTrialExpired: false,
-          updatedAt: Date.now(),
-        });
-
-        console.log(
-          `[ONBOARDING] Initialized 28-day trial for store organization ${user.organizationId as Id<"organizations">}`,
-        );
-      } else {
-        console.log(
-          `[ONBOARDING] Trial already active for organization ${user.organizationId as Id<"organizations">}`,
-        );
-      }
-    }
-
-    // Ensure organization timezone is set if we received a valid IANA timezone during connect
     try {
-      const tz = args.shopData?.timezone;
-      if (tz && isIanaTimeZone(tz) && user.organizationId) {
-        const org = await ctx.db.get(user.organizationId as Id<"organizations">);
-        if (!org || org.timezone !== tz) {
-          await ctx.db.patch(user.organizationId as Id<"organizations">, {
-            timezone: tz,
+      const { user } = await requireUserAndOrg(ctx);
+
+      console.log("[ONBOARDING] connectShopifyStore auth resolved", {
+        userId: user._id,
+        organizationId: user.organizationId,
+      });
+
+      // Normalize the domain and check if store already exists
+      const domain = normalizeShopDomain(args.domain);
+      const existingStore = await findShopifyStoreByDomain(ctx.db, domain);
+
+      console.log("[ONBOARDING] connectShopifyStore store lookup complete", {
+        domain,
+        existingStoreId: existingStore?._id,
+        existingOrganizationId: existingStore?.organizationId,
+      });
+
+      const storeName = args.shopData?.shopName || domain;
+      const currency = args.shopData?.currency || "USD";
+
+      if (existingStore) {
+        // Prevent reassigning a store connected to another organization
+        if (
+          existingStore.organizationId &&
+          user.organizationId &&
+          existingStore.organizationId !== (user.organizationId as Id<"organizations">)
+        ) {
+          throw new Error("This Shopify store is already connected to another organization.");
+        }
+        // Reactivate existing store
+        await ctx.db.patch(existingStore._id, {
+          organizationId: user.organizationId,
+          accessToken: args.accessToken,
+          scope: args.scope,
+          storeName: storeName,
+          primaryCurrency: currency,
+          operatingCountry: args.shopData?.country,
+          isActive: true,
+          updatedAt: Date.now(),
+        });
+      } else {
+        // Create new store
+        await ctx.db.insert("shopifyStores", {
+          organizationId: user.organizationId as Id<"organizations">,
+          userId: user._id,
+          shopDomain: domain,
+          storeName: storeName,
+          accessToken: args.accessToken,
+          scope: args.scope,
+          primaryCurrency: currency,
+          operatingCountry: args.shopData?.country,
+          isActive: true,
+        });
+      }
+
+      if (user.organizationId) {
+        const orgId = user.organizationId as Id<"organizations">;
+        const orgDoc = await ctx.db.get(orgId);
+        if (!orgDoc || orgDoc.primaryCurrency !== currency) {
+          await ctx.db.patch(orgId, {
+            primaryCurrency: currency,
             updatedAt: Date.now(),
           });
         }
       }
-    } catch (e) {
-      console.warn("[ONBOARDING] timezone set skipped", e);
-    }
 
-    if (user.organizationId) {
-      await ctx.scheduler.runAfter(
-        0,
-        internal.core.time.refreshOrganizationTimezone,
-        {
-          organizationId: user.organizationId as Id<"organizations">,
-        },
+      // Initialize trial for store organizations if needed
+      const billingRecord = await ctx.db
+        .query("billing")
+        .withIndex("by_organization", (q) =>
+          q.eq("organizationId", user.organizationId as Id<"organizations">),
+        )
+        .first();
+
+      if (billingRecord) {
+        const now = Date.now();
+        const needsTrialInit =
+          !billingRecord.trialStartDate ||
+          billingRecord.hasTrialExpired;
+
+        if (needsTrialInit) {
+          const trialEndDate = now + 28 * 24 * 60 * 60 * 1000;
+
+          await ctx.db.patch(billingRecord._id, {
+            trialStartDate: now,
+            trialEndDate,
+            trialEndsAt: trialEndDate,
+            isTrialActive: true,
+            hasTrialExpired: false,
+            updatedAt: Date.now(),
+          });
+
+          console.log(
+            `[ONBOARDING] Initialized 28-day trial for store organization ${user.organizationId as Id<"organizations">}`,
+          );
+        } else {
+          console.log(
+            `[ONBOARDING] Trial already active for organization ${user.organizationId as Id<"organizations">}`,
+          );
+        }
+      }
+
+      // Ensure organization timezone is set if we received a valid IANA timezone during connect
+      try {
+        const tz = args.shopData?.timezone;
+        if (tz && isIanaTimeZone(tz) && user.organizationId) {
+          const org = await ctx.db.get(user.organizationId as Id<"organizations">);
+          if (!org || org.timezone !== tz) {
+            await ctx.db.patch(user.organizationId as Id<"organizations">, {
+              timezone: tz,
+              updatedAt: Date.now(),
+            });
+          }
+        }
+      } catch (e) {
+        console.warn("[ONBOARDING] timezone set skipped", e);
+      }
+
+      if (user.organizationId) {
+        await ctx.scheduler.runAfter(
+          0,
+          internal.core.time.refreshOrganizationTimezone,
+          {
+            organizationId: user.organizationId as Id<"organizations">,
+          },
+        );
+      }
+
+      // Update user with primary currency from shop
+      // Determine next step: If trial is active, skip billing and go to costs
+      // If trial has expired, go to billing step
+      // Remain on SHOPIFY step for sub-steps (billing/costs) to align with UI enums
+      const nextStep = ONBOARDING_STEPS.BILLING;
+
+      // Get or create onboarding record
+      const onboarding = await getOrCreateOnboarding(
+        ctx,
+        user._id,
+        user.organizationId as Id<"organizations">,
       );
-    }
 
-    // Update user with primary currency from shop
-    // Determine next step: If trial is active, skip billing and go to costs
-    // If trial has expired, go to billing step
-    // Remain on SHOPIFY step for sub-steps (billing/costs) to align with UI enums
-    const nextStep = ONBOARDING_STEPS.BILLING;
+      if (!onboarding) {
+        throw new Error("Failed to get onboarding record");
+      }
 
-    // Get or create onboarding record
-    const onboarding = await getOrCreateOnboarding(
-      ctx,
-      user._id,
-      user.organizationId as Id<"organizations">,
-    );
+      // Update onboarding progress
+      const completedSteps = onboarding.onboardingData?.completedSteps || [];
 
-    if (!onboarding) {
-      throw new Error("Failed to get onboarding record");
-    }
+      if (!completedSteps.includes("shopify")) {
+        completedSteps.push("shopify");
+      }
 
-    // Update onboarding progress
-    const completedSteps = onboarding.onboardingData?.completedSteps || [];
+      interface OnboardingUpdateData {
+        onboardingStep: number;
+        hasShopifyConnection: boolean;
+        onboardingData: {
+          completedSteps: string[];
+          setupDate?: string;
+        };
+        updatedAt: number;
+      }
 
-    if (!completedSteps.includes("shopify")) {
-      completedSteps.push("shopify");
-    }
-
-    interface OnboardingUpdateData {
-      onboardingStep: number;
-      hasShopifyConnection: boolean;
-      onboardingData: {
-        completedSteps: string[];
-        setupDate?: string;
+      const onboardingUpdates: OnboardingUpdateData = {
+        onboardingStep: nextStep,
+        hasShopifyConnection: true,
+        onboardingData: {
+          ...onboarding.onboardingData,
+          completedSteps,
+        },
+        updatedAt: Date.now(),
       };
-      updatedAt: number;
+
+      await ctx.db.patch(onboarding._id, onboardingUpdates);
+
+      console.log(
+        `[ONBOARDING] Successfully connected Shopify store for ${user.email}. Sync will be triggered by callback.`,
+      );
+
+      return {
+        success: true,
+        organizationId: user.organizationId as Id<"organizations">,
+      };
+    } catch (error) {
+      console.error("[ONBOARDING] connectShopifyStore failed", {
+        domain: args.domain,
+        error,
+      });
+      throw error;
     }
-
-    const onboardingUpdates: OnboardingUpdateData = {
-      onboardingStep: nextStep,
-      hasShopifyConnection: true,
-      onboardingData: {
-        ...onboarding.onboardingData,
-        completedSteps,
-      },
-      updatedAt: Date.now(),
-    };
-
-    await ctx.db.patch(onboarding._id, onboardingUpdates);
-
-    console.log(
-      `[ONBOARDING] Successfully connected Shopify store for ${user.email}. Sync will be triggered by callback.`,
-    );
-
-    return {
-      success: true,
-      organizationId: user.organizationId as Id<"organizations">,
-    };
   },
 });
 

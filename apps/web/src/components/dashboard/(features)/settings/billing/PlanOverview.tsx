@@ -43,8 +43,8 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function PlanOverview() {
-  const userBilling = useQuery(api.core.users.getUserBilling);
-  const userUsage = useQuery(api.core.users.getUserUsage);
+  const userBilling = useQuery(api.core.organizationBilling.getCurrentBilling);
+  const userUsage = useQuery(api.core.organizationBilling.getCurrentUsage);
 
   const currentPlanKey = (userBilling?.plan ?? "free") as PlanKey;
   const planLabel = PLAN_KEY_TO_LABEL[currentPlanKey];
