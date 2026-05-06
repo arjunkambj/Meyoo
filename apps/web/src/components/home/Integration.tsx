@@ -60,7 +60,7 @@ const Integration = () => {
       <div className={designSystem.spacing.container}>
         <div className="text-center">
           <div className={designSystem.typography.sectionChip}>
-            <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">
+            <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Integrations
             </span>
           </div>
@@ -80,7 +80,7 @@ const Integration = () => {
                 {logos.map((logo) => (
                   <div
                     key={`${groupIndex}-${logo.name}`}
-                    className="flex items-center justify-center gap-3.5 rounded-full bg-gradient-to-br from-muted/60 to-muted/40 px-6 py-3 backdrop-blur-md ring-1 ring-default-100 transition-all duration-200 hover:scale-105 hover:ring-primary/30"
+                    className="flex items-center justify-center gap-3.5 rounded-full bg-gradient-to-br from-muted/60 to-muted/40 px-6 py-3 backdrop-blur-md ring-1 ring-surface-tertiary transition-all duration-200 hover:scale-105 hover:ring-accent/30"
                   >
                     {"image" in logo ? (
                       <Image
@@ -116,7 +116,7 @@ const Integration = () => {
             className={`${designSystem.card.base} group w-full rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02]`}
           >
             <div className="flex flex-col h-full">
-              <div className={cn("relative overflow-hidden rounded-[20px] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent", feature.imageOrder)}>
+              <div className={cn("relative overflow-hidden rounded-[20px] bg-gradient-to-br from-accent/10 via-accent/5 to-transparent", feature.imageOrder)}>
                 <div className="relative h-64 w-full sm:h-72">
                   <Image
                     src={feature.image}
@@ -128,7 +128,7 @@ const Integration = () => {
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/24 via-transparent to-transparent" />
                 <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm rounded-full px-4 py-1.5">
-                  <p className="text-xs uppercase tracking-[0.15em] text-primary font-semibold">
+                  <p className="text-xs uppercase tracking-[0.15em] text-accent font-semibold">
                     Step {feature.number}
                   </p>
                 </div>

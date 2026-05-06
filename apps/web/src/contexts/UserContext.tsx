@@ -3,7 +3,9 @@
 import React, {
   createContext,
   useContext,
+  useEffect,
   useMemo,
+  useState,
   type ReactNode,
 } from "react";
 import { useUser as useStackUser } from "@stackframe/stack";
@@ -35,6 +37,16 @@ type UserContextValue = {
 
 const UserContext = createContext<UserContextValue | undefined>(undefined);
 
+const loadingUserContextValue: UserContextValue = {
+  user: null,
+  loading: true,
+  error: null,
+  isAuthenticated: false,
+  membershipRole: null,
+  organizationId: undefined,
+  primaryCurrency: "USD",
+};
+
 const getOnboarded = (metadata: unknown) =>
   Boolean(
     metadata &&
@@ -43,7 +55,7 @@ const getOnboarded = (metadata: unknown) =>
       metadata.onboarded,
   );
 
-export function UserProvider({ children }: { children: ReactNode }) {
+function UserProviderContent({ children }: { children: ReactNode }) {
   const stackUser = useStackUser();
   const membership = useQuery(api.core.memberships.getCurrentMembership);
   const organization = useQuery(api.core.organizations.getCurrentOrganization);
@@ -78,6 +90,26 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   return (
     <UserContext.Provider value={userContextValue}>{children}</UserContext.Provider>
+  );
+}
+
+export function UserProvider({ children }: { children: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <UserContext.Provider value={loadingUserContextValue}>
+        {children}
+      </UserContext.Provider>
+    );
+  }
+
+  return (
+    <UserProviderContent>{children}</UserProviderContent>
   );
 }
 

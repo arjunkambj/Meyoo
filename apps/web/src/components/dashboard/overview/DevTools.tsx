@@ -1,11 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { Radio, RadioGroup } from "@heroui/radio";
-import { useDisclosure } from "@heroui/use-disclosure";
+import { Button, Chip, Input, Modal, Radio, RadioGroup, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -35,12 +30,11 @@ export function DevTools() {
   const { hasShopify, hasMeta } = useIntegrationStatus();
   const isOnboarded = useIsOnboarded();
 
-  const {
-    isOpen: isRecalcOpen,
-    onOpen: openRecalc,
-    onClose: closeRecalc,
-    onOpenChange: onRecalcOpenChange,
-  } = useDisclosure();
+  const recalcOverlay = useOverlayState();
+  const isRecalcOpen = recalcOverlay.isOpen;
+  const openRecalc = recalcOverlay.open;
+  const closeRecalc = recalcOverlay.close;
+  const onRecalcOpenChange = recalcOverlay.setOpen;
   const [range, setRange] = useState<"all" | "60" | "30" | "custom">("60");
   const [customDays, setCustomDays] = useState("60");
   const resolvedDaysBack = useMemo(() => {
@@ -93,8 +87,8 @@ export function DevTools() {
 
   if (!user) {
     return (
-      <div className="bg-content2 dark:bg-content1 rounded-2xl border border-default-200/50 p-6">
-        <p className="text-sm text-default-500">Loading user authentication...</p>
+      <div className="bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 p-6">
+        <p className="text-sm text-muted">Loading user authentication...</p>
       </div>
     );
   }
@@ -122,7 +116,7 @@ export function DevTools() {
   };
 
   return (
-    <div className="bg-content2 dark:bg-content1 rounded-2xl border border-default-200/50 p-6">
+    <div className="bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -133,9 +127,9 @@ export function DevTools() {
             />
             Developer Tools
           </h3>
-          <p className="text-sm text-default-500">Dangerous operations for development only</p>
+          <p className="text-sm text-muted">Dangerous operations for development only</p>
         </div>
-        <Chip color="warning" size="sm" variant="flat">
+        <Chip color="warning" size="sm" variant="soft">
           Dev Only
         </Chip>
       </div>
@@ -143,16 +137,12 @@ export function DevTools() {
       <div className="grid grid-cols-2 gap-4">
         <Button
           className="justify-start"
-          color="primary"
+         
           isDisabled={!isOnboarded}
-          isLoading={buttonLoading["recalc-analytics"]}
+          isPending={buttonLoading["recalc-analytics"]}
           size="lg"
-          startContent={
-            !buttonLoading["recalc-analytics"] && (
-              <Icon icon="heroicons:chart-bar-20-solid" width={20} />
-            )
-          }
-          variant="solid"
+         
+          variant="primary"
           onPress={() => {
             setRecalcMessage(null);
             setRecalcError(null);
@@ -164,16 +154,12 @@ export function DevTools() {
 
         <Button
           className="justify-start"
-          color="warning"
+         
           isDisabled={!isOnboarded}
-          isLoading={buttonLoading["delete-metrics"]}
+          isPending={buttonLoading["delete-metrics"]}
           size="lg"
-          startContent={
-            !buttonLoading["delete-metrics"] && (
-              <Icon icon="heroicons:trash-20-solid" width={20} />
-            )
-          }
-          variant="solid"
+         
+          variant="primary"
           onPress={() =>
             handleConfirm(
               async () => {
@@ -203,14 +189,12 @@ export function DevTools() {
 
         <Button
           className="justify-start"
-          color="danger"
+         
           isDisabled={!isOnboarded}
-          isLoading={buttonLoading["reset-all"]}
+          isPending={buttonLoading["reset-all"]}
           size="lg"
-          startContent={
-            !buttonLoading["reset-all"] && <Icon icon="heroicons:arrow-path-20-solid" width={20} />
-          }
-          variant="solid"
+         
+          variant="primary"
           onPress={() =>
             handleConfirm(
               async () => {
@@ -229,14 +213,10 @@ export function DevTools() {
         <Button
           className="justify-start bg-emerald-600 text-white"
           isDisabled={!hasShopify}
-          isLoading={buttonLoading["disconnect-shopify"]}
+          isPending={buttonLoading["disconnect-shopify"]}
           size="lg"
-          startContent={
-            !buttonLoading["disconnect-shopify"] && (
-              <Icon icon="simple-icons:shopify" width={20} />
-            )
-          }
-          variant="solid"
+         
+          variant="primary"
           onPress={() =>
             handleConfirm(
               disconnectShopify,
@@ -252,14 +232,10 @@ export function DevTools() {
         <Button
           className="justify-start bg-blue-600 text-white"
           isDisabled={!hasMeta}
-          isLoading={buttonLoading["disconnect-meta"]}
+          isPending={buttonLoading["disconnect-meta"]}
           size="lg"
-          startContent={
-            !buttonLoading["disconnect-meta"] && (
-              <Icon icon="streamline:meta-solid" width={20} />
-            )
-          }
-          variant="solid"
+         
+          variant="primary"
           onPress={() =>
             handleConfirm(
               disconnectMeta,
@@ -280,33 +256,34 @@ export function DevTools() {
         {deleteMetricsError && <p className="text-danger">{deleteMetricsError}</p>}
         {error && <p className="text-danger">{error}</p>}
         {globalLoading && !Object.values(buttonLoading).some(Boolean) && (
-          <p className="text-default-500">Running requested operation…</p>
+          <p className="text-muted">Running requested operation…</p>
         )}
       </div>
 
       <ConfirmationDialog
         confirmText="Confirm"
+                isOpen={confirmDialog.isOpen}
         description={confirmDialog.description}
-        isOpen={confirmDialog.isOpen}
         title={confirmDialog.title}
         variant="danger"
         onClose={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
         onConfirm={confirmDialog.action}
       />
 
-      <Modal isOpen={isRecalcOpen} onOpenChange={onRecalcOpenChange} placement="center">
-        <ModalContent>
-          {(onClose) => (
+      <Modal>
+        <Modal.Backdrop isOpen={isRecalcOpen} onOpenChange={onRecalcOpenChange}>
+          <Modal.Container placement="center">
+            <Modal.Dialog>
+          {({ close }) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <Modal.Header className="flex flex-col gap-1">
                 Recalculate Analytics
-              </ModalHeader>
-              <ModalBody className="space-y-4">
+              </Modal.Header>
+              <Modal.Body className="space-y-4">
                 <RadioGroup
-                  label="Lookback window"
-                  orientation="vertical"
+                                    orientation="vertical"
                   value={range}
-                  onValueChange={(value) => setRange(value as typeof range)}
+                  onChange={(value) => setRange(value as typeof range)}
                 >
                   <Radio value="60">Last 60 days</Radio>
                   <Radio value="30">Last 30 days</Radio>
@@ -315,29 +292,30 @@ export function DevTools() {
                 </RadioGroup>
                 {range === "custom" && (
                   <Input
-                    label="Days back"
-                    placeholder="e.g. 7"
+                                        placeholder="e.g. 7"
                     type="number"
                     value={customDays}
-                    onValueChange={setCustomDays}
+                    onChange={(event) => setCustomDays(event.currentTarget.value)}
                   />
                 )}
-              </ModalBody>
-              <ModalFooter>
-                <Button color="default" variant="light" onPress={onClose}>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>
-                <Button
-                  color="primary"
+                <Button variant="primary"
+                 
                   isDisabled={buttonLoading["recalc-analytics"]}
                   onPress={handleRecalcConfirm}
                 >
                   Recalculate
                 </Button>
-              </ModalFooter>
+              </Modal.Footer>
             </>
           )}
-        </ModalContent>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </div>
   );

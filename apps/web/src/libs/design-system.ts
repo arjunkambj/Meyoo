@@ -15,9 +15,9 @@ export const designSystem = {
   // Typography
   typography: {
     sectionLabel:
-      "text-center mb-4 text-xs uppercase tracking-[0.15em] font-medium text-primary/70",
+      "text-center mb-4 text-xs uppercase tracking-[0.15em] font-medium text-accent/70",
     sectionChip:
-      "inline-flex items-center gap-2 mb-1 sm:mb-2 px-0 py-0 text-primary/80",
+      "inline-flex items-center gap-2 mb-1 sm:mb-2 px-0 py-0 text-accent/80",
     sectionTitle:
       "text-center text-2xl sm:text-3xl lg:text-5xl font-semibold tracking-tight leading-tight",
     sectionSubtitle:
@@ -28,7 +28,7 @@ export const designSystem = {
 
   // Card styling
   card: {
-    base: "bg-gradient-to-br from-default-100 to-default-100/50 border border-default-200/20",
+    base: "bg-gradient-to-br from-surface-secondary to-surface-secondary/50 border border-surface-tertiary/20",
   },
 
   // Background patterns
@@ -49,7 +49,7 @@ export const designSystem = {
   // Colors (consistent opacity)
   colors: {
     mutedBg: "bg-muted/40",
-    primaryAccent: "text-primary",
-    borderLight: "border-default-200/20",
+    primaryAccent: "text-accent",
+    borderLight: "border-surface-tertiary/20",
   },
 } as const;

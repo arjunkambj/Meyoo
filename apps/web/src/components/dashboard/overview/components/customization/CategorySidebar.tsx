@@ -1,9 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { ScrollShadow } from "@heroui/scroll-shadow";
-import { Icon } from "@iconify/react";
+import { Button, Chip, ScrollShadow } from "@heroui/react";
 import React, { useCallback } from "react";
 
 import { METRIC_CATEGORIES, METRICS } from "../../metrics/registry";
@@ -27,28 +24,21 @@ export const CategorySidebar = React.memo(function CategorySidebar({
 
   return (
     <div className="col-span-3 border-r pr-4 flex flex-col">
-      <h3 className="text-sm font-semibold mb-3 text-default-700">
+      <h3 className="text-sm font-semibold mb-3 text-muted">
         Categories
       </h3>
       <ScrollShadow hideScrollBar className="h-[400px]" visibility="none">
         <div className="space-y-1">
           {/* All Metrics */}
           <Button
-            fullWidth
             className="justify-start"
             size="sm"
-            startContent={
-              <Icon
-                className={activeCategory === "all" ? "text-primary" : "text-default-400"}
-                icon="solar:list-bold-duotone"
-                width={16}
-              />
-            }
-            variant={activeCategory === "all" ? "flat" : "light"}
+           
+            variant={activeCategory === "all" ? "secondary" : "tertiary"}
             onPress={() => handleCategoryChange("all")}
           >
-            <span className="text-left flex-1 text-default-700">All Metrics</span>
-            <Chip className="h-5 text-xs" size="sm" variant="flat">
+            <span className="text-left flex-1 text-muted">All Metrics</span>
+            <Chip className="h-5 text-xs" size="sm" variant="soft">
               {Object.keys(METRICS).length}
             </Chip>
           </Button>
@@ -62,23 +52,16 @@ export const CategorySidebar = React.memo(function CategorySidebar({
             return (
               <Button
                 key={category.id}
-                fullWidth
                 className="justify-start"
                 size="sm"
-                startContent={
-                  <Icon
-                    className={isActive ? "text-primary" : "text-default-400"}
-                    icon={category.icon}
-                    width={16}
-                  />
-                }
-                variant={isActive ? "flat" : "light"}
+               
+                variant={isActive ? "secondary" : "tertiary"}
                 onPress={() => handleCategoryChange(category.id)}
               >
-                <span className="text-left flex-1 text-default-700">
+                <span className="text-left flex-1 text-muted">
                   {category.name}
                 </span>
-                <Chip className="h-5 text-xs" size="sm" variant="flat">
+                <Chip className="h-5 text-xs" size="sm" variant="soft">
                   {count}
                 </Chip>
               </Button>

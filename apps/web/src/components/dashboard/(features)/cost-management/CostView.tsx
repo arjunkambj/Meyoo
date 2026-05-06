@@ -1,6 +1,5 @@
 "use client";
-import { Spacer } from "@heroui/spacer";
-import { Tab, Tabs } from "@heroui/tabs";
+import { Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import OtherCostsTable from "./OtherCostsTable";
 import PaymentFeesTable from "./PaymentFeesTable";
@@ -12,84 +11,65 @@ export default function CostView() {
   return (
     <div className="flex flex-col space-y-6 pb-20">
       {/* Header */}
-      <Spacer y={0.5} />
+      <div className="h-2" />
 
       {/* Tabs Section */}
       <div>
-        <Tabs
-          aria-label="Cost management tabs"
-          classNames={{
-            base: "w-full",
-            tabList:
-              "gap-0 w-full relative rounded-none p-0 border-b border-divider bg-transparent",
-            tab: "max-w-fit px-6 h-12 rounded-none border-b-2 border-transparent data-[selected=true]:border-primary data-[selected=true]:text-primary font-medium text-default-600 hover:text-default-900 transition-colors",
-            tabContent: "group-data-[selected=true]:text-primary",
-            cursor: "w-full bg-transparent",
-            panel: "pt-6 px-0 overflow-y-auto",
-          }}
-          variant="underlined"
-        >
-          <Tab
-            key="products"
-            title={
+        <Tabs variant="primary">
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="Cost management sections">
+              <Tabs.Tab id="products">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:box-bold-duotone" width={18} />
                 <span>Products</span>
               </div>
-            }
-          >
-            <ProductCostTable />
-          </Tab>
-
-          <Tab
-            key="shipping"
-            title={
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="shipping">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:delivery-bold-duotone" width={18} />
                 <span>Shipping</span>
               </div>
-            }
-          >
-            <ShippingCostTable />
-          </Tab>
-
-          <Tab
-            key="payment"
-            title={
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="payment">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:card-bold-duotone" width={18} />
                 <span>Payment Fees</span>
               </div>
-            }
-          >
-            <PaymentFeesTable />
-          </Tab>
-
-          {/* Tax & Fees tab removed: manage tax per product instead */}
-
-          <Tab
-            key="operating"
-            title={
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="operating">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:wallet-bold-duotone" width={18} />
                 <span>Operating Costs</span>
               </div>
-            }
-          >
-            <OtherCostsTable />
-          </Tab>
-
-          <Tab
-            key="returns"
-            title={
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="returns">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:refresh-circle-bold-duotone" width={18} />
                 <span>RTO & Returns</span>
               </div>
-            }
-          >
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListContainer>
+          <Tabs.Panel id="products">
+            <ProductCostTable />
+          </Tabs.Panel>
+          <Tabs.Panel id="shipping">
+            <ShippingCostTable />
+          </Tabs.Panel>
+          <Tabs.Panel id="payment">
+            <PaymentFeesTable />
+          </Tabs.Panel>
+          <Tabs.Panel id="operating">
+            <OtherCostsTable />
+          </Tabs.Panel>
+          <Tabs.Panel id="returns">
             <ReturnRateSettings />
-          </Tab>
+          </Tabs.Panel>
         </Tabs>
       </div>
     </div>

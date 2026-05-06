@@ -1,10 +1,8 @@
 "use client";
 
+import { Badge, Button, cn } from "@heroui/react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Badge } from "@heroui/badge";
-import { Button } from "@heroui/button";
-import { cn } from "@heroui/theme";
 import { Icon } from "@iconify/react";
 
 interface SortableItemProps {
@@ -44,7 +42,7 @@ export function SortableItem({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex items-center justify-between p-1.5 rounded-lg border border-200/50 bg-default-100  mb-1.5",
+        "flex items-center justify-between p-1.5 rounded-lg border border-200/50 bg-surface-secondary  mb-1.5",
         isDragging && "opacity-50"
       )}
       style={style}
@@ -56,19 +54,18 @@ export function SortableItem({
           className="cursor-grab active:cursor-grabbing p-0.5 flex-shrink-0"
         >
           <Icon
-            className="text-default-700"
+            className="text-muted"
             icon="solar:hamburger-menu-linear"
             width={16}
           />
         </div>
         <Icon className="flex-shrink-0" icon={icon} width={14} />
-        <span className="text-xs truncate text-default-600">{label}</span>
+        <span className="text-xs truncate text-muted">{label}</span>
         {isPinned && (
           <Badge
             className="flex-shrink-0"
-            color="success"
             size="sm"
-            variant="flat"
+            variant="soft"
           >
             Pinned
           </Badge>
@@ -78,7 +75,7 @@ export function SortableItem({
         isIconOnly
         className="flex-shrink-0 min-w-unit-6 w-unit-6 h-unit-6"
         size="sm"
-        variant="light"
+        variant="tertiary"
         onPress={() => onRemove(id)}
       >
         <Icon icon="solar:close-circle-linear" width={14} />

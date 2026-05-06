@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from "@heroui/modal";
-import { Button } from "@heroui/button";
+import { Button, Modal } from "@heroui/react";
 import React from "react";
 
 interface SkipConfirmationModalProps {
@@ -22,26 +15,30 @@ export default function SkipConfirmationModal({
   onConfirm,
 }: SkipConfirmationModalProps) {
   return (
-    <Modal isOpen={isOpen} size="sm" onClose={onCancel}>
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          Skip cost setup?
-        </ModalHeader>
-        <ModalBody>
-          <p className="text-sm text-default-600">
-            You can add costs later, but profit calculations won&apos;t be available
-            until you do.
-          </p>
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="flat" onPress={onCancel}>
-            Cancel
-          </Button>
-          <Button color="primary" onPress={onConfirm}>
-            Skip Setup
-          </Button>
-        </ModalFooter>
-      </ModalContent>
+    <Modal>
+      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => !open && onCancel()}>
+        <Modal.Container size="sm">
+          <Modal.Dialog>
+            <Modal.Header className="flex flex-col gap-1">
+              Skip cost setup?
+            </Modal.Header>
+            <Modal.Body>
+              <p className="text-sm text-muted">
+                You can add costs later, but profit calculations won&apos;t be available
+                until you do.
+              </p>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="tertiary" onPress={onCancel}>
+                Cancel
+              </Button>
+              <Button variant="primary" onPress={onConfirm}>
+                Skip Setup
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

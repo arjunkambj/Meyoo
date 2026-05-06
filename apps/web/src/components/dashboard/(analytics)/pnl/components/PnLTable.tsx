@@ -1,7 +1,6 @@
 "use client";
 
-import { Skeleton } from "@heroui/skeleton";
-import { Tab, Tabs } from "@heroui/tabs";
+import { Skeleton, Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import React, { useCallback, useMemo } from "react";
 import type { PnLGranularity, PnLMetrics, PnLTablePeriod } from "@repo/types";
@@ -197,21 +196,21 @@ const metricConfig: Record<
   discounts: {
     label: "Discounts",
     icon: "solar:tag-price-bold-duotone",
-    iconColor: "text-default-500",
+    iconColor: "text-muted",
     category: "revenue",
     isSubItem: true,
   },
   refunds: {
     label: "Returns",
     icon: "solar:rewind-back-bold-duotone",
-    iconColor: "text-default-500",
+    iconColor: "text-muted",
     category: "revenue",
     isSubItem: true,
   },
   cancelledRevenue: {
     label: "Cancellations",
     icon: "solar:close-circle-bold-duotone",
-    iconColor: "text-default-500",
+    iconColor: "text-muted",
     category: "revenue",
     isSubItem: true,
   },
@@ -225,10 +224,10 @@ const metricConfig: Record<
   revenue: {
     label: "Net Revenue",
     icon: "solar:wallet-2-bold-duotone",
-    iconColor: "text-primary",
+    iconColor: "text-accent",
     category: "revenue",
     isBold: true,
-    rowTintClass: "bg-primary-50 dark:bg-primary-500/10",
+    rowTintClass: "bg-accent-50 dark:bg-accent-500/10",
   },
   cogs: {
     label: "Total COGS",
@@ -240,28 +239,28 @@ const metricConfig: Record<
   shippingCosts: {
     label: "Shipping",
     icon: "solar:delivery-bold-duotone",
-    iconColor: "text-danger-400",
+    iconColor: "text-danger",
     category: "cogs",
     isSubItem: true,
   },
   transactionFees: {
     label: "Transaction Fees",
     icon: "solar:card-transfer-bold-duotone",
-    iconColor: "text-danger-400",
+    iconColor: "text-danger",
     category: "cogs",
     isSubItem: true,
   },
   handlingFees: {
     label: "Handling",
     icon: "solar:hand-money-bold-duotone",
-    iconColor: "text-danger-400",
+    iconColor: "text-danger",
     category: "cogs",
     isSubItem: true,
   },
   grossProfit: {
     label: "Gross Profit",
     icon: "solar:chart-2-bold-duotone",
-    iconColor: "text-primary",
+    iconColor: "text-accent",
     category: "profit",
     isBold: true,
     rowTintClass: "bg-success-50 dark:bg-success-500/10",
@@ -293,7 +292,7 @@ const metricConfig: Record<
     iconColor: "text-success",
     category: "profit",
     isBold: true,
-    rowTintClass: "bg-content2 dark:bg-default-100/10",
+    rowTintClass: "bg-surface-secondary dark:bg-surface-secondary/10",
   },
   netProfitMargin: {
     label: "Net Margin %",
@@ -301,7 +300,7 @@ const metricConfig: Record<
     iconColor: "text-success-600",
     category: "profit",
     isBold: true,
-    rowTintClass: "bg-content2 dark:bg-default-100/10",
+    rowTintClass: "bg-surface-secondary dark:bg-surface-secondary/10",
   },
 };
 
@@ -409,17 +408,17 @@ export const PnLTable = React.memo(function PnLTable({
       const isSubItem = config.isSubItem;
       const rowTintClass =
         config.rowTintClass ??
-        (isBoldRow ? "bg-content2 dark:bg-default-100/10" : "");
+        (isBoldRow ? "bg-surface-secondary dark:bg-surface-secondary/10" : "");
 
       return (
         <tr
           key={metricKey}
           className={`
-            border-b border-divider
+            border-b border-surface-tertiary
             transition-all duration-200
             ${isBoldRow ? "font-semibold" : ""}
             ${rowTintClass}
-            ${isSubItem ? "" : "hover:bg-content1"}
+            ${isSubItem ? "" : "hover:bg-surface"}
           `}
         >
           <td
@@ -433,12 +432,12 @@ export const PnLTable = React.memo(function PnLTable({
                 <Icon
                   icon={config.icon}
                   width={isSubItem ? 14 : 16}
-                  className={config.iconColor || "text-default-500"}
+                  className={config.iconColor || "text-muted"}
                 />
               )}
               <span
                 className={`
-                ${isBoldRow ? "text-sm font-semibold" : isSubItem ? "text-xs text-default-600" : "text-sm text-default-700"}
+                ${isBoldRow ? "text-sm font-semibold" : isSubItem ? "text-xs text-muted" : "text-sm text-muted"}
               `}
               >
                 {config.label}
@@ -455,19 +454,19 @@ export const PnLTable = React.memo(function PnLTable({
                   ? "text-danger"
                   : "text-success"
                 : isHeadlineRevenue
-                  ? "text-primary"
+                  ? "text-accent"
                   : metricKey === "netProfitMargin"
                     ? value < 0
                       ? "text-danger"
                       : "text-success-600"
                     : shouldAddParentheses
-                      ? "text-default-500"
+                      ? "text-muted"
                       : "text-foreground";
 
             return (
               <td
                 key={period.label}
-                className="text-right py-2 px-3 border-r border-divider"
+                className="text-right py-2 px-3 border-r border-surface-tertiary"
               >
                 <span
                   className={`
@@ -483,7 +482,7 @@ export const PnLTable = React.memo(function PnLTable({
           })}
           {totalPeriod && (
             <td
-              className={`sticky right-0 text-right py-2 px-3 border-l-4 border-primary-200 dark:border-primary-600 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.02)] ${isBoldRow ? "bg-primary-100 dark:bg-primary-100/10" : "bg-content1"}`}
+              className={`sticky right-0 text-right py-2 px-3 border-l-4 border-accent-200 dark:border-accent-600 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.02)] ${isBoldRow ? "bg-accent-100 dark:bg-accent-100/10" : "bg-surface"}`}
             >
               <span
                 className={`
@@ -500,13 +499,13 @@ export const PnLTable = React.memo(function PnLTable({
                     return totalValue < 0 ? "text-danger" : "text-success";
                   }
                   if (isHeadlineRevenueTotal) {
-                    return "text-primary";
+                    return "text-accent";
                   }
                   if (metricKey === "netProfitMargin") {
                     return totalValue < 0 ? "text-danger" : "text-success-600";
                   }
                   if (isSubItem || shouldAddParentheses) {
-                    return "text-default-500";
+                    return "text-muted";
                   }
                   return "text-foreground";
                 })()}
@@ -528,13 +527,13 @@ export const PnLTable = React.memo(function PnLTable({
       <div className="w-full overflow-x-auto border rounded-2xl relative max-w-full">
         <table className="w-full text-sm  min-w-fit">
           <thead className="sticky top-0 z-20">
-            <tr className="bg-content2 dark:bg-content1">
-              <th className="text-left py-3 px-3 font-semibold text-foreground sticky left-0 bg-content2 dark:bg-content1 min-w-[180px] max-w-[200px] z-30 border-b-2 border-divider shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
+            <tr className="bg-surface-secondary dark:bg-surface">
+              <th className="text-left py-3 px-3 font-semibold text-foreground sticky left-0 bg-surface-secondary dark:bg-surface min-w-[180px] max-w-[200px] z-30 border-b-2 border-surface-tertiary shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                 <div className="flex items-center gap-1.5">
                   <Icon
                     icon="solar:chart-square-bold-duotone"
                     width={16}
-                    className="text-primary"
+                    className="text-accent"
                   />
                   <span className="text-xs">Metrics</span>
                 </div>
@@ -542,13 +541,13 @@ export const PnLTable = React.memo(function PnLTable({
               {displayPeriods.map((period) => (
                 <th
                   key={period.label}
-                  className="text-right py-3 px-3 font-medium text-xs text-default-800 min-w-[110px] border-r border-b-2 border-divider"
+                  className="text-right py-3 px-3 font-medium text-xs text-muted min-w-[110px] border-r border-b-2 border-surface-tertiary"
                 >
                   {formatPeriodLabel(period)}
                 </th>
               ))}
               {totalPeriod && (
-                <th className="sticky right-0 text-right py-3 px-3 font-bold text-xs text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-100/10 min-w-[100px] border-l-4 border-primary-500 border-b-2 z-30 shadow-[-2px_0_4px_rgba(0,0,0,0.05)]">
+                <th className="sticky right-0 text-right py-3 px-3 font-bold text-xs text-accent-700 dark:text-accent-300 bg-accent-50 dark:bg-accent-100/10 min-w-[100px] border-l-4 border-accent-500 border-b-2 z-30 shadow-[-2px_0_4px_rgba(0,0,0,0.05)]">
                   TOTAL
                 </th>
               )}
@@ -559,7 +558,7 @@ export const PnLTable = React.memo(function PnLTable({
             <tr className="bg-success-50 dark:bg-success-100/10">
               <td
                 colSpan={displayPeriods.length + 1 + (totalPeriod ? 1 : 0)}
-                className="px-4 py-2.5 border-b border-divider"
+                className="px-4 py-2.5 border-b border-surface-tertiary"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-1 h-4 bg-success rounded-full" />
@@ -584,14 +583,14 @@ export const PnLTable = React.memo(function PnLTable({
             </tr>
 
             {/* COGS Section */}
-            <tr className="bg-danger-50 dark:bg-danger-100/10">
+            <tr className="bg-danger dark:bg-danger/10">
               <td
                 colSpan={displayPeriods.length + 1 + (totalPeriod ? 1 : 0)}
-                className="px-4 py-2.5 border-b border-divider"
+                className="px-4 py-2.5 border-b border-surface-tertiary"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-1 h-4 bg-danger rounded-full" />
-                  <span className="text-xs font-bold tracking-wider uppercase text-danger-700 dark:text-danger-400">
+                  <span className="text-xs font-bold tracking-wider uppercase text-danger dark:text-danger">
                     Cost of Goods Sold
                   </span>
                 </div>
@@ -626,7 +625,7 @@ export const PnLTable = React.memo(function PnLTable({
             <tr className="bg-warning-50 dark:bg-warning-100/10">
               <td
                 colSpan={displayPeriods.length + 1 + (totalPeriod ? 1 : 0)}
-                className="px-4 py-2.5 border-b border-divider"
+                className="px-4 py-2.5 border-b border-surface-tertiary"
               >
                 <div className="flex items-center gap-2">
                   <div className="w-1 h-4 bg-warning rounded-full" />
@@ -670,15 +669,26 @@ export const PnLTable = React.memo(function PnLTable({
           </h3>
           {setGranularity && (
             <Tabs
-              aria-label="P&L granularity"
-              radius="lg"
-              color="primary"
+              variant="primary"
               selectedKey={granularity}
-              onSelectionChange={(key) => setGranularity(key as PnLGranularity)}
+              onSelectionChange={(key) => setGranularity(String(key) as PnLGranularity)}
             >
-              <Tab key="monthly" title="Monthly" />
-              <Tab key="weekly" title="Weekly" />
-              <Tab key="daily" title="Daily" />
+              <Tabs.ListContainer>
+                <Tabs.List aria-label="P&L granularity">
+                  <Tabs.Tab id="monthly">
+                    Monthly
+                    <Tabs.Indicator />
+                  </Tabs.Tab>
+                  <Tabs.Tab id="weekly">
+                    Weekly
+                    <Tabs.Indicator />
+                  </Tabs.Tab>
+                  <Tabs.Tab id="daily">
+                    Daily
+                    <Tabs.Indicator />
+                  </Tabs.Tab>
+                </Tabs.List>
+              </Tabs.ListContainer>
             </Tabs>
           )}
         </div>
@@ -693,17 +703,17 @@ export const PnLTable = React.memo(function PnLTable({
         <div className="pb-6">{tableContent}</div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="p-4 bg-content2 rounded-full mb-4">
+          <div className="p-4 bg-surface-secondary rounded-full mb-4">
             <Icon
-              className="text-default-700"
+              className="text-muted"
               icon="solar:chart-square-line-duotone"
               width={48}
             />
           </div>
-          <p className="text-base font-medium text-default-700 mb-1">
+          <p className="text-base font-medium text-muted mb-1">
             No P&L data available
           </p>
-          <p className="text-sm text-default-700">
+          <p className="text-sm text-muted">
             Select a different date range to view financial data
           </p>
         </div>

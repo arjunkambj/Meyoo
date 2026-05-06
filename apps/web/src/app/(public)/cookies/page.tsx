@@ -1,6 +1,6 @@
-﻿"use client";
-import { Card, CardBody } from "@heroui/card";
-import { Divider } from "@heroui/divider";
+"use client";
+
+import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 
@@ -71,22 +71,22 @@ const thirdPartyCookies = [
 export default function CookiesPage() {
   return (
     <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-default-200/70 to-transparent dark:via-default-100/40" />
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2.5 bg-content1/70 dark:bg-content1/50 backdrop-blur-md border border-divider rounded-full px-5 py-2.5 mb-6">
+          <div className="inline-flex items-center gap-2.5 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-5 py-2.5 mb-6">
             <Icon
-              className="text-secondary"
+              className="text-accent"
               icon="solar:cookie-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-default-700">
+            <span className="text-sm font-semibold text-muted">
               Cookie Policy
             </span>
           </div>
           <h1 className="text-5xl font-bold mb-4">Cookie Policy</h1>
-          <p className="text-xl text-default-600">
+          <p className="text-xl text-muted">
             Last updated: {lastUpdated}
           </p>
         </div>
@@ -96,16 +96,16 @@ export default function CookiesPage() {
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Introduction */}
-          <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none mb-12">
-            <CardBody className="p-8">
+          <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-12">
+            <Card.Content className="p-8">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <Icon
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-accent"
                   icon="solar:info-circle-bold-duotone"
                 />
                 About This Policy
               </h2>
-              <div className="space-y-4 text-default-700">
+              <div className="space-y-4 text-muted">
                 <p>
                   This Cookie Policy explains how Meyoo (&quot;we&quot;,
                   &quot;us&quot;, or &quot;our&quot;), operated by Pyro Labs
@@ -118,21 +118,21 @@ export default function CookiesPage() {
                   should be read in conjunction with our Privacy Policy.
                 </p>
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
 
           {/* What Are Cookies */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">What Are Cookies?</h2>
-            <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-              <CardBody className="p-6">
-                <p className="text-default-700 mb-4">
+            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card.Content className="p-6">
+                <p className="text-muted mb-4">
                   Cookies are small data files that are placed on your computer
                   or mobile device when you visit a website. Cookies are widely
                   used by website owners to make their websites work, or to work
                   more efficiently, as well as to provide reporting information.
                 </p>
-                <p className="text-default-700">
+                <p className="text-muted">
                   Cookies set by the website owner (in this case, Meyoo) are
                   called &quot;first party cookies&quot;. Cookies set by parties
                   other than the website owner are called &quot;third party
@@ -140,11 +140,11 @@ export default function CookiesPage() {
                   or functionality to be provided on or through the website
                   (e.g., analytics, interactive content and advertising).
                 </p>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Types of Cookies */}
           <div className="mb-12">
@@ -153,13 +153,13 @@ export default function CookiesPage() {
               {cookieTypes.map((type) => (
                 <Card
                   key={type.title}
-                  className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
                 >
-                  <CardBody className="p-6">
+                  <Card.Content className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                         <Icon
-                          className="w-6 h-6 text-primary"
+                          className="w-6 h-6 text-accent"
                           icon={type.icon}
                         />
                       </div>
@@ -178,19 +178,19 @@ export default function CookiesPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-default-600 mb-3">
+                        <p className="text-muted mb-3">
                           {type.description}
                         </p>
-                        <div className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-lg p-4">
+                        <div className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-lg p-4">
                           <p className="text-sm font-medium mb-2">Examples:</p>
                           <ul className="space-y-1">
                             {type.examples.map((example) => (
                               <li
                                 key={example}
-                                className="text-sm text-default-600 flex items-start gap-2"
+                                className="text-sm text-muted flex items-start gap-2"
                               >
                                 <Icon
-                                  className="w-4 h-4 text-primary mt-0.5"
+                                  className="w-4 h-4 text-accent mt-0.5"
                                   icon="solar:check-circle-bold"
                                 />
                                 <span>{example}</span>
@@ -200,20 +200,20 @@ export default function CookiesPage() {
                         </div>
                       </div>
                     </div>
-                  </CardBody>
+                  </Card.Content>
                 </Card>
               ))}
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Third-Party Cookies */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Third-Party Cookies</h2>
-            <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none mb-6">
-              <CardBody className="p-6">
-                <p className="text-default-700 mb-6">
+            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-6">
+              <Card.Content className="p-6">
+                <p className="text-muted mb-6">
                   We use cookies from trusted third-party services to provide
                   core functionality and integrations. These cookies are
                   essential for connecting your e-commerce platforms and
@@ -222,7 +222,7 @@ export default function CookiesPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-divider">
+                      <tr className="border-b border-surface-tertiary">
                         <th className="text-left py-3 px-4 font-semibold">
                           Service
                         </th>
@@ -238,15 +238,15 @@ export default function CookiesPage() {
                       {thirdPartyCookies.map((cookie) => (
                         <tr
                           key={cookie.name}
-                          className="border-b border-default-200/70 dark:border-default-100/60"
+                          className="border-b border-surface-tertiary/70 dark:border-surface-tertiary/60"
                         >
-                          <td className="py-3 px-4 text-default-700">
+                          <td className="py-3 px-4 text-muted">
                             {cookie.name}
                           </td>
-                          <td className="py-3 px-4 text-default-600 text-sm">
+                          <td className="py-3 px-4 text-muted text-sm">
                             {cookie.purpose}
                           </td>
-                          <td className="py-3 px-4 text-default-600 text-sm">
+                          <td className="py-3 px-4 text-muted text-sm">
                             {cookie.retention}
                           </td>
                         </tr>
@@ -254,11 +254,11 @@ export default function CookiesPage() {
                     </tbody>
                   </table>
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Managing Cookies */}
           <div className="mb-12">
@@ -266,52 +266,52 @@ export default function CookiesPage() {
               Managing Your Cookie Preferences
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-white/70 dark:bg-content1/40 backdrop-blur-md border border-default-200/70 dark:border-default-100/60 rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:settings-bold-duotone"
                     />
                     Browser Controls
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     Most web browsers allow you to control cookies through their
                     settings:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>• View what cookies are stored</li>
                     <li>• Delete cookies individually or all at once</li>
                     <li>• Block third-party cookies</li>
                     <li>• Block all cookies (may affect functionality)</li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-white/70 dark:bg-content1/40 backdrop-blur-md border border-default-200/70 dark:border-default-100/60 rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:shield-check-bold-duotone"
                     />
                     Our Cookie Settings
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     You can manage your cookie preferences for Meyoo:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>• Essential cookies cannot be disabled</li>
                     <li>• Analytics cookies can be opted out</li>
                     <li>• Functional cookies can be managed</li>
                     <li>• Changes take effect immediately</li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
 
             <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none mt-6">
-              <CardBody className="p-6">
+              <Card.Content className="p-6">
                 <div className="flex gap-3">
                   <Icon
                     className="w-5 h-5 text-warning shrink-0 mt-0.5"
@@ -319,7 +319,7 @@ export default function CookiesPage() {
                   />
                   <div>
                     <h4 className="font-semibold mb-2">Important Note</h4>
-                    <p className="text-sm text-default-700">
+                    <p className="text-sm text-muted">
                       Disabling certain cookies may impact the functionality of
                       Meyoo. Essential cookies are required for core features
                       like authentication, data syncing, and security. Without
@@ -327,11 +327,11 @@ export default function CookiesPage() {
                     </p>
                   </div>
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Compliance */}
           <div className="mb-12">
@@ -339,16 +339,16 @@ export default function CookiesPage() {
               Compliance & Legal Basis
             </h2>
             <div className="space-y-6">
-              <Card className="bg-white/70 dark:bg-content1/40 backdrop-blur-md border border-default-200/70 dark:border-default-100/60 rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3">
                     GDPR Compliance (EU Users)
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     For users in the European Union, we comply with GDPR
                     requirements:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>• We obtain consent for non-essential cookies</li>
                     <li>• You can withdraw consent at any time</li>
                     <li>
@@ -359,16 +359,16 @@ export default function CookiesPage() {
                       • Cookie information is included in our privacy policy
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-white/70 dark:bg-content1/40 backdrop-blur-md border border-default-200/70 dark:border-default-100/60 rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3">Platform Compliance</h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     Our cookie usage complies with platform requirements:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>
                       • <strong>Shopify:</strong> Follows Shopify App Store
                       requirements
@@ -382,27 +382,27 @@ export default function CookiesPage() {
                       Terms
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Updates & Contact */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Updates to This Policy</h2>
-            <Card className="bg-white/70 dark:bg-content1/40 backdrop-blur-md border border-default-200/70 dark:border-default-100/60 rounded-2xl shadow-none mb-6">
-              <CardBody className="p-6">
-                <p className="text-default-700 mb-4">
+            <Card className="bg-white/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary/70 dark:border-surface-tertiary/60 rounded-2xl shadow-none mb-6">
+              <Card.Content className="p-6">
+                <p className="text-muted mb-4">
                   We may update this Cookie Policy from time to time to reflect
                   changes in our practices or for operational, legal, or
                   regulatory reasons. When we make material changes, we will:
                 </p>
-                <ul className="space-y-2 text-default-700">
+                <ul className="space-y-2 text-muted">
                   <li className="flex items-start gap-2">
                     <Icon
-                      className="w-4 h-4 text-primary mt-0.5"
+                      className="w-4 h-4 text-accent mt-0.5"
                       icon="solar:check-circle-bold"
                     />
                     <span>
@@ -412,7 +412,7 @@ export default function CookiesPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Icon
-                      className="w-4 h-4 text-primary mt-0.5"
+                      className="w-4 h-4 text-accent mt-0.5"
                       icon="solar:check-circle-bold"
                     />
                     <span>
@@ -422,40 +422,40 @@ export default function CookiesPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <Icon
-                      className="w-4 h-4 text-primary mt-0.5"
+                      className="w-4 h-4 text-accent mt-0.5"
                       icon="solar:check-circle-bold"
                     />
                     <span>Request renewed consent where required by law</span>
                   </li>
                 </ul>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
           {/* Contact Information */}
-          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl shadow-none">
-            <CardBody className="p-8">
+          <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
+            <Card.Content className="p-8">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <Icon
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-accent"
                   icon="solar:phone-bold-duotone"
                 />
                 Questions About Cookies?
               </h2>
-              <p className="text-default-700 mb-6">
+              <p className="text-muted mb-6">
                 If you have questions about our use of cookies or this Cookie
                 Policy, please contact our data protection team:
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <Icon
-                    className="w-5 h-5 text-primary"
+                    className="w-5 h-5 text-accent"
                     icon="solar:letter-bold-duotone"
                   />
                   <span>
                     Email:{" "}
                     <Link
-                      className="text-primary hover:underline"
+                      className="text-accent hover:underline"
                       href="mailto:hey@meyoo.io"
                     >
                       hey@meyoo.io
@@ -464,7 +464,7 @@ export default function CookiesPage() {
                 </div>
                 <div className="flex items-start gap-3">
                   <Icon
-                    className="w-5 h-5 text-primary mt-0.5"
+                    className="w-5 h-5 text-accent mt-0.5"
                     icon="solar:buildings-2-bold-duotone"
                   />
                   <span>
@@ -474,12 +474,12 @@ export default function CookiesPage() {
                   </span>
                 </div>
               </div>
-              <div className="mt-6 pt-6 border-t border-divider">
-                <p className="text-sm text-default-600">
+              <div className="mt-6 pt-6 border-t border-surface-tertiary">
+                <p className="text-sm text-muted">
                   For more information about how we handle your data, please see
                   our{" "}
                   <Link
-                    className="text-primary hover:underline"
+                    className="text-accent hover:underline"
                     href="/privacy/policy"
                   >
                     Privacy Policy
@@ -487,7 +487,7 @@ export default function CookiesPage() {
                   .
                 </p>
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
         </div>
       </section>

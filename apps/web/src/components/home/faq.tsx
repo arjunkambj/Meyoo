@@ -1,7 +1,6 @@
 "use client";
 
-import { Accordion, AccordionItem } from "@heroui/accordion";
-import { Button } from "@heroui/button";
+import { Accordion, Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { designSystem } from "@/libs/design-system";
 
@@ -46,7 +45,7 @@ const Faq = () => {
       <div className={`${designSystem.spacing.container} mx-auto max-w-7xl`}>
         <div className="text-center mb-12">
           <div className={designSystem.typography.sectionChip}>
-            <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">
+            <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               FAQ
             </span>
           </div>
@@ -64,57 +63,37 @@ const Faq = () => {
               Drop a note to our
               <a
                 href="mailto:hey@meyoo.io"
-                className="mx-1 whitespace-nowrap underline text-primary hover:text-primary/80 transition-colors"
+                className="mx-1 whitespace-nowrap underline text-accent hover:text-accent/80 transition-colors"
               >
                 support team
               </a>
               and we&apos;ll point you in the right direction.
             </p>
-            <Button
-              as="a"
-              href="mailto:hey@meyoo.io"
-              size="lg"
-              color="primary"
-              className="w-full sm:w-fit"
-            >
-              Email hey@meyoo.io
-            </Button>
+            <a href="mailto:hey@meyoo.io" className="w-full sm:w-fit">
+              <Button variant="primary" size="lg" className="w-full sm:w-fit">
+                Email hey@meyoo.io
+              </Button>
+            </a>
           </div>
-          <Accordion
-            className="w-full"
-            fullWidth={true}
-            itemClasses={{
-              base: "w-full min-w-full max-w-full block bg-transparent backdrop-blur-sm rounded-xl mb-2 transition-all duration-300",
-              title: "font-medium text-foreground w-full min-w-full",
-              trigger:
-                "px-4 sm:px-6 py-5 sm:py-6 w-full min-w-full flex items-center justify-between",
-              indicator: "text-primary shrink-0",
-              content: "text-default-600 px-4 sm:px-6 pb-5 sm:pb-6 pt-2 w-full",
-            }}
-            variant="light"
-          >
-            {faqs.map((faq, _index) => (
-              <AccordionItem
-                key={faq.question}
-                aria-label={faq.question}
-                className="mb-0"
-                indicator={({ isOpen }) => (
-                  <Icon
-                    className={`text-primary/60 transition-transform duration-200 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                    icon="solar:alt-arrow-down-outline"
-                    width={20}
-                  />
-                )}
-                title={
-                  <span className="block w-full pr-8">{faq.question}</span>
-                }
-              >
-                <p className="leading-relaxed break-words text-muted-foreground">
-                  {faq.answer}
-                </p>
-              </AccordionItem>
+          <Accordion hideSeparator className="w-full">
+            {faqs.map((faq) => (
+              <Accordion.Item key={faq.question} id={faq.question} className="border-none">
+                <Accordion.Heading>
+                  <Accordion.Trigger className="text-lg sm:text-xl">
+                    {faq.question}
+                    <Accordion.Indicator>
+                      <Icon icon="solar:alt-arrow-down-outline" />
+                    </Accordion.Indicator>
+                  </Accordion.Trigger>
+                </Accordion.Heading>
+                <Accordion.Panel>
+                  <Accordion.Body>
+                    <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+                      {faq.answer}
+                    </p>
+                  </Accordion.Body>
+                </Accordion.Panel>
+              </Accordion.Item>
             ))}
           </Accordion>
         </div>

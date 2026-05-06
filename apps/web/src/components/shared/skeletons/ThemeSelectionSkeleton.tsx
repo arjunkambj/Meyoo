@@ -1,7 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/card";
-import { Skeleton } from "@heroui/skeleton";
+import { Card, Skeleton } from "@heroui/react";
 export function ThemeSelectionSkeleton() {
   return (
     <div className="space-y-6">
@@ -18,11 +17,11 @@ export function ThemeSelectionSkeleton() {
         {Array.from({ length: 3 }).map((_, i) => (
           <Card
             key={`theme-skeleton-${i + 1}`}
-            className="border-2 border-default-200"
+            className="border-2 border-surface-tertiary"
           >
-            <CardBody className="p-4">
+            <Card.Content className="p-4">
               {/* Preview Window */}
-              <div className="rounded-lg p-3 mb-4 border border-divider bg-default-50">
+              <div className="rounded-lg p-3 mb-4 border border-surface-tertiary bg-surface-secondary">
                 <div className="space-y-2">
                   <Skeleton className="h-2 w-16 rounded" />
                   <Skeleton className="h-2 w-24 rounded" />
@@ -41,13 +40,13 @@ export function ThemeSelectionSkeleton() {
                   <Skeleton className="h-3 w-24 rounded-lg" />
                 </div>
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
         ))}
       </div>
 
       {/* Info Box */}
-      <div className="bg-default-50 rounded-lg p-4">
+      <div className="bg-surface-secondary rounded-lg p-4">
         <div className="flex gap-3">
           <Skeleton className="w-5 h-5 rounded-full shrink-0 mt-0.5" />
           <div className="space-y-2 flex-1">

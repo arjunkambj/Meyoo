@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Tooltip } from "@heroui/tooltip";
+import { Button, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useCallback, useMemo } from "react";
@@ -33,17 +32,18 @@ export default function SidebarToggle() {
   );
 
   return (
-    <Tooltip closeDelay={0} content={tooltipContent} placement="bottom" delay={300}>
-      <Button
-        isIconOnly
-        aria-label="Toggle sidebar"
-        className="text-default-600 hover:text-foreground transition-colors"
-        size="sm"
-        variant="light"
-        onPress={handleToggle}
-      >
-        {iconContent}
-      </Button>
+    <Tooltip closeDelay={0} delay={300}>
+      <Tooltip.Trigger>
+        <Button
+          isIconOnly           className="text-muted hover:text-foreground transition-colors"
+          size="sm"
+          variant="tertiary"
+          onPress={handleToggle}
+        >
+          {iconContent}
+        </Button>
+      </Tooltip.Trigger>
+      <Tooltip.Content placement="bottom">{tooltipContent}</Tooltip.Content>
     </Tooltip>
   );
 }

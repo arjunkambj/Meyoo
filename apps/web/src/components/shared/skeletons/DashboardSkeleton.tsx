@@ -1,7 +1,6 @@
 "use client";
 
-import { Card } from "@heroui/card";
-import { Skeleton } from "@heroui/skeleton";
+import { Card, Skeleton } from "@heroui/react";
 import { KPISkeleton } from "@/components/shared/cards/KPI";
 
 export function PinnedMetricsGridSkeleton() {
@@ -51,10 +50,9 @@ export function WidgetSkeleton({
     // Cost Breakdown Widget Skeleton
     return (
       <Card
-        className="p-5 bg-default-100 dark:bg-content1 border border-default-50 rounded-2xl h-full"
-        shadow="none"
+        className="p-5 bg-surface-secondary dark:bg-surface border border-surface-tertiary rounded-2xl h-full"
       >
-        <div className="mb-3.5 pb-3.5 border-b border-divider flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <div className="mb-3.5 pb-3.5 border-b border-surface-tertiary flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Skeleton className="h-5 w-5 rounded-md" />
             <Skeleton className="h-5 w-32 rounded-md" />
@@ -78,7 +76,7 @@ export function WidgetSkeleton({
                 <div
                   // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton components use index-based keys as they don't represent real data
                   key={i}
-                  className="bg-background border border-default-50 rounded-xl p-3"
+                  className="bg-background border border-surface-tertiary rounded-xl p-3"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 flex-1">
@@ -103,17 +101,16 @@ export function WidgetSkeleton({
   // Default widget skeleton (Order Summary, Customer Summary, etc.)
   return (
     <Card
-      className="p-5 bg-default-100 dark:bg-content1 border border-default-50 rounded-2xl h-full"
-      shadow="none"
+      className="p-5 bg-surface-secondary dark:bg-surface border border-surface-tertiary rounded-2xl h-full"
     >
-      <div className="mb-3.5 pb-3.5 border-b border-divider">
+      <div className="mb-3.5 pb-3.5 border-b border-surface-tertiary">
         <div className="flex items-center gap-2">
           <Skeleton className="h-5 w-5 rounded-md" />
           <Skeleton className="h-4 w-32 rounded-md" />
         </div>
       </div>
       <div className="space-y-1">
-        <div className="py-2 px-3 bg-background border border-default-50 rounded-xl">
+        <div className="py-2 px-3 bg-background border border-surface-tertiary rounded-xl">
           <div className="flex items-center justify-between">
             <Skeleton className="h-3 w-24 rounded-md" />
             <Skeleton className="h-5 w-20 rounded-md" />
@@ -124,7 +121,7 @@ export function WidgetSkeleton({
           <div
             // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton components use index-based keys as they don't represent real data
             key={i}
-            className="py-2.5 px-3 border-b border-default-200 last:border-0"
+            className="py-2.5 px-3 border-b border-surface-tertiary last:border-0"
           >
             <div className="flex items-center justify-between">
               <Skeleton className="h-3 w-28 rounded-md" />
@@ -153,7 +150,7 @@ export function DashboardLoadingSkeleton() {
       </div>
 
       {/* Sync Status Bar Skeleton */}
-      <div className="flex items-center gap-2 p-2 bg-default-50 rounded-lg">
+      <div className="flex items-center gap-2 p-2 bg-surface-secondary rounded-lg">
         <Skeleton className="h-4 w-4 rounded-full" />
         <Skeleton className="h-4 w-48 rounded-md" />
       </div>

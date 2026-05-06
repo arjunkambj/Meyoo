@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Icon } from "@iconify/react";
-import Link from "next/link";
+import { Button } from "@heroui/react";
 import type React from "react";
 
 interface EmailButtonProps {
@@ -11,20 +9,13 @@ interface EmailButtonProps {
   body?: string;
   children: React.ReactNode;
   size?: "sm" | "md" | "lg";
-  color?:
+  variant?:
     | "primary"
     | "secondary"
-    | "success"
-    | "warning"
+    | "tertiary"
+    | "outline"
     | "danger"
-    | "default";
-  variant?:
-    | "solid"
-    | "bordered"
-    | "light"
-    | "flat"
-    | "faded"
-    | "shadow"
+    | "danger-soft"
     | "ghost";
   startIcon?: string;
   className?: string;
@@ -36,9 +27,7 @@ export default function EmailButton({
   body = "",
   children,
   size = "lg",
-  color = "primary",
-  variant = "solid",
-  startIcon = "solar:letter-bold-duotone",
+  variant = "primary",
   className = "",
 }: EmailButtonProps) {
   const mailtoLink = `mailto:${email}${subject || body ? "?" : ""}${
@@ -46,16 +35,15 @@ export default function EmailButton({
   }${subject && body ? "&" : ""}${body ? `body=${encodeURIComponent(body)}` : ""}`;
 
   return (
-    <Button
-      as={Link}
-      className={className}
-      color={color}
-      href={mailtoLink}
-      size={size}
-      startContent={<Icon icon={startIcon} />}
-      variant={variant}
-    >
-      {children}
-    </Button>
+    <a href={mailtoLink}>
+      <Button
+        className={className}
+        size={size}
+       
+        variant={variant}
+      >
+        {children}
+      </Button>
+    </a>
   );
 }

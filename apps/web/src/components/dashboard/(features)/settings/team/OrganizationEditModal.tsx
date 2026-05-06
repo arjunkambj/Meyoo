@@ -1,9 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { addToast } from "@heroui/toast";
+import { Button, Input, Modal, toast } from "@heroui/react";
 import { useMutation } from "convex/react";
 import { useState } from "react";
 
@@ -29,12 +26,7 @@ export default function OrganizationEditModal({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      addToast({
-        title: "Name is required",
-        description: "Please enter a valid organization name",
-        color: "danger",
-        timeout: 3000,
-      });
+      toast.danger("Name is required", { description: "Please enter a valid organization name", timeout: 3000 });
 
       return;
     }
@@ -50,60 +42,51 @@ export default function OrganizationEditModal({
       // Update organization name in Convex
       await updateOrganizationName({ name: name.trim() });
 
-      addToast({
-        title: "Organization updated",
-        description: "Organization name has been updated successfully",
-        color: "default",
-        timeout: 3000,
-      });
+      toast("Organization updated", { description: "Organization name has been updated successfully", timeout: 3000 });
 
       // Close modal
       onClose();
     } catch (error) {
-      addToast({
-        title: "Update failed",
-        description:
-          error instanceof Error
+      toast.danger("Update failed", { description: error instanceof Error
             ? error.message
-            : "Failed to update organization name",
-        color: "danger",
-        timeout: 3000,
-      });
+            : "Failed to update organization name", timeout: 3000 });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          Edit Organization Name
-        </ModalHeader>
-        <ModalBody>
-          <Input
-            label="Organization Name"
-            labelPlacement="outside"
-            placeholder="Enter organization name"
-            value={name}
-            
-            onChange={(e) => setName(e.target.value)}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            color="default"
-            isDisabled={isLoading}
-            variant="light"
-            onPress={onClose}
-          >
-            Cancel
-          </Button>
-          <Button color="primary" isLoading={isLoading} onPress={handleSave}>
-            Save Changes
-          </Button>
-        </ModalFooter>
-      </ModalContent>
+    <Modal>
+      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Modal.Container>
+          <Modal.Dialog>
+            <Modal.Header className="flex flex-col gap-1">
+              Edit Organization Name
+            </Modal.Header>
+            <Modal.Body>
+              <Input
+                                        placeholder="Enter organization name"
+                value={name}
+                
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+               
+                isDisabled={isLoading}
+                variant="tertiary"
+                onPress={onClose}
+              >
+                Cancel
+              </Button>
+              <Button variant="primary" isPending={isLoading} onPress={handleSave}>
+                Save Changes
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

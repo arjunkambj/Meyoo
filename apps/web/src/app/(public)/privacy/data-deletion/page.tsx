@@ -1,7 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/card";
-import { Divider } from "@heroui/divider";
+import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 import CTAButton from "@/components/home/components/CTAButton";
@@ -71,24 +70,24 @@ const deletionSteps = [
 export default function DataDeletionPage() {
   return (
     <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-default-200/70 to-transparent dark:via-default-100/40" />
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2.5 bg-content1/70 dark:bg-content1/50 backdrop-blur-md border border-divider rounded-full px-5 py-2.5 mb-6">
+          <div className="inline-flex items-center gap-2.5 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-5 py-2.5 mb-6">
             <Icon
               className="text-danger"
               icon="solar:trash-bin-trash-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-default-700">
+            <span className="text-sm font-semibold text-muted">
               Data Deletion
             </span>
           </div>
           <h1 className="text-5xl font-bold mb-4">
             Data Deletion Instructions
           </h1>
-          <p className="text-xl text-default-600">
+          <p className="text-xl text-muted">
             Control your data. Delete it anytime.
           </p>
         </div>
@@ -98,16 +97,16 @@ export default function DataDeletionPage() {
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Introduction */}
-          <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none mb-12">
-            <CardBody className="p-8">
+          <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-12">
+            <Card.Content className="p-8">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <Icon
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-accent"
                   icon="solar:shield-check-bold-duotone"
                 />
                 Your Privacy Matters
               </h2>
-              <div className="space-y-4 text-default-700">
+              <div className="space-y-4 text-muted">
                 <p>
                   Meyoo is a profit intelligence platform that helps e-commerce
                   merchants track their profitability by combining data from
@@ -119,7 +118,7 @@ export default function DataDeletionPage() {
                   explains what data we collect and how to request its deletion.
                 </p>
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
 
           {/* What Data We Collect */}
@@ -129,12 +128,12 @@ export default function DataDeletionPage() {
               {dataWeCollect.map((category) => (
                 <Card
                   key={category.title}
-                  className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
                 >
-                  <CardBody className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Card.Content className="p-6">
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
                       <Icon
-                        className="w-6 h-6 text-primary"
+                        className="w-6 h-6 text-accent"
                         icon={category.icon}
                       />
                     </div>
@@ -143,22 +142,22 @@ export default function DataDeletionPage() {
                       {category.items.map((item) => (
                         <li
                           key={item}
-                          className="text-sm text-default-600 flex items-start gap-2"
+                          className="text-sm text-muted flex items-start gap-2"
                         >
                           <Icon
-                            className="w-4 h-4 text-primary mt-0.5"
+                            className="w-4 h-4 text-accent mt-0.5"
                             icon="solar:check-circle-bold-duotone"
                           />
                           <span>{item}</span>
                         </li>
                       ))}
                     </ul>
-                  </CardBody>
+                  </Card.Content>
                 </Card>
               ))}
             </div>
             <Card className="bg-success-50 dark:bg-success-100/10 border border-success-200 dark:border-success-200/20 rounded-2xl shadow-none mt-6">
-              <CardBody className="p-6">
+              <Card.Content className="p-6">
                 <div className="flex gap-3">
                   <Icon
                     className="w-5 h-5 text-success shrink-0 mt-0.5"
@@ -166,65 +165,65 @@ export default function DataDeletionPage() {
                   />
                   <div>
                     <h4 className="font-semibold mb-2">Privacy First</h4>
-                    <p className="text-sm text-default-700">
+                    <p className="text-sm text-muted">
                       We never store personal customer information. All customer
                       data is aggregated and anonymized for analytics purposes
                       only.
                     </p>
                   </div>
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* How to Request Data Deletion */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">
               How to Request Data Deletion
             </h2>
-            <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl shadow-none mb-8">
-              <CardBody className="p-8">
-                <p className="text-default-700 mb-6">
+            <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none mb-8">
+              <Card.Content className="p-8">
+                <p className="text-muted mb-6">
                   To request complete deletion of your data from Meyoo, follow
                   these simple steps:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {deletionSteps.map((step) => (
                     <div key={step.number} className="text-center">
-                      <div className="w-16 h-16 rounded-full bg-content1/80 dark:bg-content1/70 backdrop-blur-md border border-divider flex items-center justify-center mx-auto mb-3">
-                        <span className="text-2xl font-bold text-primary">
+                      <div className="w-16 h-16 rounded-full bg-surface/80 dark:bg-surface/70 backdrop-blur-md border border-surface-tertiary flex items-center justify-center mx-auto mb-3">
+                        <span className="text-2xl font-bold text-accent">
                           {step.number}
                         </span>
                       </div>
                       <h3 className="font-semibold mb-1">{step.title}</h3>
-                      <p className="text-sm text-default-600">
+                      <p className="text-sm text-muted">
                         {step.description}
                       </p>
                     </div>
                   ))}
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:letter-bold-duotone"
                     />
                     Email Template
                   </h3>
-                  <div className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-lg p-4 font-mono text-sm">
-                    <p className="text-default-600">To: hey@meyoo.io</p>
-                    <p className="text-default-600">
+                  <div className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-lg p-4 font-mono text-sm">
+                    <p className="text-muted">To: hey@meyoo.io</p>
+                    <p className="text-muted">
                       Subject: Data Deletion Request
                     </p>
                     <br />
-                    <p className="text-default-700">
+                    <p className="text-muted">
                       Hi Meyoo Team,
                       <br />
                       <br />I would like to request deletion of all data
@@ -237,14 +236,14 @@ export default function DataDeletionPage() {
                       Thank you
                     </p>
                   </div>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:clock-circle-bold-duotone"
                     />
                     Processing Time
@@ -257,7 +256,7 @@ export default function DataDeletionPage() {
                       />
                       <div>
                         <p className="font-medium text-sm">Acknowledgment</p>
-                        <p className="text-sm text-default-600">
+                        <p className="text-sm text-muted">
                           Within 24 hours
                         </p>
                       </div>
@@ -269,37 +268,37 @@ export default function DataDeletionPage() {
                       />
                       <div>
                         <p className="font-medium text-sm">Processing</p>
-                        <p className="text-sm text-default-600">
+                        <p className="text-sm text-muted">
                           Up to 30 days
                         </p>
                       </div>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon
-                        className="w-5 h-5 text-primary mt-0.5"
+                        className="w-5 h-5 text-accent mt-0.5"
                         icon="solar:letter-bold-duotone"
                       />
                       <div>
                         <p className="font-medium text-sm">Confirmation</p>
-                        <p className="text-sm text-default-600">
+                        <p className="text-sm text-muted">
                           Email notification when complete
                         </p>
                       </div>
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* What Gets Deleted */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">What Gets Deleted</h2>
-            <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-              <CardBody className="p-8">
-                <p className="text-default-700 mb-6">
+            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+              <Card.Content className="p-8">
+                <p className="text-muted mb-6">
                   When you request data deletion, we remove:
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -312,35 +311,35 @@ export default function DataDeletionPage() {
                       Permanently Deleted
                     </h3>
                     <ul className="space-y-2">
-                      <li className="text-sm text-default-600 flex items-start gap-2">
+                      <li className="text-sm text-muted flex items-start gap-2">
                         <Icon
                           className="w-4 h-4 text-danger mt-0.5"
                           icon="solar:close-circle-bold-duotone"
                         />
                         <span>All store information and settings</span>
                       </li>
-                      <li className="text-sm text-default-600 flex items-start gap-2">
+                      <li className="text-sm text-muted flex items-start gap-2">
                         <Icon
                           className="w-4 h-4 text-danger mt-0.5"
                           icon="solar:close-circle-bold-duotone"
                         />
                         <span>Imported marketing and ad data</span>
                       </li>
-                      <li className="text-sm text-default-600 flex items-start gap-2">
+                      <li className="text-sm text-muted flex items-start gap-2">
                         <Icon
                           className="w-4 h-4 text-danger mt-0.5"
                           icon="solar:close-circle-bold-duotone"
                         />
                         <span>Order and transaction history</span>
                       </li>
-                      <li className="text-sm text-default-600 flex items-start gap-2">
+                      <li className="text-sm text-muted flex items-start gap-2">
                         <Icon
                           className="w-4 h-4 text-danger mt-0.5"
                           icon="solar:close-circle-bold-duotone"
                         />
                         <span>Calculated metrics and reports</span>
                       </li>
-                      <li className="text-sm text-default-600 flex items-start gap-2">
+                      <li className="text-sm text-muted flex items-start gap-2">
                         <Icon
                           className="w-4 h-4 text-danger mt-0.5"
                           icon="solar:close-circle-bold-duotone"
@@ -359,31 +358,31 @@ export default function DataDeletionPage() {
                     </h3>
                     <div className="space-y-4">
                       <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none">
-                        <CardBody className="p-4">
-                          <p className="text-sm text-default-700">
+                        <Card.Content className="p-4">
+                          <p className="text-sm text-muted">
                             <strong>Backup retention:</strong> Data may remain
                             in backups for up to 90 days after deletion for
                             disaster recovery purposes.
                           </p>
-                        </CardBody>
+                        </Card.Content>
                       </Card>
                       <Card className="bg-info-50 dark:bg-info-100/10 border border-info-200 dark:border-info-200/20 rounded-2xl shadow-none">
-                        <CardBody className="p-4">
-                          <p className="text-sm text-default-700">
+                        <Card.Content className="p-4">
+                          <p className="text-sm text-muted">
                             <strong>Immediate removal:</strong> Your data is
                             immediately marked for deletion and becomes
                             inaccessible in our production systems.
                           </p>
-                        </CardBody>
+                        </Card.Content>
                       </Card>
                     </div>
                   </div>
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Platform-Specific Data Deletion Procedures */}
           <div className="mb-12">
@@ -391,20 +390,20 @@ export default function DataDeletionPage() {
               Platform-Specific Data Deletion Procedures
             </h2>
             <div className="space-y-6">
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:shop-bold-duotone"
                     />
                     Shopify Data Deletion Procedures
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     When you request data deletion, we automatically handle
                     Shopify-specific requirements:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>
                       • Webhook deregistration from your Shopify store within 24
                       hours
@@ -425,22 +424,22 @@ export default function DataDeletionPage() {
                       • GDPR webhook compliance for merchant data protection
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="logos:meta-icon"
                     />
                     Meta Platform Data Deletion
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     For Meta/Facebook data, our deletion process includes:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>
                       • Immediate revocation of all Facebook Marketing API
                       access tokens
@@ -461,22 +460,22 @@ export default function DataDeletionPage() {
                       policies
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:verified-check-bold-duotone"
                     />
                     Google Ads Data Deletion
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     Google Ads API data deletion procedures include:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>
                       • Revocation of all Google Ads API refresh and access
                       tokens
@@ -498,101 +497,101 @@ export default function DataDeletionPage() {
                       for data deletion
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Compliance */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Legal Compliance</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="tabler:brand-europa"
                     />
                     GDPR & Privacy Laws
                   </h3>
-                  <p className="text-sm text-default-600 mb-3">
+                  <p className="text-sm text-muted mb-3">
                     We comply with GDPR and other data protection regulations:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li className="flex items-start gap-2">
                       <Icon
-                        className="w-4 h-4 text-primary mt-0.5"
+                        className="w-4 h-4 text-accent mt-0.5"
                         icon="solar:check-circle-bold-duotone"
                       />
                       <span>Right to erasure (Right to be forgotten)</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Icon
-                        className="w-4 h-4 text-primary mt-0.5"
+                        className="w-4 h-4 text-accent mt-0.5"
                         icon="solar:check-circle-bold-duotone"
                       />
                       <span>Transparent data handling</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Icon
-                        className="w-4 h-4 text-primary mt-0.5"
+                        className="w-4 h-4 text-accent mt-0.5"
                         icon="solar:check-circle-bold-duotone"
                       />
                       <span>Timely response to requests</span>
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:document-text-bold-duotone"
                     />
                     Platform Requirements
                   </h3>
-                  <p className="text-sm text-default-600 mb-3">
+                  <p className="text-sm text-muted mb-3">
                     This page meets all platform compliance requirements:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li className="flex items-start gap-2">
                       <Icon
-                        className="w-4 h-4 text-primary mt-0.5"
+                        className="w-4 h-4 text-accent mt-0.5"
                         icon="solar:check-circle-bold-duotone"
                       />
                       <span>Clear deletion instructions</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Icon
-                        className="w-4 h-4 text-primary mt-0.5"
+                        className="w-4 h-4 text-accent mt-0.5"
                         icon="solar:check-circle-bold-duotone"
                       />
                       <span>30-day processing commitment</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Icon
-                        className="w-4 h-4 text-primary mt-0.5"
+                        className="w-4 h-4 text-accent mt-0.5"
                         icon="solar:check-circle-bold-duotone"
                       />
                       <span>Platform-specific procedures</span>
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
           </div>
 
           {/* Contact Information */}
-          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl shadow-none">
-            <CardBody className="p-8">
+          <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
+            <Card.Content className="p-8">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <Icon
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-accent"
                   icon="solar:phone-bold-duotone"
                 />
                 Contact Information
@@ -603,13 +602,13 @@ export default function DataDeletionPage() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <Icon
-                        className="w-5 h-5 text-primary"
+                        className="w-5 h-5 text-accent"
                         icon="solar:letter-bold-duotone"
                       />
                       <span>
                         Email:{" "}
                         <Link
-                          className="text-primary hover:underline"
+                          className="text-accent hover:underline"
                           href="mailto:hey@meyoo.io"
                         >
                           hey@meyoo.io
@@ -618,14 +617,14 @@ export default function DataDeletionPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <Icon
-                        className="w-5 h-5 text-primary"
+                        className="w-5 h-5 text-accent"
                         icon="solar:smartphone-bold-duotone"
                       />
                       <span>App: Meyoo - Profit Intelligence</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Icon
-                        className="w-5 h-5 text-primary"
+                        className="w-5 h-5 text-accent"
                         icon="solar:clock-circle-bold-duotone"
                       />
                       <span>Response: Within 30 days</span>
@@ -634,7 +633,7 @@ export default function DataDeletionPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-3">Legal Entity</h3>
-                  <p className="text-default-700">
+                  <p className="text-muted">
                     Pyro Labs Private Limited
                     <br />
                     (Operating as Meyoo)
@@ -645,7 +644,7 @@ export default function DataDeletionPage() {
                   </p>
                 </div>
               </div>
-              <Divider className="my-6" />
+              <Separator className="my-6" />
               <div className="flex flex-wrap gap-4">
                 <EmailButton
                   email="hey@meyoo.io"
@@ -658,17 +657,17 @@ export default function DataDeletionPage() {
                   href="/privacy/policy"
                   size="lg"
                   startIcon="solar:document-text-bold-duotone"
-                  variant="bordered"
+                  variant="secondary"
                 >
                   Privacy Policy
                 </CTAButton>
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
 
           {/* Last Updated */}
           <div className="text-center mt-8">
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               This page was last updated on{" "}
               {new Date().toLocaleDateString("en-US", {
                 year: "numeric",

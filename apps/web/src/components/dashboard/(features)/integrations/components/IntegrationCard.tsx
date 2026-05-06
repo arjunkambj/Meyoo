@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
+import { Button, Card } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 interface IntegrationCardProps {
@@ -37,8 +36,7 @@ export function IntegrationCard({
 }: IntegrationCardProps) {
   return (
     <Card
-      className="relative shadow-none overflow-hidden bg-content2 dark:bg-content1 rounded-2xl border border-default-200/50 transition-colors hover:border-primary/30"
-      isPressable={false}
+      className="relative shadow-none overflow-hidden bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 transition-colors hover:border-accent/30"
     >
       {/* Connection Status Indicator */}
       {isConnected && (
@@ -47,7 +45,7 @@ export function IntegrationCard({
         </div>
       )}
 
-      <CardBody className="p-5">
+      <Card.Content className="p-5">
         {/* Header with icon and title */}
         <div className="flex items-start gap-3 mb-4">
           <div
@@ -67,7 +65,7 @@ export function IntegrationCard({
                 {name}
               </h3>
             </div>
-            <p className="text-xs text-default-500 line-clamp-2 mt-1.5 leading-relaxed">
+            <p className="text-xs text-muted line-clamp-2 mt-1.5 leading-relaxed">
               {description}
             </p>
           </div>
@@ -78,37 +76,37 @@ export function IntegrationCard({
           {isUpcoming ? (
             <Button
               className="w-full font-medium"
-              color="default"
+             
               size="sm"
-              startContent={<Icon icon="solar:bell-bold" width={16} />}
-              variant="flat"
+             
+              variant="tertiary"
               onPress={onNotifyMe}
             >
               {releaseDate}
             </Button>
           ) : isConnected ? (
-            <Button
+            <Button variant="tertiary"
               className="w-full font-medium"
-              color="success"
+             
               size="sm"
-              startContent={<Icon icon="solar:check-circle-bold" width={16} />}
+             
             >
               Connected
             </Button>
           ) : (
             <Button
               className="w-full font-medium"
-              color="primary"
-              endContent={<Icon icon="solar:arrow-right-bold" width={16} />}
+             
+             
               size="sm"
-              variant="solid"
+              variant="primary"
               onPress={onConnect}
             >
               Connect
             </Button>
           )}
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

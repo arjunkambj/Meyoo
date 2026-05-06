@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton } from "@heroui/skeleton";
+import { Skeleton } from "@heroui/react";
 interface FormSkeletonProps {
   fields?: number;
   showAvatar?: boolean;

@@ -1,7 +1,7 @@
 "use client";
 
+import { Avatar } from "@heroui/react";
 import React from "react";
-import { Avatar } from "@heroui/avatar";
 import { Icon } from "@iconify/react";
 import { designSystem } from "@/libs/design-system";
 
@@ -52,7 +52,7 @@ const Testimonial = () => {
       <div className={designSystem.spacing.container}>
         <div className="text-center">
           <div className={designSystem.typography.sectionChip}>
-            <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">
+            <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Testimonial
             </span>
           </div>
@@ -66,11 +66,11 @@ const Testimonial = () => {
         {testimonials.map((testimonial) => (
           <article
             key={testimonial.id}
-            className={`${designSystem.card.base} group relative flex h-full min-h-[22rem] flex-col rounded-3xl p-1.5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/20`}
+            className={`${designSystem.card.base} group relative flex h-full min-h-[22rem] flex-col rounded-3xl p-1.5 transition-all duration-300 hover:-translate-y-1 hover:border-accent/20`}
           >
             <div className="relative flex h-full flex-col rounded-[20px] px-6 py-5 sm:px-7 sm:py-6">
               <div className="mb-4">
-                <div className="inline-flex text-primary">
+                <div className="inline-flex text-accent">
                   <Icon icon="ri:double-quotes-l" width={40} />
                 </div>
               </div>
@@ -86,10 +86,11 @@ const Testimonial = () => {
               <div className="mt-6 flex items-center gap-3 border-t border-foreground/10 pt-4">
                 <Avatar
                   size="md"
-                  src={testimonial.user.avatar}
                   className="ring-2 ring-background"
-                  name={testimonial.user.name}
-                />
+                >
+                  <Avatar.Image src={testimonial.user.avatar} alt={testimonial.user.name} />
+                  <Avatar.Fallback>{testimonial.user.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
+                </Avatar>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold">
                     {testimonial.user.name}

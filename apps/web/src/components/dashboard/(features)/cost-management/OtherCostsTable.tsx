@@ -1,16 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Calendar } from "@heroui/calendar";
-import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
-import { Select, SelectItem } from "@heroui/select";
-import { Skeleton } from "@heroui/skeleton";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
-import { addToast } from "@heroui/toast";
-import { useDisclosure } from "@heroui/use-disclosure";
+import { Button, Calendar, Chip, Input, ListBox, Modal, Popover, Select, Skeleton, Table, toast, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useMemo, useState } from "react";
 import { ConfirmationModal } from "@/components/shared/ConfirmationModal";
@@ -26,7 +16,6 @@ import { createLogger } from "@/libs/logging";
 import { getCurrencySymbol } from "@/libs/utils/format";
 import { TableSkeleton } from "@/components/shared/skeletons";
 import {
-  DATA_TABLE_HEADER_CLASS,
   DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
@@ -38,6 +27,12 @@ import {
 } from "@internationalized/date";
 
 const logger = createLogger("OtherCostsTable");
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 
 // Type definitions based on the costs schema
 interface Cost {
@@ -174,7 +169,10 @@ export default function OtherCostsTable() {
     amount: 0,
     frequency: "monthly",
   });
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const overlay = useOverlayState();
+  const isOpen = overlay.isOpen;
+  const onOpen = overlay.open;
+  const onOpenChange = overlay.setOpen;
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -239,19 +237,10 @@ export default function OtherCostsTable() {
         });
 
         if (result.success) {
-          addToast({
-            title: "Operating cost updated",
-            color: "default",
-            timeout: 3000,
-          });
-          onOpenChange();
+          toast("Operating cost updated", { timeout: 3000 });
+          onOpenChange(false);
         } else {
-          addToast({
-            title: "Failed to update cost",
-            description: result.error || "Please try again",
-            color: "danger",
-            timeout: 5000,
-          });
+          toast.danger("Failed to update cost", { description: result.error || "Please try again", timeout: 5000 });
         }
       } else {
         // For new expense, use addCompleteExpense
@@ -266,21 +255,12 @@ export default function OtherCostsTable() {
             : new Date().toISOString(),
           frequency: newFrequency,
         });
-        addToast({
-          title: "Operating cost added successfully",
-          color: "default",
-          timeout: 3000,
-        });
-        onOpenChange();
+        toast("Operating cost added successfully", { timeout: 3000 });
+        onOpenChange(false);
       }
     } catch (_error) {
       logger.error("Error saving expense:", _error);
-      addToast({
-        title: "Failed to save cost",
-        description: _error instanceof Error ? _error.message : "Unknown error",
-        color: "danger",
-        timeout: 5000,
-      });
+      toast.danger("Failed to save cost", { description: _error instanceof Error ? _error.message : "Unknown error", timeout: 5000 });
     }
   };
 
@@ -295,19 +275,11 @@ export default function OtherCostsTable() {
     setIsDeleting(true);
     try {
       await deleteOtherCost(itemToDelete as Id<"globalCosts">);
-      addToast({
-        title: "Operating cost deleted",
-        color: "default",
-        timeout: 3000,
-      });
+      toast("Operating cost deleted", { timeout: 3000 });
       setDeleteModalOpen(false);
       setItemToDelete(null);
     } catch (_error) {
-      addToast({
-        title: "Failed to delete",
-        color: "danger",
-        timeout: 3000,
-      });
+      toast.danger("Failed to delete", { timeout: 3000 });
     } finally {
       setIsDeleting(false);
     }
@@ -340,7 +312,7 @@ export default function OtherCostsTable() {
           frequencies.find((f) => f.key === "monthly");
 
         return (
-          <Chip size="sm" variant="flat">
+          <Chip size="sm" variant="soft">
             {freq?.label || "Monthly"}
           </Chip>
         );
@@ -354,16 +326,16 @@ export default function OtherCostsTable() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={() => handleEdit(item)}
             >
               <Icon icon="solar:pen-linear" width={16} />
             </Button>
             <Button
               isIconOnly
-              color="danger"
+             
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={() => handleDeleteClick(item._id as string)}
             >
               <Icon icon="solar:trash-bin-trash-bold-duotone" width={16} />
@@ -380,9 +352,9 @@ export default function OtherCostsTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Operating Costs</h2>
-        <Button
-          color="primary"
-          startContent={<Icon icon="solar:add-square-bold" width={16} />}
+        <Button variant="primary"
+         
+         
           isDisabled={isLoading}
           onPress={handleAdd}
         >
@@ -404,123 +376,84 @@ export default function OtherCostsTable() {
               columns={4}
               showHeader={false}
               showPagination={false}
-              className="border border-default-200/60"
+              className="border border-surface-tertiary/60"
             />
           </div>
         ) : (
-          <Table
-            removeWrapper
-            aria-label="Operating costs table"
-            className={DATA_TABLE_TABLE_CLASS}
-            classNames={{
-              th: DATA_TABLE_HEADER_CLASS,
-              td: "py-2.5 px-3 text-sm text-default-800 align-middle",
-              table: "text-sm",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn key={column.uid}>{column.name}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              emptyContent={
-                <div className="py-10 text-center">
-                  <Icon
-                    className="mx-auto mb-4 text-default-300"
-                    icon="solar:wallet-bold-duotone"
-                    width={48}
-                  />
-                  <p className="mb-2 text-default-500">
-                    No operating costs added yet
-                  </p>
-                  <p className="text-small text-default-400">
-                    Add operational costs to track business performance
-                  </p>
-                </div>
-              }
-              items={(otherCosts || []) as Cost[]}
-            >
-              {(item: Cost) => (
-                <TableRow
-                  key={item._id as string}
-                  className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
-                >
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+          <Table className={DATA_TABLE_TABLE_CLASS}>
+            <Table.ScrollContainer>
+              <Table.Content aria-label="Operating costs table">
+                <TableHeader columns={columns}>
+                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
+                    <TableColumn id={column.uid} isRowHeader={column.uid === "name"}>
+                      {column.name}
+                    </TableColumn>
                   )}
-                </TableRow>
-              )}
-            </TableBody>
+                </TableHeader>
+                <TableBody items={(otherCosts || []) as Cost[]}>
+                  {(item: Cost) => (
+                    <TableRow
+                      key={item._id as string}
+                      id={item._id as string}
+                      className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
+                    >
+                      {(columnKey: unknown) => (
+                        <TableCell>{renderCell(item, String(columnKey))}</TableCell>
+                      )}
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table.Content>
+            </Table.ScrollContainer>
           </Table>
         )}
       </div>
 
-      <Modal
-        classNames={{
-          backdrop: "backdrop-blur-sm",
-          base: "max-h-[85vh] overflow-hidden",
-          body: "overflow-y-auto scrollbar-hide",
-          wrapper: "items-center",
-        }}
-        isOpen={isOpen}
-        scrollBehavior="inside"
-        size="2xl"
-        onOpenChange={onOpenChange}
-      >
-        <ModalContent>
-          {(onClose) => (
+      <Modal>
+        <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
+          <Modal.Container scroll="inside" size="lg">
+            <Modal.Dialog>
+          {({ close }) => (
             <>
-              <ModalHeader className="flex flex-col dark:bg-default-50 gap-1 border-b border-divider pb-3">
+              <Modal.Header className="flex flex-col dark:bg-surface-secondary gap-1 border-b border-surface-tertiary pb-3">
                 <h2 className="text-lg font-semibold">
                   {formData._id ? "Edit Operating Cost" : "Add Operating Cost"}
                 </h2>
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   Track operational costs for better P&L visibility
                 </p>
-              </ModalHeader>
-              <ModalBody className="bg-default-50 gap-6 py-4">
+              </Modal.Header>
+              <Modal.Body className="bg-surface-secondary gap-6 py-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <Input
-                    isRequired
-                    label="Cost Name"
-                    labelPlacement="outside"
-                    placeholder="e.g., Office Rent, Software Subscription"
+                    required
+                                                            placeholder="e.g., Office Rent, Software Subscription"
                     value={formData.name || ""}
-                    onValueChange={(value) =>
+                    onChange={(event) => { const value = event.currentTarget.value;
                       setFormData({ ...formData, name: value })
-                    }
+                    }}
                   />
                 </div>
 
                 {/* Amount + Frequency/Apply To aligned in one row */}
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Input
-                    isRequired
-                    label="Amount"
-                    labelPlacement="outside"
-                    startContent={getCurrencySymbol(currency)}
-                    step="0.01"
+                    required
+                                                                                step="0.01"
                     type="number"
                     value={formData.amount.toString()}
-                    onValueChange={(value) =>
+                    onChange={(event) => { const value = event.currentTarget.value;
                       setFormData({
                         ...formData,
                         amount: parseFloat(value) || 0,
                       })
-                    }
+                    }}
                   />
 
                   <Select
-                    label="Frequency"
-                    labelPlacement="outside"
-                    selectedKeys={[formData.frequency]}
-                    onSelectionChange={(keys) => {
-                      if (keys === "all") return;
-                      const [nextFrequency] = Array.from(keys) as (
-                        | CostFrequency
-                        | undefined
-                      )[];
+                    value={formData.frequency}
+                    onChange={(key) => {
+                      const nextFrequency = key as CostFrequency | null;
                       if (!nextFrequency) return;
                       setFormData((prev) => ({
                         ...prev,
@@ -528,40 +461,51 @@ export default function OtherCostsTable() {
                       }));
                     }}
                   >
-                    {frequencies.map((freq) => (
-                      <SelectItem key={freq.key}>{freq.label}</SelectItem>
-                    ))}
+                    <Select.Trigger>
+                      <Select.Value />
+                      <Select.Indicator />
+                    </Select.Trigger>
+                    <Select.Popover>
+                      <ListBox>
+                        {frequencies.map((freq) => (
+                          <ListBox.Item
+                            key={freq.key}
+                            id={freq.key}
+                            textValue={freq.label}
+                          >
+                            {freq.label}
+                            <ListBox.ItemIndicator />
+                          </ListBox.Item>
+                        ))}
+                      </ListBox>
+                    </Select.Popover>
                   </Select>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-default-600">
+                    <span className="text-sm font-medium text-muted">
                       Effective From
                     </span>
                     <Popover
                       isOpen={isEffectiveFromOpen}
-                      placement="bottom-start"
                       onOpenChange={setIsEffectiveFromOpen}
                     >
-                      <PopoverTrigger>
-                        <Button
-                          className="w-full justify-between text-left"
-                          variant="bordered"
-                        >
-                          <span className="flex items-center gap-2">
-                            <Icon icon="solar:calendar-linear" width={16} />
-                            {formatEffectiveFromLabel(formData.effectiveFrom)}
-                          </span>
-                          <Icon icon="solar:alt-arrow-down-bold" width={14} />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="p-2">
-                        <Calendar
-                          aria-label="Effective from date"
-                          className="w-full"
+                      <Button
+                        className="w-full justify-between text-left"
+                        variant="outline"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Icon icon="solar:calendar-linear" width={16} />
+                          {formatEffectiveFromLabel(formData.effectiveFrom)}
+                        </span>
+                        <Icon icon="solar:alt-arrow-down-bold" width={14} />
+                      </Button>
+                      <Popover.Content>
+                        <Popover.Dialog className="p-2">
+                        <Calendar                           className="w-full"
                           value={effectiveFromCalendarValue}
-                          onChange={(date) => {
+                          onChange={(date: CalendarDate | null) => {
                             if (!date) return;
                             setFormData((prev) => ({
                               ...prev,
@@ -569,28 +513,30 @@ export default function OtherCostsTable() {
                             }));
                             setIsEffectiveFromOpen(false);
                           }}
-                          weekdayStyle="short"
                         />
-                      </PopoverContent>
+                        </Popover.Dialog>
+                      </Popover.Content>
                     </Popover>
                   </div>
                 </div>
-              </ModalBody>
-              <ModalFooter className="dark:bg-default-50">
-                <Button variant="flat" onPress={onClose}>
+              </Modal.Body>
+              <Modal.Footer className="dark:bg-surface-secondary">
+                <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>
-                <Button
-                  color="primary"
+                <Button variant="primary"
+                 
                   isDisabled={!formData.name || !formData.amount}
                   onPress={handleSave}
                 >
                   {formData._id ? "Update" : "Add"}
                 </Button>
-              </ModalFooter>
+              </Modal.Footer>
             </>
           )}
-        </ModalContent>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
 
       {/* Delete Confirmation Modal */}

@@ -1,21 +1,16 @@
 "use client";
 
-import { Accordion, AccordionItem } from "@heroui/accordion";
-import { Input } from "@heroui/input";
-import { Skeleton } from "@heroui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/table";
-import { Button } from "@heroui/button";
-import { Tooltip } from "@heroui/tooltip";
+import { Button, Input, Skeleton, Table, Tooltip } from "@heroui/react";
+import { Accordion } from "@heroui/react/accordion";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import React, { useMemo } from "react";
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 
 type Product = {
   id: string;
@@ -54,66 +49,73 @@ export default function ProductCostsSection({
 
   return (
     <Accordion
-      isCompact
-      className="border border-default-200 px-4 py-2 mb-2 rounded-2xl"
-      selectedKeys={productsOpen ? ["products"] : []}
-      onSelectionChange={(keys) => {
-        // HeroUI provides a Set<string> for selected keys in single mode
-        const open = Array.from(keys as Set<string>).includes("products");
+      className="border border-surface-tertiary px-4 py-2 mb-2 rounded-2xl"
+      expandedKeys={productsOpen ? ["products"] : []}
+      onExpandedChange={(keys) => {
+        const open = Array.from(keys).includes("products");
         setProductsOpen(open);
       }}
     >
-      <AccordionItem
-        aria-label="Products"
-        classNames={{ content: "px-0" }}
-        key="products"
-        subtitle={
-          <span className="text-default-500 text-xs">
-            Optional: fine-tune specific product costs
-          </span>
-        }
-        title={
-          <div className="flex items-center gap-2">
-            <Icon
-              className="text-primary text-base"
-              icon="solar:box-bold-duotone"
-            />
-            <span className="text-sm font-medium">Product-level Overrides</span>
-          </div>
-        }
-      >
-        <div className="space-y-4">
+      <Accordion.Item key="products" id="products">
+        <Accordion.Heading>
+          <Accordion.Trigger className="flex w-full items-center justify-between py-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <Icon
+                  className="text-accent text-base"
+                  icon="solar:box-bold-duotone"
+                />
+                <span className="text-sm font-medium">Product-level Overrides</span>
+              </div>
+              <span className="text-muted text-xs">
+                Optional: fine-tune specific product costs
+              </span>
+            </div>
+            <Accordion.Indicator>
+              <Icon icon="solar:alt-arrow-down-linear" width={16} />
+            </Accordion.Indicator>
+          </Accordion.Trigger>
+        </Accordion.Heading>
+        <Accordion.Panel>
+          <Accordion.Body>
+            <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="text-xs text-default-500">
+            <div className="text-xs text-muted">
               Set per-product cost to improve accuracy
             </div>
             <div className="flex items-center gap-2">
-              <Tooltip
-                content="Apply percentage of price as cost to all products"
-                placement="top"
-              >
-                <Button
-                  size="sm"
-                  variant="flat"
-                  onPress={() => onApplyPercentageToAll(30)}
-                >
-                  Quick apply: 30%
-                </Button>
+              <Tooltip>
+                <Tooltip.Trigger>
+                  <Button
+                    size="sm"
+                    variant="tertiary"
+                    onPress={() => onApplyPercentageToAll(30)}
+                  >
+                    Quick apply: 30%
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content placement="top">
+                  Apply percentage of price as cost to all products
+                </Tooltip.Content>
               </Tooltip>
             </div>
           </div>
 
-          <div className="rounded-xl border border-default-100 overflow-hidden">
-            <Table aria-label="Products cost table" removeWrapper>
-              <TableHeader>
-                <TableColumn>Product</TableColumn>
-                <TableColumn>Price</TableColumn>
-                <TableColumn>Cost</TableColumn>
-              </TableHeader>
-              <TableBody emptyContent={isLoading ? undefined : "No products"}>
+          <div className="rounded-xl border border-surface-tertiary overflow-hidden">
+            <Table>
+              <Table.ScrollContainer>
+                <Table.Content aria-label="Product costs">
+                  <TableHeader>
+                    <TableColumn id="product" isRowHeader>
+                      Product
+                    </TableColumn>
+                    <TableColumn id="price">Price</TableColumn>
+                    <TableColumn id="cost">Cost</TableColumn>
+                  </TableHeader>
+                  <TableBody>
                 {isLoading
                   ? skeletonIndexes.map((i) => (
-                      <TableRow key={`sk-${i}`}>
+                      <TableRow key={`sk-${i}`} id={`sk-${i}`}>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Skeleton className="w-6 h-6 rounded" />
@@ -132,7 +134,7 @@ export default function ProductCostsSection({
                       </TableRow>
                     ))
                   : products.map((product) => (
-                      <TableRow key={product.id}>
+                      <TableRow key={product.id} id={product.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {product.imageUrl && (
@@ -149,7 +151,7 @@ export default function ProductCostsSection({
                                 {product.title}
                               </p>
                               {product.sku && (
-                                <p className="text-xs text-default-500">
+                                <p className="text-xs text-muted">
                                   SKU: {product.sku}
                                 </p>
                               )}
@@ -164,18 +166,8 @@ export default function ProductCostsSection({
                         </TableCell>
                         <TableCell>
                           <Input
-                            classNames={{
-                              inputWrapper: "h-8",
-                              input: "text-xs",
-                            }}
-                            placeholder={`${(product.price * 0.3).toFixed(2)}`}
-                            size="sm"
-                            startContent={
-                              <span className="text-default-400 text-xs">
-                                {currencySymbol}
-                              </span>
-                            }
-                            value={productCosts[product.id]?.toString() || ""}
+                                                        placeholder={`${(product.price * 0.3).toFixed(2)}`}
+                                                        value={productCosts[product.id]?.toString() || ""}
                             onChange={(e) => {
                               const parsed = parseFloat(e.target.value) || 0;
                               onChangeById(product.id, parsed);
@@ -184,11 +176,15 @@ export default function ProductCostsSection({
                         </TableCell>
                       </TableRow>
                     ))}
-              </TableBody>
+                  </TableBody>
+                </Table.Content>
+              </Table.ScrollContainer>
             </Table>
           </div>
-        </div>
-      </AccordionItem>
+            </div>
+          </Accordion.Body>
+        </Accordion.Panel>
+      </Accordion.Item>
     </Accordion>
   );
 }

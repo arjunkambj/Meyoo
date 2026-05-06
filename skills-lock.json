@@ -7,6 +7,12 @@
       "skillPath": "skills/convex-performance-audit/SKILL.md",
       "computedHash": "d4f372ad6bed01b3a83983f5e8386017606e1bf8a97833c016af07f277157f96"
     },
+    "heroui-migration": {
+      "source": "heroui-inc/heroui",
+      "sourceType": "github",
+      "skillPath": "skills/heroui-migration/SKILL.md",
+      "computedHash": "9696b5cf0009120bfe03e00cc94c0e2defc1f5af981fc5bb10b1eeffa53e34cf"
+    },
     "heroui-react": {
       "source": "heroui-inc/heroui",
       "sourceType": "github",

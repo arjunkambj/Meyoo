@@ -1,7 +1,6 @@
 "use client";
 
-import { Card } from "@heroui/card";
-import { Tooltip } from "@heroui/tooltip";
+import { Card, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { memo } from "react";
 
@@ -75,21 +74,21 @@ export const CustomerJourney = memo(function CustomerJourney({
   const safeReturnRate = Number.isFinite(returnRate) ? returnRate : 0;
 
   return (
-    <Card className="p-6 rounded-2xl border border-default-100/60 bg-content2 dark:bg-content1 shadow-none backdrop-blur-sm">
+    <Card className="p-6 rounded-2xl border border-surface-tertiary/60 bg-surface-secondary dark:bg-surface shadow-none backdrop-blur-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-medium text-default-900">
+          <h3 className="text-lg font-medium text-muted">
             Customer Journey
           </h3>
-          <p className="text-sm text-default-500 mt-0.5">
+          <p className="text-sm text-muted mt-0.5">
             Track customer progression through your sales funnel
           </p>
         </div>
-        <div className="text-sm bg-background border border-default-50 rounded-full px-4 py-2 text-default-600">
+        <div className="text-sm bg-background border border-surface-tertiary rounded-full px-4 py-2 text-muted">
           <span className="font-medium">
             {formatNumber(safeVisitors)}
           </span>
-          <span className="text-default-400 ml-1">visitors</span>
+          <span className="text-muted ml-1">visitors</span>
         </div>
       </div>
 
@@ -103,10 +102,10 @@ export const CustomerJourney = memo(function CustomerJourney({
                   {/* Simple connecting line */}
                   {index < journeyData.length - 1 && (
                     <div className="hidden lg:block absolute top-8 left-[calc(100%-1rem)] w-8 pointer-events-none z-0">
-                      <div className="h-px bg-default-100 w-full" />
+                      <div className="h-px bg-surface-secondary w-full" />
                     </div>
                   )}
-                  <div className="relative z-10 rounded-xl border border-default-100/70 bg-background p-4">
+                  <div className="relative z-10 rounded-xl border border-surface-tertiary/70 bg-background p-4">
                     <div className="flex flex-col items-center text-center space-y-3">
                       <div
                         className={`flex h-10 w-10 items-center justify-center rounded-xl ${stage.bgColor}`}
@@ -117,26 +116,25 @@ export const CustomerJourney = memo(function CustomerJourney({
                         />
                       </div>
                       <div>
-                        <Tooltip
-                          closeDelay={0}
-                          content={
-                            stageDescriptions[stage.stage] || stage.stage
-                          }
-                          placement="top"
-                        >
-                          <p className="font-medium text-sm text-default-900 mb-1">
-                            {stage.stage}
-                          </p>
+                        <Tooltip closeDelay={0}>
+                          <Tooltip.Trigger>
+                            <p className="font-medium text-sm text-muted mb-1">
+                              {stage.stage}
+                            </p>
+                          </Tooltip.Trigger>
+                          <Tooltip.Content placement="top">
+                            {stageDescriptions[stage.stage] || stage.stage}
+                          </Tooltip.Content>
                         </Tooltip>
-                        <p className="text-xs text-default-500">
+                        <p className="text-xs text-muted">
                           {formatNumber(stage.customers)}
                         </p>
                       </div>
-                      <div className="w-full pt-2 border-t border-default-100/70">
-                        <p className="text-xs text-default-400 mb-1">
+                      <div className="w-full pt-2 border-t border-surface-tertiary/70">
+                        <p className="text-xs text-muted mb-1">
                           Conversion
                         </p>
-                        <p className="text-sm font-medium text-default-700">
+                        <p className="text-sm font-medium text-muted">
                           {formatPercentValue(stage.conversionRate)}%
                         </p>
                       </div>
@@ -146,7 +144,7 @@ export const CustomerJourney = memo(function CustomerJourney({
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-default-100/70 bg-background p-6 text-center text-sm text-default-500">
+            <div className="rounded-xl border border-surface-tertiary/70 bg-background p-6 text-center text-sm text-muted">
               No customer journey data is available for the selected period yet.
             </div>
           )}
@@ -154,50 +152,50 @@ export const CustomerJourney = memo(function CustomerJourney({
 
         {/* Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="rounded-xl p-4 border bg-background border-default-50">
-            <p className="text-xs font-medium text-default-600 mb-2">
+          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+            <p className="text-xs font-medium text-muted mb-2">
               Overall Conversion
             </p>
-            <p className="text-xl font-semibold text-default-900">
+            <p className="text-xl font-semibold text-muted">
               {formatPercentValue(
                 retentionStage?.conversionRate ?? purchaseStage?.conversionRate ?? 0,
               )}
               %
             </p>
-            <p className="text-xs text-default-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               From awareness to purchase
             </p>
           </div>
-          <div className="rounded-xl p-4 border bg-background border-default-50">
-            <p className="text-xs font-medium text-default-600 mb-2">
+          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+            <p className="text-xs font-medium text-muted mb-2">
               Meta Conversion
             </p>
-            <p className="text-xl font-semibold text-default-900">
+            <p className="text-xl font-semibold text-muted">
               {formatPercentValue(metaConversionRateValue)}%
             </p>
-            <p className="text-xs text-default-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               Landing page conversion from ads
             </p>
           </div>
-          <div className="rounded-xl p-4 border bg-background border-default-50">
-            <p className="text-xs font-medium text-default-600 mb-2">
+          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+            <p className="text-xs font-medium text-muted mb-2">
               Cancel Rate
             </p>
-            <p className="text-xl font-semibold text-default-900">
+            <p className="text-xl font-semibold text-muted">
               {formatPercentValue(safeCancelRate)}%
             </p>
-            <p className="text-xs text-default-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               Orders cancelled before fulfillment
             </p>
           </div>
-          <div className="rounded-xl p-4 border bg-background border-default-50">
-            <p className="text-xs font-medium text-default-600 mb-2">
+          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+            <p className="text-xs font-medium text-muted mb-2">
               Return / RTO Rate
             </p>
-            <p className="text-xl font-semibold text-default-900">
+            <p className="text-xl font-semibold text-muted">
               {formatPercentValue(safeReturnRate)}%
             </p>
-            <p className="text-xs text-default-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               Deliveries that resulted in returns or RTO
             </p>
           </div>

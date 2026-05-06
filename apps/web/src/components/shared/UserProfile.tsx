@@ -1,14 +1,11 @@
 "use client";
 
-import { Avatar } from "@heroui/avatar";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownSection, DropdownTrigger } from "@heroui/dropdown";
-import { Switch } from "@heroui/switch";
+import { Avatar, Dropdown, Label } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import type { Route } from "next";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useUser } from "@stackframe/stack";
-
-import { useTheme } from "@/components/theme/ThemeProvider";
 
 type UserProfileProps = {
   showNavigationLinks?: boolean;
@@ -17,25 +14,11 @@ type UserProfileProps = {
 const UserProfile = React.memo(
   ({ showNavigationLinks = true }: UserProfileProps) => {
     const user = useUser();
-    const { theme, setTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
 
-    useEffect(() => {
-      setMounted(true);
-    }, []);
-
-    const handleLogout = useCallback(async () => {
-      await user?.signOut();
-      window.location.href = "/sign-in";
+    const handleLogout = useCallback(() => {
+      void user?.signOut();
     }, [user]);
-
-    const handleThemeChange = useCallback(
-      (isSelected: boolean) => {
-        setTheme(isSelected ? "dark" : "light");
-      },
-      [setTheme]
-    );
-
+    
     // Memoize user data extraction
     type UserProfileData = {
       name: string;
@@ -79,137 +62,93 @@ const UserProfile = React.memo(
     // Memoize dropdown menu items
     const dropdownContent = useMemo(
       () => (
-        <DropdownMenu
-          aria-label="Profile Actions"
-          variant="flat"
-          classNames={{
-            base: "p-1",
-          }}
-        >
-          <DropdownSection showDivider>
-            <DropdownItem
-              key="profile"
+        <Dropdown.Menu>
+          <Dropdown.Section>
+            <Dropdown.Item
+              id="profile"
               className="h-16 gap-2 cursor-default hover:bg-transparent"
               textValue="Profile"
-              isReadOnly
             >
               <div className="flex items-center gap-3">
                 <Avatar
                   size="sm"
-                  name={userData.name}
-                  src={userData.image || undefined}
                   className="flex-shrink-0"
-                />
+                >
+                  <Avatar.Image src={userData.image || undefined} alt={userData.name} />
+                  <Avatar.Fallback>{userData.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
+                </Avatar>
                 <div className="flex flex-col">
-                  <p className="font-semibold text-small">{userData.name}</p>
-                  <p className="text-tiny text-default-400">{userData.email}</p>
+                  <p className="font-semibold text-sm">{userData.name}</p>
+                  <p className="text-xs text-muted">{userData.email}</p>
                 </div>
               </div>
-            </DropdownItem>
-          </DropdownSection>
-          <DropdownSection showDivider>
-            <DropdownItem
-              key="theme"
+            </Dropdown.Item>
+          </Dropdown.Section>
+          <Dropdown.Section>
+            <Dropdown.Item
+              id="theme"
               className="gap-2 py-2"
-              startContent={
-                <Icon
-                  icon={
-                    theme === "dark"
-                      ? "solar:moon-stars-bold-duotone"
-                      : "solar:sun-bold-duotone"
-                  }
-                  width={20}
-                  className="text-default-500"
-                />
-              }
-              endContent={
-                mounted ? (
-                  <Switch
-                    size="sm"
-                    isSelected={theme === "dark"}
-                    onValueChange={handleThemeChange}
-                    aria-label="Toggle theme"
-                    classNames={{
-                      wrapper: "group-data-[selected=true]:bg-primary",
-                    }}
-                    thumbIcon={({ isSelected }) =>
-                      isSelected ? (
-                        <Icon icon="solar:moon-bold-duotone" width={12} />
-                      ) : (
-                        <Icon icon="solar:sun-bold-duotone" width={12} />
-                      )
-                    }
-                  />
-                ) : undefined
-              }
-              isReadOnly
+              textValue="Appearance"
             >
-              <span className="text-small font-medium">Appearance</span>
-            </DropdownItem>
-          </DropdownSection>
+              <Label>Appearance</Label>
+            </Dropdown.Item>
+          </Dropdown.Section>
           {showNavigationLinks ? (
-            <DropdownSection showDivider>
+            <Dropdown.Section>
               {navigationItems.map((item) => (
-                <DropdownItem
+                <Dropdown.Item
                   key={item.key}
-                  as={Link}
+                  id={item.key}
                   className="py-2"
-                  href={item.href}
-                  startContent={
-                    <Icon
-                      icon={item.icon}
-                      width={20}
-                      className="text-default-500"
-                    />
-                  }
+                  textValue={item.label}
                 >
-                  <span className="text-small font-medium">{item.label}</span>
-                </DropdownItem>
+                  <Link
+                    href={item.href as Route}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon icon={item.icon} width={20} className="text-muted" />
+                    <Label className="text-sm font-medium">{item.label}</Label>
+                  </Link>
+                </Dropdown.Item>
               ))}
-            </DropdownSection>
+            </Dropdown.Section>
           ) : null}
-          <DropdownSection>
-            <DropdownItem
-              key="logout"
-              className="text-danger data-[hover=true]:bg-danger-50 data-[hover=true]:text-danger py-2"
-              startContent={<Icon icon="solar:logout-2-bold-duotone" width={20} />}
+          <Dropdown.Section>
+            <Dropdown.Item
+              id="logout"
+              className="text-danger data-[hover=true]:bg-danger data-[hover=true]:text-danger py-2"
+              textValue="Log Out"
               onPress={handleLogout}
             >
-              <span className="text-small font-semibold">Log Out</span>
-            </DropdownItem>
-          </DropdownSection>
-        </DropdownMenu>
+              <Label className="text-sm font-semibold">Log Out</Label>
+            </Dropdown.Item>
+          </Dropdown.Section>
+        </Dropdown.Menu>
       ),
       [
+        handleLogout,
         userData,
         navigationItems,
-        handleLogout,
-        theme,
-        mounted,
-        handleThemeChange,
         showNavigationLinks,
       ]
     );
 
     return (
-      <Dropdown
-        placement="bottom-end"
-        classNames={{
-          content: "min-w-[260px]",
-        }}
-      >
-        <DropdownTrigger>
-          <Avatar
-            isBordered
-            as="button"
-            className="transition-transform hover:scale-105"
-            color="primary"
-            name={userData.name}
-            size="sm"
-            src={userData.image || undefined}
-          />
-        </DropdownTrigger>
-        {dropdownContent}
+      <Dropdown>
+        <Dropdown.Trigger>
+          <span className="inline-flex rounded-full">
+            <Avatar
+              className="border-2 border-background transition-transform hover:scale-105"
+              size="sm"
+            >
+              <Avatar.Image src={userData.image || undefined} alt={userData.name} />
+              <Avatar.Fallback>{userData.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
+            </Avatar>
+          </span>
+        </Dropdown.Trigger>
+        <Dropdown.Popover placement="bottom end">
+          {dropdownContent}
+        </Dropdown.Popover>
       </Dropdown>
     );
   }

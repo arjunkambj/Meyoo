@@ -32,8 +32,8 @@ function normalizeJourneyStages(raw: OrdersJourneyStage[] | undefined): JourneyS
   if (!raw) return [];
 
   const colorMap: Record<string, { bg: string; text: string }> = {
-    primary: { bg: "bg-primary/10", text: "text-primary" },
-    secondary: { bg: "bg-secondary/10", text: "text-secondary" },
+    primary: { bg: "bg-accent/10", text: "text-accent" },
+    secondary: { bg: "bg-accent/10", text: "text-accent" },
     success: { bg: "bg-success/10", text: "text-success" },
     warning: { bg: "bg-warning/10", text: "text-warning" },
     danger: { bg: "bg-danger/10", text: "text-danger" },
@@ -46,7 +46,7 @@ function normalizeJourneyStages(raw: OrdersJourneyStage[] | undefined): JourneyS
       bg: "bg-emerald-100 dark:bg-emerald-500/15",
       text: "text-emerald-700 dark:text-emerald-200",
     },
-    default: { bg: "bg-default-100", text: "text-default-500" },
+    default: { bg: "bg-surface-secondary", text: "text-muted" },
   };
 
   return raw.map((stage) => {

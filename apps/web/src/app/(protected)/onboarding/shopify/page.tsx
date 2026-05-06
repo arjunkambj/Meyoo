@@ -7,10 +7,10 @@ export default function ShopifyOnboardingPage() {
     <section className="max-w-3xl mx-auto h-full">
       {/* Header */}
       <div className="mb-8 text-center lg:text-left">
-        <h1 className="text-2xl lg:text-3xl font-bold text-default-900 mb-3">
+        <h1 className="text-2xl lg:text-3xl font-bold text-muted mb-3">
           Connect Your Shopify Store
         </h1>
-        <p className="text-base text-default-600">
+        <p className="text-base text-muted">
           Connect your store to start tracking your profits and performance
         </p>
       </div>

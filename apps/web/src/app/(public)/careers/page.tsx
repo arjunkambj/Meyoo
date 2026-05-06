@@ -1,8 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Divider } from "@heroui/divider";
+import { Card, Chip, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 import CareerApplicationButton from "@/components/home/components/CareerApplicationButton";
@@ -83,22 +81,22 @@ const openPositions = [
 export default function CareersPage() {
   return (
     <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-default-200/70 to-transparent dark:via-default-100/40" />
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-content1/70 dark:bg-content1/50 backdrop-blur-md border border-divider rounded-full px-4 py-2 mb-6">
+          <div className="inline-flex items-center gap-2 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-4 py-2 mb-6">
             <Icon
-              className="text-primary"
+              className="text-accent"
               icon="solar:case-round-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-default-700">
+            <span className="text-sm font-semibold text-muted">
               Careers
             </span>
           </div>
           <h1 className="text-5xl font-bold mb-4">Join Our Mission</h1>
-          <p className="text-xl text-default-600 max-w-2xl mx-auto">
+          <p className="text-xl text-muted max-w-2xl mx-auto">
             Help us empower e-commerce businesses with profit intelligence.
             We&apos;re building the future of financial analytics for online
             merchants.
@@ -115,9 +113,9 @@ export default function CareersPage() {
               {openPositions.map((position) => (
                 <Card
                   key={position.id}
-                  className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
                 >
-                  <CardBody className="p-6 md:p-8">
+                  <Card.Content className="p-6 md:p-8">
                     <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                       <div className="flex-1">
                         <div className="flex items-start justify-between mb-4">
@@ -127,35 +125,35 @@ export default function CareersPage() {
                             </h3>
                             <div className="flex flex-wrap gap-2 mb-5">
                               <Chip
-                                className="bg-content1/60 dark:bg-content1/40 border border-divider/60 text-default-700"
+                                className="bg-surface/60 dark:bg-surface/40 border border-surface-tertiary/60 text-muted"
                                 size="sm"
-                                variant="flat"
+                                variant="soft"
                               >
                                 {position.department}
                               </Chip>
                               <Chip
-                                className="bg-content1/60 dark:bg-content1/40 border border-divider/60 text-default-700"
+                                className="bg-surface/60 dark:bg-surface/40 border border-surface-tertiary/60 text-muted"
                                 size="sm"
-                                variant="flat"
+                                variant="soft"
                               >
                                 <Icon
-                                  className="w-3 h-3 mr-1 text-default-600"
+                                  className="w-3 h-3 mr-1 text-muted"
                                   icon="solar:map-point-bold"
                                 />
                                 {position.location}
                               </Chip>
                               <Chip
-                                className="bg-content1/60 dark:bg-content1/40 border border-divider/60 text-default-700"
+                                className="bg-surface/60 dark:bg-surface/40 border border-surface-tertiary/60 text-muted"
                                 size="sm"
-                                variant="flat"
+                                variant="soft"
                               >
                                 {position.type}
                               </Chip>
                               <Chip
-                                className="text-primary bg-primary/10 border border-primary/20"
-                                color="primary"
+                                className="text-accent bg-accent/10 border border-accent/20"
+                                color="accent"
                                 size="sm"
-                                variant="flat"
+                                variant="soft"
                               >
                                 {position.experience}
                               </Chip>
@@ -163,7 +161,7 @@ export default function CareersPage() {
                           </div>
                         </div>
 
-                        <p className="text-default-700 mb-5 leading-relaxed">
+                        <p className="text-muted mb-5 leading-relaxed">
                           {position.description}
                         </p>
 
@@ -176,10 +174,10 @@ export default function CareersPage() {
                               {position.requirements.map((req) => (
                                 <li
                                   key={req}
-                                  className="text-sm text-default-600 flex items-start gap-2"
+                                  className="text-sm text-muted flex items-start gap-2"
                                 >
                                   <Icon
-                                    className="w-4 h-4 text-primary mt-0.5 shrink-0"
+                                    className="w-4 h-4 text-accent mt-0.5 shrink-0"
                                     icon="solar:check-circle-bold"
                                   />
                                   <span>{req}</span>
@@ -196,10 +194,10 @@ export default function CareersPage() {
                               {position.nice.map((item) => (
                                 <li
                                   key={item}
-                                  className="text-sm text-default-600 flex items-start gap-2"
+                                  className="text-sm text-muted flex items-start gap-2"
                                 >
                                   <Icon
-                                    className="w-4 h-4 text-secondary mt-0.5 shrink-0"
+                                    className="w-4 h-4 text-accent mt-0.5 shrink-0"
                                     icon="solar:add-circle-bold"
                                   />
                                   <span>{item}</span>
@@ -216,13 +214,13 @@ export default function CareersPage() {
                         />
                       </div>
                     </div>
-                  </CardBody>
+                  </Card.Content>
                 </Card>
               ))}
             </div>
           </div>
 
-          <Divider className="my-16" />
+          <Separator className="my-16" />
 
           {/* Application Process */}
           <div className="mb-16">
@@ -257,23 +255,23 @@ export default function CareersPage() {
                 },
               ].map((item) => (
                 <div key={item.title} className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider flex items-center justify-center mx-auto mb-3">
-                    <Icon className="w-8 h-8 text-primary" icon={item.icon} />
+                  <div className="w-16 h-16 rounded-full bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary flex items-center justify-center mx-auto mb-3">
+                    <Icon className="w-8 h-8 text-accent" icon={item.icon} />
                   </div>
                   <h3 className="font-semibold mb-1.5">{item.title}</h3>
-                  <p className="text-sm text-default-600">{item.description}</p>
+                  <p className="text-sm text-muted">{item.description}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* CTA */}
-          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl shadow-none">
-            <CardBody className="p-6 md:p-8 text-center">
+          <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
+            <Card.Content className="p-6 md:p-8 text-center">
               <h2 className="text-2xl font-bold mb-4">
                 Don&apos;t See Your Role?
               </h2>
-              <p className="text-default-700 mb-6 max-w-2xl mx-auto">
+              <p className="text-muted mb-6 max-w-2xl mx-auto">
                 We&apos;re always looking for exceptional talent. If you&apos;re
                 passionate about e-commerce and data analytics, we&apos;d love
                 to hear from you.
@@ -286,10 +284,10 @@ export default function CareersPage() {
               >
                 Send Your Resume
               </EmailButton>
-              <p className="text-sm text-default-600 mt-4">
+              <p className="text-sm text-muted mt-4">
                 Contact: arjun@meyoo.io
               </p>
-            </CardBody>
+            </Card.Content>
           </Card>
         </div>
       </section>

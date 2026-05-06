@@ -1,8 +1,6 @@
 "use client";
 
-import { Chip } from "@heroui/chip";
-import { Switch } from "@heroui/switch";
-import { addToast } from "@heroui/toast";
+import { Chip, Switch, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useQuery } from "convex/react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -92,12 +90,7 @@ export default function OnboardingBillingView() {
       const shopDomain = shopFromUrl || shopDomainData;
 
       if (!shopDomain) {
-        addToast({
-          title: "Shopify connection required",
-          description: "Please connect your Shopify store first",
-          color: "danger",
-          timeout: 5000,
-        });
+        toast.danger("Shopify connection required", { description: "Please connect your Shopify store first", timeout: 5000 });
         console.error(
           "No shop domain found for billing - ensure Shopify is connected"
         );
@@ -115,13 +108,7 @@ export default function OnboardingBillingView() {
       await upgradePlan(plan, shopDomain, "/onboarding/marketing");
     } catch (error) {
       console.error("Plan upgrade failed:", error);
-      addToast({
-        title: "Plan selection failed",
-        description:
-          error instanceof Error ? error.message : "Please try again",
-        color: "danger",
-        timeout: 5000,
-      });
+      toast.danger("Plan selection failed", { description: error instanceof Error ? error.message : "Please try again", timeout: 5000 });
       // Only clear pending state if we handled the error locally (no redirect)
       setNavigationPending(false);
     } finally {
@@ -153,27 +140,27 @@ export default function OnboardingBillingView() {
         <h1 className="text-3xl lg:text-4xl font-bold text-foreground">
           Choose Your Plan
         </h1>
-        <p className="text-lg text-default-600">
+        <p className="text-lg text-muted">
           Select a plan to unlock all features and continue growing your
           business
         </p>
       </div>
 
       {/* Billing Frequency Toggle */}
-      <div className="flex items-center justify-center gap-3 text-sm text-default-600">
+      <div className="flex items-center justify-center gap-3 text-sm text-muted">
         <span className="font-medium text-foreground">Monthly</span>
         <Switch
           isSelected={selectedFrequency.key === FrequencyEnum.Yearly}
-          onValueChange={(isSelected) =>
+          onChange={(isSelected) => {
             onFrequencyChange(
               isSelected ? FrequencyEnum.Yearly : FrequencyEnum.Monthly
-            )
-          }
+            );
+          }}
           size="sm"
         />
         <div className="flex items-center gap-1">
           <span className="font-medium text-foreground">Yearly</span>
-          <Chip color="success" size="sm" variant="flat">
+          <Chip color="success" size="sm" variant="soft">
             Save 2 Months
           </Chip>
         </div>
@@ -231,7 +218,7 @@ export default function OnboardingBillingView() {
 
       {/* Current Plan Status */}
       <div className="flex items-center justify-between">
-        <Chip color="default" size="sm" variant="flat">
+        <Chip color="default" size="sm" variant="soft">
           {(() => {
             const map: Record<string, string> = {
               free: "Free Plan",

@@ -1,6 +1,6 @@
 "use client";
 
-import { Skeleton } from "@heroui/skeleton";
+import { Skeleton } from "@heroui/react";
 import { memo } from "react";
 // import { TOTAL_STEPS as _TOTAL_STEPS } from "@/constants/onboarding";
 
@@ -15,7 +15,7 @@ export const OnboardingSkeleton = memo(function OnboardingSkeleton({
     <div className="flex h-screen bg-background">
       <main className="flex flex-col flex-1 min-w-0 h-full">
         {/* Header */}
-        <div className="sticky top-0 z-20 bg-background border-b border-divider">
+        <div className="sticky top-0 z-20 bg-background border-b border-surface-tertiary">
           <div className="px-4 sm:px-6 py-4 max-w-3xl mx-auto w-full">
             <div className="flex items-center justify-between gap-4">
               <Skeleton className="h-6 w-28 rounded" />

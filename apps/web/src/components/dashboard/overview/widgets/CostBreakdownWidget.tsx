@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card } from "@heroui/card";
-import { Tooltip } from "@heroui/tooltip";
+import { Button, Card, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
@@ -190,17 +188,17 @@ export function CostBreakdownWidget({
       <Card
         aria-busy="true"
         aria-live="polite"
-        className="p-6 bg-content2 dark:bg-content1 rounded-2xl border border-default-200/50"
+        className="p-6 bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50"
         role="status"
       >
         <span className="sr-only">Loading cost breakdown…</span>
         <div className="animate-pulse">
           {/* Header Section */}
-          <div className="mb-3.5 pb-3.5 border-b border-divider">
+          <div className="mb-3.5 pb-3.5 border-b border-surface-tertiary">
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 bg-default-200 rounded" />
-              <div className="h-5 bg-default-200 rounded w-36" />
-              <div className="ml-auto hidden sm:block h-7 w-24 bg-default-200 rounded" />
+              <div className="w-5 h-5 bg-surface-tertiary rounded" />
+              <div className="h-5 bg-surface-tertiary rounded w-36" />
+              <div className="ml-auto hidden sm:block h-7 w-24 bg-surface-tertiary rounded" />
             </div>
           </div>
 
@@ -210,10 +208,10 @@ export function CostBreakdownWidget({
             <div className="lg:col-span-1 flex flex-col  h-full">
               <div className="w-full h-full">
                 <div className="relative">
-                  <div className="h-40 w-40 bg-default-200 rounded-full" />
+                  <div className="h-40 w-40 bg-surface-tertiary rounded-full" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <div className="h-3 w-10 bg-default-300/60 rounded mb-1" />
-                    <div className="h-4 w-16 bg-default-300/60 rounded" />
+                    <div className="h-3 w-10 bg-surface-tertiary/60 rounded mb-1" />
+                    <div className="h-4 w-16 bg-surface-tertiary/60 rounded" />
                   </div>
                 </div>
               </div>
@@ -226,25 +224,25 @@ export function CostBreakdownWidget({
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="bg-background border border-default-100 rounded-xl p-3.5"
+                    className="bg-background border border-surface-tertiary rounded-xl p-3.5"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         {/* Icon skeleton */}
-                        <div className="w-9 h-9 rounded-lg bg-default-200" />
+                        <div className="w-9 h-9 rounded-lg bg-surface-tertiary" />
                         <div className="space-y-1">
                           {/* Label skeleton */}
-                          <div className="h-4 bg-default-200 rounded w-16" />
+                          <div className="h-4 bg-surface-tertiary rounded w-16" />
                           {/* Percentage skeleton */}
-                          <div className="h-3 bg-default-200 rounded w-10" />
+                          <div className="h-3 bg-surface-tertiary rounded w-10" />
                         </div>
                       </div>
                       {/* Value skeleton */}
-                      <div className="h-4 bg-default-200 rounded w-12" />
+                      <div className="h-4 bg-surface-tertiary rounded w-12" />
                     </div>
-                    {/* Progress Bar skeleton */}
+                    {/* ProgressBar Bar skeleton */}
                     <div className="mt-2.5">
-                      <div className="w-full bg-default-100 rounded-full h-1" />
+                      <div className="w-full bg-surface-secondary rounded-full h-1" />
                     </div>
                   </div>
                 ))}
@@ -257,26 +255,26 @@ export function CostBreakdownWidget({
   }
 
   return (
-    <Card className="p-6 bg-default-100 dark:bg-content1 shadow-none border border-default-50 rounded-2xl h-full">
+    <Card className="p-6 bg-surface-secondary dark:bg-surface shadow-none border border-surface-tertiary rounded-2xl h-full">
       {/* Header Section */}
-      <div className="mb-4 pb-4 border-b border-divider flex flex-col sm:flex-row justify-between items-start sm:items-center">
+      <div className="mb-4 pb-4 border-b border-surface-tertiary flex flex-col sm:flex-row justify-between items-start sm:items-center">
         <div className="flex items-center gap-2.5">
           <Icon
             icon="solar:wallet-bold-duotone"
             width={20}
-            className="text-default-500"
+            className="text-muted"
           />
-          <h3 className="text-lg font-semibold text-default-900">
+          <h3 className="text-lg font-semibold text-muted">
             Cost Breakdown
           </h3>
         </div>
         {showCostSetupWarning && (
           <Button
-            color="warning"
+           
             size="sm"
             className="px-3 py-1"
-            startContent={<Icon icon="solar:settings-bold-duotone" />}
-            variant="flat"
+           
+            variant="tertiary"
             onPress={() => router.push("/cost-management")}
           >
             Setup Costs
@@ -301,7 +299,7 @@ export function CostBreakdownWidget({
                     fill="#2563EB"
                     dataKey="value"
                     strokeWidth={3}
-                    stroke="hsl(var(--heroui-default-100))"
+                    stroke="var(--surface-secondary)"
                   >
                     {chartData.map((entry) => (
                       <Cell key={`cell-${entry.name}`} fill={entry.fill} />
@@ -311,10 +309,10 @@ export function CostBreakdownWidget({
               </ResponsiveContainer>
               {/* Center label */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-6">
-                <div className="text-[10px] font-bold text-default-400 uppercase tracking-wide mb-0.5">
+                <div className="text-[10px] font-bold text-muted uppercase tracking-wide mb-0.5">
                   Total Costs
                 </div>
-                <div className="font-bold text-default-900 break-all text-center leading-tight max-w-[120px]">
+                <div className="font-bold text-muted break-all text-center leading-tight max-w-[120px]">
                   {(() => {
                     const total = chartData.reduce(
                       (sum, item) => sum + item.value,
@@ -325,7 +323,7 @@ export function CostBreakdownWidget({
                       : formatCurrency(total, currency);
                   })()}
                 </div>
-                <div className="text-[10px] text-default-400 mt-0.5">
+                <div className="text-[10px] text-muted mt-0.5">
                   {chartData.length}{" "}
                   {chartData.length === 1 ? "category" : "categories"}
                 </div>
@@ -333,17 +331,17 @@ export function CostBreakdownWidget({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center h-full min-h-[220px] text-center">
-              <div className="w-16 h-16 rounded-2xl bg-default-100 flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-surface-secondary flex items-center justify-center mb-4">
                 <Icon
-                  className="text-default-400"
+                  className="text-muted"
                   icon="solar:pie-chart-3-bold-duotone"
                   width={32}
                 />
               </div>
-              <p className="text-sm font-semibold text-default-700 mb-1">
+              <p className="text-sm font-semibold text-muted mb-1">
                 No cost data available
               </p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 Add cost data to see breakdown
               </p>
             </div>
@@ -357,7 +355,7 @@ export function CostBreakdownWidget({
             {costBreakdown.map((item) => (
               <div
                 key={item.key}
-                className="bg-background border border-default-100 rounded-xl p-3.5 hover:bg-default-50 transition-colors"
+                className="bg-background border border-surface-tertiary rounded-xl p-3.5 hover:bg-surface-secondary transition-colors"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5 flex-1">
@@ -372,24 +370,25 @@ export function CostBreakdownWidget({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-xs font-semibold text-default-900 truncate">
+                        <p className="text-xs font-semibold text-muted truncate">
                           {item.label}
                         </p>
-                        <Tooltip
-                          content={`${item.label} costs in the selected period`}
-                          placement="top"
-                          delay={200}
-                        >
-                          <span className="text-default-500 cursor-help hover:text-default-700 transition-colors">
-                            <Icon
-                              icon="solar:info-circle-bold-duotone"
-                              width={14}
-                            />
-                          </span>
+                        <Tooltip delay={200}>
+                          <Tooltip.Trigger>
+                            <span className="text-muted cursor-help hover:text-muted transition-colors">
+                              <Icon
+                                icon="solar:info-circle-bold-duotone"
+                                width={14}
+                              />
+                            </span>
+                          </Tooltip.Trigger>
+                          <Tooltip.Content placement="top">
+                            {`${item.label} costs in the selected period`}
+                          </Tooltip.Content>
                         </Tooltip>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs font-medium text-default-500">
+                        <span className="text-xs font-medium text-muted">
                           {item.value > 0
                             ? `${item.percentage.toFixed(1)}%`
                             : "No costs"}
@@ -398,13 +397,11 @@ export function CostBreakdownWidget({
                         {item.value > 0 && (
                           <div className="flex-1 max-w-[60px]">
                             <div
-                              className="w-full bg-default-200 rounded-full h-1"
+                              className="w-full bg-surface-tertiary rounded-full h-1"
                               role="progressbar"
                               aria-valuenow={Number(item.percentage.toFixed(1))}
                               aria-valuemin={0}
-                              aria-valuemax={100}
-                              aria-label={`${item.label} share`}
-                            >
+                              aria-valuemax={100}                             >
                               <div
                                 className="h-1 rounded-full transition-all"
                                 style={{
@@ -422,7 +419,7 @@ export function CostBreakdownWidget({
                   <div className="text-right shrink-0">
                     <p
                       className={`text-xs font-bold ${
-                        item.value > 0 ? "text-default-900" : "text-default-400"
+                        item.value > 0 ? "text-muted" : "text-muted"
                       }`}
                     >
                       {item.value > 0

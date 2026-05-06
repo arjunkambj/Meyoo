@@ -61,7 +61,7 @@ export interface OnboardingData {
 }
 
 // Removed persistent storage - using Convex as single source of truth
-// Progress is now tracked server-side only
+// ProgressBar is now tracked server-side only
 
 // Current onboarding state
 export const onboardingStateAtom = atom<OnboardingState>({

@@ -56,13 +56,13 @@ export default function DashBoardHeader({ className }: { className?: string }) {
 
   return (
     <header
-      className={`flex bg-content2 dark:bg-content1 px-6 py-3.5 rounded-2xl justify-between items-center w-full min-h-[68px] ${className || ""}`}
+      className={`flex bg-surface-secondary dark:bg-surface px-6 py-3.5 rounded-2xl justify-between items-center w-full min-h-[68px] ${className || ""}`}
     >
       {/* Left side - Sidebar toggle and page title */}
       <div className="flex items-center gap-4 min-w-0">
         <SidebarToggle />
-        <div aria-hidden className="h-6 w-px bg-default-200" />
-        <h1 className="text-xl font-bold text-default-900 tracking-tight">
+        <div aria-hidden className="h-6 w-px bg-surface-tertiary" />
+        <h1 className="text-xl font-bold text-muted tracking-tight">
           {pageTitle}
         </h1>
       </div>

@@ -34,7 +34,7 @@ export const OrdersOverviewCards = memo(function OrdersOverviewCards({
       value: formatNumber(metrics.totalOrders),
       change: metrics.changes.totalOrders,
       icon: "solar:bag-check-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
       subtitle: `AOV: ${formatCurrency(metrics.avgOrderValue)}`,
     },
     {
@@ -42,7 +42,7 @@ export const OrdersOverviewCards = memo(function OrdersOverviewCards({
       value: formatCurrency(metrics.totalRevenue),
       change: metrics.changes.revenue,
       icon: "solar:wallet-money-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
       subtitle: `Costs: ${formatCurrency(metrics.totalCosts)}`,
     },
     {
@@ -50,7 +50,7 @@ export const OrdersOverviewCards = memo(function OrdersOverviewCards({
       value: formatCurrency(metrics.netProfit),
       change: metrics.changes.netProfit,
       icon: "solar:graph-new-up-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
       subtitle: `Margin: ${metrics.grossMargin.toFixed(1)}%`,
     },
     {
@@ -58,7 +58,7 @@ export const OrdersOverviewCards = memo(function OrdersOverviewCards({
       value: formatCurrency(metrics.customerAcquisitionCost),
       change: metrics.changes.cac,
       icon: "solar:bill-list-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
       subtitle: `Tax & Fees: ${formatCurrency(metrics.totalTax)}`,
     },
     {
@@ -66,7 +66,7 @@ export const OrdersOverviewCards = memo(function OrdersOverviewCards({
       value: `${(metrics.fulfillmentRate || 0).toFixed(1)}%`,
       change: metrics.changes.fulfillmentRate,
       icon: "solar:delivery-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
       subtitle: "Orders fulfilled",
     },
   ];

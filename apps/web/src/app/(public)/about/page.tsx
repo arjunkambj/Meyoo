@@ -1,7 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/card";
-import { Divider } from "@heroui/divider";
+import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { designSystem } from "@/libs/design-system";
 import CTAButton from "@/components/home/components/CTAButton";
@@ -35,7 +34,7 @@ export default function AboutPage() {
       <section className={`relative ${designSystem.spacing.section} px-4`}>
         <div className="max-w-4xl mx-auto text-center">
           <div className={designSystem.typography.sectionChip}>
-            <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">
+            <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               About
             </span>
           </div>
@@ -45,7 +44,7 @@ export default function AboutPage() {
           <p className={designSystem.typography.sectionSubtitle}>
             Helping e‑commerce brands track what really matters.
             <br />
-            <span className="text-primary font-medium">Launching October 2025</span>
+            <span className="text-accent font-medium">Launching October 2025</span>
           </p>
         </div>
       </section>
@@ -57,7 +56,7 @@ export default function AboutPage() {
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 text-foreground">Our Story</h2>
             <Card className={`${designSystem.card.base} rounded-3xl p-1.5`}>
-              <CardBody className="p-8">
+              <Card.Content className="p-8">
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
                     We spent years in spreadsheets trying to calculate real
@@ -72,11 +71,11 @@ export default function AboutPage() {
                     always wanted — and opening access in October 2025.
                   </p>
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Divider className="my-12 bg-default-100" />
+          <Separator className="my-12 bg-surface-secondary" />
 
           {/* Our Values */}
           <div className="mb-12">
@@ -87,10 +86,10 @@ export default function AboutPage() {
                   key={value.title}
                   className={`${designSystem.card.base} rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02]`}
                 >
-                  <CardBody className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Card.Content className="p-6">
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
                       <Icon
-                        className="text-primary"
+                        className="text-accent"
                         icon={value.icon}
                         width={24}
                       />
@@ -101,13 +100,13 @@ export default function AboutPage() {
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       {value.description}
                     </p>
-                  </CardBody>
+                  </Card.Content>
                 </Card>
               ))}
             </div>
           </div>
 
-          <Divider className="my-12 bg-default-100" />
+          <Separator className="my-12 bg-surface-secondary" />
 
           {/* Timeline */}
           <div className="mb-12">
@@ -118,22 +117,22 @@ export default function AboutPage() {
                   key={`${milestone.year}-${milestone.event}`}
                   className={`${designSystem.card.base} flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 hover:scale-[1.01]`}
                 >
-                  <div className="w-16 text-primary font-bold">
+                  <div className="w-16 text-accent font-bold">
                     {milestone.year}
                   </div>
-                  <Divider className="h-6 bg-default-100" orientation="vertical" />
+                  <Separator className="h-6 bg-surface-secondary" orientation="vertical" />
                   <p className="text-muted-foreground">{milestone.event}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <Divider className="my-12 bg-default-100" />
+          <Separator className="my-12 bg-surface-secondary" />
 
           {/* Company Info */}
           <div className="mb-12">
             <Card className={`${designSystem.card.base} rounded-3xl p-1.5`}>
-              <CardBody className="p-8">
+              <Card.Content className="p-8">
                 <h3 className="font-semibold text-foreground mb-4">Company</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">
                   Pyro Labs Private Limited
@@ -142,14 +141,14 @@ export default function AboutPage() {
                   <br />
                   Noida, India
                 </p>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
           {/* CTA */}
           <div className="text-center">
             <Card className={`${designSystem.card.base} rounded-3xl p-1.5`}>
-              <CardBody className="p-8">
+              <Card.Content className="p-8">
                 <h3 className="text-2xl font-bold mb-3 text-foreground">
                   Be first to try Meyoo
                 </h3>
@@ -159,7 +158,7 @@ export default function AboutPage() {
                 <CTAButton endIcon="solar:arrow-right-bold" href="/signup">
                   Join the waitlist
                 </CTAButton>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
         </div>

@@ -34,7 +34,6 @@ export function Logo({
   spacing = "md",
   className = "",
   href,
-  ariaLabel,
   mobileStacked = false,
 }: LogoProps) {
   const { image, text, touch } = SIZES[size];
@@ -92,12 +91,7 @@ export function Logo({
   );
 
   return href ? (
-    <Link
-      aria-label={
-        ariaLabel ??
-        (href === "/overview" ? "Go to overview" : "Go to Meyoo home")
-      }
-      className="group inline-flex rounded-lg no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+    <Link       className="group inline-flex rounded-lg no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       href={href}
     >
       {content}

@@ -1,7 +1,6 @@
 "use client";
 
-import { Card } from "@heroui/card";
-import { Skeleton } from "@heroui/skeleton";
+import { Card, Skeleton } from "@heroui/react";
 interface CardSkeletonProps {
   showIcon?: boolean;
   showChart?: boolean;
@@ -61,7 +60,7 @@ export function CardSkeleton({
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-divider">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-surface-tertiary">
           <Skeleton className="h-4 w-20 rounded-lg" />
           <Skeleton className="h-4 w-16 rounded-lg" />
         </div>

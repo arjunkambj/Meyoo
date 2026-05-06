@@ -1,10 +1,7 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Divider } from "@heroui/divider";
+import { Button, Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import type { ComponentProps } from "react";
 
 import type { Frequency, Tier } from "@/components/home/pricing/types";
 import { cn } from "@/libs/utils";
@@ -12,17 +9,15 @@ import { cn } from "@/libs/utils";
 export type PricingTierCardButton = {
   label: string;
   className?: string;
-} & Pick<
-  ComponentProps<typeof Button>,
-  | "color"
-  | "variant"
-  | "onPress"
-  | "isLoading"
-  | "disabled"
-  | "size"
-  | "fullWidth"
-  | "endContent"
->;
+  color?: string;
+  variant?: "solid" | "flat" | "primary" | "secondary" | "tertiary" | "outline" | "danger" | "danger-soft" | "ghost";
+  onPress?: () => void;
+  isLoading?: boolean;
+  disabled?: boolean;
+  size?: "sm" | "md" | "lg";
+  fullWidth?: boolean;
+  endContent?: React.ReactNode;
+};
 
 export type PricingTierCardProps = {
   tier: Tier;
@@ -37,7 +32,7 @@ const highlightClassNames: Record<
   string
 > = {
   active: "border-success ring-2 ring-success/20",
-  popular: "border-primary/70 ring-2 ring-primary/20",
+  popular: "border-accent/70 ring-2 ring-accent/20",
 };
 
 export function PricingTierCard({
@@ -47,6 +42,21 @@ export function PricingTierCard({
   highlight = null,
   className,
 }: PricingTierCardProps) {
+  const {
+    color: _color,
+    disabled,
+    fullWidth: _fullWidth,
+    isLoading,
+    label,
+    variant,
+    ...buttonProps
+  } = button;
+  const buttonVariant =
+    variant === "solid"
+      ? "primary"
+      : variant === "flat"
+        ? "secondary"
+        : variant;
   const price =
     typeof tier.price === "string"
       ? tier.price
@@ -57,23 +67,23 @@ export function PricingTierCard({
     selectedFrequency.priceSuffix;
 
   const cardClassName = cn(
-    "flex h-full w-full flex-col rounded-2xl border bg-content2 dark:bg-content1 shadow-none transition duration-300",
+    "flex h-full w-full flex-col rounded-2xl border bg-surface-secondary dark:bg-surface shadow-none transition duration-300",
     highlight
       ? highlightClassNames[highlight]
-      : "border-default-100 hover:border-primary/30",
+      : "border-surface-tertiary hover:border-accent/30",
     className
   );
 
   return (
-    <Card className={cardClassName} shadow="sm">
-      <CardHeader className="flex flex-col gap-4 py-6">
+    <Card className={cardClassName}>
+      <Card.Header className="flex flex-col gap-4 py-6">
         <div className="flex items-center gap-3">
           <div className="space-y-2">
             <h3 className="text-lg font-semibold text-center tracking-tight text-foreground">
               {tier.title}
             </h3>
             {tier.description ? (
-              <p className="text-sm text-center text-default-500">
+              <p className="text-sm text-center text-muted">
                 {tier.description}
               </p>
             ) : null}
@@ -84,38 +94,40 @@ export function PricingTierCard({
           <div className="text-3xl font-semibold text-center tracking-tight text-foreground">
             {price}
           </div>
-          <div className="text-xs font-medium text-center text-default-500">
+          <div className="text-xs font-medium text-center text-muted">
             {periodCopy}
           </div>
         </div>
 
         <Button
-          {...button}
+          {...buttonProps}
           className={cn("mt-2", button.className)}
-          fullWidth={button.fullWidth ?? true}
+          isDisabled={disabled}
+          isPending={isLoading}
+          variant={buttonVariant}
         >
-          {button.label}
+          {label}
         </Button>
-      </CardHeader>
+      </Card.Header>
 
       {tier.features && tier.features.length > 0 ? (
         <>
-          <Divider className="my-2 bg-default-200" />
-          <CardBody className="flex flex-col px-6 pb-6 pt-2">
+          <Separator className="my-2 bg-surface-tertiary" />
+          <Card.Content className="flex flex-col px-6 pb-6 pt-2">
             <ul className="space-y-3">
               {tier.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-3">
                   <Icon
                     icon="hugeicons:tick-02"
-                    className="mt-0.5 size-5 text-primary/60"
+                    className="mt-0.5 size-5 text-accent/60"
                   />
-                  <span className="text-sm leading-relaxed text-default-600">
+                  <span className="text-sm leading-relaxed text-muted">
                     {feature}
                   </span>
                 </li>
               ))}
             </ul>
-          </CardBody>
+          </Card.Content>
         </>
       ) : null}
     </Card>

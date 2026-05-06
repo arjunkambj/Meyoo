@@ -1,5 +1,5 @@
+import { ToastProvider } from "@heroui/react";
 import "@/styles/globals.css";
-import { ToastProvider } from "@heroui/toast";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { StackProvider } from "@stackframe/stack";

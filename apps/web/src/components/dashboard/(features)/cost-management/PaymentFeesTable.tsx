@@ -1,18 +1,17 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { Skeleton } from "@heroui/skeleton";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
-import { addToast } from "@heroui/toast";
-import { useDisclosure } from "@heroui/use-disclosure";
+import { Button, Input, Modal, Skeleton, Table, toast, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { useCreateTransactionFee, useTransactionFees } from "@/hooks";
 import { TableSkeleton } from "@/components/shared/skeletons";
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 import {
-  DATA_TABLE_HEADER_CLASS,
   DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
@@ -40,7 +39,10 @@ type PaymentFormData = Partial<TransactionCost>;
 
 export default function PaymentFeesTable() {
   const [formData, setFormData] = useState<PaymentFormData>({});
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const overlay = useOverlayState();
+  const isOpen = overlay.isOpen;
+  const onOpen = overlay.open;
+  const onOpenChange = overlay.setOpen;
   // Delete disabled: single processing fee only
 
   const { fees: allTransactionCosts, loading } = useTransactionFees();
@@ -70,18 +72,10 @@ export default function PaymentFeesTable() {
         calculation: "PERCENTAGE",
         description: formData.description,
       });
-      addToast({
-        title: formData._id ? "Payment fee updated" : "Payment fee added",
-        color: "default",
-        timeout: 3000,
-      });
-      onOpenChange();
+      toast(formData._id ? "Payment fee updated" : "Payment fee added", { timeout: 3000 });
+      onOpenChange(false);
     } catch (_error) {
-      addToast({
-        title: "Failed to save",
-        color: "danger",
-        timeout: 3000,
-      });
+      toast.danger("Failed to save", { timeout: 3000 });
     }
   };
 
@@ -92,11 +86,11 @@ export default function PaymentFeesTable() {
       case "name":
         return (
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-default-900">
+            <p className="truncate text-sm font-medium text-muted">
               {item.name || "Payment Processor"}
             </p>
             {item.description ? (
-              <p className="truncate text-xs text-default-500">
+              <p className="truncate text-xs text-muted">
                 {item.description}
               </p>
             ) : null}
@@ -121,7 +115,7 @@ export default function PaymentFeesTable() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={() => handleEdit(item)}
             >
               <Icon icon="solar:pen-linear" width={16} />
@@ -139,9 +133,9 @@ export default function PaymentFeesTable() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Payment Processing Fee</h2>
         {(transactionCosts?.length || 0) === 0 ? (
-          <Button
-            color="primary"
-            startContent={<Icon icon="solar:add-square-bold" width={16} />}
+          <Button variant="primary"
+           
+           
             isDisabled={loading}
             onPress={handleAdd}
           >
@@ -164,110 +158,90 @@ export default function PaymentFeesTable() {
               columns={3}
               showHeader={false}
               showPagination={false}
-              className="border border-default-200/60"
+              className="border border-surface-tertiary/60"
             />
           </div>
         ) : (
-          <Table
-            removeWrapper
-            aria-label="Payment fees table"
-            className={DATA_TABLE_TABLE_CLASS}
-            classNames={{
-              th: DATA_TABLE_HEADER_CLASS,
-              td: "py-2.5 px-3 text-sm text-default-800 align-middle",
-              table: "text-sm",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn key={column.uid}>{column.name}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              emptyContent={
-                <div className="py-10 text-center">
-                  <Icon
-                    className="mx-auto mb-4 text-default-300"
-                    icon="solar:card-bold-duotone"
-                    width={48}
-                  />
-                  <p className="mb-2 text-default-500">
-                    No payment fee configured yet
-                  </p>
-                  <p className="text-small text-default-400">
-                    Set a single processing fee for all transactions
-                  </p>
-                </div>
-              }
-              items={(transactionCosts as TransactionCost[]) || []}
-            >
-              {(item: TransactionCost) => (
-                <TableRow
-                  key={item._id}
-                  className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
-                >
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+          <Table className={DATA_TABLE_TABLE_CLASS}>
+            <Table.ScrollContainer>
+              <Table.Content aria-label="Payment fees table">
+                <TableHeader columns={columns}>
+                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
+                    <TableColumn id={column.uid} isRowHeader={column.uid === "name"}>
+                      {column.name}
+                    </TableColumn>
                   )}
-                </TableRow>
-              )}
-            </TableBody>
+                </TableHeader>
+                <TableBody items={(transactionCosts as TransactionCost[]) || []}>
+                  {(item: TransactionCost) => (
+                    <TableRow
+                      key={item._id}
+                      id={item._id}
+                      className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
+                    >
+                      {(columnKey: unknown) => (
+                        <TableCell>{renderCell(item, String(columnKey))}</TableCell>
+                      )}
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table.Content>
+            </Table.ScrollContainer>
           </Table>
         )}
       </div>
 
-      <Modal isOpen={isOpen} size="lg" onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
+      <Modal>
+        <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
+          <Modal.Container size="lg">
+            <Modal.Dialog>
+          {({ close }) => (
             <>
-              <ModalHeader className="dark:bg-default-50">
+              <Modal.Header className="dark:bg-surface-secondary">
                 {formData._id ? "Edit Payment Fee" : "Set Payment Fee"}
-              </ModalHeader>
-              <ModalBody className="dark:bg-default-50 gap-6">
+              </Modal.Header>
+              <Modal.Body className="dark:bg-surface-secondary gap-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
-                    isRequired
-                    label="Provider Name"
-                    labelPlacement="outside"
-                    value={formData.name || ""}
-                    onValueChange={(value) =>
+                    required
+                                                            value={formData.name || ""}
+                    onChange={(event) => { const value = event.currentTarget.value;
                       setFormData({ ...formData, name: value })
-                    }
+                    }}
                   />
                   <Input
-                    isRequired
-                    endContent="%"
-                    label="Processing Fee (%)"
-                    labelPlacement="outside"
-                    step="0.01"
+                    required
+                                                                                step="0.01"
                     type="number"
                     value={
                       formData.value != null ? formData.value.toString() : ""
                     }
-                    onValueChange={(value) =>
+                    onChange={(event) => { const value = event.currentTarget.value;
                       setFormData({
                         ...formData,
                         value: parseFloat(value) || 0,
                       })
-                    }
+                    }}
                   />
                 </div>
-              </ModalBody>
-              <ModalFooter className="dark:bg-default-50">
-                <Button variant="flat" onPress={onClose}>
+              </Modal.Body>
+              <Modal.Footer className="dark:bg-surface-secondary">
+                <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>
-                <Button
-                  color="primary"
+                <Button variant="primary"
+                 
                   isDisabled={!formData.name || !((formData.value ?? 0) > 0)}
                   onPress={handleSave}
                 >
                   {formData._id ? "Update" : "Add"}
                 </Button>
-              </ModalFooter>
+              </Modal.Footer>
             </>
           )}
-        </ModalContent>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );

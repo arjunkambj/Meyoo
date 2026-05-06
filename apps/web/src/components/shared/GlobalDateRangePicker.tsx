@@ -1,10 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { RangeCalendar } from "@heroui/calendar";
-import { Input } from "@heroui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
-import { Icon } from "@iconify/react";
+import { Button, Input, Popover, RangeCalendar } from "@heroui/react";
 import {
   type CalendarDate,
   type DateValue,
@@ -297,43 +293,28 @@ export default function GlobalDateRangePicker({
   }, [appliedRange, selectedPreset]);
 
   return (
-    <Popover isOpen={isOpen} onOpenChange={setIsOpen} placement="bottom-start">
-      <PopoverTrigger>
-        <Button
-          className={className}
-          size={size}
-          variant="bordered"
-          startContent={
-            <Icon
-              icon="solar:calendar-bold-duotone"
-              width={18}
-              className="text-primary"
-            />
-          }
-          endContent={
-            <Icon
-              icon="solar:alt-arrow-down-line-duotone"
-              width={14}
-              className="text-default-400"
-            />
-          }
-        >
-          {label ? (
-            <div className="flex flex-col items-start">
-              <span className="text-xs text-default-500">{label}</span>
-              <span className="text-sm font-medium">{triggerLabel}</span>
-            </div>
-          ) : (
-            <span className="text-sm font-medium">
-              {triggerLabel || placeholder}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto overflow-hidden rounded-2xl p-0">
-        <div className="flex">
-          <div className="w-44 shrink-0 border-r border-divider bg-content2 p-4">
-            <p className="mb-3 text-xs font-semibold uppercase text-default-500">
+    <Popover isOpen={isOpen} onOpenChange={setIsOpen}>
+      <Button
+        className={className}
+        size={size}
+        variant="outline"
+      >
+        {label ? (
+          <div className="flex flex-col items-start">
+            <span className="text-xs text-muted">{label}</span>
+            <span className="text-sm font-medium">{triggerLabel}</span>
+          </div>
+        ) : (
+          <span className="text-sm font-medium">
+            {triggerLabel || placeholder}
+          </span>
+        )}
+      </Button>
+      <Popover.Content className="w-auto overflow-hidden rounded-2xl p-0" placement="bottom start">
+        <Popover.Dialog className="p-0">
+          <div className="flex">
+          <div className="w-44 shrink-0 border-r border-surface-tertiary bg-surface-secondary p-4">
+            <p className="mb-3 text-xs font-semibold uppercase text-muted">
               Quick ranges
             </p>
             <div className="flex flex-col gap-1">
@@ -343,17 +324,9 @@ export default function GlobalDateRangePicker({
                   <Button
                     key={presetItem.key}
                     size="sm"
-                    variant={isActive ? "flat" : "light"}
-                    color={isActive ? "primary" : "default"}
+                    variant={isActive ? "secondary" : "tertiary"}
                     className="justify-start text-sm"
-                    startContent={
-                      isActive && (
-                        <Icon
-                          icon="solar:check-circle-bold-duotone"
-                          width={16}
-                        />
-                      )
-                    }
+                   
                     onPress={() => handlePresetChange(presetItem.key)}
                   >
                     {presetItem.label}
@@ -363,58 +336,29 @@ export default function GlobalDateRangePicker({
             </div>
           </div>
 
-          <div className="flex-1 bg-content1 px-2 pr-4 py-4">
+          <div className="flex-1 bg-surface px-2 pr-4 py-4">
             <div className="grid grid-cols-2 gap-3 mb-4">
               <Input
-                size="sm"
                 placeholder="Start date"
-                classNames={{
-                  inputWrapper: "shadow-none dark:bg-background",
-                }}
-                value={calendarDateToString(draftRange.start)}
-                onValueChange={(input) => handleInputChange("start", input)}
-                startContent={
-                  <Icon
-                    icon="solar:calendar-minimalistic-bold-duotone"
-                    width={16}
-                    className="text-default-400"
-                  />
-                }
-              />
+                                value={calendarDateToString(draftRange.start)}
+                onChange={(event) => { const input = event.currentTarget.value; handleInputChange("start", input)}}
+                              />
               <Input
-                size="sm"
                 placeholder="End date"
-                classNames={{
-                  inputWrapper: "shadow-none dark:bg-background",
-                }}
-                value={calendarDateToString(draftRange.end)}
-                onValueChange={(input) => handleInputChange("end", input)}
-                startContent={
-                  <Icon
-                    icon="solar:calendar-minimalistic-bold-duotone"
-                    width={16}
-                    className="text-default-400"
-                  />
-                }
-              />
+                                value={calendarDateToString(draftRange.end)}
+                onChange={(event) => { const input = event.currentTarget.value; handleInputChange("end", input)}}
+                              />
             </div>
 
-            <RangeCalendar
-              aria-label="Analytics date range"
-              minValue={minDate}
+            <RangeCalendar               minValue={minDate}
               maxValue={maxDate ?? today(getLocalTimeZone())}
               value={draftRange}
               onChange={handleCalendarChange}
-              visibleMonths={2}
-              classNames={{
-                base: "shadow-none dark:bg-content1",
-                gridWrapper: "gap-6",
-                gridHeader: "shadow-none",
-              }}
-            />
+                          />
           </div>
-        </div>
-      </PopoverContent>
+          </div>
+        </Popover.Dialog>
+      </Popover.Content>
     </Popover>
   );
 }

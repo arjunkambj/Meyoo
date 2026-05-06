@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Icon } from "@iconify/react";
-import Link from "next/link";
+import { Button } from "@heroui/react";
 
 interface CareerApplicationButtonProps {
   positionTitle: string;
@@ -19,15 +17,15 @@ export default function CareerApplicationButton({
   const mailtoLink = `mailto:arjun@meyoo.io?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   return (
-    <Button
-      as={Link}
-      className={className}
-      color="primary"
-      href={mailtoLink}
-      size="md"
-      startContent={<Icon icon="solar:letter-bold-duotone" />}
-    >
-      Apply Now
-    </Button>
+    <a href={mailtoLink}>
+      <Button variant="primary"
+        className={className}
+       
+        size="md"
+       
+      >
+        Apply Now
+      </Button>
+    </a>
   );
 }

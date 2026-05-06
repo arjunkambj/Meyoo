@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardBody } from "@heroui/card";
+import { Card } from "@heroui/react";
 import AvailablePlans from "./AvailablePlans";
 import InvoicesList from "./InvoicesList";
 import PlanOverview from "./PlanOverview";
@@ -8,17 +8,17 @@ export default function BillingSettingsView() {
   return (
     <div className="space-y-6 pb-8">
       {/* Current Plan - Moved to top */}
-      <Card className="rounded-2xl border border-default-100 shadow-none bg-content2 dark:bg-content1">
-        <CardBody className="px-5 py-5">
+      <Card className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary dark:bg-surface">
+        <Card.Content className="px-5 py-5">
           <PlanOverview />
-        </CardBody>
+        </Card.Content>
       </Card>
 
       {/* Billing History */}
-      <Card className="rounded-2xl border border-default-100 shadow-none bg-content2 dark:bg-content1">
-        <CardBody className="p-0">
+      <Card className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary dark:bg-surface">
+        <Card.Content className="p-0">
           <InvoicesList />
-        </CardBody>
+        </Card.Content>
       </Card>
 
       {/* Available Plans (Pricing) - Moved below invoices */}

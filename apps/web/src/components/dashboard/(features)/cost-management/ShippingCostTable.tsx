@@ -1,12 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { Skeleton } from "@heroui/skeleton";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
-import { addToast } from "@heroui/toast";
-import { useDisclosure } from "@heroui/use-disclosure";
+import { Button, Input, Modal, Skeleton, Table, toast, useOverlayState } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 // Delete flow removed; only edit/set single shipping cost
@@ -19,8 +13,13 @@ import {
 import { useUserContext } from "@/contexts/UserContext";
 import { getCurrencySymbol } from "@/libs/utils/format";
 import { TableSkeleton } from "@/components/shared/skeletons";
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 import {
-  DATA_TABLE_HEADER_CLASS,
   DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
@@ -48,7 +47,10 @@ interface ShippingCostItem {
 
 export default function ShippingCostTable() {
   const [formData, setFormData] = useState<ShippingFormData>({});
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const overlay = useOverlayState();
+  const isOpen = overlay.isOpen;
+  const onOpen = overlay.open;
+  const onOpenChange = overlay.setOpen;
 
   const { primaryCurrency } = useUserContext();
   const currency = primaryCurrency;
@@ -101,18 +103,10 @@ export default function ShippingCostTable() {
           });
         }
       }
-      addToast({
-        title: formData._id ? "Shipping rate updated" : "Shipping rate set",
-        color: "default",
-        timeout: 3000,
-      });
-      onOpenChange();
+      toast(formData._id ? "Shipping rate updated" : "Shipping rate set", { timeout: 3000 });
+      onOpenChange(false);
     } catch (_error) {
-      addToast({
-        title: "Failed to save",
-        color: "danger",
-        timeout: 3000,
-      });
+      toast.danger("Failed to save", { timeout: 3000 });
     }
   };
 
@@ -124,7 +118,7 @@ export default function ShippingCostTable() {
         return (
           <div className="flex flex-col">
             <span className="font-medium">{item.name}</span>
-            <span className="text-xs text-default-500">
+            <span className="text-xs text-muted">
               {typeof item.value === "number"
                 ? `Rate: ${getCurrencySymbol(currency)}${item.value.toFixed(2)}`
                 : typeof item.baseRate === "number"
@@ -140,7 +134,7 @@ export default function ShippingCostTable() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={() => handleEdit(item)}
             >
               <Icon icon="solar:pen-linear" width={16} />
@@ -158,9 +152,9 @@ export default function ShippingCostTable() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Shipping Rates</h2>
         {shippingCosts.length === 0 ? (
-          <Button
-            color="primary"
-            startContent={<Icon icon="solar:add-square-bold" width={16} />}
+          <Button variant="primary"
+           
+           
             isDisabled={loading}
             onPress={handleAdd}
           >
@@ -183,107 +177,87 @@ export default function ShippingCostTable() {
               columns={2}
               showHeader={false}
               showPagination={false}
-              className="border border-default-200/60"
+              className="border border-surface-tertiary/60"
             />
           </div>
         ) : (
-          <Table
-            removeWrapper
-            aria-label="Shipping rates table"
-            className={DATA_TABLE_TABLE_CLASS}
-            classNames={{
-              th: DATA_TABLE_HEADER_CLASS,
-              td: "py-2.5 px-3 text-sm text-default-800 align-middle",
-              table: "text-sm",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn key={column.uid}>{column.name}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              emptyContent={
-                <div className="py-10 text-center">
-                  <Icon
-                    className="mx-auto mb-4 text-default-300"
-                    icon="solar:delivery-bold-duotone"
-                    width={48}
-                  />
-                  <p className="mb-2 text-default-500">
-                    No shipping rates added yet
-                  </p>
-                  <p className="text-small text-default-400">
-                    Add shipping rates to track delivery expenses
-                  </p>
-                </div>
-              }
-              items={shippingCosts || []}
-            >
-              {(item: ShippingCostItem) => (
-                <TableRow
-                  key={item._id}
-                  className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
-                >
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+          <Table className={DATA_TABLE_TABLE_CLASS}>
+            <Table.ScrollContainer>
+              <Table.Content aria-label="Shipping costs table">
+                <TableHeader columns={columns}>
+                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
+                    <TableColumn id={column.uid} isRowHeader={column.uid === "name"}>
+                      {column.name}
+                    </TableColumn>
                   )}
-                </TableRow>
-              )}
-            </TableBody>
+                </TableHeader>
+                <TableBody items={shippingCosts || []}>
+                  {(item: ShippingCostItem) => (
+                    <TableRow
+                      key={item._id}
+                      id={item._id}
+                      className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
+                    >
+                      {(columnKey: unknown) => (
+                        <TableCell>{renderCell(item, String(columnKey))}</TableCell>
+                      )}
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table.Content>
+            </Table.ScrollContainer>
           </Table>
         )}
       </div>
 
-      <Modal isOpen={isOpen} size="2xl" onOpenChange={onOpenChange}>
-        <ModalContent>
-          {(onClose) => (
+      <Modal>
+        <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
+          <Modal.Container size="lg">
+            <Modal.Dialog>
+          {({ close }) => (
             <>
-              <ModalHeader className="dark:bg-default-50 mb-3">
+              <Modal.Header className="dark:bg-surface-secondary mb-3">
                 {formData._id ? "Edit Shipping Rate" : "Set Shipping Rate"}
-              </ModalHeader>
-              <ModalBody className="dark:bg-default-50 gap-6">
+              </Modal.Header>
+              <Modal.Body className="dark:bg-surface-secondary gap-6">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
-                    isRequired
-                    label="Name"
-                    labelPlacement="outside"
-                    value={formData.name || ""}
-                    onValueChange={(value) =>
+                    required
+                                                            value={formData.name || ""}
+                    onChange={(event) => { const value = event.currentTarget.value;
                       setFormData({ ...formData, name: value })
-                    }
+                    }}
                   />
                   <Input
-                    isRequired
-                    label="Shipping Rate"
-                    labelPlacement="outside"
-                    startContent={getCurrencySymbol(currency)}
-                    type="number"
+                    required
+                                                                                type="number"
                     value={formData.baseRate?.toString() || ""}
-                    onValueChange={(value) =>
+                    onChange={(event) => { const value = event.currentTarget.value;
                       setFormData({
                         ...formData,
                         baseRate: parseFloat(value) || 0,
                       })
-                    }
+                    }}
                   />
                 </div>
-              </ModalBody>
-              <ModalFooter className="dark:bg-default-50">
-                <Button variant="flat" onPress={onClose}>
+              </Modal.Body>
+              <Modal.Footer className="dark:bg-surface-secondary">
+                <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>
-                <Button
-                  color="primary"
+                <Button variant="primary"
+                 
                   isDisabled={!formData.name}
                   onPress={handleSave}
                 >
                   {formData._id ? "Update" : "Add"}
                 </Button>
-              </ModalFooter>
+              </Modal.Footer>
             </>
           )}
-        </ModalContent>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );

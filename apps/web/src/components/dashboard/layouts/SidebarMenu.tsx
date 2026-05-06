@@ -1,7 +1,7 @@
 "use client";
 
-import { Accordion, AccordionItem } from "@heroui/accordion";
-import { cn } from "@heroui/theme";
+import { cn } from "@heroui/react";
+import { Accordion } from "@heroui/react/accordion";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 import type { Route } from "next";
@@ -53,8 +53,8 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
             "flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200",
             "no-underline group",
             active
-              ? "bg-primary/20 text-primary-600 font-semibold"
-              : "text-default-700 hover:text-foreground hover:bg-default-200/70"
+              ? "bg-accent/20 text-accent-600 font-semibold"
+              : "text-muted hover:text-foreground hover:bg-surface-tertiary/70"
           )}
           href={item.href}
           prefetch={true}
@@ -65,8 +65,8 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
               className={cn(
                 "shrink-0 transition-all w-5 h-5",
                 active
-                  ? "text-primary-600"
-                  : "text-default-700 group-hover:text-foreground"
+                  ? "text-accent-600"
+                  : "text-muted group-hover:text-foreground"
               )}
               icon={item.icon}
             />
@@ -80,45 +80,40 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
 
   const renderCategory = useCallback(
     (category: SidebarItem) => (
-      <AccordionItem
-        key={category.key}
-        aria-label={category.title}
-        classNames={{
-          base: "bg-transparent shadow-none border-none px-0 focus-visible:ring-0 focus:ring-0 ring-0 focus:outline-none",
-          heading: "pr-0 focus-visible:ring-0 focus:ring-0 ring-0",
-          trigger:
-            "px-3 py-0 min-h-10 h-10 rounded-lg hover:bg-default-100 data-[hover=true]:bg-default-100 focus-visible:ring-0 focus:ring-0 ring-0 transition-colors",
-          content: "py-0 pl-0",
-          indicator: "text-default-600 data-[open=true]:rotate-90",
-        }}
-        indicator={
-          <Icon
-            aria-hidden
-            className="transition-transform"
-            icon="solar:alt-arrow-right-linear"
-            width={16}
-          />
-        }
-        title={
-          <div className="flex h-10 items-center gap-2.5">
+      <Accordion.Item key={category.key} id={category.key}>
+        <Accordion.Heading>
+          <Accordion.Trigger className="flex h-10 w-full items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
             {category.icon && (
               <Icon
                 aria-hidden
-                className="text-default-600"
+                className="text-muted"
                 icon={category.icon}
                 width={18}
               />
             )}
-            <span className="text-xs font-bold text-default-700 uppercase tracking-wider">
+            <span className="text-xs font-bold text-muted uppercase tracking-wider">
               {category.title}
             </span>
-          </div>
-        }
-      >
-        <div className="px-1 space-y-1 overflow-hidden mt-1">
-          {category.items?.map(renderMenuItem)}
-        </div>
-      </AccordionItem>
+            </div>
+            <Accordion.Indicator>
+              <Icon
+                aria-hidden
+                className="transition-transform"
+                icon="solar:alt-arrow-right-linear"
+                width={16}
+              />
+            </Accordion.Indicator>
+          </Accordion.Trigger>
+        </Accordion.Heading>
+        <Accordion.Panel>
+          <Accordion.Body>
+            <div className="px-1 space-y-1 overflow-hidden mt-1">
+              {category.items?.map(renderMenuItem)}
+            </div>
+          </Accordion.Body>
+        </Accordion.Panel>
+      </Accordion.Item>
     ),
     [renderMenuItem]
   );
@@ -127,9 +122,9 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
     () => (
       <Accordion
         className="px-0 gap-4"
+        allowsMultipleExpanded
         defaultExpandedKeys={defaultExpandedKeys}
-        selectionMode="multiple"
-        variant="splitted"
+        variant="surface"
       >
         {items.map(renderCategory)}
       </Accordion>

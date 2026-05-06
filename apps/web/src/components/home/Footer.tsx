@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 import { footerNavigation } from "@/constants/navigation/footerNavigation";
@@ -47,7 +47,7 @@ const Footer = () => {
         <footer>
           {/* CTA Section */}
           <div
-            className="mb-16 sm:mb-24 rounded-2xl max-w-6xl mx-auto bg-content1 p-8 sm:p-10 md:p-12 lg:p-16 transition-all duration-300"
+            className="mb-16 sm:mb-24 rounded-2xl max-w-6xl mx-auto bg-surface p-8 sm:p-10 md:p-12 lg:p-16 transition-all duration-300"
           >
             <div className="flex flex-col items-center text-center gap-5">
               <h2 className="max-w-[640px] text-xl leading-tight font-semibold tracking-tight text-balance sm:text-2xl lg:text-3xl text-foreground">
@@ -57,32 +57,32 @@ const Footer = () => {
                 Connect Shopify, add costs, and track profit without the spreadsheet mess.
               </p>
               <div className="mt-6 flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-center sm:gap-4">
-                <Button
-                  as={Link}
-                  href="/signin"
-                  size="lg"
-                  className="group w-full sm:w-auto font-medium"
-                  variant="solid"
-                  color="primary"
-                >
-                  <span className="flex items-center gap-2">
-                    Start 28-day trial
-                    <Icon
-                      icon="solar:arrow-right-linear"
-                      className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                    />
-                  </span>
-                </Button>
-                <Button
-                  as="a"
-                  href="mailto:hey@meyoo.io"
-                  size="lg"
-                  className="w-full sm:w-auto font-medium"
-                  variant="bordered"
-                  color="default"
-                >
-                  Email hey@meyoo.io
-                </Button>
+                <Link href="/sign-in">
+                  <Button
+                    size="lg"
+                    className="group w-full sm:w-auto font-medium"
+                    variant="primary"
+                   
+                  >
+                    <span className="flex items-center gap-2">
+                      Start 28-day trial
+                      <Icon
+                        icon="solar:arrow-right-linear"
+                        className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                      />
+                    </span>
+                  </Button>
+                </Link>
+                <a href="mailto:hey@meyoo.io">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto font-medium"
+                    variant="outline"
+                   
+                  >
+                    Email hey@meyoo.io
+                  </Button>
+                </a>
               </div>
             </div>
           </div>
@@ -108,14 +108,14 @@ const Footer = () => {
                         {link.href?.startsWith("/") ? (
                           <Link
                             href={link.href as Route}
-                            className="inline-block text-sm sm:text-base text-muted-foreground transition-colors duration-300 hover:text-primary"
+                            className="inline-block text-sm sm:text-base text-muted-foreground transition-colors duration-300 hover:text-accent"
                           >
                             {link.name}
                           </Link>
                         ) : (
                           <a
                             href={link.href || "#"}
-                            className="inline-block text-sm sm:text-base text-muted-foreground transition-colors duration-300 hover:text-primary"
+                            className="inline-block text-sm sm:text-base text-muted-foreground transition-colors duration-300 hover:text-accent"
                           >
                             {link.name}
                           </a>
@@ -129,18 +129,16 @@ const Footer = () => {
           </nav>
 
           {/* Bottom Section */}
-          <div className="mx-auto mt-4 border-t border-default-200/70 pt-8">
+          <div className="mx-auto mt-4 border-t border-surface-tertiary/70 pt-8">
             <div className="flex flex-col items-center justify-between gap-6 text-center sm:flex-row sm:text-left">
               <p className="text-sm sm:text-base text-muted-foreground">
                 © 2025 Meyoo Inc. All rights reserved.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-5 sm:justify-end">
                 {socialLinks.map((link) => (
-                  <a
-                    aria-label={link.label}
-                    key={link.href}
+                  <a                     key={link.href}
                     href={link.href}
-                    className="text-muted-foreground transition-all duration-300 hover:text-primary hover:scale-110"
+                    className="text-muted-foreground transition-all duration-300 hover:text-accent hover:scale-110"
                   >
                     <Icon
                       icon={link.icon}

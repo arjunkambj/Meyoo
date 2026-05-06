@@ -1,9 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Skeleton } from "@heroui/skeleton";
-import { Tab, Tabs } from "@heroui/tabs";
-import { Spacer } from "@heroui/spacer";
+import { Button, Skeleton, Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useCallback, useState } from "react";
 import { INTEGRATIONS } from "@/constants/features/integrations";
@@ -139,7 +136,7 @@ export function IntegrationsView() {
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="bg-content2 dark:bg-content1 rounded-2xl border border-default-200/50 p-5"
+          className="bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary/50 p-5"
         >
           <div className="flex items-start gap-3 mb-4">
             <Skeleton className="w-10 h-10 rounded-lg" />
@@ -157,33 +154,47 @@ export function IntegrationsView() {
   return (
     <div className="flex flex-col space-y-6">
       {/* Header */}
-      <Spacer y={0.5} />
+      <div className="h-2" />
       {/* Integration Tabs */}
       <div>
         <Tabs
-          aria-label="Integration tabs"
-          classNames={{
-            base: "w-full",
-            tabList:
-              "gap-0 w-full relative rounded-none p-0 border-b border-divider bg-transparent",
-            tab: "max-w-fit px-6 h-12 rounded-none border-b-2 border-transparent data-[selected=true]:border-primary data-[selected=true]:text-primary font-medium text-default-600 hover:text-default-900 transition-colors",
-            tabContent: "group-data-[selected=true]:text-primary",
-            cursor: "w-full bg-transparent",
-            panel: "pt-6 px-0",
-          }}
           selectedKey={selectedTab}
-          variant="underlined"
+          variant="primary"
           onSelectionChange={(key) => setSelectedTab(String(key))}
         >
-          <Tab
-            key="all"
-            title={
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="Integrations sections">
+              <Tabs.Tab id="all">
               <div className="flex items-center gap-2">
                 <Icon icon="solar:widget-2-bold-duotone" width={18} />
                 <span>All ({allIntegrations.length})</span>
               </div>
-            }
-          >
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="connected">
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:link-circle-bold-duotone" width={18} />
+                <span>Connected ({connectedIntegrations.length})</span>
+              </div>
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="available">
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:add-square-bold-duotone" width={18} />
+                <span>Available ({availableIntegrations.length})</span>
+              </div>
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id="upcoming">
+              <div className="flex items-center gap-2">
+                <Icon icon="solar:hourglass-bold-duotone" width={18} />
+                <span>Upcoming</span>
+              </div>
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListContainer>
+          <Tabs.Panel id="all">
             {loading ? (
               renderLoadingState()
             ) : (
@@ -194,7 +205,7 @@ export function IntegrationsView() {
                     category={integration.category}
                     color={integration.color}
                     description={integration.description}
-                    features={integration.features}
+                                        features={integration.features}
                     icon={integration.icon}
                     isConnected={Boolean(integration.isConnected)}
                     isUpcoming={integration.isUpcoming}
@@ -218,17 +229,8 @@ export function IntegrationsView() {
                 ))}
               </div>
             )}
-          </Tab>
-
-          <Tab
-            key="connected"
-            title={
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:link-circle-bold-duotone" width={18} />
-                <span>Connected ({connectedIntegrations.length})</span>
-              </div>
-            }
-          >
+          </Tabs.Panel>
+          <Tabs.Panel id="connected">
             {loading ? (
               renderLoadingState()
             ) : (
@@ -239,8 +241,8 @@ export function IntegrationsView() {
                       key={integration.id}
                       category={integration.category}
                       color={integration.color}
-                      description={integration.description}
-                      features={integration.features}
+                    description={integration.description}
+                                            features={integration.features}
                       icon={integration.icon}
                       isConnected={true}
                       isUpcoming={integration.isUpcoming}
@@ -260,16 +262,16 @@ export function IntegrationsView() {
                 ) : (
                   <div className="col-span-full text-center py-12">
                     <Icon
-                      className="text-default-300 mx-auto mb-4"
+                      className="text-muted mx-auto mb-4"
                       icon="solar:link-broken-bold-duotone"
                       width={64}
                     />
-                    <p className="text-default-500 mb-4">
+                    <p className="text-muted mb-4">
                       No integrations connected yet
                     </p>
                     <Button
-                      color="primary"
-                      variant="flat"
+                     
+                      variant="tertiary"
                       onPress={() => setSelectedTab("available")}
                     >
                       Browse Available Integrations
@@ -278,17 +280,8 @@ export function IntegrationsView() {
                 )}
               </div>
             )}
-          </Tab>
-
-          <Tab
-            key="available"
-            title={
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:add-square-bold-duotone" width={18} />
-                <span>Available ({availableIntegrations.length})</span>
-              </div>
-            }
-          >
+          </Tabs.Panel>
+          <Tabs.Panel id="available">
             {loading ? (
               renderLoadingState()
             ) : (
@@ -299,8 +292,8 @@ export function IntegrationsView() {
                       key={integration.id}
                       category={integration.category}
                       color={integration.color}
-                      description={integration.description}
-                      features={integration.features}
+                    description={integration.description}
+                                            features={integration.features}
                       icon={integration.icon}
                       isConnected={false}
                       isUpcoming={integration.isUpcoming}
@@ -323,46 +316,33 @@ export function IntegrationsView() {
                       icon="solar:check-circle-bold-duotone"
                       width={64}
                     />
-                    <p className="text-default-500">
+                    <p className="text-muted">
                       All available integrations are connected!
                     </p>
-                    <p className="text-sm text-default-400 mt-2">
+                    <p className="text-sm text-muted mt-2">
                       Use the button below to request new integrations
                     </p>
                   </div>
                 )}
               </div>
             )}
-          </Tab>
-
-          <Tab
-            key="upcoming"
-            title={
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:hourglass-bold-duotone" width={18} />
-                <span>Upcoming</span>
-              </div>
-            }
-          >
+          </Tabs.Panel>
+          <Tabs.Panel id="upcoming">
             <UpcomingIntegrations />
-          </Tab>
+          </Tabs.Panel>
         </Tabs>
 
         {/* Request Integration Button */}
         <div className="md:mt-20 mt-8 flex flex-col items-center gap-3">
           <div className="text-center">
-            <p className="text-sm text-default-600 ">
+            <p className="text-sm text-muted ">
               Can&apos;t find the integration you need?
             </p>
           </div>
           <Button
-            color="primary"
-            radius="full"
             size="lg"
-            startContent={
-              <Icon icon="solar:add-square-bold-duotone" width={22} />
-            }
-            variant="shadow"
+           
+            variant="primary"
             onPress={() => setShowRequestModal(true)}
           >
             Request New Integration

@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Input, Textarea } from "@heroui/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
+import { Button, Input, Modal, TextArea } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 
@@ -115,28 +113,22 @@ export function RequestIntegrationModal({
   };
 
   return (
-    <Modal
-      hideCloseButton={isSubmitting}
-      isDismissable={!isSubmitting}
-      isOpen={isOpen}
-      className="bg-default-50"
-      scrollBehavior="inside"
-      size="2xl"
-      onClose={handleClose}
-    >
-      <ModalContent>
-        {(_onClose) => (
+    <Modal>
+      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => !open && handleClose()}>
+        <Modal.Container scroll="inside" size="lg">
+          <Modal.Dialog className="bg-surface-secondary">
+        {() => (
           <>
-            <ModalHeader className="flex items-center gap-2">
+            <Modal.Header className="flex items-center gap-2">
               <Icon
-                className="text-primary"
+                className="text-accent"
                 icon="solar:add-square-bold-duotone"
                 width={24}
               />
               <span>Request New Integration</span>
-            </ModalHeader>
+            </Modal.Header>
 
-            <ModalBody className="bg-default-50 gap-6 pb-6">
+            <Modal.Body className="bg-surface-secondary gap-6 pb-6">
               {error && (
                 <div className="bg-danger/10 border border-danger/20 rounded-lg p-3 flex items-start gap-2">
                   <Icon
@@ -149,37 +141,18 @@ export function RequestIntegrationModal({
               )}
 
               <Input
-                isRequired
-                description="Name of the platform you want to integrate"
-                errorMessage={formErrors.platformName}
-                isDisabled={isSubmitting}
-                isInvalid={!!formErrors.platformName}
-                label="Platform Name"
-                labelPlacement="outside"
-                placeholder="e.g., QuickBooks, Klaviyo, TikTok Shop"
-                startContent={
-                  <Icon
-                    className="text-default-400"
-                    icon="solar:widget-2-bold"
-                    width={18}
-                  />
-                }
-                value={formData.platformName}
+                required
+                                                disabled={isSubmitting}
+                                                                placeholder="e.g., QuickBooks, Klaviyo, TikTok Shop"
+                                value={formData.platformName}
                 onChange={(e) =>
                   handleInputChange("platformName", e.target.value)
                 }
               />
 
-              <Textarea
-                isRequired
-                description="Help us understand what this integration would do"
-                errorMessage={formErrors.description}
-                isDisabled={isSubmitting}
-                isInvalid={!!formErrors.description}
-                label="Description"
-                labelPlacement="outside"
-                maxRows={3}
-                minRows={2}
+              <TextArea
+                required
+                                                disabled={isSubmitting}
                 placeholder="Briefly describe what this platform does and why you need it"
                 value={formData.description}
                 onChange={(e) =>
@@ -189,13 +162,13 @@ export function RequestIntegrationModal({
 
               {/* Simplified form: no use case, impact, priority or category */}
 
-              <div className="bg-default-100 rounded-lg p-3 flex items-start gap-2">
+              <div className="bg-surface-secondary rounded-lg p-3 flex items-start gap-2">
                 <Icon
-                  className="text-default-500 mt-0.5"
+                  className="text-muted mt-0.5"
                   icon="solar:info-circle-bold"
                   width={18}
                 />
-                <div className="text-xs text-default-600">
+                <div className="text-xs text-muted">
                   <p className="font-medium mb-1">What happens next?</p>
                   <ul className="space-y-0.5">
                     <li>• We&apos;ll review your request within 48 hours</li>
@@ -207,33 +180,31 @@ export function RequestIntegrationModal({
                   </ul>
                 </div>
               </div>
-            </ModalBody>
+            </Modal.Body>
 
-            <ModalFooter>
+            <Modal.Footer>
               <Button
-                color="default"
+               
                 isDisabled={isSubmitting}
-                variant="flat"
+                variant="tertiary"
                 onPress={handleClose}
               >
                 Cancel
               </Button>
-              <Button
-                color="primary"
-                isLoading={isSubmitting}
-                startContent={
-                  !isSubmitting && (
-                    <Icon icon="solar:send-square-bold" width={18} />
-                  )
-                }
+              <Button variant="primary"
+               
+                isPending={isSubmitting}
+               
                 onPress={handleSubmit}
               >
                 {isSubmitting ? "Submitting..." : "Submit Request"}
               </Button>
-            </ModalFooter>
+            </Modal.Footer>
           </>
         )}
-      </ModalContent>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

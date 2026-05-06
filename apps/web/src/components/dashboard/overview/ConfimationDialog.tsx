@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
+import { Button, Modal } from "@heroui/react";
 type ConfirmationDialogProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -24,31 +23,35 @@ export function ConfirmationDialog({
   variant = "danger",
 }: ConfirmationDialogProps) {
   return (
-    <Modal isOpen={isOpen} onOpenChange={onClose}>
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-            <ModalBody className="bg-default-50 gap-6">
-              <p className="text-default-600">{description}</p>
-            </ModalBody>
-            <ModalFooter>
-              <Button color="default" variant="light" onPress={onClose}>
-                {cancelText}
-              </Button>
-              <Button
-                color={variant === "danger" ? "danger" : "warning"}
-                onPress={() => {
-                  onConfirm();
-                  onClose();
-                }}
-              >
-                {confirmText}
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
+    <Modal>
+      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Modal.Container>
+          <Modal.Dialog>
+            {({ close }) => (
+              <>
+                <Modal.Header className="flex flex-col gap-1">{title}</Modal.Header>
+                <Modal.Body className="bg-surface-secondary gap-6">
+                  <p className="text-muted">{description}</p>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="tertiary" onPress={close}>
+                    {cancelText}
+                  </Button>
+                  <Button
+                    variant={variant === "danger" ? "danger" : "secondary"}
+                    onPress={() => {
+                      onConfirm();
+                      close();
+                    }}
+                  >
+                    {confirmText}
+                  </Button>
+                </Modal.Footer>
+              </>
+            )}
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

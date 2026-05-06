@@ -1,10 +1,6 @@
 "use client";
 
-import { Card } from "@heroui/card";
-import { Divider } from "@heroui/divider";
-import { Skeleton } from "@heroui/skeleton";
-import { cn } from "@heroui/theme";
-import { Tooltip } from "@heroui/tooltip";
+import { Card, cn, Separator, Skeleton, Tooltip } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import React, { useMemo } from "react";
 
@@ -38,7 +34,7 @@ export interface KPISkeletonProps {
 }
 
 const KPI_CARD_BASE_CLASS =
-  "bg-content2 dark:bg-content1 rounded-2xl border border-default-100 w-full overflow-hidden shadow-none";
+  "bg-surface-secondary dark:bg-surface rounded-2xl border border-surface-tertiary w-full overflow-hidden shadow-none";
 const KPI_CARD_PADDING = "py-4 px-5";
 const KPI_SIZE_CLASSES: Record<KPISize, string> = {
   small: "col-span-1",
@@ -98,7 +94,6 @@ export const KPISkeleton = React.memo(function KPISkeleton({
         KPI_SIZE_CLASSES[size],
         className
       )}
-      shadow="none"
     >
       <div className="flex h-full min-w-0 flex-col">
         <div className="mb-2.5 flex items-start justify-between gap-2">
@@ -132,7 +127,7 @@ export const KPISkeleton = React.memo(function KPISkeleton({
           )}
         </div>
 
-        <Divider className="mt-3.5 mb-1.5 bg-default-200" />
+        <Separator className="mt-3.5 mb-1.5 bg-surface-tertiary" />
 
         {showChangeIndicator && (
           <div className="flex items-center justify-between">
@@ -155,7 +150,7 @@ const KPI = React.memo(function KPI({
   change,
   changeType,
   icon,
-  iconColor = "text-default-500",
+  iconColor = "text-muted",
   loading = false,
   className,
   size = "small",
@@ -227,12 +222,11 @@ const KPI = React.memo(function KPI({
         KPI_SIZE_CLASSES[size],
         className
       )}
-      shadow="none"
     >
       <div className="flex h-full min-w-0 flex-col justify-between">
         {/* Header with title and icon */}
         <div className="flex items-start justify-between mb-3 gap-3">
-          <span className="text-sm font-semibold text-default-700 truncate flex-1">
+          <span className="text-sm font-semibold text-muted truncate flex-1">
             {title}
           </span>
           {icon && (
@@ -246,7 +240,7 @@ const KPI = React.memo(function KPI({
         <div className="flex-1 min-w-0 mb-3">
           <div
             className={cn(
-              "font-bold tracking-tight tabular-nums text-default-900 truncate",
+              "font-bold tracking-tight tabular-nums text-muted truncate",
               KPI_VALUE_TEXT_CLASSES[size]
             )}
           >
@@ -262,9 +256,9 @@ const KPI = React.memo(function KPI({
         {/* Change indicator at bottom */}
         {changeData && (
           <>
-            <Divider className="mb-2 bg-default-200" />
+            <Separator className="mb-2 bg-surface-tertiary" />
             <div className="flex items-center justify-between">
-              <div className="text-xs font-medium text-default-500">
+              <div className="text-xs font-medium text-muted">
                 vs last period
               </div>
               <div
@@ -274,7 +268,7 @@ const KPI = React.memo(function KPI({
                     ? "text-success-600"
                     : changeData.type === "neutral"
                       ? "text-warning-600"
-                      : "text-danger-600"
+                      : "text-danger"
                 )}
               >
                 <span>{changeData.text}</span>
@@ -289,8 +283,9 @@ const KPI = React.memo(function KPI({
   // Wrap with tooltip if provided
   if (tooltip) {
     return (
-      <Tooltip closeDelay={0} content={tooltip}>
-        {cardContent}
+      <Tooltip closeDelay={0}>
+        <Tooltip.Trigger>{cardContent}</Tooltip.Trigger>
+        <Tooltip.Content>{tooltip}</Tooltip.Content>
       </Tooltip>
     );
   }

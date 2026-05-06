@@ -66,7 +66,7 @@ const Feature = () => {
         className={`${designSystem.spacing.container} flex w-full flex-col items-center justify-center`}
       >
         <div className={designSystem.typography.sectionChip}>
-          <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">
+          <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
             Features
           </span>
         </div>
@@ -83,7 +83,7 @@ const Feature = () => {
               key={item.id}
               className={`${designSystem.card.base} group relative flex h-full flex-col overflow-hidden rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02] ${featureCardSpan(index)}`}
             >
-              <div className={`relative ${featureImageArea(index)} overflow-hidden rounded-[20px] bg-gradient-to-br from-primary/10 via-primary/5 to-transparent`}>
+              <div className={`relative ${featureImageArea(index)} overflow-hidden rounded-[20px] bg-gradient-to-br from-accent/10 via-accent/5 to-transparent`}>
                 <Image
                   src={item.image}
                   alt=""

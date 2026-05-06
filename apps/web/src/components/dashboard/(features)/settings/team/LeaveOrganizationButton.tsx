@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { addToast } from "@heroui/toast";
+import { Button, Modal, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -25,16 +23,16 @@ export default function LeaveOrganizationButton() {
     try {
       const res = await leaveOrg({});
       if (res.success) {
-        addToast({ title: "Left organization successfully", color: "default" });
+        toast("Left organization successfully");
         // Redirect to onboarding
         router.push("/onboarding/shopify");
       } else {
-        addToast({ title: res.message, color: "danger" });
+        toast.danger(res.message);
       }
     } catch (e) {
       const msg =
         e instanceof Error ? e.message : "Failed to leave organization";
-      addToast({ title: msg, color: "danger" });
+      toast.danger(msg);
     } finally {
       setLoading(false);
       setOpen(false);
@@ -46,44 +44,48 @@ export default function LeaveOrganizationButton() {
 
   return (
     <>
-      <Button
-        color="danger"
-        startContent={<Icon icon="solar:logout-2-bold-duotone" width={18} />}
+      <Button variant="danger"
+       
+       
         onPress={() => setOpen(true)}
       >
         Leave Organization
       </Button>
 
-      <Modal isOpen={open} onOpenChange={setOpen} placement="center" size="md">
-        <ModalContent>
-          {(onClose) => (
+      <Modal>
+        <Modal.Backdrop isOpen={open} onOpenChange={setOpen}>
+          <Modal.Container placement="center" size="md">
+            <Modal.Dialog>
+          {({ close }) => (
             <>
-              <ModalHeader className="flex items-center gap-2">
+              <Modal.Header className="flex items-center gap-2">
                 <Icon
                   className="text-danger"
                   icon="solar:warning-triangle-bold-duotone"
                   width={20}
                 />
                 <span>Leave Organization</span>
-              </ModalHeader>
-              <ModalBody>
-                <p className="text-sm text-default-600">
+              </Modal.Header>
+              <Modal.Body>
+                <p className="text-sm text-muted">
                   Are you sure you want to leave this organization? You will
                   lose access to its data. A new personal organization will be
                   created for you, like a fresh signup.
                 </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="tertiary" onPress={close}>
                   Cancel
                 </Button>
-                <Button color="danger" isLoading={loading} onPress={onConfirm}>
+                <Button variant="danger" isPending={loading} onPress={onConfirm}>
                   Yes, Leave
                 </Button>
-              </ModalFooter>
+              </Modal.Footer>
             </>
           )}
-        </ModalContent>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );

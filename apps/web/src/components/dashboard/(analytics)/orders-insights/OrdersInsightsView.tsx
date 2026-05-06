@@ -1,7 +1,6 @@
 "use client";
 
-import { Skeleton } from "@heroui/skeleton";
-import { Spacer } from "@heroui/spacer";
+import { Skeleton } from "@heroui/react";
 import { memo, useCallback } from "react";
 import { AnalyticsHeader } from "@/components/shared/AnalyticsHeader";
 import GlobalDateRangePicker from "@/components/shared/GlobalDateRangePicker";
@@ -31,7 +30,7 @@ export const OrdersInsightsView = memo(function OrdersInsightsView() {
 
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <Spacer y={0.5} />
+      <div className="h-2" />
       <AnalyticsHeader
         leftActions={
           <GlobalDateRangePicker

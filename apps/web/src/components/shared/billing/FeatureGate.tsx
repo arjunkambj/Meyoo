@@ -1,7 +1,6 @@
 "use client";
 
-import { Button, type ButtonProps } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
+import { Button, Card, type ButtonProps } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import type { ReactNode } from "react";
 
@@ -33,7 +32,7 @@ export function FeatureGate({
         <div className="opacity-50 pointer-events-none">{children}</div>
         <div className="absolute inset-0 flex items-center justify-center bg-background/50 rounded-lg">
           <Card className="border-warning/20 bg-warning/10">
-            <CardBody className="p-4 text-center">
+            <Card.Content className="p-4 text-center">
               <Icon
                 className="text-warning mx-auto mb-2"
                 icon="solar:info-circle-bold"
@@ -42,7 +41,7 @@ export function FeatureGate({
               <p className="text-sm font-medium text-foreground">
                 Feature temporarily disabled
               </p>
-            </CardBody>
+            </Card.Content>
           </Card>
         </div>
       </div>
@@ -63,7 +62,7 @@ export function FeatureGate({
   if (!hasAccess && upgradeRequired && showUpgradePrompt) {
     return (
       <Card className="border-warning/20">
-        <CardBody className="p-6">
+        <Card.Content className="p-6">
           <div className="flex items-start gap-4">
             <Icon
               className="text-warning shrink-0"
@@ -75,19 +74,15 @@ export function FeatureGate({
                 <h4 className="text-lg font-semibold text-foreground mb-1">
                   Upgrade Required
                 </h4>
-                <p className="text-sm text-default-600">{reason}</p>
+                <p className="text-sm text-muted">{reason}</p>
               </div>
 
               <div className="flex gap-3">
                 <Button
-                  color="warning"
-                  isLoading={upgradeLoading}
-                  startContent={
-                    upgradeLoading ? null : (
-                      <Icon icon="solar:crown-star-bold" width={16} />
-                    )
-                  }
-                  variant="solid"
+                 
+                  isPending={upgradeLoading}
+                 
+                  variant="primary"
                   onPress={() => {
                     // Handle upgrade - could redirect to billing page
                     console.log(
@@ -99,8 +94,8 @@ export function FeatureGate({
                 </Button>
 
                 <Button
-                  color="default"
-                  variant="flat"
+                 
+                  variant="tertiary"
                   onPress={() => {
                     // Navigate to billing page
                     window.location.href = "/settings/billing-invoices";
@@ -111,7 +106,7 @@ export function FeatureGate({
               </div>
             </div>
           </div>
-        </CardBody>
+        </Card.Content>
       </Card>
     );
   }
@@ -122,9 +117,9 @@ export function FeatureGate({
       <div className="opacity-30 pointer-events-none">{children}</div>
       <div className="absolute inset-0 flex items-center justify-center bg-background/30 rounded-lg">
         <Card className="border-default/20 bg-default/10">
-          <CardBody className="p-4 text-center">
+          <Card.Content className="p-4 text-center">
             <Icon
-              className="text-default-400 mx-auto mb-2"
+              className="text-muted mx-auto mb-2"
               icon="solar:lock-bold"
               width={24}
             />
@@ -132,9 +127,9 @@ export function FeatureGate({
               Feature not available
             </p>
             {reason && (
-              <p className="text-xs text-default-500 mt-1">{reason}</p>
+              <p className="text-xs text-muted mt-1">{reason}</p>
             )}
-          </CardBody>
+          </Card.Content>
         </Card>
       </div>
     </div>
@@ -180,15 +175,15 @@ export function FeatureGatedButton({
   onUpgrade,
   ...buttonProps
 }: FeatureGatedButtonProps) {
-  const { hasAccess, reason, upgradeRequired } = useFeatureAccess(feature);
+  const { hasAccess, upgradeRequired } = useFeatureAccess(feature);
 
   if (!hasAccess && upgradeRequired) {
     return (
       <Button
         {...buttonProps}
-        color="warning"
-        startContent={<Icon icon="solar:crown-star-bold" width={16} />}
-        variant="flat"
+       
+       
+        variant="tertiary"
         onPress={
           onUpgrade ||
           (() => {
@@ -205,8 +200,7 @@ export function FeatureGatedButton({
   return (
     <Button
       {...buttonProps}
-      disabled={!hasAccess || buttonProps.disabled}
-      title={!hasAccess ? reason : buttonProps.title}
+      isDisabled={!hasAccess || buttonProps.isDisabled}
     >
       {children}
     </Button>

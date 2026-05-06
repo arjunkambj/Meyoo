@@ -1,7 +1,5 @@
 "use client";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Tab, Tabs } from "@heroui/tabs";
+import { Button, Chip, Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { useMemo, useState } from "react";
@@ -95,23 +93,28 @@ export default function AvailablePlans() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-default-800">
+        <h3 className="text-base font-semibold text-muted">
           Upgrade Plan
         </h3>
         {/* Frequency Toggle - Inline */}
-        <Tabs radius="full" size="sm" onSelectionChange={onFrequencyChange}>
-          <Tab key={FrequencyEnum.Monthly} title="Monthly" />
-          <Tab
-            key={FrequencyEnum.Yearly}
-            title={
-              <div className="flex items-center gap-1.5">
-                <span>Yearly</span>
-                <Chip color="success" size="sm" variant="flat">
-                  -25%
-                </Chip>
-              </div>
-            }
-          />
+        <Tabs onSelectionChange={onFrequencyChange}>
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="Billing frequency">
+              <Tabs.Tab id={FrequencyEnum.Monthly}>
+                Monthly
+                <Tabs.Indicator />
+              </Tabs.Tab>
+              <Tabs.Tab id={FrequencyEnum.Yearly}>
+                <div className="flex items-center gap-1.5">
+                  <span>Yearly</span>
+                  <Chip size="sm" variant="soft">
+                    -25%
+                  </Chip>
+                </div>
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListContainer>
         </Tabs>
       </div>
 
@@ -129,10 +132,10 @@ export default function AvailablePlans() {
                 Billing Error: {error}
               </p>
               <Button
-                color="danger"
+               
                 size="sm"
-                startContent={<Icon icon="solar:refresh-bold-duotone" width={14} />}
-                variant="flat"
+               
+                variant="tertiary"
                 className="h-6 text-xs px-2"
                 onPress={clearError}
               >
@@ -215,7 +218,7 @@ export default function AvailablePlans() {
             icon="solar:gift-bold-duotone"
             width={16}
           />
-          <p className="text-xs text-default-700">
+          <p className="text-xs text-muted">
             <span className="font-medium text-foreground">
               Free for small stores:
             </span>{" "}

@@ -1,17 +1,15 @@
 "use client";
 
+import { Button, Card, Separator, Switch } from "@heroui/react";
 import React, { useMemo, useState } from "react";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Divider } from "@heroui/divider";
-import { Switch } from "@heroui/switch";
 import { Icon } from "@iconify/react";
 import { frequencies, tiers } from "./pricing/constants";
 import { type Frequency, FrequencyEnum, TiersEnum } from "./pricing/types";
 import { designSystem } from "@/libs/design-system";
+import type { Route } from "next";
 import Link from "next/link";
-import { NumberTicker } from "@/components/ui/number-ticker";
+import { NumberTicker } from "@/components/shared/NumberTicker";
 
 const usePrevious = <T,>(value: T) => {
   const ref = React.useRef<T>(value);
@@ -52,7 +50,7 @@ const Pricing = () => {
   const [billingCycle, setBillingCycle] = useState<FrequencyEnum>(
     FrequencyEnum.Monthly
   );
-  const previousBillingCycle = usePrevious(billingCycle);
+  usePrevious(billingCycle);
 
   const selectedFrequency = useMemo<Frequency>(
     () =>
@@ -71,7 +69,7 @@ const Pricing = () => {
       >
         <div className="flex flex-col items-center text-center">
           <div className={designSystem.typography.sectionChip}>
-            <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">
+            <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Plans
             </span>
           </div>
@@ -93,7 +91,7 @@ const Pricing = () => {
           </span>
           <Switch
             isSelected={billingCycle === FrequencyEnum.Yearly}
-            onValueChange={(isSelected) => {
+            onChange={(isSelected) => {
               setBillingCycle(
                 isSelected ? FrequencyEnum.Yearly : FrequencyEnum.Monthly
               );
@@ -116,11 +114,11 @@ const Pricing = () => {
           <Card
             className={`mx-auto w-full max-w-3xl ${designSystem.card.base} rounded-3xl p-1.5 shadow-none`}
           >
-            <CardBody className="flex flex-col gap-2 rounded-[20px] bg-background px-6 py-3 md:flex-row md:items-center md:justify-between">
+            <Card.Content className="flex flex-col gap-2 rounded-[20px] bg-background px-6 py-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-2.5">
                 <Icon
                   icon="solar:bolt-bold"
-                  className="size-10 shrink-0 text-primary"
+                  className="size-10 shrink-0 text-accent"
                 />
                 <div className="space-y-0.5">
                   <h3 className="text-lg font-semibold tracking-tight text-foreground">
@@ -133,44 +131,34 @@ const Pricing = () => {
               </div>
 
               <div className="flex shrink-0 items-center">
-                <Button
-                  as={Link}
-                  className="h-10 font-semibold transition-all duration-200 active:scale-100"
-                  color={freeTier.buttonColor}
-                  href={freeTier.href}
-                  variant={freeTier.buttonVariant}
-                  size="md"
-                >
-                  {freeTier.buttonText}
-                </Button>
+                <Link href={freeTier.href as Route}>
+                  <Button
+                    className="h-10 font-semibold transition-all duration-200 active:scale-100"
+                    variant={freeTier.buttonVariant}
+                    size="md"
+                  >
+                    {freeTier.buttonText}
+                  </Button>
+                </Link>
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
         ) : null}
 
         <div className="grid items-stretch gap-6 md:grid-cols-3">
           {paidTiers.map((tier) => {
             const price = getTierPrice(tier, billingCycle);
-            const previousPrice = getTierPrice(
-              tier,
-              previousBillingCycle ?? billingCycle
-            );
             const periodCopy =
               tier.period?.[billingCycle] ?? selectedFrequency.priceSuffix;
             const currentPriceValue = parsePrice(price);
-            const previousPriceValue = parsePrice(previousPrice);
-            const shouldAnimate =
-              Number.isFinite(currentPriceValue) &&
-              Number.isFinite(previousPriceValue);
-            const tickerDirection =
-              currentPriceValue >= previousPriceValue ? "up" : "down";
+            const shouldAnimate = Number.isFinite(currentPriceValue);
 
             return (
               <Card
                 key={tier.key}
                 className={`flex h-full w-full flex-col ${designSystem.card.base} rounded-3xl p-1.5 transition-all duration-300 shadow-none overflow-hidden`}
               >
-                <CardHeader className="flex flex-col gap-3 py-5 px-6 bg-background rounded-[20px]">
+                <Card.Header className="flex flex-col gap-3 py-5 px-6 bg-background rounded-[20px]">
                   <div className="text-center space-y-1.5">
                     <h3 className="text-lg font-semibold tracking-tight text-foreground">
                       {tier.title}
@@ -188,9 +176,7 @@ const Pricing = () => {
                           </span>
                           <NumberTicker
                             value={currentPriceValue}
-                            startValue={previousPriceValue}
                             decimalPlaces={0}
-                            direction={tickerDirection}
                           />
                         </>
                       ) : (
@@ -204,28 +190,27 @@ const Pricing = () => {
                     </div>
                   </div>
 
-                  <Button
-                    as={Link}
-                    className="w-full h-10 font-semibold transition-all duration-200 active:scale-100"
-                    color={tier.buttonColor}
-                    href={tier.href}
-                    variant={tier.buttonVariant}
-                    size="md"
-                  >
-                    {tier.buttonText}
-                  </Button>
-                </CardHeader>
+                  <Link href={tier.href as Route} className="w-full">
+                    <Button
+                      className="w-full h-10 font-semibold transition-all duration-200 active:scale-100"
+                      variant={tier.buttonVariant}
+                      size="md"
+                    >
+                      {tier.buttonText}
+                    </Button>
+                  </Link>
+                </Card.Header>
 
-                <Divider className="my-0 bg-default-100" />
+                <Separator className="my-0 bg-surface-secondary" />
 
-                <CardBody className="flex flex-1 flex-col px-6 pb-8 pt-4">
+                <Card.Content className="flex flex-1 flex-col px-6 pb-8 pt-4">
                   <div className="flex-1">
                     <ul className="space-y-4">
                       {tier.features?.map((feature) => (
                         <li key={feature} className="flex items-start gap-3">
                           <Icon
                             icon="hugeicons:tick-02"
-                            className="mt-0.5 size-5 shrink-0 text-primary"
+                            className="mt-0.5 size-5 shrink-0 text-accent"
                           />
                           <span className="text-sm leading-relaxed text-muted-foreground">
                             {feature}
@@ -234,7 +219,7 @@ const Pricing = () => {
                       ))}
                     </ul>
                   </div>
-                </CardBody>
+                </Card.Content>
               </Card>
             );
           })}

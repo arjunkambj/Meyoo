@@ -22,30 +22,22 @@ export function OtpInput({
 }: OtpInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const focusInput = useCallback(
-    (index: number) => {
-      const input = inputRefs.current[index];
-      if (input) {
-        input.focus();
-        input.select();
-      }
-    },
-    [],
-  );
+  const focusInput = useCallback((index: number) => {
+    const input = inputRefs.current[index];
+    input?.focus();
+    input?.select();
+  }, []);
 
   const handleChange = useCallback(
     (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
       const char = e.target.value.slice(-1).toUpperCase();
       if (!char) return;
 
-      const newValue = value.split("");
-      newValue[index] = char;
-      const updated = newValue.join("").slice(0, length);
-      onChange(updated);
+      const nextValue = value.split("");
+      nextValue[index] = char;
+      onChange(nextValue.join("").slice(0, length));
 
-      if (index < length - 1 && char) {
-        focusInput(index + 1);
-      }
+      if (index < length - 1) focusInput(index + 1);
     },
     [value, onChange, length, focusInput],
   );
@@ -54,19 +46,26 @@ export function OtpInput({
     (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Backspace") {
         e.preventDefault();
-        const newValue = value.split("");
+        const nextValue = value.split("");
         if (value[index]) {
-          newValue[index] = "";
-          onChange(newValue.join(""));
-        } else if (index > 0) {
-          newValue[index - 1] = "";
-          onChange(newValue.join(""));
+          nextValue[index] = "";
+          onChange(nextValue.join(""));
+          return;
+        }
+
+        if (index > 0) {
+          nextValue[index - 1] = "";
+          onChange(nextValue.join(""));
           focusInput(index - 1);
         }
-      } else if (e.key === "ArrowLeft" && index > 0) {
+      }
+
+      if (e.key === "ArrowLeft" && index > 0) {
         e.preventDefault();
         focusInput(index - 1);
-      } else if (e.key === "ArrowRight" && index < length - 1) {
+      }
+
+      if (e.key === "ArrowRight" && index < length - 1) {
         e.preventDefault();
         focusInput(index + 1);
       }
@@ -77,10 +76,12 @@ export function OtpInput({
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
-      const pasted = e.clipboardData.getData("text").toUpperCase().slice(0, length);
+      const pasted = e.clipboardData
+        .getData("text")
+        .toUpperCase()
+        .slice(0, length);
       onChange(pasted);
-      const nextEmpty = Math.min(pasted.length, length - 1);
-      focusInput(nextEmpty);
+      focusInput(Math.min(pasted.length, length - 1));
     },
     [onChange, length, focusInput],
   );
@@ -95,11 +96,9 @@ export function OtpInput({
           }}
           className={cn(
             "flex h-12 w-11 items-center justify-center rounded-lg border bg-background text-center text-lg font-semibold tracking-widest transition-colors",
-            "focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20",
+            "focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20",
             "disabled:cursor-not-allowed disabled:opacity-50",
-            value[index]
-              ? "border-foreground/20"
-              : "border-default-200",
+            value[index] ? "border-foreground/20" : "border-surface-tertiary",
           )}
           disabled={disabled}
           inputMode="text"

@@ -1,6 +1,6 @@
 "use client";
 
-import { Drawer, DrawerBody, DrawerContent } from "@heroui/drawer";
+import { Drawer } from "@heroui/react";
 import { useAtom } from "jotai";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@/hooks";
@@ -57,7 +57,7 @@ const Sidebar = React.memo(({ className }: { className?: string }) => {
   const drawerClasses = useMemo(
     () =>
       // Match Settings drawer styling: solid surface, subtle border, no shadow padding
-      "max-w-66 w-66 bg-content1 border-r border-default-100 shadow-none p-0",
+      "max-w-66 w-66 bg-surface border-r border-surface-tertiary shadow-none p-0",
     []
   );
   const sectionClasses = useMemo(
@@ -68,24 +68,22 @@ const Sidebar = React.memo(({ className }: { className?: string }) => {
   const drawerContent = useMemo(
     () => (
       <Drawer
-        hideCloseButton
-        backdrop="transparent"
-        className={drawerClasses}
-        isOpen={isOpen}
-        placement="left"
-        radius="none"
-        shadow="none"
-        onOpenChange={handleDrawerOpenChange}
       >
-        <DrawerContent className="p-0">
-          {(onClose) => (
-            <>
-              <DrawerBody className="p-0 rounded-none">
-                <SidebarContent onClose={onClose} />
-              </DrawerBody>
-            </>
-          )}
-        </DrawerContent>
+        <Drawer.Backdrop
+          isOpen={isOpen}
+          variant="transparent"
+          onOpenChange={handleDrawerOpenChange}
+        >
+          <Drawer.Content className={drawerClasses} placement="left">
+            <Drawer.Dialog>
+              {({ close }) => (
+                <Drawer.Body className="p-0 rounded-none">
+                  <SidebarContent onClose={close} />
+                </Drawer.Body>
+              )}
+            </Drawer.Dialog>
+          </Drawer.Content>
+        </Drawer.Backdrop>
       </Drawer>
     ),
     [drawerClasses, isOpen, handleDrawerOpenChange]

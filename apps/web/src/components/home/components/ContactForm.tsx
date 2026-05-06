@@ -1,9 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Input, Textarea } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
-import { addToast } from "@heroui/toast";
+import { Button, Input, ListBox, Select, TextArea, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import type React from "react";
 import { useState } from "react";
@@ -48,12 +45,7 @@ export default function ContactForm() {
         `Contact form: ${formData.reason}`,
       )}&body=${encodeURIComponent(body)}`;
       setIsSubmitted(true);
-      addToast({
-        title: "Message ready",
-        description: "Your email app should open with the message.",
-        color: "default",
-        timeout: 5000,
-      });
+      toast("Message ready", { description: "Your email app should open with the message.", timeout: 5000 });
 
       setTimeout(() => {
         setIsSubmitted(false);
@@ -66,12 +58,7 @@ export default function ContactForm() {
         });
       }, 5000);
     } catch {
-      addToast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        color: "danger",
-        timeout: 5000,
-      });
+      toast.danger("Error", { description: "Something went wrong. Please try again.", timeout: 5000 });
     } finally {
       setIsSubmitting(false);
     }
@@ -91,7 +78,7 @@ export default function ContactForm() {
           />
         </div>
         <h3 className="text-xl font-semibold mb-2">Message Sent!</h3>
-        <p className="text-default-600">
+        <p className="text-muted">
           We&apos;ll get back to you within 24 hours.
         </p>
       </div>
@@ -102,26 +89,15 @@ export default function ContactForm() {
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
-          isRequired
-          label="Your Name"
-          placeholder="John Doe"
-          startContent={
-            <Icon className="w-4 h-4 text-default-400" icon="solar:user-bold" />
-          }
-          value={formData.name}
+          required
+                    placeholder="John Doe"
+                    value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
         />
         <Input
-          isRequired
-          label="Email Address"
-          placeholder="john@company.com"
-          startContent={
-            <Icon
-              className="w-4 h-4 text-default-400"
-              icon="solar:letter-bold"
-            />
-          }
-          type="email"
+          required
+                    placeholder="john@company.com"
+                    type="email"
           value={formData.email}
           onChange={(e) => handleChange("email", e.target.value)}
         />
@@ -129,62 +105,50 @@ export default function ContactForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
-          label="Company Name"
-          placeholder="Acme Inc."
-          startContent={
-            <Icon
-              className="w-4 h-4 text-default-400"
-              icon="solar:buildings-bold"
-            />
-          }
-          value={formData.company}
+                    placeholder="Acme Inc."
+                    value={formData.company}
           onChange={(e) => handleChange("company", e.target.value)}
         />
         <Select
           isRequired
-          label="Reason for Contact"
           placeholder="Select a reason"
-          selectedKeys={[formData.reason]}
-          startContent={
-            <Icon
-              className="w-4 h-4 text-default-400"
-              icon="solar:chat-square-text-bold"
-            />
-          }
-          onChange={(e) => handleChange("reason", e.target.value)}
+          value={formData.reason || null}
+          onChange={(key) => handleChange("reason", key?.toString() || "")}
         >
-          {contactReasons.map((reason) => (
-            <SelectItem key={reason.value} textValue={reason.value}>
-              {reason.label}
-            </SelectItem>
-          ))}
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {contactReasons.map((reason) => (
+                <ListBox.Item
+                  key={reason.value}
+                  id={reason.value}
+                  textValue={reason.label}
+                >
+                  {reason.label}
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
         </Select>
       </div>
 
-      <Textarea
-        isRequired
-        label="Your Message"
-        minRows={5}
+      <TextArea
+        required
         placeholder="Tell us how we can help you..."
-        startContent={
-          <Icon
-            className="w-4 h-4 text-default-400 mt-2"
-            icon="solar:text-field-bold"
-          />
-        }
-        value={formData.message}
+                value={formData.message}
         onChange={(e) => handleChange("message", e.target.value)}
       />
 
-      <Button
+      <Button variant="primary"
         className="w-full font-semibold"
-        color="primary"
-        isLoading={isSubmitting}
-        radius="full"
+       
+        isPending={isSubmitting}
         size="lg"
-        startContent={
-          !isSubmitting && <Icon className="w-5 h-5" icon="solar:send-bold" />
-        }
+       
         type="submit"
       >
         {isSubmitting ? "Sending..." : "Send"}

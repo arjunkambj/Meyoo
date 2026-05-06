@@ -1,6 +1,5 @@
 "use client";
 
-import { Spacer } from "@heroui/spacer";
 import { useAtomValue } from "jotai";
 import React, { useCallback, useMemo, useState } from "react";
 import { useAnalyticsDateRange, useDashboardOverview } from "@/hooks";
@@ -219,7 +218,7 @@ export const UnifiedDashboard = React.memo(function UnifiedDashboard() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <Spacer y={0.5} />
+      <div className="h-2" />
       <DashboardHeader
         onCustomize={() => setIsCustomizing(true)}
         onDateRangeChange={updateOverviewRange}

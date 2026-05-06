@@ -1,9 +1,7 @@
 "use client";
 
-import { Chip } from "@heroui/chip";
-import { Pagination } from "@heroui/pagination";
-import { Skeleton } from "@heroui/skeleton";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
+import { Chip, Skeleton, Table } from "@heroui/react";
+import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import React, { useCallback } from "react";
 
@@ -11,7 +9,6 @@ import { FulfillmentStatusBadge } from "@/components/shared/badges/StatusBadge";
 import { useUser } from "@/hooks";
 import { formatCurrencyPrecise } from "@/libs/utils/dashboard-formatters";
 import {
-  DATA_TABLE_HEADER_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 import type { AnalyticsOrder } from "@repo/types";
@@ -53,7 +50,7 @@ export const OrdersTable = React.memo(function OrdersTable({
         case "order":
           return (
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-default-900">
+              <p className="truncate text-sm font-medium text-muted">
                 #{item.orderNumber}
               </p>
               {item.tags && item.tags.length > 0 ? (
@@ -74,7 +71,7 @@ export const OrdersTable = React.memo(function OrdersTable({
               ? item.customer.email
               : "Guest Checkout";
           return (
-            <div className="min-w-0 truncate text-sm text-default-900">
+            <div className="min-w-0 truncate text-sm text-muted">
               {email}
             </div>
           );
@@ -85,7 +82,7 @@ export const OrdersTable = React.memo(function OrdersTable({
             <FulfillmentStatusBadge
               size="sm"
               status={item.fulfillmentStatus || "unfulfilled"}
-              variant="solid"
+              variant="primary"
             />
           );
 
@@ -93,7 +90,7 @@ export const OrdersTable = React.memo(function OrdersTable({
           return (
             <div>
               <p className="font-medium">{formatCurrency(item.totalPrice)}</p>
-              <p className="text-xs text-default-500">{item.items} items</p>
+              <p className="text-xs text-muted">{item.items} items</p>
             </div>
           );
 
@@ -108,7 +105,7 @@ export const OrdersTable = React.memo(function OrdersTable({
                     : "default"
               }
               size="sm"
-              variant="flat"
+              variant="soft"
             >
               {item.financialStatus === "paid"
                 ? "Paid"
@@ -122,7 +119,7 @@ export const OrdersTable = React.memo(function OrdersTable({
           return (
             <div className="text-sm">
               <p>{item.shippingAddress.city}</p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {item.shippingAddress.country}
               </p>
             </div>
@@ -138,11 +135,8 @@ export const OrdersTable = React.memo(function OrdersTable({
   const paginationNode =
     !loading && pagination && orders.length > 0 ? (
       <div className="flex justify-center py-3">
-        <Pagination
-          showControls
-          boundaries={1}
+        <PaginationControls
           page={pagination.page}
-          siblings={1}
           size="sm"
           total={Math.max(
             1,
@@ -151,9 +145,7 @@ export const OrdersTable = React.memo(function OrdersTable({
                 Math.max(1, pagination.pageSize)
             )
           )}
-          onChange={(newPage) => {
-            pagination.setPage(newPage);
-          }}
+          onChange={pagination.setPage}
         />
       </div>
     ) : null;
@@ -172,57 +164,54 @@ export const OrdersTable = React.memo(function OrdersTable({
           </div>
         </div>
       ) : (
-        <Table
-          removeWrapper
-          aria-label="Orders table"
-          className={DATA_TABLE_TABLE_CLASS}
-          classNames={{
-            th: DATA_TABLE_HEADER_CLASS,
-            td: "py-2.5 px-3 text-sm text-default-800 align-middle",
-            table: "text-xs",
-          }}
-          shadow="none"
-        >
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn key={column.uid}>{column.name}</TableColumn>
+        <Table className={DATA_TABLE_TABLE_CLASS}>
+          <Table.ScrollContainer>
+            <Table.Content aria-label="Orders table">
+              <Table.Header columns={columns}>
+            {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
+              <Table.Column id={column.uid} isRowHeader={column.uid === "order"}>
+                {column.name}
+              </Table.Column>
             )}
-          </TableHeader>
-          <TableBody>
+              </Table.Header>
+              <Table.Body>
             {orders.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={columns.length}>
+              <Table.Row id="empty">
+                <Table.Cell colSpan={columns.length}>
                   <div className="py-10 text-center">
                     <Icon
-                      className="mx-auto mb-4 text-default-300"
+                      className="mx-auto mb-4 text-muted"
                       icon="solar:cart-large-minimalistic-outline"
                       width={48}
                     />
-                    <p className="text-default-500">
+                    <p className="text-muted">
                       No orders found. Orders will sync from Shopify.
                     </p>
                   </div>
-                </TableCell>
-              </TableRow>
+                </Table.Cell>
+              </Table.Row>
             ) : (
               orders.map((item, index) => {
                 const stripe = index % 2 === 1;
 
                 return (
-                  <TableRow
+                  <Table.Row
                     key={item.id}
-                    className={`${stripe ? "bg-default-50 dark:bg-content1/50" : "bg-background"} border-t border-default-border`}
+                    id={item.id}
+                    className={`${stripe ? "bg-surface-secondary dark:bg-surface/50" : "bg-background"} border-t border-default-border`}
                   >
                     {columns.map((column) => (
-                      <TableCell key={column.uid}>
+                      <Table.Cell key={column.uid}>
                         {renderCell(item, column.uid)}
-                      </TableCell>
+                      </Table.Cell>
                     ))}
-                  </TableRow>
+                  </Table.Row>
                 );
               })
             )}
-          </TableBody>
+              </Table.Body>
+            </Table.Content>
+          </Table.ScrollContainer>
         </Table>
       )}
       {paginationNode}

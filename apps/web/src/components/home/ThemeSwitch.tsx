@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
+import { Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useEffect, useState } from "react";
 
@@ -21,15 +21,13 @@ export function ThemeSwitch() {
   return (
     <div className="fixed bottom-5 right-5 z-50">
       <Button
-        isIconOnly
-        aria-label="Toggle theme"
-        className="group relative flex items-center justify-center bg-default-50/70 dark:bg-content1/70 backdrop-blur-md rounded-full w-11 h-11 border border-divider/50 shadow-[0_4px_14px_rgba(0,0,0,0.06)] dark:shadow-[0_6px_20px_rgba(0,0,0,0.25)] transition-all duration-200 hover:border-primary/30 hover:shadow-[0_6px_18px_rgba(0,0,0,0.10)] dark:hover:shadow-[0_8px_26px_rgba(0,0,0,0.32)]"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        isIconOnly         className="group relative flex items-center justify-center bg-surface-secondary/70 dark:bg-surface/70 backdrop-blur-md rounded-full w-11 h-11 border border-surface-tertiary/50 shadow-[0_4px_14px_rgba(0,0,0,0.06)] dark:shadow-[0_6px_20px_rgba(0,0,0,0.25)] transition-all duration-200 hover:border-accent/30 hover:shadow-[0_6px_18px_rgba(0,0,0,0.10)] dark:hover:shadow-[0_8px_26px_rgba(0,0,0,0.32)]"
+        onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
       >
         {/* subtle inner ring for cohesion */}
         <span className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-white/5 dark:ring-white/10" />
         <Icon
-          className="w-5 h-5 text-default-600 transition-transform duration-200 group-hover:rotate-180 group-hover:text-primary"
+          className="w-5 h-5 text-muted transition-transform duration-200 group-hover:rotate-180 group-hover:text-accent"
           icon={theme === "dark" ? "solar:sun-bold" : "solar:moon-bold"}
         />
         {/* soft drop highlight for depth on light bg */}

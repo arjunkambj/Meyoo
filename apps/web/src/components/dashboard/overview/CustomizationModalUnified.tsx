@@ -1,10 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/modal";
-import { Tab, Tabs } from "@heroui/tabs";
+import { Button, Chip, Input, Modal, Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import React, { useCallback, useMemo, useState, useTransition } from "react";
 import { SelectedItemsList } from "./components/customization/SelectedItemsList";
@@ -208,33 +204,34 @@ export function CustomizationModalUnified({
   );
 
   return (
-    <Modal isOpen={isOpen} scrollBehavior="inside" size="4xl" onClose={onClose}>
-      <ModalContent className="max-h-[85vh] rounded-2xl bg-background border border-default-100">
-        {(onClose) => (
+    <Modal>
+      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Modal.Container scroll="inside" size="cover">
+          <Modal.Dialog className="max-h-[85vh] rounded-2xl bg-background border border-surface-tertiary">
+        {({ close }) => (
           <>
-            <ModalHeader className="px-6 pt-6 pb-3 bg-background flex-shrink-0 rounded-t-2xl">
+            <Modal.Header className="px-6 pt-6 pb-3 bg-background flex-shrink-0 rounded-t-2xl">
               <div className="w-full">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h2 className="text-xl font-bold text-default-900">
+                    <h2 className="text-xl font-bold text-muted">
                       Customize Dashboard
                     </h2>
-                    <p className="text-xs text-default-500 mt-1">
+                    <p className="text-xs text-muted mt-1">
                       Select and organize{" "}
                       {activeTab === "kpi" ? "KPI metrics" : "widgets"} for your
                       dashboard
                     </p>
                   </div>
-                  <Chip size="sm" variant="flat" color="default">
+                  <Chip size="sm" variant="soft">
                     {selectedCount} of {totalCount} selected
                   </Chip>
                 </div>
               </div>
-            </ModalHeader>
-            <ModalBody className="px-6 pb-6 pt-4 overflow-hidden flex flex-col bg-background gap-6">
+            </Modal.Header>
+            <Modal.Body className="px-6 pb-6 pt-4 overflow-hidden flex flex-col bg-background gap-6">
               {/* Tabs */}
               <Tabs
-                aria-label="Customization tabs"
                 selectedKey={activeTab}
                 onSelectionChange={(key) => {
                   startTransition(() => {
@@ -242,64 +239,43 @@ export function CustomizationModalUnified({
                     setSearchQuery(""); // Clear search on tab change
                   });
                 }}
-                classNames={{
-                  tabList:
-                    "border border-default-100 rounded-xl p-1 bg-default-100",
-                  tab: "px-4 py-2 rounded-lg transition-colors data-[selected=true]:bg-background",
-                  tabContent:
-                    "text-default-600 group-data-[selected=true]:text-primary",
-                }}
               >
-                <Tab
-                  key="kpi"
-                  title={
-                    <div className="flex items-center gap-1.5">
-                      <Icon icon="solar:graph-bold-duotone" width={14} />
-                      <span className="text-sm">KPI Cards</span>
-                      <Chip className="h-5 text-xs" color="primary" size="sm">
-                        {selectedKpis.length}
-                      </Chip>
-                    </div>
-                  }
-                />
-                <Tab
-                  key="widget"
-                  title={
-                    <div className="flex items-center gap-1.5">
-                      <Icon icon="solar:widget-bold-duotone" width={14} />
-                      <span className="text-sm">Widgets</span>
-                      <Chip className="h-5 text-xs" color="primary" size="sm">
-                        {selectedWidgets.length}
-                      </Chip>
-                    </div>
-                  }
-                />
+                <Tabs.ListContainer>
+                  <Tabs.List aria-label="Dashboard customization sections">
+                    <Tabs.Tab id="kpi">
+                      <div className="flex items-center gap-1.5">
+                        <Icon icon="solar:graph-bold-duotone" width={14} />
+                        <span className="text-sm">KPI Cards</span>
+                        <Chip className="h-5 text-xs" size="sm">
+                          {selectedKpis.length}
+                        </Chip>
+                      </div>
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                    <Tabs.Tab id="widget">
+                      <div className="flex items-center gap-1.5">
+                        <Icon icon="solar:widget-bold-duotone" width={14} />
+                        <span className="text-sm">Widgets</span>
+                        <Chip className="h-5 text-xs" size="sm">
+                          {selectedWidgets.length}
+                        </Chip>
+                      </div>
+                      <Tabs.Indicator />
+                    </Tabs.Tab>
+                  </Tabs.List>
+                </Tabs.ListContainer>
               </Tabs>
 
               {/* Search and action buttons */}
               <div className="flex gap-2">
                 <Input
-                  size="sm"
                   placeholder={`Search ${activeTab === "kpi" ? "metrics" : "widgets"}...`}
                   value={searchQuery}
-                  onValueChange={setSearchQuery}
-                  startContent={
-                    <Icon
-                      icon="solar:magnifer-linear"
-                      width={16}
-                      className="text-default-400"
-                    />
-                  }
-                  isClearable
-                  onClear={() => setSearchQuery("")}
-                  classNames={{
-                    input: "text-sm",
-                    inputWrapper: "h-8",
-                  }}
-                />
+                  onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                                  />
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   onPress={handleSelectAll}
                   className="flex-shrink-0"
                 >
@@ -307,16 +283,16 @@ export function CustomizationModalUnified({
                 </Button>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   onPress={handleDeselectAll}
                   className="flex-shrink-0"
                 >
                   Deselect All
                 </Button>
-                <Button
+                <Button variant="danger"
                   size="sm"
-                  color="danger"
-                  startContent={<Icon icon="solar:restart-linear" width={14} />}
+                 
+                 
                   onPress={handleResetToDefault}
                   className="flex-shrink-0"
                 >
@@ -348,18 +324,20 @@ export function CustomizationModalUnified({
                   />
                 </div>
               </div>
-            </ModalBody>
-            <ModalFooter className="px-6 py-4 bg-background rounded-b-2xl">
-              <Button variant="flat" onPress={onClose}>
+            </Modal.Body>
+            <Modal.Footer className="px-6 py-4 bg-background rounded-b-2xl">
+              <Button variant="tertiary" onPress={close}>
                 Cancel
               </Button>
-              <Button color="primary" onPress={handleApply}>
+              <Button variant="primary" onPress={handleApply}>
                 Apply Changes
               </Button>
-            </ModalFooter>
+            </Modal.Footer>
           </>
         )}
-      </ModalContent>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </Modal>
   );
 }

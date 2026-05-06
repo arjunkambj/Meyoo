@@ -1,13 +1,7 @@
 "use client";
 
-import { Avatar } from "@heroui/avatar";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Pagination } from "@heroui/pagination";
-import { Skeleton } from "@heroui/skeleton";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
-import { addToast } from "@heroui/toast";
-import { Tooltip } from "@heroui/tooltip";
+import { Avatar, Button, Chip, Skeleton, Table, toast, Tooltip } from "@heroui/react";
+import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import React, { useCallback, useState } from "react";
 import { useUser } from "@/hooks";
@@ -15,13 +9,18 @@ import { getStockStatusConfig } from "@/libs/utils/dashboard-formatters";
 import { getCurrencySymbol, formatNumber } from "@/libs/utils/format";
 import {
   DATA_TABLE_GROUP_ROW_BORDER_CLASS,
-  DATA_TABLE_HEADER_CLASS,
   DATA_TABLE_ROW_BASE_BG,
   DATA_TABLE_ROW_STRIPE_BG,
   DATA_TABLE_ROW_STRIPE_CHILD_BG,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 import { cn } from "@/libs/utils";
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 
 export interface ProductVariant {
   id: string;
@@ -105,14 +104,13 @@ export const ProductsTable = React.memo(function ProductsTable({
           const variantLabel = formatVariantLabel(item);
           return (
             <div className="flex items-center gap-3">
-              <Avatar
-                fallback={item.name.substring(0, 2).toUpperCase()}
-                size="sm"
-                src={item.image}
-              />
+              <Avatar size="sm">
+                <Avatar.Image src={item.image} />
+                <Avatar.Fallback>{item.name.substring(0, 2).toUpperCase()}</Avatar.Fallback>
+              </Avatar>
               <div>
                 <p className="font-medium text-sm">{item.name}</p>
-                <p className="text-xs text-default-500">{variantLabel}</p>
+                <p className="text-xs text-muted">{variantLabel}</p>
               </div>
             </div>
           );
@@ -128,7 +126,7 @@ export const ProductsTable = React.memo(function ProductsTable({
           const statusConfig = getStockStatusConfig(item.stockStatus);
 
           return (
-            <Chip color={statusConfig.color} size="sm" variant="flat">
+            <Chip color={statusConfig.color} size="sm" variant="soft">
               {statusConfig.label}
             </Chip>
           );
@@ -149,7 +147,7 @@ export const ProductsTable = React.memo(function ProductsTable({
                 {currencySymbol}
                 {item.cost.toFixed(2)}
               </p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 Total: {currencySymbol}
                 {(item.cost * item.stock).toFixed(2)}
               </p>
@@ -182,22 +180,20 @@ export const ProductsTable = React.memo(function ProductsTable({
         case "actions":
           return (
             <div className="flex items-center gap-1">
-              <Tooltip content="Order Stock">
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  onPress={() => {
-                    addToast({
-                      title: "Working on this feature",
-                      description: "Stock ordering will be available soon",
-                      color: "primary",
-                      timeout: 3000,
-                    });
-                  }}
-                >
-                  <Icon icon="solar:cart-large-2-bold-duotone" width={16} />
-                </Button>
+              <Tooltip>
+                <Tooltip.Trigger>
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="tertiary"
+                    onPress={() => {
+                      toast.info("Working on this feature", { description: "Stock ordering will be available soon", timeout: 3000 });
+                    }}
+                  >
+                    <Icon icon="solar:cart-large-2-bold-duotone" width={16} />
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>Order Stock</Tooltip.Content>
               </Tooltip>
             </div>
           );
@@ -212,11 +208,8 @@ export const ProductsTable = React.memo(function ProductsTable({
   const paginationContent =
     !loading && pagination && products.length > 0 ? (
       <div className="flex justify-center pt-2">
-        <Pagination
-          showControls
-          boundaries={1}
+        <PaginationControls
           page={pagination.page}
-          siblings={1}
           size="sm"
           total={
             pagination.totalPages ??
@@ -251,32 +244,27 @@ export const ProductsTable = React.memo(function ProductsTable({
         </div>
       ) : (
         <>
-          <Table
-            removeWrapper
-            aria-label="Products table"
-            className={DATA_TABLE_TABLE_CLASS}
-            classNames={{
-              th: DATA_TABLE_HEADER_CLASS,
-              td: "py-2.5 px-3 text-sm text-default-800 align-middle",
-              table: "text-xs",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn key={column.uid}>{column.name}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody>
+          <Table className={DATA_TABLE_TABLE_CLASS}>
+            <Table.ScrollContainer>
+              <Table.Content aria-label="Products table">
+                <TableHeader columns={columns}>
+                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
+                    <TableColumn id={column.uid} isRowHeader={column.uid === "product"}>
+                      {column.name}
+                    </TableColumn>
+                  )}
+                </TableHeader>
+                <TableBody>
               {products.length === 0 ? (
-                <TableRow>
+                <TableRow id="empty">
                   <TableCell colSpan={columns.length}>
                     <div className="py-10 text-center">
                       <Icon
-                        className="mx-auto mb-4 text-default-300"
+                        className="mx-auto mb-4 text-muted"
                         icon="solar:box-outline"
                         width={48}
                       />
-                      <p className="text-default-500">
+                      <p className="text-muted">
                         No products found. Products will sync from Shopify.
                       </p>
                     </div>
@@ -297,6 +285,7 @@ export const ProductsTable = React.memo(function ProductsTable({
                   const header = (
                     <TableRow
                       key={`p-h-${item.id}`}
+                      id={`p-h-${item.id}`}
                       className={cn(
                         stripe
                           ? DATA_TABLE_ROW_STRIPE_BG
@@ -308,7 +297,7 @@ export const ProductsTable = React.memo(function ProductsTable({
                         <div className="min-w-0 flex items-center gap-3 py-1">
                           <button
                             type="button"
-                            className="flex-none text-default-500 transition hover:text-default-900"
+                            className="flex-none text-muted transition hover:text-muted"
                             onClick={() => {
                               setExpanded((prev) => {
                                 const next = new Set(prev);
@@ -316,9 +305,7 @@ export const ProductsTable = React.memo(function ProductsTable({
                                 else next.add(item.id);
                                 return next;
                               });
-                            }}
-                            aria-label={isOpen ? "Collapse" : "Expand"}
-                          >
+                            }}                           >
                             <Icon
                               icon={
                                 isOpen
@@ -328,18 +315,15 @@ export const ProductsTable = React.memo(function ProductsTable({
                               width={18}
                             />
                           </button>
-                          <Avatar
-                            size="sm"
-                            className="flex-none"
-                            radius="md"
-                            name={item.name}
-                            src={item.image}
-                          />
+                          <Avatar size="sm" className="flex-none rounded-md">
+                            <Avatar.Image src={item.image} />
+                            <Avatar.Fallback>{item.name.substring(0, 2).toUpperCase()}</Avatar.Fallback>
+                          </Avatar>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-default-900">
+                            <p className="truncate text-sm font-medium text-muted">
                               {item.name}
                             </p>
-                            <p className="truncate text-xs text-default-500">
+                            <p className="truncate text-xs text-muted">
                               {formatVariantLabel(item)}
                             </p>
                           </div>
@@ -372,6 +356,7 @@ export const ProductsTable = React.memo(function ProductsTable({
                   const children = item.variants.map((v) => (
                     <TableRow
                       key={`v-${v.id}`}
+                      id={`v-${v.id}`}
                       className={cn(
                         "pointer-events-none",
                         DATA_TABLE_ROW_BASE_BG,
@@ -380,16 +365,16 @@ export const ProductsTable = React.memo(function ProductsTable({
                     >
                       <TableCell>
                         <div className="min-w-0">
-                          <div className="truncate text-sm text-default-900">
+                          <div className="truncate text-sm text-muted">
                             {v.title || "Variant"}
                           </div>
-                          <div className="truncate text-xs text-default-500">
+                          <div className="truncate text-xs text-muted">
                             {v.sku || ""}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-default-500">
+                        <span className="text-sm text-muted">
                           {item.category}
                         </span>
                       </TableCell>
@@ -417,7 +402,9 @@ export const ProductsTable = React.memo(function ProductsTable({
                   return [header, ...children];
                 })
               )}
-            </TableBody>
+                </TableBody>
+              </Table.Content>
+            </Table.ScrollContainer>
           </Table>
           {paginationContent}
         </>

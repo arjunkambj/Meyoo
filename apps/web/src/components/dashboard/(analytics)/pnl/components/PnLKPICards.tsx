@@ -49,7 +49,7 @@ export const PnLKPICards = memo(function PnLKPICards({
           ? "positive"
           : ("negative" as const),
       icon: "solar:wallet-money-bold-duotone",
-      iconColor: "text-primary-500",
+      iconColor: "text-accent-500",
     },
     {
       title: "Net Revenue",
@@ -61,7 +61,7 @@ export const PnLKPICards = memo(function PnLKPICards({
           ? "positive"
           : ("negative" as const),
       icon: "solar:wallet-2-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
     },
     {
       title: "Net Profit",
@@ -73,7 +73,7 @@ export const PnLKPICards = memo(function PnLKPICards({
           ? "positive"
           : ("negative" as const),
       icon: "solar:dollar-minimalistic-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
     },
     {
       title: "Marketing",
@@ -85,7 +85,7 @@ export const PnLKPICards = memo(function PnLKPICards({
           ? "positive"
           : ("negative" as const),
       icon: "mingcute:meta-fill",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
     },
     {
       title: "Op. Expenses",
@@ -96,7 +96,7 @@ export const PnLKPICards = memo(function PnLKPICards({
           ? "positive"
           : ("negative" as const),
       icon: "solar:calculator-bold-duotone",
-      iconColor: "text-default-500",
+      iconColor: "text-muted",
     },
   ];
 

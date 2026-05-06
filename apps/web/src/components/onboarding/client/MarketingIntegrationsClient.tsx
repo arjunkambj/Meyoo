@@ -1,6 +1,6 @@
 "use client";
 
-import { addToast } from "@heroui/toast";
+import { toast } from "@heroui/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "next";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -109,12 +109,7 @@ export default function MarketingIntegrationsClient() {
 
       // Clear params first to minimize duplicate processing in Strict Mode
       clearParams(router, searchParams, ["error", "message", "details"]);
-      addToast({
-        title: errorTitle,
-        description: errorMessage,
-        color: "danger",
-        timeout: 10000, // Show for longer since these are important errors
-      });
+      toast.danger(errorTitle, { description: errorMessage, timeout: 10000 });
     }
 
     // Success toasts removed per onboarding policy; just clear params
@@ -142,15 +137,9 @@ export default function MarketingIntegrationsClient() {
         "[ONBOARDING] Failed to continue from marketing step:",
         error
       );
-      addToast({
-        title: "Error",
-        description:
-          error instanceof Error
+      toast.danger("Error", { description: error instanceof Error
             ? error.message
-            : "Failed to continue. Please try again.",
-        color: "danger",
-        timeout: 3000,
-      });
+            : "Failed to continue. Please try again.", timeout: 3000 });
     }
   }, []);
 
@@ -164,12 +153,8 @@ export default function MarketingIntegrationsClient() {
       <div className="space-y-3 sm:space-y-4">
         <div className="space-y-4">
           <IntegrationCard
-            description={
-              user?.hasMetaConnection
-                ? "Connected"
-                : "Facebook & Instagram advertising"
-            }
-            icon="logos:meta-icon"
+            description="Connect Meta Ads to sync spend, campaign performance, and ROAS."
+                        icon="logos:meta-icon"
             isConnected={user?.hasMetaConnection}
             isLoading={metaLoading}
             name="Meta Ads"
@@ -181,8 +166,8 @@ export default function MarketingIntegrationsClient() {
           <IntegrationCard
             comingSoon
             comingSoonLabel="Coming soon"
-            description="Google Ads integration is coming soon."
-            icon="logos:google-ads"
+            description="Google Ads support is planned for a future onboarding step."
+                        icon="logos:google-ads"
             isConnected={false}
             name="Google Ads"
           />

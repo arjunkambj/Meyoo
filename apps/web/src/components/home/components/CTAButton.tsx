@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Icon } from "@iconify/react";
+import { Button } from "@heroui/react";
+import type { Route } from "next";
 import Link from "next/link";
 import type React from "react";
 
@@ -9,20 +9,13 @@ interface CTAButtonProps {
   href: string;
   children: React.ReactNode;
   size?: "sm" | "md" | "lg";
-  color?:
+  variant?:
     | "primary"
     | "secondary"
-    | "success"
-    | "warning"
+    | "tertiary"
+    | "outline"
     | "danger"
-    | "default";
-  variant?:
-    | "solid"
-    | "bordered"
-    | "light"
-    | "flat"
-    | "faded"
-    | "shadow"
+    | "danger-soft"
     | "ghost";
   endIcon?: string;
   startIcon?: string;
@@ -34,28 +27,18 @@ export default function CTAButton({
   href,
   children,
   size = "lg",
-  color = "primary",
-  variant = "solid",
-  endIcon,
-  startIcon,
+  variant = "primary",
   className = "",
-  radius = "full",
 }: CTAButtonProps) {
   return (
-    <Button
-      as={Link}
-      className={`font-semibold ${className}`}
-      color={color}
-      endContent={endIcon ? <Icon icon={endIcon} width={20} /> : undefined}
-      href={href}
-      radius={radius}
-      size={size}
-      startContent={
-        startIcon ? <Icon icon={startIcon} width={20} /> : undefined
-      }
-      variant={variant}
-    >
-      {children}
-    </Button>
+    <Link href={href as Route}>
+      <Button
+        className={`font-semibold ${className}`}
+        size={size}
+        variant={variant}
+      >
+        {children}
+      </Button>
+    </Link>
   );
 }

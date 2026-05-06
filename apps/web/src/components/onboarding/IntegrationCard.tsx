@@ -1,10 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Spinner } from "@heroui/spinner";
-import { cn } from "@heroui/theme";
+import { Button, Card, Chip, cn } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import React from "react";
 
@@ -38,21 +34,21 @@ const SimpleIntegrationCard = React.memo(function SimpleIntegrationCard({
   return (
     <Card
       className={cn(
-        "bg-default-50 dark:bg-default-100/50 border border-default-200 rounded-xl shadow-none transition-all duration-200",
-        !isConnected && "hover:border-primary/20"
+        "bg-surface-secondary dark:bg-surface-secondary/50 border border-surface-tertiary rounded-xl shadow-none transition-all duration-200",
+        !isConnected && "hover:border-accent/20"
       )}
     >
-      <CardBody className="px-5 py-6">
+      <Card.Content className="px-5 py-6">
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           {/* Logo */}
-          <div className="rounded-lg border border-default-100 bg-default-50 p-3">
+          <div className="rounded-lg border border-surface-tertiary bg-surface-secondary p-3">
             <Icon className="text-foreground" icon={icon} width={20} />
           </div>
 
           {/* Info */}
           <div className="flex-1 space-y-0.5">
             <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-              <h3 className="font-medium text-default-900">{name}</h3>
+              <h3 className="font-medium text-muted">{name}</h3>
               {required && (
                 <Chip color="danger" size="sm" className="px-3">
                   Required
@@ -64,43 +60,36 @@ const SimpleIntegrationCard = React.memo(function SimpleIntegrationCard({
                 </Chip>
               )}
             </div>
-            <p className="text-sm mt-0.5 text-default-700">{description}</p>
+            <p className="text-sm mt-0.5 text-muted">{description}</p>
           </div>
 
           {/* Action Button */}
           <div className="shrink-0">
             {isLoading ? (
               <Button
-                color="default"
-                variant="flat"
-                radius="lg"
+               
+                variant="tertiary"
                 size="md"
                 isDisabled
-                startContent={<Spinner color="primary" size="sm" />}
+               
               >
                 Connecting...
               </Button>
             ) : isConnected ? (
               <div className="flex items-center gap-2">
-                <Button
-                  color="success"
+                <Button variant="tertiary"
+                 
                   size="md"
-                  radius="lg"
-                  startContent={
-                    <Icon icon="solar:check-circle-bold-duotone" width={18} />
-                  }
+                 
                 >
                   Connected
                 </Button>
                 {showDisconnect && onDisconnect && (
                   <Button
-                    color="danger"
-                    variant="flat"
+                   
+                    variant="tertiary"
                     size="md"
-                    radius="lg"
-                    startContent={
-                      <Icon icon="solar:unlink-bold-duotone" width={16} />
-                    }
+                   
                     onPress={onDisconnect}
                   >
                     Disconnect
@@ -109,22 +98,18 @@ const SimpleIntegrationCard = React.memo(function SimpleIntegrationCard({
               </div>
             ) : comingSoon ? (
               <Button
-                color="default"
+               
                 size="md"
-                radius="lg"
                 isDisabled
-                variant="flat"
+                variant="tertiary"
               >
                 {comingSoonLabel ?? "Coming soon"}
               </Button>
             ) : (
-              <Button
-                color="primary"
+              <Button variant="primary"
+               
                 size="md"
-                radius="lg"
-                endContent={
-                  <Icon icon="solar:arrow-right-line-duotone" width={18} />
-                }
+               
                 onPress={onConnect}
               >
                 Connect
@@ -132,7 +117,7 @@ const SimpleIntegrationCard = React.memo(function SimpleIntegrationCard({
             )}
           </div>
         </div>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 });

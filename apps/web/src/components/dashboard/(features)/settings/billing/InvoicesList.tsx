@@ -1,7 +1,5 @@
 "use client";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Skeleton } from "@heroui/skeleton";
+import { Button, Chip, Skeleton } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 
@@ -52,12 +50,12 @@ export default function InvoicesList() {
   return (
     <div>
       {/* Compact Header */}
-      <div className="px-4 py-3 border-b border-divider">
+      <div className="px-4 py-3 border-b border-surface-tertiary">
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold text-default-800">
+          <h3 className="text-base font-semibold text-muted">
             Billing History
           </h3>
-          <span className="text-xs text-default-500">
+          <span className="text-xs text-muted">
             {totalCount > 0 &&
               `${totalCount}${hasMore ? "+" : ""} transaction${
                 totalCount !== 1 ? "s" : ""
@@ -67,8 +65,8 @@ export default function InvoicesList() {
       </div>
 
       {/* Compact Table Header */}
-      <div className="px-4 py-2 border-b border-divider bg-content1">
-        <div className="grid grid-cols-12 gap-3 text-xs font-medium text-default-500">
+      <div className="px-4 py-2 border-b border-surface-tertiary bg-surface">
+        <div className="grid grid-cols-12 gap-3 text-xs font-medium text-muted">
           <div className="col-span-3">Invoice</div>
           <div className="col-span-3">Date</div>
           <div className="col-span-2">Amount</div>
@@ -86,7 +84,7 @@ export default function InvoicesList() {
                 key={index}
                 className={`px-4 py-2.5 ${
                   index % 2 === 0
-                    ? "bg-content1/40 dark:bg-content1/10"
+                    ? "bg-surface/40 dark:bg-surface/10"
                     : "bg-transparent dark:bg-transparent"
                 }`}
               >
@@ -114,12 +112,12 @@ export default function InvoicesList() {
         ) : invoices.length === 0 ? (
           <div className="px-4 py-8 text-center">
             <Icon
-              className="mx-auto mb-2 text-default-300"
+              className="mx-auto mb-2 text-muted"
               icon="solar:document-text-bold-duotone"
               width={32}
             />
-            <p className="text-xs text-default-500">No billing history yet</p>
-            <p className="text-xs text-default-400 mt-0.5">
+            <p className="text-xs text-muted">No billing history yet</p>
+            <p className="text-xs text-muted mt-0.5">
               Transactions will appear here
             </p>
           </div>
@@ -141,24 +139,24 @@ export default function InvoicesList() {
                 key={invoice.id}
                 className={`px-4 py-2.5 transition-colors ${
                   index % 2 === 0
-                    ? "bg-content1/40 dark:bg-content1/10"
+                    ? "bg-surface/40 dark:bg-surface/10"
                     : "bg-transparent dark:bg-transparent"
-                } hover:bg-content1/60 dark:hover:bg-content1/20`}
+                } hover:bg-surface/60 dark:hover:bg-surface/20`}
               >
                 <div className="grid grid-cols-12 gap-3 items-center">
                   {/* Invoice ID */}
                   <div className="col-span-3">
-                    <p className="text-xs font-semibold text-default-800 truncate">
+                    <p className="text-xs font-semibold text-muted truncate">
                       {invoice.invoiceNumber}
                     </p>
-                    <p className="text-xs text-default-400 truncate">
+                    <p className="text-xs text-muted truncate">
                       {invoice.description}
                     </p>
                   </div>
 
                   {/* Date */}
                   <div className="col-span-3">
-                    <p className="text-xs text-default-600">
+                    <p className="text-xs text-muted">
                       {new Date(invoice.issuedAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -169,7 +167,7 @@ export default function InvoicesList() {
 
                   {/* Amount */}
                   <div className="col-span-2">
-                    <p className="text-xs font-semibold text-default-800">
+                    <p className="text-xs font-semibold text-muted">
                       {formatAmount(invoice.amount, invoice.currency)}
                     </p>
                   </div>
@@ -179,17 +177,8 @@ export default function InvoicesList() {
                     <Chip
                       color={getStatusColor(invoice.status)}
                       size="sm"
-                      startContent={
-                        invoice.status === "paid" && (
-                          <Icon icon="solar:check-circle-bold-duotone" width={12} />
-                        )
-                      }
-                      variant="flat"
-                      classNames={{
-                        base: "h-5 px-1.5",
-                        content: "text-xs px-0.5"
-                      }}
-                    >
+                                            variant="soft"
+                                          >
                       {invoice.status.charAt(0).toUpperCase() +
                         invoice.status.slice(1)}
                     </Chip>
@@ -199,10 +188,10 @@ export default function InvoicesList() {
                   <div className="col-span-2">
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="danger"
+                      variant="tertiary"
+                     
                       isIconOnly
-                      isLoading={deletingId === invoice.id}
+                      isPending={deletingId === invoice.id}
                       isDisabled={deletingId === invoice.id}
                       onPress={() => handleDelete(invoice.id)}
                     >
@@ -218,15 +207,15 @@ export default function InvoicesList() {
 
       {/* Compact Footer */}
       {hasMore && (
-        <div className="px-4 py-2 border-t border-divider">
+        <div className="px-4 py-2 border-t border-surface-tertiary">
           <Button
-            color="primary"
-            endContent={<Icon icon="solar:arrow-down-line-duotone" width={14} />}
+           
+           
             size="sm"
-            variant="flat"
+            variant="tertiary"
             className="w-full h-7 text-xs"
             isDisabled={loadingMore}
-            isLoading={loadingMore}
+            isPending={loadingMore}
             onPress={() => loadMore()}
           >
             {loadingMore ? "Loading" : "Load More"}

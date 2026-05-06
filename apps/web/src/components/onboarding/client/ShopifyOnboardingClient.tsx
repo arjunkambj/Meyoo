@@ -1,15 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Divider } from "@heroui/divider";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from "@heroui/modal";
-import { addToast } from "@heroui/toast";
+import { Button, Modal, Separator, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -80,13 +71,7 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
       const result = await joinDemoOrganization({});
       if (result.success) {
         trackOnboardingAction("shopify", "join_demo_success");
-        addToast({
-          title: "Demo workspace enabled",
-          description:
-            "You now have access to Meyoo's demo data set to explore the dashboard.",
-          color: "success",
-          timeout: 4000,
-        });
+        toast.success("Demo workspace enabled", { description: "You now have access to Meyoo's demo data set to explore the dashboard.", timeout: 4000 });
         handleDismissDemoModal(true);
         router.refresh();
       } else {
@@ -113,8 +98,8 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
       {/* Integration Card */}
       <div>
         <IntegrationCard
-          description="Connect your Shopify store to start tracking profits"
-          icon="logos:shopify"
+          description="Connect your Shopify store to sync products, orders, customers, and inventory."
+                    icon="logos:shopify"
           isConnected={user?.hasShopifyConnection || false}
           isLoading={connecting}
           name="Shopify Store"
@@ -129,12 +114,7 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
                 window.location.href = installUri;
               } catch (e) {
                 console.error("Failed to navigate to APP install URI", e);
-                addToast({
-                  title: "Navigation failed",
-                  description: "Please try again or contact support.",
-                  color: "danger",
-                  timeout: 5000,
-                });
+                toast.danger("Navigation failed", { description: "Please try again or contact support.", timeout: 5000 });
                 setConnecting(false);
                 setNavigationPending(false);
               }
@@ -150,42 +130,35 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
       {!user?.hasShopifyConnection && (
         <>
           <div className="relative my-10">
-            <Divider />
+            <Separator />
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-4">
-              <span className="text-xs font-medium text-default-400">OR</span>
+              <span className="text-xs font-medium text-muted">OR</span>
             </div>
           </div>
 
-          <div className="rounded-lg border border-default-200 bg-default-50 p-6">
+          <div className="rounded-lg border border-surface-tertiary bg-surface-secondary p-6">
             <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-              <div className="rounded-full bg-default-100 p-3">
+              <div className="rounded-full bg-surface-secondary p-3">
                 <Icon
                   aria-hidden="true"
-                  className="text-default-600"
+                  className="text-muted"
                   icon="solar:planet-bold-duotone"
                   width={24}
                 />
               </div>
               <div className="flex-1 space-y-1">
-                <h3 className="text-base font-medium text-default-900">
+                <h3 className="text-base font-medium text-muted">
                   Don&apos;t have a store yet?
                 </h3>
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   Explore Meyoo with our demo workspace to see how it works
                 </p>
               </div>
               <Button
-                color="default"
-                variant="flat"
-                radius="lg"
+               
+                variant="tertiary"
                 size="md"
-                startContent={
-                  <Icon
-                    aria-hidden="true"
-                    icon="solar:play-circle-bold-duotone"
-                    width={18}
-                  />
-                }
+               
                 onPress={handleOpenDemoModal}
               >
                 View Demo
@@ -213,35 +186,34 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
         }
       />
 
-      <Modal
-        isDismissable={!joiningDemo}
-        isOpen={isDemoModalOpen}
-        size="md"
-        hideCloseButton={joiningDemo}
-        placement="center"
-        onOpenChange={(open) => {
-          if (!open) {
-            if (!suppressCancelTracking.current) {
-              trackOnboardingAction("shopify", "join_demo_cancel");
+      <Modal>
+        <Modal.Backdrop
+          isDismissable={!joiningDemo}
+          isOpen={isDemoModalOpen}
+          onOpenChange={(open) => {
+            if (!open) {
+              if (!suppressCancelTracking.current) {
+                trackOnboardingAction("shopify", "join_demo_cancel");
+              }
+              suppressCancelTracking.current = false;
+              setIsDemoModalOpen(false);
+              setDemoError(null);
+            } else {
+              suppressCancelTracking.current = false;
+              setIsDemoModalOpen(true);
             }
-            suppressCancelTracking.current = false;
-            setIsDemoModalOpen(false);
-            setDemoError(null);
-          } else {
-            suppressCancelTracking.current = false;
-            setIsDemoModalOpen(true);
-          }
-        }}
-      >
-        <ModalContent>
+          }}
+        >
+          <Modal.Container placement="center" size="md">
+            <Modal.Dialog>
           {() => (
             <>
-              <ModalHeader className="flex flex-col gap-2">
-                <h2 className="text-lg font-semibold text-default-900">
+              <Modal.Header className="flex flex-col gap-2">
+                <h2 className="text-lg font-semibold text-muted">
                   Join Demo Workspace
                 </h2>
-              </ModalHeader>
-              <ModalBody className="gap-4 pb-6">
+              </Modal.Header>
+              <Modal.Body className="gap-4 pb-6">
                 {demoError && (
                   <div className="flex items-start gap-2 rounded-lg bg-danger/10 p-3">
                     <Icon
@@ -254,30 +226,32 @@ export default function ShopifyOnboardingClient({ installUri }: Props) {
                   </div>
                 )}
 
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   Explore the dashboard with sample e-commerce data. You can
                   leave anytime from team settings.
                 </p>
-              </ModalBody>
-              <ModalFooter className="gap-2">
+              </Modal.Body>
+              <Modal.Footer className="gap-2">
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   isDisabled={joiningDemo}
                   onPress={() => handleDismissDemoModal()}
                 >
                   Cancel
                 </Button>
-                <Button
-                  color="primary"
-                  isLoading={joiningDemo}
+                <Button variant="primary"
+                 
+                  isPending={joiningDemo}
                   onPress={handleJoinDemo}
                 >
                   {joiningDemo ? "Joining..." : "Join Demo"}
                 </Button>
-              </ModalFooter>
+              </Modal.Footer>
             </>
           )}
-        </ModalContent>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
       </Modal>
     </>
   );

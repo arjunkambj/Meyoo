@@ -186,8 +186,8 @@ export const OnboardingLayoutClient = memo(function OnboardingLayoutClient({
     <div className="relative flex min-h-dvh w-full bg-background overflow-x-hidden">
       <main className="flex flex-col flex-1 min-w-0 min-h-0">
         {/* Minimal Header */}
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-divider">
-          {/* Progress Bar at top */}
+        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-surface-tertiary">
+          {/* ProgressBar Bar at top */}
           <MinimalProgressBar
             currentStep={currentStep}
             totalSteps={TOTAL_STEPS}
@@ -196,7 +196,7 @@ export const OnboardingLayoutClient = memo(function OnboardingLayoutClient({
           <div className="px-4 sm:px-6 py-4">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
               <Logo size="sm" />
-              <span className="text-xs font-medium text-default-500">
+              <span className="text-xs font-medium text-muted">
                 Step {currentStep} of {TOTAL_STEPS}
               </span>
               <UserProfile showNavigationLinks={false} />

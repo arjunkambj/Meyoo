@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Icon } from "@iconify/react";
+import { Button } from "@heroui/react";
 import { useState } from "react";
 import { useSetAtom } from "jotai";
 import { setNavigationPendingAtom } from "@/store/onboarding";
@@ -51,11 +50,11 @@ export default function SimpleNavigationButtons({
       {/* Previous Button */}
       {showPrevious && (
         <Button
-          variant="flat"
+          variant="tertiary"
           size="md"
           onPress={onPrevious}
           isDisabled={isLoading}
-          startContent={<Icon icon="solar:arrow-left-line-duotone" />}
+         
         >
           {previousLabel}
         </Button>
@@ -63,19 +62,11 @@ export default function SimpleNavigationButtons({
 
       {/* Next/Complete Button */}
       <Button
-        color={isLastStep ? "success" : "primary"}
+        variant={isLastStep ? "secondary" : "primary"}
         size="md"
         onPress={handleNext}
         isDisabled={isNextDisabled || isLoading}
-        endContent={
-          isLoading ? (
-            <Icon icon="solar:spinner-linear" className="animate-spin" />
-          ) : isLastStep ? (
-            <Icon icon="solar:check-circle-bold-duotone" />
-          ) : (
-            <Icon icon="solar:arrow-right-line-duotone" />
-          )
-        }
+       
       >
         {isLastStep ? "Complete" : nextLabel}
       </Button>

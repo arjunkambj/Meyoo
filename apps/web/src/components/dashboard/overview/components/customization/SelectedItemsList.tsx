@@ -1,5 +1,6 @@
 "use client";
 
+import { Chip, ScrollShadow } from "@heroui/react";
 import {
   closestCenter,
   DndContext,
@@ -15,8 +16,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Chip } from "@heroui/chip";
-import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Icon } from "@iconify/react";
 import React, { useCallback, useMemo } from "react";
 
@@ -72,13 +71,13 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
       style={style}
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-default-700">
+        <h3 className="text-sm font-semibold text-muted">
           {type === "kpi" ? "Selected KPIs" : "Selected Widgets"}
         </h3>
         <Chip
-          color={type === "kpi" ? "primary" : "secondary"}
+          color={type === "kpi" ? "accent" : "default"}
           size="sm"
-          variant="flat"
+          variant="soft"
         >
           {items.length} total
         </Chip>
@@ -96,7 +95,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
               <>
                 {type === "kpi" && pinnedItems.length > 0 && (
                   <div className="mb-3">
-                    <div className="text-xs text-default-500 font-medium mb-2 px-1">
+                    <div className="text-xs text-muted font-medium mb-2 px-1">
                       Pinned Metrics
                     </div>
                     <div className="space-y-0">
@@ -111,7 +110,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
                             icon={metric.icon}
                             id={itemId}
                             label={metric.label}
-                            type="kpi"
+                                                        type="kpi"
                             onRemove={onItemRemove}
                           />
                         );
@@ -121,8 +120,8 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
                 )}
 
                 {type === "kpi" && additionalItems.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-divider">
-                    <div className="text-xs text-default-500 font-medium mb-2 px-1">
+                  <div className="mt-3 pt-3 border-t border-surface-tertiary">
+                    <div className="text-xs text-muted font-medium mb-2 px-1">
                       Additional ({additionalItems.length})
                     </div>
                     <div className="space-y-0">
@@ -137,7 +136,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
                             icon={metric.icon}
                             id={itemId}
                             label={metric.label}
-                            type="kpi"
+                                                        type="kpi"
                             onRemove={onItemRemove}
                           />
                         );
@@ -158,7 +157,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
                         icon={widget.icon}
                         id={itemId}
                         label={widget.name}
-                        type="widget"
+                                                type="widget"
                         onRemove={onItemRemove}
                       />
                     );
@@ -174,7 +173,7 @@ export const SelectedItemsList = React.memo(function SelectedItemsList({
 
 function EmptyState({ type }: { type: "kpi" | "widget" }) {
   return (
-    <div className="flex flex-col items-center justify-center h-32 text-default-400">
+    <div className="flex flex-col items-center justify-center h-32 text-muted">
       <Icon
         className="mb-2"
         icon={type === "kpi" ? "solar:chart-2-linear" : "solar:widget-linear"}

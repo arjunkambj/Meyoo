@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Icon } from "@iconify/react";
+import { Button } from "@heroui/react";
 import { useRouter, usePathname } from "next/navigation";
 import type { Route } from "next";
 import { memo, useCallback, useMemo, useState } from "react";
@@ -196,10 +195,10 @@ const NavigationButtons = memo(function NavigationButtons({
       <div className={isFloating ? "pointer-events-auto" : ""}>
         {showPrevious && previousRoute ? (
           <Button
-            variant="flat"
+            variant="tertiary"
             onPress={handlePrevious}
             isDisabled={internalLoading || isNextLoading}
-            startContent={<Icon icon="solar:arrow-left-line-duotone" width={18} />}
+           
             className="font-semibold"
           >
             {previousLabel}
@@ -213,7 +212,7 @@ const NavigationButtons = memo(function NavigationButtons({
         {/* Skip Button */}
         {showSkip && onSkip && (
           <Button
-            variant="flat"
+            variant="tertiary"
             onPress={onSkip}
             className="font-semibold"
           >
@@ -223,24 +222,13 @@ const NavigationButtons = memo(function NavigationButtons({
 
         {/* Next Button */}
         {nextRoute && (
-          <Button
-            color="primary"
+          <Button variant="primary"
+           
             size="lg"
             onPress={handleNext}
             isDisabled={isNextDisabled || internalLoading || isNextLoading}
-            isLoading={isNextLoading || internalLoading}
-            endContent={
-              !isNextLoading && !internalLoading && (
-                <Icon
-                  icon={
-                    isLastStep
-                      ? "solar:check-circle-bold-duotone"
-                      : "solar:arrow-right-bold-duotone"
-                  }
-                  width={20}
-                />
-              )
-            }
+            isPending={isNextLoading || internalLoading}
+           
             className="font-bold min-w-40"
           >
             {computedNextLabel}

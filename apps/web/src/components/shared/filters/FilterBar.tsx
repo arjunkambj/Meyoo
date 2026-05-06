@@ -1,12 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { DatePicker, DateRangePicker } from "@heroui/date-picker";
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from "@heroui/dropdown";
-import { Input } from "@heroui/input";
-import { cn } from "@heroui/theme";
-import { Icon } from "@iconify/react";
+import { Button, Chip, cn, DatePicker, DateRangePicker, Dropdown, Input, Label } from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import React from "react";
 
@@ -24,7 +18,7 @@ export interface FilterOption {
   icon?: string;
   color?:
     | "default"
-    | "primary"
+    | "accent"
     | "secondary"
     | "success"
     | "warning"
@@ -96,45 +90,33 @@ export function FilterBar({
       case "select":
         return (
           <Dropdown>
-            <DropdownTrigger>
-              <Button
-                className="w-full"
-                endContent={
-                  <Icon
-                    className="w-4 h-4"
-                    icon="solar:alt-arrow-down-linear"
-                  />
-                }
-                size={isInline ? "sm" : "md"}
-                startContent={
-                  filter.icon && <Icon className="w-4 h-4" icon={filter.icon} />
-                }
-                variant="flat"
-              >
-                {value && filter.options?.find((o) => o.value === value)?.label
-                  ? filter.options.find((o) => o.value === value)?.label
-                  : filter.label}
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label={filter.label}
-              selectedKeys={value ? new Set([value as string]) : new Set()}
-              selectionMode="single"
-              onAction={(key) => onFilterChange(filter.key, key)}
+            <Button
+              className="w-full"
+              size={isInline ? "sm" : "md"}
+              variant="tertiary"
             >
-              {filter.options?.map((option) => (
-                <DropdownItem
-                  key={option.value}
-                  startContent={
-                    option.icon && (
-                      <Icon className="w-4 h-4" icon={option.icon} />
-                    )
-                  }
-                >
-                  {option.label}
-                </DropdownItem>
-              )) || []}
-            </DropdownMenu>
+              {value && filter.options?.find((o) => o.value === value)?.label
+                ? filter.options.find((o) => o.value === value)?.label
+                : filter.label}
+            </Button>
+            <Dropdown.Popover>
+              <Dropdown.Menu
+                selectedKeys={value ? new Set([value as string]) : new Set()}
+                selectionMode="single"
+                onAction={(key) => onFilterChange(filter.key, key)}
+              >
+                {filter.options?.map((option) => (
+                  <Dropdown.Item
+                    key={option.value}
+                    id={option.value}
+                    textValue={option.label}
+                  >
+                    <Dropdown.ItemIndicator />
+                    <Label>{option.label}</Label>
+                  </Dropdown.Item>
+                )) || []}
+              </Dropdown.Menu>
+            </Dropdown.Popover>
           </Dropdown>
         );
 
@@ -143,51 +125,39 @@ export function FilterBar({
 
         return (
           <Dropdown>
-            <DropdownTrigger>
-              <Button
-                endContent={
-                  <Icon
-                    className="w-4 h-4"
-                    icon="solar:alt-arrow-down-linear"
-                  />
-                }
-                size={isInline ? "sm" : "md"}
-                startContent={
-                  filter.icon && <Icon className="w-4 h-4" icon={filter.icon} />
-                }
-                variant="flat"
-              >
-                {selectedValues && selectedValues.length > 0
-                  ? `${filter.label} (${selectedValues.length})`
-                  : filter.label}
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label={filter.label}
-              selectedKeys={new Set(selectedValues)}
-              selectionMode="multiple"
-              onAction={(key) => {
-                const keyStr = String(key);
-                const newValues = selectedValues.includes(keyStr)
-                  ? selectedValues.filter((v) => v !== keyStr)
-                  : [...selectedValues, keyStr];
-
-                onFilterChange(filter.key, newValues);
-              }}
+            <Button
+              size={isInline ? "sm" : "md"}
+              variant="tertiary"
             >
-              {filter.options?.map((option) => (
-                <DropdownItem
-                  key={option.value}
-                  startContent={
-                    option.icon && (
-                      <Icon className="w-4 h-4" icon={option.icon} />
-                    )
-                  }
-                >
-                  {option.label}
-                </DropdownItem>
-              )) || []}
-            </DropdownMenu>
+              {selectedValues && selectedValues.length > 0
+                ? `${filter.label} (${selectedValues.length})`
+                : filter.label}
+            </Button>
+            <Dropdown.Popover>
+              <Dropdown.Menu
+                selectedKeys={new Set(selectedValues)}
+                selectionMode="multiple"
+                onAction={(key) => {
+                  const keyStr = String(key);
+                  const newValues = selectedValues.includes(keyStr)
+                    ? selectedValues.filter((v) => v !== keyStr)
+                    : [...selectedValues, keyStr];
+
+                  onFilterChange(filter.key, newValues);
+                }}
+              >
+                {filter.options?.map((option) => (
+                  <Dropdown.Item
+                    key={option.value}
+                    id={option.value}
+                    textValue={option.label}
+                  >
+                    <Dropdown.ItemIndicator />
+                    <Label>{option.label}</Label>
+                  </Dropdown.Item>
+                )) || []}
+              </Dropdown.Menu>
+            </Dropdown.Popover>
           </Dropdown>
         );
       }
@@ -196,8 +166,6 @@ export function FilterBar({
         return (
           <DatePicker
             className={isInline ? "w-40" : "max-w-xs"}
-            label={filter.label}
-            size={isInline ? "sm" : "md"}
             value={
               value ? (parseDate(value as string) as unknown as never) : null
             }
@@ -211,8 +179,6 @@ export function FilterBar({
         return (
           <DateRangePicker
             className={isInline ? "w-60" : "max-w-xs"}
-            label={filter.label}
-            size={isInline ? "sm" : "md"}
             value={value as unknown as never}
             onChange={(range: unknown) => onFilterChange(filter.key, range)}
           />
@@ -222,29 +188,21 @@ export function FilterBar({
         return (
           <Input
             className={isInline ? "w-32" : "max-w-xs"}
-            label={filter.label}
-            placeholder={filter.placeholder}
-            size={isInline ? "sm" : "md"}
-            startContent={
-              filter.icon && <Icon className="w-4 h-4" icon={filter.icon} />
-            }
-            type="number"
+                        placeholder={filter.placeholder}
+                        type="number"
             value={(value || "") as string}
-            onValueChange={(val) =>
+            onChange={(event) => { const val = event.currentTarget.value;
               onFilterChange(filter.key, val ? Number(val) : undefined)
-            }
+            }}
           />
         );
 
       case "boolean":
         return (
           <Button
-            color={value ? "primary" : "default"}
             size={isInline ? "sm" : "md"}
-            startContent={
-              filter.icon && <Icon className="w-4 h-4" icon={filter.icon} />
-            }
-            variant={value ? "solid" : "flat"}
+           
+            variant={value ? "primary" : "tertiary"}
             onPress={() => onFilterChange(filter.key, !value)}
           >
             {filter.label}
@@ -269,10 +227,8 @@ export function FilterBar({
         {activeFilters > 0 && onReset && (
           <Button
             size="sm"
-            startContent={
-              <Icon className="w-4 h-4" icon="solar:restart-linear" />
-            }
-            variant="light"
+           
+            variant="tertiary"
             onPress={onReset}
           >
             Clear ({activeFilters})
@@ -287,15 +243,13 @@ export function FilterBar({
       {/* Presets */}
       {presets && presets.length > 0 && (
         <div className="flex gap-2 items-center">
-          <span className="text-small text-default-500">Quick filters:</span>
+          <span className="text-sm text-muted">Quick filters:</span>
           {presets.map((preset) => (
             <Button
               key={preset.key}
               size="sm"
-              startContent={
-                preset.icon && <Icon className="w-4 h-4" icon={preset.icon} />
-              }
-              variant="flat"
+             
+              variant="tertiary"
               onPress={() => onPresetSelect?.(preset)}
             >
               {preset.label}
@@ -316,16 +270,14 @@ export function FilterBar({
         {/* Active filters indicator and reset - kept inline */}
         {activeFilters > 0 && (
           <>
-            <Chip color="primary" size="sm" variant="solid">
+            <Chip color="accent" size="sm" variant="soft">
               {activeFilters} active
             </Chip>
             {onReset && (
               <Button
                 size="sm"
-                startContent={
-                  <Icon className="w-4 h-4" icon="solar:restart-linear" />
-                }
-                variant="light"
+               
+                variant="tertiary"
                 onPress={onReset}
               >
                 Reset

@@ -1,12 +1,6 @@
 "use client";
 
-import { Avatar } from "@heroui/avatar";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
-import { addToast } from "@heroui/toast";
-import type { SharedSelection } from "@heroui/system";
-import { Icon } from "@iconify/react";
+import { Avatar, Button, Input, ListBox, Select, toast } from "@heroui/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSetAtom } from "jotai";
 import { setSettingsPendingAtom } from "@/store/atoms";
@@ -166,17 +160,9 @@ export default function ProfileSection() {
         await updateOrganization(updates);
       }
 
-      addToast({
-        title: "Profile updated",
-        description: "Your changes have been saved",
-        color: "default",
-      });
+      toast("Profile updated", { description: "Your changes have been saved" });
     } catch (_error) {
-      addToast({
-        title: "Update failed",
-        description: "Please try again later",
-        color: "danger",
-      });
+      toast.danger("Update failed", { description: "Please try again later" });
     } finally {
       setIsLoading(false);
       setPending(false);
@@ -240,16 +226,14 @@ export default function ProfileSection() {
     []
   );
 
-  const handleCurrencyChange = useCallback((keys: SharedSelection) => {
-    if (keys === "all") return;
-    const [nextCurrency] = Array.from(keys).map(String);
+  const handleCurrencyChange = useCallback((key: React.Key | null) => {
+    const nextCurrency = key?.toString();
     if (!nextCurrency) return;
     setFormData((prev) => ({ ...prev, currency: nextCurrency }));
   }, []);
 
-  const handleTimezoneChange = useCallback((keys: SharedSelection) => {
-    if (keys === "all") return;
-    const [nextTimezone] = Array.from(keys).map(String);
+  const handleTimezoneChange = useCallback((key: React.Key | null) => {
+    const nextTimezone = key?.toString();
     if (!nextTimezone) return;
     setFormData((prev) => ({ ...prev, timezone: nextTimezone }));
   }, []);
@@ -265,18 +249,18 @@ export default function ProfileSection() {
       <div className="flex px-1 items-center gap-6">
         <div className="relative">
           <Avatar
-            isBordered
-            className="h-20 w-20"
-            color="primary"
-            name={fullName || formData.email}
-            src={user?.image || ""}
-          />
+            className="h-20 w-20 border-2 border-background"
+            variant="soft"
+          >
+            <Avatar.Image src={user?.image || ""} alt={fullName || formData.email} />
+            <Avatar.Fallback>{(fullName || formData.email).slice(0, 2).toUpperCase()}</Avatar.Fallback>
+          </Avatar>
         </div>
         <div className="space-y-2">
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             Profile picture synced from your authentication provider
           </p>
-          <p className="text-xs text-default-400">
+          <p className="text-xs text-muted">
             Sign in with Google to use your Google profile picture
           </p>
         </div>
@@ -285,143 +269,90 @@ export default function ProfileSection() {
       {/* Form Fields */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Input
-          classNames={{
-            label: "text-sm font-medium text-foreground",
-          }}
-          isDisabled={isLoading}
-          label="First Name"
-          labelPlacement="outside"
-          placeholder="Enter your first name"
+                    disabled={isLoading}
+                              placeholder="Enter your first name"
           value={formData.firstName}
           onChange={handleFirstNameChange}
         />
         <Input
-          classNames={{
-            label: "text-sm font-medium text-foreground",
-          }}
-          isDisabled={isLoading}
-          label="Last Name"
-          labelPlacement="outside"
-          placeholder="Enter your last name"
+                    disabled={isLoading}
+                              placeholder="Enter your last name"
           value={formData.lastName}
           onChange={handleLastNameChange}
         />
         <Input
-          classNames={{
-            label: "text-sm font-medium text-foreground",
-          }}
-          description="Your unique organization identifier"
-          endContent={
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              onPress={() => {
-                navigator.clipboard.writeText(formData.organizationId);
-                addToast({
-                  title: "Copied",
-                  description: "Organization ID copied to clipboard",
-                  color: "default",
-                  timeout: 2000,
-                });
-              }}
-            >
-              <Icon icon="solar:copy-bold-duotone" width={18} />
-            </Button>
-          }
-          isReadOnly
-          label="Organization ID"
-          labelPlacement="outside"
-          placeholder="Organization ID"
+                                        readOnly
+                              placeholder="Organization ID"
           value={formData.organizationId}
         />
         <Input
-          classNames={{
-            label: "text-sm font-medium text-foreground",
-          }}
-          description="The name of your organization"
-          isDisabled={isLoading}
-          label="Organization Name"
-          labelPlacement="outside"
-          placeholder="Enter organization name"
+                              disabled={isLoading}
+                              placeholder="Enter organization name"
           value={formData.organizationName}
           onChange={handleOrganizationNameChange}
         />
         <Select
-          classNames={{
-            label: "text-sm font-medium text-foreground",
-            listboxWrapper: "shadow-none before:hidden after:hidden",
-          }}
-          disallowEmptySelection
           isDisabled={isLoading}
-          label="Primary Currency"
-          labelPlacement="outside"
           placeholder="Select a currency"
-          selectedKeys={formData.currency ? [formData.currency] : []}
-          onSelectionChange={handleCurrencyChange}
+          value={formData.currency || null}
+          onChange={(key) => handleCurrencyChange(key)}
         >
-          {CURRENCY_OPTIONS.map((option) => (
-            <SelectItem key={option.value}>{option.label}</SelectItem>
-          ))}
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {CURRENCY_OPTIONS.map((option) => (
+                <ListBox.Item
+                  key={option.value}
+                  id={option.value}
+                  textValue={option.label}
+                >
+                  {option.label}
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
         </Select>
         <Select
-          classNames={{
-            label: "text-sm font-medium text-foreground",
-            listboxWrapper: "shadow-none before:hidden after:hidden",
-          }}
-          disallowEmptySelection
           isDisabled={isLoading}
-          label="Timezone"
-          labelPlacement="outside"
           placeholder="Select a timezone"
-          selectedKeys={formData.timezone ? [formData.timezone] : []}
-          onSelectionChange={handleTimezoneChange}
+          value={formData.timezone || null}
+          onChange={(key) => handleTimezoneChange(key)}
         >
-          {TIMEZONE_OPTIONS.map((option) => (
-            <SelectItem key={option.value}>{option.label}</SelectItem>
-          ))}
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              {TIMEZONE_OPTIONS.map((option) => (
+                <ListBox.Item
+                  key={option.value}
+                  id={option.value}
+                  textValue={option.label}
+                >
+                  {option.label}
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              ))}
+            </ListBox>
+          </Select.Popover>
         </Select>
         <div className="flex flex-col gap-2">
           <Input
-            classNames={{
-              label: "text-sm font-medium text-foreground",
-            }}
-            description="Email is your login identifier"
-            endContent={
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                onPress={() => {
-                  navigator.clipboard.writeText(formData.email);
-                  addToast({
-                    title: "Copied",
-                    description: "Email copied to clipboard",
-                    color: "default",
-                    timeout: 2000,
-                  });
-                }}
-              >
-                <Icon icon="solar:copy-bold-duotone" width={18} />
-              </Button>
-            }
-            isReadOnly
-            label="Email Address"
-            labelPlacement="outside"
-            placeholder="your@email.com"
+                                                readOnly
+                                    placeholder="your@email.com"
             type="email"
             value={formData.email}
           />
         </div>
         <div className="flex flex-col gap-2">
           <Input
-            classNames={{
-              label: "text-sm font-medium text-foreground",
-            }}
-            isDisabled={isLoading}
-            label="Phone Number"
-            labelPlacement="outside"
-            placeholder="+1 (555) 123-4567"
+                        disabled={isLoading}
+                                    placeholder="+1 (555) 123-4567"
             type="tel"
             value={formData.phone}
             onChange={handlePhoneChange}
@@ -431,10 +362,10 @@ export default function ProfileSection() {
 
       {/* Action Buttons */}
       <div className="flex justify-end flex-wrap gap-3 pt-4">
-        <Button
-          color="primary"
+        <Button variant="primary"
+         
           isDisabled={!hasChanges}
-          isLoading={isLoading}
+          isPending={isLoading}
           onPress={handleSubmit}
         >
           Save Changes

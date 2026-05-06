@@ -1,9 +1,6 @@
 "use client";
 
-import { Checkbox } from "@heroui/checkbox";
-import { Input } from "@heroui/input";
-import { ScrollShadow } from "@heroui/scroll-shadow";
-import { cn } from "@heroui/theme";
+import { Checkbox, cn, Input, ScrollShadow } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useMemo } from "react";
 
@@ -42,23 +39,20 @@ export function ItemSelector({
       <Input
         className="mb-4"
         placeholder={placeholder}
-        size="sm"
-        startContent={<Icon icon="solar:search-linear" width={16} />}
-        value={searchQuery}
-        onValueChange={onSearchChange}
+                value={searchQuery}
+        onChange={(event) => onSearchChange(event.currentTarget.value)}
       />
       <ScrollShadow hideScrollBar className="h-[420px]">
         <div className="space-y-2">
           {items.map((item) => (
             <div
               key={item.id}
-              className="p-2 border border-divider rounded-lg hover:bg-default-100 transition-colors"
+              className="p-2 border border-surface-tertiary rounded-lg hover:bg-surface-secondary transition-colors"
             >
               <Checkbox
                 isSelected={selectedSet.has(item.id)}
-                size="sm"
                 value={item.id}
-                onValueChange={(checked) => onItemToggle(item.id, checked)}
+                onChange={(checked) => onItemToggle(item.id, checked)}
               >
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
@@ -72,7 +66,7 @@ export function ItemSelector({
                     </span>
                   </div>
                   {item.description && (
-                    <span className="text-xs text-default-500 ml-6">
+                    <span className="text-xs text-muted ml-6">
                       {item.description}
                     </span>
                   )}

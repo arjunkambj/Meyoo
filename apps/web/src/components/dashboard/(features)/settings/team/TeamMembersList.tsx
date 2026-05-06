@@ -1,20 +1,21 @@
 "use client";
 
-import { Avatar } from "@heroui/avatar";
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Skeleton } from "@heroui/skeleton";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
-import { addToast } from "@heroui/toast";
+import { Avatar, Button, Chip, Skeleton, Table, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useMutation } from "convex/react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useSetAtom } from "jotai";
 import { setSettingsPendingAtom } from "@/store/atoms";
 import { api } from "@/libs/convexApi";
 import type { GenericId as Id } from "convex/values";
 import { useTeamMembersWithManagement, useUser } from "@/hooks";
 import { formatDate } from "@/libs/utils/format";
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 
 // Use inferred return type from Convex API; no local TeamMember type
 
@@ -29,14 +30,6 @@ export default function TeamMembersList() {
 
   const removeTeamMember = useMutation(api.core.teams.removeTeamMember);
 
-  const tableClassNames = useMemo(
-    () => ({
-      wrapper: "shadow-none border-0",
-      th: "dark:bg-background",
-    }),
-    []
-  );
-
   const handleRemoveMember = useCallback(
     async (userId: Id<"users">) => {
       setRemovingUserId(userId);
@@ -45,16 +38,16 @@ export default function TeamMembersList() {
         const result = await removeTeamMember({ memberId: userId });
 
         if (result.success) {
-          addToast({ title: result.message, color: "default" });
+          toast(result.message);
         } else {
-          addToast({ title: result.message, color: "danger" });
+          toast.danger(result.message);
         }
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
             : "Failed to remove team member";
-        addToast({ title: message, color: "danger" });
+        toast.danger(message);
       } finally {
         setRemovingUserId(null);
         setPending(false);
@@ -65,17 +58,21 @@ export default function TeamMembersList() {
 
   if (isLoading) {
     return (
-      <Table aria-label="Team members table" classNames={tableClassNames}>
-        <TableHeader>
-          <TableColumn>MEMBER</TableColumn>
-          <TableColumn>ROLE</TableColumn>
-          <TableColumn>STATUS</TableColumn>
-          <TableColumn>JOINED</TableColumn>
-          <TableColumn>{canManageTeam ? "ACTIONS" : ""}</TableColumn>
-        </TableHeader>
-        <TableBody>
+      <Table>
+        <Table.ScrollContainer>
+          <Table.Content aria-label="Loading team members">
+            <TableHeader>
+              <TableColumn id="member" isRowHeader>
+                MEMBER
+              </TableColumn>
+              <TableColumn id="role">ROLE</TableColumn>
+              <TableColumn id="status">STATUS</TableColumn>
+              <TableColumn id="joined">JOINED</TableColumn>
+              <TableColumn id="actions">{canManageTeam ? "ACTIONS" : ""}</TableColumn>
+            </TableHeader>
+            <TableBody>
           {Array.from({ length: 3 }).map((_, index) => (
-            <TableRow key={index}>
+            <TableRow key={index} id={`skeleton-${index}`}>
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-8 w-8 rounded-full" />
@@ -99,7 +96,9 @@ export default function TeamMembersList() {
               </TableCell>
             </TableRow>
           ))}
-        </TableBody>
+            </TableBody>
+          </Table.Content>
+        </Table.ScrollContainer>
       </Table>
     );
   }
@@ -110,7 +109,7 @@ export default function TeamMembersList() {
         <div className="text-center space-y-4 max-w-md">
           <div className="flex justify-center mb-4">
             <Icon
-              className="text-primary"
+              className="text-accent"
               icon="solar:users-group-two-rounded-bold-duotone"
               width={48}
             />
@@ -118,7 +117,7 @@ export default function TeamMembersList() {
           <p className="text-lg font-medium text-foreground">
             No team members yet
           </p>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             Invite team members to collaborate on your store. They will have
             access to all features except billing and team management.
           </p>
@@ -128,35 +127,40 @@ export default function TeamMembersList() {
   }
 
   return (
-    <Table aria-label="Team members table" classNames={tableClassNames}>
-      <TableHeader>
-        <TableColumn>MEMBER</TableColumn>
-        <TableColumn>ROLE</TableColumn>
-        <TableColumn>STATUS</TableColumn>
-        <TableColumn>JOINED</TableColumn>
-        <TableColumn>{canManageTeam ? "ACTIONS" : ""}</TableColumn>
-      </TableHeader>
-      <TableBody>
+    <Table>
+      <Table.ScrollContainer>
+        <Table.Content aria-label="Team members">
+          <TableHeader>
+            <TableColumn id="member" isRowHeader>
+              MEMBER
+            </TableColumn>
+            <TableColumn id="role">ROLE</TableColumn>
+            <TableColumn id="status">STATUS</TableColumn>
+            <TableColumn id="joined">JOINED</TableColumn>
+            <TableColumn id="actions">{canManageTeam ? "ACTIONS" : ""}</TableColumn>
+          </TableHeader>
+          <TableBody>
         {(teamMembers || []).map((member) => (
-          <TableRow key={member._id}>
+          <TableRow key={member._id} id={member._id}>
             <TableCell>
               <div className="flex items-center gap-3">
                 <Avatar
-                  name={member.name || member.email}
                   size="sm"
-                  src={member.image}
-                />
+                >
+                  <Avatar.Image src={member.image} alt={member.name || member.email || "Team member"} />
+                  <Avatar.Fallback>{(member.name || member.email || "TM").slice(0, 2).toUpperCase()}</Avatar.Fallback>
+                </Avatar>
                 <div>
                   <p className="text-sm font-medium">
                     {member.name || "Unnamed"}
                   </p>
-                  <p className="text-xs text-default-500">{member.email}</p>
+                  <p className="text-xs text-muted">{member.email}</p>
                 </div>
               </div>
             </TableCell>
             <TableCell>
               <Chip
-                color={member.role === "StoreOwner" ? "primary" : "default"}
+                color={member.role === "StoreOwner" ? "accent" : "default"}
                 size="sm"
               >
                 {member.role === "StoreOwner" ? "Owner" : "Team"}
@@ -167,7 +171,7 @@ export default function TeamMembersList() {
                 <Chip
                   color={member.status === "active" ? "success" : "warning"}
                   size="sm"
-                  variant="dot"
+                  variant="soft"
                 >
                   {member.status === "active" ? "Active" : "Invited"}
                 </Chip>
@@ -175,7 +179,7 @@ export default function TeamMembersList() {
               </div>
             </TableCell>
             <TableCell>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {member.createdAt ? formatDate(member.createdAt) : "—"}
               </p>
             </TableCell>
@@ -184,26 +188,24 @@ export default function TeamMembersList() {
               member.role !== "StoreOwner" &&
               currentUserRole === "StoreOwner" ? (
                 <Button
-                  color="danger"
-                  isLoading={removingUserId === member._id}
+                 
+                  isPending={removingUserId === member._id}
                   size="sm"
-                  startContent={
-                    !removingUserId && (
-                      <Icon icon="solar:trash-bin-2-bold-duotone" width={16} />
-                    )
-                  }
-                  variant="light"
+                 
+                  variant="tertiary"
                   onPress={() => handleRemoveMember(member._id)}
                 >
                   Remove
                 </Button>
               ) : (
-                <span className="text-xs text-default-400">—</span>
+                <span className="text-xs text-muted">—</span>
               )}
             </TableCell>
           </TableRow>
         ))}
-      </TableBody>
+          </TableBody>
+        </Table.Content>
+      </Table.ScrollContainer>
     </Table>
   );
 }

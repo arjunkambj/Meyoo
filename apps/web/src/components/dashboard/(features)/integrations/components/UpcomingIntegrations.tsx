@@ -74,7 +74,7 @@ export function UpcomingIntegrations() {
           category={integration.category}
           color={integration.color}
           description={integration.description}
-          features={integration.features}
+                    features={integration.features}
           icon={integration.icon}
           isConnected={false}
           isUpcoming={true}

@@ -14,7 +14,7 @@ export default async function AppLayout({
   return (
     <UserProvider>
       <OnboardingProvider>
-        <div className="flex h-full w-full bg-background border border-default-100">
+        <div className="flex h-full w-full bg-background border border-surface-tertiary">
           <div className="flex h-full w-full py-6">
             <aside className="h-full">
               <DashboardSidebar />

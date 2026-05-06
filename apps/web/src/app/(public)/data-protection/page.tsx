@@ -1,6 +1,6 @@
-﻿"use client";
-import { Card, CardBody } from "@heroui/card";
-import { Divider } from "@heroui/divider";
+"use client";
+
+import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 
@@ -122,25 +122,25 @@ const securityMeasures = [
 export default function DataProtectionPage() {
   return (
     <div className="min-h-screen bg-background pt-28">
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-default-200/70 to-transparent dark:via-default-100/40" />
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-surface-secondary/70 to-transparent dark:via-surface-secondary/40" />
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2.5 bg-content1/70 dark:bg-content1/50 backdrop-blur-md border border-divider rounded-full px-5 py-2.5 mb-6">
+          <div className="inline-flex items-center gap-2.5 bg-surface/70 dark:bg-surface/50 backdrop-blur-md border border-surface-tertiary rounded-full px-5 py-2.5 mb-6">
             <Icon
-              className="text-primary"
+              className="text-accent"
               icon="solar:shield-keyhole-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-semibold text-default-700">
+            <span className="text-sm font-semibold text-muted">
               Data Protection
             </span>
           </div>
           <h1 className="text-5xl font-bold mb-4">Data Protection</h1>
-          <p className="text-xl text-default-600 mb-2">
+          <p className="text-xl text-muted mb-2">
             Your Rights and Our Commitments
           </p>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             Last updated: {lastUpdated}
           </p>
         </div>
@@ -150,16 +150,16 @@ export default function DataProtectionPage() {
       <section className="py-12 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Introduction */}
-          <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none mb-12">
-            <CardBody className="p-8">
+          <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-12">
+            <Card.Content className="p-8">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <Icon
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-accent"
                   icon="solar:shield-keyhole-bold-duotone"
                 />
                 Our Commitment to Data Protection
               </h2>
-              <div className="space-y-4 text-default-700">
+              <div className="space-y-4 text-muted">
                 <p>
                   At Meyoo, operated by Pyro Labs Private Limited, we take data
                   protection seriously. This page outlines your rights under
@@ -175,7 +175,7 @@ export default function DataProtectionPage() {
                   Google policies.
                 </p>
               </div>
-            </CardBody>
+            </Card.Content>
           </Card>
 
           {/* Data Protection Principles */}
@@ -187,13 +187,13 @@ export default function DataProtectionPage() {
               {dataProtectionPrinciples.map((principle) => (
                 <Card
                   key={principle.title}
-                  className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
                 >
-                  <CardBody className="p-6">
+                  <Card.Content className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                         <Icon
-                          className="w-6 h-6 text-primary"
+                          className="w-6 h-6 text-accent"
                           icon={principle.icon}
                         />
                       </div>
@@ -201,51 +201,51 @@ export default function DataProtectionPage() {
                         <h3 className="font-semibold mb-2">
                           {principle.title}
                         </h3>
-                        <p className="text-sm text-default-600">
+                        <p className="text-sm text-muted">
                           {principle.description}
                         </p>
                       </div>
                     </div>
-                  </CardBody>
+                  </Card.Content>
                 </Card>
               ))}
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* GDPR Rights */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
               <Icon
-                className="w-6 h-6 text-primary"
+                className="w-6 h-6 text-accent"
                 icon="tabler:brand-europa"
               />
               GDPR Rights (European Union)
             </h2>
-            <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none mb-6">
-              <CardBody className="p-6">
-                <p className="text-default-700">
+            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-6">
+              <Card.Content className="p-6">
+                <p className="text-muted">
                   If you&apos;re located in the European Economic Area (EEA),
                   you have the following rights under GDPR:
                 </p>
-              </CardBody>
+              </Card.Content>
             </Card>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {gdprRights.map((right) => (
                 <Card
                   key={right.title}
-                  className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
+                  className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none transition-transform hover:-translate-y-0.5"
                 >
-                  <CardBody className="p-6">
+                  <Card.Content className="p-6">
                     <div className="flex items-start gap-4">
                       <Icon
-                        className="w-8 h-8 text-primary shrink-0"
+                        className="w-8 h-8 text-accent shrink-0"
                         icon={right.icon}
                       />
                       <div className="flex-1">
                         <h3 className="font-semibold mb-2">{right.title}</h3>
-                        <p className="text-sm text-default-600 mb-3">
+                        <p className="text-sm text-muted mb-3">
                           {right.description}
                         </p>
                         {right.details && (
@@ -253,10 +253,10 @@ export default function DataProtectionPage() {
                             {right.details.map((detail) => (
                               <li
                                 key={detail}
-                                className="text-xs text-default-500 flex items-start gap-2"
+                                className="text-xs text-muted flex items-start gap-2"
                               >
                                 <Icon
-                                  className="w-3 h-3 text-primary mt-0.5"
+                                  className="w-3 h-3 text-accent mt-0.5"
                                   icon="solar:check-circle-bold-duotone"
                                 />
                                 <span>{detail}</span>
@@ -266,93 +266,93 @@ export default function DataProtectionPage() {
                         )}
                       </div>
                     </div>
-                  </CardBody>
+                  </Card.Content>
                 </Card>
               ))}
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* CCPA Rights */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <Icon className="w-6 h-6 text-primary" icon="tabler:flag-usa" />
+              <Icon className="w-6 h-6 text-accent" icon="tabler:flag-usa" />
               CCPA Rights (California, USA)
             </h2>
-            <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none mb-6">
-              <CardBody className="p-6">
-                <p className="text-default-700">
+            <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none mb-6">
+              <Card.Content className="p-6">
+                <p className="text-muted">
                   California residents have specific rights under the California
                   Consumer Privacy Act (CCPA):
                 </p>
-              </CardBody>
+              </Card.Content>
             </Card>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:info-square-bold-duotone"
                     />
                     Right to Know
                   </h3>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     Request disclosure of personal information collected, used,
                     disclosed, or sold in the past 12 months.
                   </p>
-                </CardBody>
+                </Card.Content>
               </Card>
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:trash-bin-2-bold-duotone"
                     />
                     Right to Delete
                   </h3>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     Request deletion of personal information collected from you,
                     subject to certain exceptions.
                   </p>
-                </CardBody>
+                </Card.Content>
               </Card>
-              <Card className="bg-content1 shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:hand-money-bold-duotone"
                     />
                     Right to Opt-Out
                   </h3>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     Opt-out of the sale of personal information. Note: Meyoo
                     does not sell personal information.
                   </p>
-                </CardBody>
+                </Card.Content>
               </Card>
-              <Card className="bg-content1 shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:shield-user-bold-duotone"
                     />
                     Non-Discrimination
                   </h3>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     Exercise your privacy rights without experiencing
                     discrimination in service or pricing.
                   </p>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* How to Exercise Rights */}
           <div className="mb-12">
@@ -360,19 +360,19 @@ export default function DataProtectionPage() {
               How to Exercise Your Rights
             </h2>
             <div className="space-y-6">
-              <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-4">Self-Service Options</h3>
-                  <p className="text-default-700 text-sm mb-4">
+                  <p className="text-muted text-sm mb-4">
                     Many data rights can be exercised directly through your
                     account:
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 text-primary rounded-full text-sm">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 text-accent rounded-full text-sm">
                       <Icon icon="solar:settings-bold-duotone" />
                       <span>Account Settings</span>
                     </div>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 text-primary rounded-full text-sm">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 text-accent rounded-full text-sm">
                       <Icon icon="solar:download-square-bold-duotone" />
                       <span>Export Your Data</span>
                     </div>
@@ -381,25 +381,25 @@ export default function DataProtectionPage() {
                       <span>Delete Account</span>
                     </div>
                   </div>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-content2 border border-divider shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface-secondary border border-surface-tertiary shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-4">Submit a Request</h3>
-                  <p className="text-default-700 text-sm mb-4">
+                  <p className="text-muted text-sm mb-4">
                     For requests that cannot be completed through self-service:
                   </p>
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
                       <Icon
-                        className="w-5 h-5 text-primary mt-0.5"
+                        className="w-5 h-5 text-accent mt-0.5"
                         icon="solar:letter-bold-duotone"
                       />
                       <div>
                         <p className="font-medium text-sm">Email</p>
                         <Link
-                          className="text-sm text-primary hover:underline"
+                          className="text-sm text-accent hover:underline"
                           href="mailto:hey@meyoo.io"
                         >
                           hey@meyoo.io
@@ -408,7 +408,7 @@ export default function DataProtectionPage() {
                     </div>
                     <div className="flex items-start gap-3">
                       <Icon
-                        className="w-5 h-5 text-primary mt-0.5"
+                        className="w-5 h-5 text-accent mt-0.5"
                         icon="solar:document-text-bold-duotone"
                       />
                       <div>
@@ -416,7 +416,7 @@ export default function DataProtectionPage() {
                           Privacy Request Form
                         </p>
                         <Link
-                          className="text-sm text-primary hover:underline"
+                          className="text-sm text-accent hover:underline"
                           href="/privacy/data-deletion"
                         >
                           Submit online form
@@ -424,12 +424,12 @@ export default function DataProtectionPage() {
                       </div>
                     </div>
                   </div>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Platform-Specific Procedures */}
           <div className="mb-12">
@@ -437,19 +437,19 @@ export default function DataProtectionPage() {
               Platform-Specific Data Protection Procedures
             </h2>
             <div className="space-y-6">
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:verified-check-bold-duotone"
                     />
                     Google Ads Policy Exemption Requests
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     For Google Ads related policy matters:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>
                       • Policy violation exemptions are handled through our
                       automated compliance system
@@ -467,22 +467,22 @@ export default function DataProtectionPage() {
                       verification before implementation
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="logos:meta-icon"
                     />
                     Meta App Review Policy Violations
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     For Meta platform policy concerns:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>
                       • App review policy violations are monitored
                       continuously
@@ -500,22 +500,22 @@ export default function DataProtectionPage() {
                       data restrictions
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
 
-              <Card className="bg-content1/70 dark:bg-content1/40 backdrop-blur-md border border-divider rounded-2xl shadow-none">
-                <CardBody className="p-6">
+              <Card className="bg-surface/70 dark:bg-surface/40 backdrop-blur-md border border-surface-tertiary rounded-2xl shadow-none">
+                <Card.Content className="p-6">
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Icon
-                      className="w-5 h-5 text-primary"
+                      className="w-5 h-5 text-accent"
                       icon="solar:shop-bold-duotone"
                     />
                     Shopify App Audit Compliance
                   </h3>
-                  <p className="text-default-700 text-sm mb-3">
+                  <p className="text-muted text-sm mb-3">
                     For Shopify app audit and compliance procedures:
                   </p>
-                  <ul className="space-y-2 text-sm text-default-600">
+                  <ul className="space-y-2 text-sm text-muted">
                     <li>
                       • App audit requests are responded to within 48 hours
                     </li>
@@ -532,12 +532,12 @@ export default function DataProtectionPage() {
                       continuously
                     </li>
                   </ul>
-                </CardBody>
+                </Card.Content>
               </Card>
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Security Measures */}
           <div className="mb-12">
@@ -548,12 +548,12 @@ export default function DataProtectionPage() {
               {securityMeasures.map((measure) => (
                 <Card
                   key={measure.title}
-                  className="bg-content2 border border-divider shadow-none"
+                  className="bg-surface-secondary border border-surface-tertiary shadow-none"
                 >
-                  <CardBody className="p-6">
+                  <Card.Content className="p-6">
                     <h3 className="font-semibold mb-3 flex items-center gap-2">
                       <Icon
-                        className="w-5 h-5 text-primary"
+                        className="w-5 h-5 text-accent"
                         icon={measure.icon}
                       />
                       {measure.title}
@@ -562,7 +562,7 @@ export default function DataProtectionPage() {
                       {measure.items.map((item) => (
                         <li
                           key={item}
-                          className="text-sm text-default-600 flex items-start gap-2"
+                          className="text-sm text-muted flex items-start gap-2"
                         >
                           <Icon
                             className="w-4 h-4 text-success mt-0.5"
@@ -572,22 +572,22 @@ export default function DataProtectionPage() {
                         </li>
                       ))}
                     </ul>
-                  </CardBody>
+                  </Card.Content>
                 </Card>
               ))}
             </div>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* International Transfers */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">
               International Data Transfers
             </h2>
-            <Card className="bg-content1 shadow-none">
-              <CardBody className="p-6">
-                <p className="text-default-700 mb-6">
+            <Card className="bg-surface shadow-none">
+              <Card.Content className="p-6">
+                <p className="text-muted mb-6">
                   As we are based in India and serve global customers, your data
                   may be transferred to and processed in countries other than
                   your own. We ensure appropriate safeguards:
@@ -595,14 +595,14 @@ export default function DataProtectionPage() {
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <Icon
-                      className="w-5 h-5 text-primary mt-0.5"
+                      className="w-5 h-5 text-accent mt-0.5"
                       icon="solar:document-text-bold-duotone"
                     />
                     <div>
                       <p className="font-medium text-sm mb-1">
                         Standard Contractual Clauses
                       </p>
-                      <p className="text-sm text-default-600">
+                      <p className="text-sm text-muted">
                         EU-approved contractual terms for data transfers outside
                         the EEA
                       </p>
@@ -610,14 +610,14 @@ export default function DataProtectionPage() {
                   </div>
                   <div className="flex items-start gap-3">
                     <Icon
-                      className="w-5 h-5 text-primary mt-0.5"
+                      className="w-5 h-5 text-accent mt-0.5"
                       icon="solar:shield-keyhole-bold-duotone"
                     />
                     <div>
                       <p className="font-medium text-sm mb-1">
                         Adequacy Decisions
                       </p>
-                      <p className="text-sm text-default-600">
+                      <p className="text-sm text-muted">
                         Transfers to countries with adequate data protection
                         laws
                       </p>
@@ -625,31 +625,31 @@ export default function DataProtectionPage() {
                   </div>
                   <div className="flex items-start gap-3">
                     <Icon
-                      className="w-5 h-5 text-primary mt-0.5"
+                      className="w-5 h-5 text-accent mt-0.5"
                       icon="solar:lock-bold-duotone"
                     />
                     <div>
                       <p className="font-medium text-sm mb-1">
                         Technical Safeguards
                       </p>
-                      <p className="text-sm text-default-600">
+                      <p className="text-sm text-muted">
                         Encryption and access controls regardless of data
                         location
                       </p>
                     </div>
                   </div>
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
-          <Divider className="my-12" />
+          <Separator className="my-12" />
 
           {/* Data Breach Response */}
           <div className="mb-12">
             <h2 className="text-2xl font-bold mb-6">Data Breach Response</h2>
             <Card className="bg-warning-50 dark:bg-warning-100/10 border border-warning-200 dark:border-warning-200/20 rounded-2xl shadow-none">
-              <CardBody className="p-6">
+              <Card.Content className="p-6">
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <Icon
                     className="w-5 h-5 text-warning"
@@ -657,12 +657,12 @@ export default function DataProtectionPage() {
                   />
                   Our Commitment
                 </h3>
-                <p className="text-default-700 text-sm mb-4">
+                <p className="text-muted text-sm mb-4">
                   In the unlikely event of a data breach that affects your
                   personal information:
                 </p>
                 <ul className="space-y-2">
-                  <li className="text-sm text-default-600 flex items-start gap-2">
+                  <li className="text-sm text-muted flex items-start gap-2">
                     <Icon
                       className="w-4 h-4 text-warning mt-0.5"
                       icon="solar:check-circle-bold-duotone"
@@ -671,7 +671,7 @@ export default function DataProtectionPage() {
                       We will notify affected users within 72 hours of discovery
                     </span>
                   </li>
-                  <li className="text-sm text-default-600 flex items-start gap-2">
+                  <li className="text-sm text-muted flex items-start gap-2">
                     <Icon
                       className="w-4 h-4 text-warning mt-0.5"
                       icon="solar:check-circle-bold-duotone"
@@ -680,7 +680,7 @@ export default function DataProtectionPage() {
                       We will provide clear information about what happened
                     </span>
                   </li>
-                  <li className="text-sm text-default-600 flex items-start gap-2">
+                  <li className="text-sm text-muted flex items-start gap-2">
                     <Icon
                       className="w-4 h-4 text-warning mt-0.5"
                       icon="solar:check-circle-bold-duotone"
@@ -689,7 +689,7 @@ export default function DataProtectionPage() {
                       We will explain the potential impact on your data
                     </span>
                   </li>
-                  <li className="text-sm text-default-600 flex items-start gap-2">
+                  <li className="text-sm text-muted flex items-start gap-2">
                     <Icon
                       className="w-4 h-4 text-warning mt-0.5"
                       icon="solar:check-circle-bold-duotone"
@@ -699,7 +699,7 @@ export default function DataProtectionPage() {
                       breach
                     </span>
                   </li>
-                  <li className="text-sm text-default-600 flex items-start gap-2">
+                  <li className="text-sm text-muted flex items-start gap-2">
                     <Icon
                       className="w-4 h-4 text-warning mt-0.5"
                       icon="solar:check-circle-bold-duotone"
@@ -710,34 +710,34 @@ export default function DataProtectionPage() {
                     </span>
                   </li>
                 </ul>
-              </CardBody>
+              </Card.Content>
             </Card>
           </div>
 
           {/* Contact DPO */}
-          <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl shadow-none">
-            <CardBody className="p-8">
+          <Card className="bg-gradient-to-r from-accent/10 to-accent/10 border border-accent/20 rounded-2xl shadow-none">
+            <Card.Content className="p-8">
               <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                 <Icon
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-accent"
                   icon="solar:phone-bold-duotone"
                 />
                 Contact Our Data Protection Team
               </h2>
-              <p className="text-default-700 mb-6">
+              <p className="text-muted mb-6">
                 Our Data Protection team is available to address your privacy
                 concerns and questions:
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <Icon
-                    className="w-5 h-5 text-primary"
+                    className="w-5 h-5 text-accent"
                     icon="solar:letter-bold-duotone"
                   />
                   <span>
                     Email:{" "}
                     <Link
-                      className="text-primary hover:underline"
+                      className="text-accent hover:underline"
                       href="mailto:hey@meyoo.io"
                     >
                       hey@meyoo.io
@@ -746,7 +746,7 @@ export default function DataProtectionPage() {
                 </div>
                 <div className="flex items-start gap-3">
                   <Icon
-                    className="w-5 h-5 text-primary mt-0.5"
+                    className="w-5 h-5 text-accent mt-0.5"
                     icon="solar:buildings-2-bold-duotone"
                   />
                   <span>
@@ -756,13 +756,13 @@ export default function DataProtectionPage() {
                   </span>
                 </div>
               </div>
-              <Divider className="my-6" />
-              <p className="text-sm text-default-600">
+              <Separator className="my-6" />
+              <p className="text-sm text-muted">
                 You also have the right to lodge a complaint with your local
                 data protection supervisory authority if you believe we have not
                 adequately addressed your concerns.
               </p>
-            </CardBody>
+            </Card.Content>
           </Card>
         </div>
       </section>

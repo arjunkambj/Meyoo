@@ -1,8 +1,6 @@
 "use client";
 
-import { Checkbox } from "@heroui/checkbox";
-import { ScrollShadow } from "@heroui/scroll-shadow";
-import { cn } from "@heroui/theme";
+import { Checkbox, cn, ScrollShadow } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import React, { useCallback, useMemo } from "react";
 
@@ -55,27 +53,21 @@ const ItemRow = React.memo(
       <div
         className={`group relative rounded-md border transition-all ${
           isSelected
-            ? "bg-primary-50/80 dark:bg-primary-50/20 border-default-200/20"
-            : "bg-default-100 border-default-200/20"
+            ? "bg-accent-50/80 dark:bg-accent-50/20 border-surface-tertiary/20"
+            : "bg-surface-secondary border-surface-tertiary/20"
         }`}
       >
         <Checkbox
-          classNames={{
-            base: "py-1.5 px-2 m-0 min-w-full",
-            wrapper: "m-0 mr-1.5 w-4 h-4",
-            label: "w-full",
-          }}
-          isSelected={isSelected}
-          size="sm"
+                    isSelected={isSelected}
           value={item.id}
-          onValueChange={handleChange}
+          onChange={handleChange}
         >
           <div className="flex items-center gap-1.5 w-full">
             <Icon
               className={
                 isSelected
-                  ? "text-primary-600 dark:text-primary-400"
-                  : item.iconColor || "text-default-700"
+                  ? "text-accent-600 dark:text-accent-400"
+                  : item.iconColor || "text-muted"
               }
               icon={item.icon}
               width={14}
@@ -83,8 +75,8 @@ const ItemRow = React.memo(
             <span
               className={`text-xs font-medium flex-1 truncate leading-tight ${
                 isSelected
-                  ? "text-primary-700 dark:text-primary-400"
-                  : "text-default-800"
+                  ? "text-accent-700 dark:text-accent-400"
+                  : "text-muted"
               }`}
             >
               {item.label || item.name}
@@ -170,19 +162,19 @@ export function VirtualizedItemSelector({
               const section = row.section;
               return (
                 <div key={section.id} className="w-full mt-4 mb-2 first:mt-0">
-                  <div className="flex items-center justify-between px-2 py-1.5 bg-default-100 rounded-md border border-default-200/80">
+                  <div className="flex items-center justify-between px-2 py-1.5 bg-surface-secondary rounded-md border border-surface-tertiary/80">
                     <div className="flex items-center gap-2">
                       <Icon
-                        className="text-primary-600 dark:text-primary-400"
+                        className="text-accent-600 dark:text-accent-400"
                         icon={section.icon}
                         width={14}
                       />
-                      <span className="text-xs font-semibold text-default-800">
+                      <span className="text-xs font-semibold text-muted">
                         {section.label}
                       </span>
                     </div>
                     {section.count && (
-                      <span className="text-xs font-medium text-default-600 bg-default-200/50 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-medium text-muted bg-surface-tertiary/50 px-2 py-0.5 rounded-full">
                         {section.count}
                       </span>
                     )}

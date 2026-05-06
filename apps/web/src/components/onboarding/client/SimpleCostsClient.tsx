@@ -1,12 +1,8 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Input } from "@heroui/input";
-import { Spinner } from "@heroui/spinner";
-import { addToast } from "@heroui/toast";
+import { Button, Card, Input, Spinner, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -14,9 +10,7 @@ import {
   useManualReturnRate,
   useOnboarding,
   useOnboardingCosts,
-  useUser,
 } from "@/hooks";
-import { getCurrencySymbol } from "@/libs/utils/format";
 import { trackOnboardingAction, trackOnboardingView } from "@/libs/analytics";
 import { useSetAtom } from "jotai";
 import { setNavigationPendingAtom } from "@/store/onboarding";
@@ -31,11 +25,6 @@ export default function SimpleCostsClient() {
     isShopifyInventorySynced,
   } = useOnboarding();
   const { saveInitialCosts } = useOnboardingCosts();
-  const { primaryCurrency } = useUser();
-  const currencySymbol = useMemo(
-    () => getCurrencySymbol(primaryCurrency),
-    [primaryCurrency]
-  );
   const setNavigationPending = useSetAtom(setNavigationPendingAtom);
 
   // Guard routing for shopify/billing
@@ -215,15 +204,9 @@ export default function SimpleCostsClient() {
         throw new Error("Cost setup did not complete");
       }
     } catch (error) {
-      addToast({
-        title: "Failed to save",
-        description:
-          error instanceof Error
+      toast.danger("Failed to save", { description: error instanceof Error
             ? error.message
-            : "Please try again in a moment.",
-        color: "danger",
-        timeout: 3500,
-      });
+            : "Please try again in a moment.", timeout: 3500 });
     } finally {
       setSaving(false);
     }
@@ -235,7 +218,7 @@ export default function SimpleCostsClient() {
     return (
       <section className="mx-auto flex max-w-2xl flex-col items-center gap-4 py-16 text-center">
         <Card className="w-full border-warning bg-warning-50/40">
-          <CardBody className="space-y-3 text-default-700">
+          <Card.Content className="space-y-3 text-muted">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 text-warning-500">
                 <Icon icon="solar:refresh-circle-line-duotone" width={28} />
@@ -263,13 +246,13 @@ export default function SimpleCostsClient() {
                   : "We\u2019ll unlock this step automatically when the sync finishes."}
               </span>
             </div>
-          </CardBody>
+          </Card.Content>
         </Card>
         <div className="flex flex-wrap items-center justify-center gap-2">
           <Button
-            variant="flat"
+            variant="tertiary"
             size="sm"
-            color="primary"
+           
             onPress={() => router.refresh()}
             isDisabled={isShopifySyncing}
           >
@@ -277,9 +260,9 @@ export default function SimpleCostsClient() {
           </Button>
           {hasShopifySyncError && (
             <Button
-              variant="solid"
+              variant="primary"
               size="sm"
-              color="warning"
+             
               onPress={() => router.push("/onboarding/shopify")}
             >
               Retry Shopify sync
@@ -296,15 +279,15 @@ export default function SimpleCostsClient() {
       <div className="mb-4">
         <div className="flex items-center gap-3 mb-2">
           <Icon
-            className="text-primary"
+            className="text-accent"
             icon="solar:settings-minimalistic-bold-duotone"
             width={28}
           />
-          <h1 className="text-2xl lg:text-3xl font-bold text-default-900">
+          <h1 className="text-2xl lg:text-3xl font-bold text-muted">
             Fees & Shipping
           </h1>
         </div>
-        <p className="text-default-600 text-base">
+        <p className="text-muted text-base">
           Set global costs here. Product-specific costs (COGS, tax, handling)
           are configured in the next step. You can refine all costs later in
           Cost Management.
@@ -315,90 +298,56 @@ export default function SimpleCostsClient() {
       <div className="grid grid-cols-1 gap-8 mt-8">
         <Input
           className="max-w-md"
-          size="lg"
-          label="Fixed Monthly Operating Cost"
-          labelPlacement="outside"
-          description="Your monthly fixed expenses (rent, salaries, software, etc.)"
-          startContent={
-            <span className="text-default-400 text-base font-medium">
-              {currencySymbol}
-            </span>
-          }
-          placeholder="5000"
+                                                  placeholder="5000"
           type="number"
           inputMode="decimal"
           min={0}
           step="0.01"
           value={form.operatingCosts}
-          onValueChange={onChange("operatingCosts")}
+          onChange={(event) => onChange("operatingCosts")(event.currentTarget.value)}
         />
 
         <Input
           className="max-w-md"
-          size="lg"
-          label="Payment Gateway Fee %"
-          labelPlacement="outside"
-          description="Percentage fee charged by your payment processor"
-          endContent={
-            <span className="text-default-400 text-base font-medium">%</span>
-          }
-          placeholder="e.g. 2.9"
+                                                  placeholder="e.g. 2.9"
           type="number"
           inputMode="decimal"
           min={0}
           max={100}
           step="0.01"
           value={form.paymentFeePercent}
-          onValueChange={onChange("paymentFeePercent")}
+          onChange={(event) => onChange("paymentFeePercent")(event.currentTarget.value)}
         />
 
         <Input
           className="max-w-md"
-          size="lg"
-          label="Average Shipping Cost (per order)"
-          labelPlacement="outside"
-          description="Average shipping cost per order"
-          startContent={
-            <span className="text-default-400 text-base font-medium">
-              {currencySymbol}
-            </span>
-          }
-          placeholder="e.g. 25"
+                                                  placeholder="e.g. 25"
           type="number"
           inputMode="decimal"
           min={0}
           step="0.01"
           value={form.shippingCost}
-          onValueChange={onChange("shippingCost")}
+          onChange={(event) => onChange("shippingCost")(event.currentTarget.value)}
         />
 
         <Input
           className="max-w-md"
-          size="lg"
-          label="Manual Return / RTO Rate (Average Monthly)"
-          labelPlacement="outside"
-          description="Only set this if Shopify doesn't capture returns/RTO. Leave blank to disable."
-          endContent={
-            <span className="text-default-400 text-base font-medium">%</span>
-          }
-          placeholder="e.g. 5"
+                                                  placeholder="e.g. 5"
           type="number"
           inputMode="decimal"
           min={0}
           max={100}
           step="0.1"
           value={form.manualReturnRate}
-          onValueChange={onChange("manualReturnRate")}
+          onChange={(event) => onChange("manualReturnRate")(event.currentTarget.value)}
         />
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between pt-4 border-t border-divider">
+      <div className="flex items-center justify-between pt-4 border-t border-surface-tertiary">
         <Button
-          startContent={
-            <Icon icon="solar:arrow-left-line-duotone" width={18} />
-          }
-          variant="flat"
+         
+          variant="tertiary"
           size="lg"
           isDisabled={saving}
           className="font-semibold"
@@ -413,15 +362,13 @@ export default function SimpleCostsClient() {
         >
           Back
         </Button>
-        <Button
-          color="primary"
+        <Button variant="primary"
+         
           size="lg"
-          isLoading={saving}
+          isPending={saving}
           className="font-bold min-w-40"
           onPress={handleSave}
-          endContent={
-            !saving && <Icon icon="solar:arrow-right-line-duotone" width={20} />
-          }
+         
         >
           Save & Continue
         </Button>

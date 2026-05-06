@@ -1,7 +1,6 @@
 "use client";
 
-import { Card } from "@heroui/card";
-import { Skeleton } from "@heroui/skeleton";
+import { Card, Skeleton } from "@heroui/react";
 interface ChartSkeletonProps {
   height?: number | string;
   showTitle?: boolean;

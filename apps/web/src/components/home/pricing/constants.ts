@@ -35,8 +35,7 @@ export const tiers: Array<Tier> = [
       "$0.30 per extra order",
     ],
     buttonText: "Start for free",
-    buttonColor: "default",
-    buttonVariant: "flat",
+    buttonVariant: "secondary",
   },
   {
     key: TiersEnum.Pro,
@@ -62,8 +61,7 @@ export const tiers: Array<Tier> = [
       "Max $299 Overage Charge",
     ],
     buttonText: "Start 28-day trial",
-    buttonColor: "default",
-    buttonVariant: "flat",
+    buttonVariant: "secondary",
   },
   {
     key: TiersEnum.Team,
@@ -88,8 +86,7 @@ export const tiers: Array<Tier> = [
       "Max $399 Overage Charge",
     ],
     buttonText: "Start 28-day trial",
-    buttonColor: "primary",
-    buttonVariant: "solid",
+    buttonVariant: "primary",
   },
   {
     key: TiersEnum.Custom,
@@ -115,8 +112,7 @@ export const tiers: Array<Tier> = [
       "Priority Support",
     ],
     buttonText: "Talk to our team",
-    buttonColor: "default",
-    buttonVariant: "flat",
+    buttonVariant: "secondary",
   },
 ];
 

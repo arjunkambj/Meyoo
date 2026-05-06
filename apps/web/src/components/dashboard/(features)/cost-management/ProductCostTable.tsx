@@ -1,11 +1,7 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
-import { Pagination } from "@heroui/pagination";
-import { Skeleton } from "@heroui/skeleton";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
+import { Button, Chip, Input, Skeleton, Table } from "@heroui/react";
+import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import {
   useCallback,
@@ -25,15 +21,18 @@ import { useUserContext } from "@/contexts/UserContext";
 import { getCurrencySymbol } from "@/libs/utils/format";
 import {
   DATA_TABLE_GROUP_ROW_BORDER_CLASS,
-  DATA_TABLE_HEADER_CLASS,
-  DATA_TABLE_INPUT_CLASS,
-  DATA_TABLE_INPUT_WRAPPER_CLASS,
   DATA_TABLE_ROW_BASE_BG,
   DATA_TABLE_ROW_STRIPE_BG,
   DATA_TABLE_ROW_STRIPE_CHILD_BG,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 import { cn } from "@/libs/utils";
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 
 type TableCellElement = ReactElement<ComponentProps<typeof TableCell>>;
 
@@ -232,43 +231,37 @@ export default function ProductCostTable() {
         <div className="flex-1" />
         <div className="flex flex-wrap items-center gap-2">
           <Input
-            size="md"
             className="w-36"
-            classNames={{
-              inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-              input: DATA_TABLE_INPUT_CLASS,
-            }}
-            type="number"
+                        type="number"
             placeholder="10"
-            endContent={<span className="text-default-500">%</span>}
-            value={bulkPct}
-            onValueChange={setBulkPct}
+                        value={bulkPct}
+            onChange={(event) => setBulkPct(event.currentTarget.value)}
           />
           <Button
-            variant="flat"
-            color="primary"
+            variant="tertiary"
+           
             isDisabled={!bulkPct || isNaN(Number(bulkPct))}
             onPress={handleApplyCogs}
           >
             Apply COGS
           </Button>
           <Button
-            variant="flat"
-            color="primary"
+            variant="tertiary"
+           
             isDisabled={!bulkPct || isNaN(Number(bulkPct))}
             onPress={handleApplyTax}
           >
             Apply Tax
           </Button>
           <Button
-            variant="flat"
-            color="primary"
+            variant="tertiary"
+           
             isDisabled={!bulkPct || isNaN(Number(bulkPct))}
             onPress={handleApplyHandling}
           >
             Apply Handling
           </Button>
-          <Button color="primary" isLoading={savingAll} onPress={handleSaveAll}>
+          <Button variant="primary" isPending={savingAll} onPress={handleSaveAll}>
             Save All Changes
           </Button>
         </div>
@@ -280,10 +273,9 @@ export default function ProductCostTable() {
   const paginationContent =
     !loading && totalPages > 1 ? (
       <div className="flex justify-center">
-        <Pagination
+        <PaginationControls
           page={currentPage}
           total={totalPages}
-          showControls
           onChange={setPage}
         />
       </div>
@@ -292,37 +284,32 @@ export default function ProductCostTable() {
   return (
     <div className="space-y-4">
       {topContent}
-      <Table
-        removeWrapper
-        aria-label="Product costs table"
-        className={DATA_TABLE_TABLE_CLASS}
-        classNames={{
-          th: DATA_TABLE_HEADER_CLASS,
-          td: "py-2.5 px-3 text-sm text-default-700 align-middle",
-          table: "text-xs",
-        }}
-      >
-        <TableHeader>
-          <TableColumn>Variant</TableColumn>
-          <TableColumn>Status</TableColumn>
-          <TableColumn>COGS</TableColumn>
-          <TableColumn>Tax</TableColumn>
-          <TableColumn>Handling</TableColumn>
-          <TableColumn>Price</TableColumn>
-        </TableHeader>
-        <TableBody>
+      <Table className={DATA_TABLE_TABLE_CLASS}>
+        <Table.ScrollContainer>
+          <Table.Content aria-label="Product costs table">
+            <TableHeader>
+              <TableColumn id="variant" isRowHeader>
+                Variant
+              </TableColumn>
+              <TableColumn id="status">Status</TableColumn>
+              <TableColumn id="cogs">COGS</TableColumn>
+              <TableColumn id="tax">Tax</TableColumn>
+              <TableColumn id="handling">Handling</TableColumn>
+              <TableColumn id="price">Price</TableColumn>
+            </TableHeader>
+            <TableBody>
           {loading ? (
             Array.from({ length: 5 }).map((_, i) => (
-              <TableRow key={`skeleton-${i}`}>
+              <TableRow key={`skeleton-${i}`} id={`skeleton-${i}`}>
                 <TableCell colSpan={6}>
                   <Skeleton className="h-8 rounded-md" />
                 </TableCell>
               </TableRow>
             ))
           ) : variants.length === 0 ? (
-            <TableRow>
+            <TableRow id="empty">
               <TableCell colSpan={6}>
-                <div className="p-4 text-center text-default-500 text-sm">
+                <div className="p-4 text-center text-muted text-sm">
                   No variants found
                 </div>
               </TableCell>
@@ -395,7 +382,7 @@ export default function ProductCostTable() {
                     <div className="min-w-0 flex items-center gap-3 py-1">
                       <button
                         type="button"
-                        className="flex-none text-default-500 hover:text-default-900 transition"
+                        className="flex-none text-muted hover:text-muted transition"
                         onClick={() => {
                           setExpandedGroups((prev) => {
                             const next = new Set(prev);
@@ -403,9 +390,7 @@ export default function ProductCostTable() {
                             else next.add(grp.key);
                             return next;
                           });
-                        }}
-                        aria-label={isOpen ? "Collapse" : "Expand"}
-                      >
+                        }}                       >
                         <Icon
                           icon={
                             isOpen
@@ -423,15 +408,15 @@ export default function ProductCostTable() {
                           className="w-8 h-8 rounded object-cover flex-none"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded bg-default-100 flex items-center justify-center text-default-400 flex-none">
+                        <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-muted flex-none">
                           <Icon icon="solar:box-outline" width={16} />
                         </div>
                       )}
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-default-900">
+                        <div className="truncate text-sm font-medium text-muted">
                           {grp.productName}
                         </div>
-                        <div className="text-xs text-default-500">
+                        <div className="text-xs text-muted">
                           {count} variant{count === 1 ? "" : "s"}
                         </div>
                       </div>
@@ -447,25 +432,13 @@ export default function ProductCostTable() {
                 );
                 headerCells.push(
                   <TableCell key="cogs">
-                    <Input
-                      aria-label="COGS (apply to all variants in product)"
-                      type="number"
+                    <Input                       type="number"
                       inputMode="decimal"
                       min={0}
                       step="0.01"
-                      size="sm"
-                      classNames={{
-                        inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                        input: DATA_TABLE_INPUT_CLASS,
-                      }}
-                      startContent={
-                        <span className="text-default-500">
-                          {currencySymbol}
-                        </span>
-                      }
-                      placeholder="0.00"
+                                                                  placeholder="0.00"
                       value={groupEdits[grp.key]?.cogs ?? avgCogsStr}
-                      onValueChange={(val) => {
+                      onChange={(event) => { const val = event.currentTarget.value;
                         const nextVal = sanitizeDecimal(val);
                         setGroupEdits((prev) => ({
                           ...prev,
@@ -488,22 +461,14 @@ export default function ProductCostTable() {
                 );
                 headerCells.push(
                   <TableCell key="tax">
-                    <Input
-                      aria-label="Tax (apply to all variants in product)"
-                      type="number"
+                    <Input                       type="number"
                       inputMode="decimal"
                       min={0}
                       max={100}
                       step="0.01"
-                      size="sm"
-                      classNames={{
-                        inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                        input: DATA_TABLE_INPUT_CLASS,
-                      }}
-                      endContent={<span className="text-default-500">%</span>}
-                      placeholder="0"
+                                                                  placeholder="0"
                       value={groupEdits[grp.key]?.tax ?? avgTaxStr}
-                      onValueChange={(val) => {
+                      onChange={(event) => { const val = event.currentTarget.value;
                         const nextVal = sanitizeDecimal(val);
                         setGroupEdits((prev) => ({
                           ...prev,
@@ -523,25 +488,13 @@ export default function ProductCostTable() {
                 );
                 headerCells.push(
                   <TableCell key="handling">
-                    <Input
-                      aria-label="Handling & Overheads (apply to all variants in product)"
-                      type="number"
+                    <Input                       type="number"
                       inputMode="decimal"
                       min={0}
                       step="0.01"
-                      size="sm"
-                      classNames={{
-                        inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                        input: DATA_TABLE_INPUT_CLASS,
-                      }}
-                      startContent={
-                        <span className="text-default-500">
-                          {currencySymbol}
-                        </span>
-                      }
-                      placeholder="0"
+                                                                  placeholder="0"
                       value={groupEdits[grp.key]?.handling ?? avgHandlingStr}
-                      onValueChange={(val) => {
+                      onChange={(event) => { const val = event.currentTarget.value;
                         const nextVal = sanitizeDecimal(val);
                         setGroupEdits((prev) => ({
                           ...prev,
@@ -575,6 +528,7 @@ export default function ProductCostTable() {
                 const header = (
                   <TableRow
                     key={`grp-h-${grp.key}`}
+                    id={`grp-h-${grp.key}`}
                     className={cn(
                       stripe
                         ? DATA_TABLE_ROW_STRIPE_BG
@@ -592,6 +546,7 @@ export default function ProductCostTable() {
                   return (
                     <TableRow
                       key={String(v._id)}
+                      id={String(v._id)}
                       className={cn(
                         DATA_TABLE_ROW_BASE_BG,
                         stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG
@@ -599,44 +554,32 @@ export default function ProductCostTable() {
                     >
                       <TableCell>
                         <div className="min-w-0">
-                          <div className="truncate text-sm text-default-900">
+                          <div className="truncate text-sm text-muted">
                             {v.title || "Variant"}
                           </div>
-                          <div className="text-xs text-default-500 truncate">
+                          <div className="text-xs text-muted truncate">
                             {v.sku || ""}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Chip color={statusChipColor} size="sm" variant="flat">
+                        <Chip color={statusChipColor} size="sm" variant="soft">
                           {s ? s.charAt(0).toUpperCase() + s.slice(1) : "-"}
                         </Chip>
                       </TableCell>
                       <TableCell>
-                        <Input
-                          aria-label="COGS"
-                          type="number"
+                        <Input                           type="number"
                           inputMode="decimal"
                           min={0}
                           step="0.01"
-                          size="sm"
-                          classNames={{
-                            inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                            input: DATA_TABLE_INPUT_CLASS,
-                          }}
-                          startContent={
-                            <span className="text-default-500">
-                              {currencySymbol}
-                            </span>
-                          }
-                          placeholder="0.00"
+                                                                              placeholder="0.00"
                           value={
                             e.cogs ??
                             (typeof v.cogsPerUnit === "number"
                               ? String(v.cogsPerUnit)
                               : "")
                           }
-                          onValueChange={(val) => {
+                          onChange={(event) => { const val = event.currentTarget.value;
                             const nextVal = sanitizeDecimal(val);
                             setEdits((prev) => ({
                               ...prev,
@@ -649,29 +592,19 @@ export default function ProductCostTable() {
                         />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          aria-label="Tax"
-                          type="number"
+                        <Input                           type="number"
                           inputMode="decimal"
                           min={0}
                           max={100}
                           step="0.01"
-                          size="sm"
-                          classNames={{
-                            inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                            input: DATA_TABLE_INPUT_CLASS,
-                          }}
-                          endContent={
-                            <span className="text-default-500">%</span>
-                          }
-                          placeholder="0"
+                                                                              placeholder="0"
                           value={
                             e.tax ??
                             (typeof v.taxRate === "number"
                               ? String(v.taxRate)
                               : "")
                           }
-                          onValueChange={(val) => {
+                          onChange={(event) => { const val = event.currentTarget.value;
                             const nextVal = sanitizeDecimal(val);
                             setEdits((prev) => ({
                               ...prev,
@@ -684,30 +617,18 @@ export default function ProductCostTable() {
                         />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          aria-label="Handling"
-                          type="number"
+                        <Input                           type="number"
                           inputMode="decimal"
                           min={0}
                           step="0.01"
-                          size="sm"
-                          classNames={{
-                            inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                            input: DATA_TABLE_INPUT_CLASS,
-                          }}
-                          startContent={
-                            <span className="text-default-500">
-                              {currencySymbol}
-                            </span>
-                          }
-                          placeholder="0"
+                                                                              placeholder="0"
                           value={
                             e.handling ??
                             (typeof v.handlingPerUnit === "number"
                               ? String(v.handlingPerUnit)
                               : "")
                           }
-                          onValueChange={(val) => {
+                          onChange={(event) => { const val = event.currentTarget.value;
                             const nextVal = sanitizeDecimal(val);
                             setEdits((prev) => ({
                               ...prev,
@@ -730,7 +651,9 @@ export default function ProductCostTable() {
               });
             })()
           )}
-        </TableBody>
+            </TableBody>
+          </Table.Content>
+        </Table.ScrollContainer>
       </Table>
       {paginationContent}
       {/* CSV Import removed for this view */}

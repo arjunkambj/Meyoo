@@ -1,4 +1,4 @@
-import Divider from "@/components/home/Divider";
+import Separator from "@/components/home/Divider";
 import { Faq } from "@/components/home/faq";
 import { Feature } from "@/components/home/Feature";
 import { Hero } from "@/components/home/Hero";
@@ -10,15 +10,15 @@ export default function Home() {
   return (
     <div className="flex w-full flex-col items-center">
       <Hero />
-      <Divider />
+      <Separator />
       <Integration />
-      <Divider />
+      <Separator />
       <Feature />
-      <Divider />
+      <Separator />
       <Testimonial />
-      <Divider />
+      <Separator />
       <Pricing />
-      <Divider />
+      <Separator />
       <Faq />
     </div>
   );

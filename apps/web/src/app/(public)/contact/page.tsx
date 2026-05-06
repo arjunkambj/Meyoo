@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/card";
+import { Card } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { designSystem } from "@/libs/design-system";
 
@@ -25,7 +25,7 @@ export default function ContactPage() {
       <section className={`relative ${designSystem.spacing.section} px-4 pb-8`}>
         <div className="max-w-4xl mx-auto text-center">
           <div className={`${designSystem.typography.sectionChip} mb-6`}>
-            <span className="text-sm uppercase tracking-[0.15em] font-medium text-primary/70">
+            <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Contact Us
             </span>
           </div>
@@ -47,11 +47,11 @@ export default function ContactPage() {
                 key={item.title}
                 className={`${designSystem.card.base} rounded-3xl p-1.5 transition-all duration-300 hover:scale-[1.02]`}
               >
-                <CardBody className="p-8">
+                <Card.Content className="p-8">
                   <div className="flex items-start gap-6">
-                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                       <Icon
-                        className="text-primary"
+                        className="text-accent"
                         icon={item.icon}
                         width={28}
                       />
@@ -65,7 +65,7 @@ export default function ContactPage() {
                       </p>
                       {item.link && (
                         <a
-                          className="text-primary text-sm font-medium hover:underline inline-flex items-center gap-1.5"
+                          className="text-accent text-sm font-medium hover:underline inline-flex items-center gap-1.5"
                           href={item.link}
                         >
                           Contact via {item.title}
@@ -77,7 +77,7 @@ export default function ContactPage() {
                       )}
                     </div>
                   </div>
-                </CardBody>
+                </Card.Content>
               </Card>
             ))}
           </div>

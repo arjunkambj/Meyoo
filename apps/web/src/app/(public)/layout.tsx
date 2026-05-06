@@ -9,9 +9,8 @@ export default function HomeLayout({
 }) {
   return (
     <div className={`relative flex flex-col w-full min-h-screen bg-background`}>
-      <ThemeSwitch />
-
       <CenteredNavbar />
+      <ThemeSwitch />
       <main className="relative w-full flex-1 z-10">{children}</main>
       <Footer />
     </div>

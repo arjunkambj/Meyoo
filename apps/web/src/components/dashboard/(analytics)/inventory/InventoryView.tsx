@@ -1,7 +1,6 @@
 "use client";
 
-import { Skeleton } from "@heroui/skeleton";
-import { Spacer } from "@heroui/spacer";
+import { Skeleton } from "@heroui/react";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { AnalyticsHeader } from "@/components/shared/AnalyticsHeader";
 import GlobalDateRangePicker from "@/components/shared/GlobalDateRangePicker";
@@ -128,16 +127,16 @@ export function InventoryView() {
   );
 
   const headerRight = useMemo(() => (
-    <div className="flex flex-col items-end text-sm text-default-500">
+    <div className="flex flex-col items-end text-sm text-muted">
       <span>Last updated: {lastUpdatedLabel}</span>
-      {isRefreshing && <span className="text-primary-500">Refreshing…</span>}
+      {isRefreshing && <span className="text-accent-500">Refreshing…</span>}
     </div>
   ), [isRefreshing, lastUpdatedLabel]);
 
   if (isLoading) {
     return (
       <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
-        <Spacer y={0.5} />
+        <div className="h-2" />
         {/* Header - Always visible without loading state */}
         <AnalyticsHeader leftActions={headerLeft} rightActions={headerRight} />
 
@@ -149,7 +148,7 @@ export function InventoryView() {
         </div>
 
         {/* Table Skeleton */}
-        <div className="rounded-2xl border border-divider bg-content2 p-6">
+        <div className="rounded-2xl border border-surface-tertiary bg-surface-secondary p-6">
           <div className="space-y-3">
             {[...Array(8)].map((_, i) => (
               <Skeleton
@@ -167,7 +166,7 @@ export function InventoryView() {
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <Spacer y={0.5} />
+      <div className="h-2" />
 
       <AnalyticsHeader leftActions={headerLeft} rightActions={headerRight} />
 

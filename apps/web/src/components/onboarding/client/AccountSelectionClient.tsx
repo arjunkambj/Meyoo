@@ -1,18 +1,13 @@
 "use client";
 
+import { Button, Card, Radio, RadioGroup, Spinner, toast } from "@heroui/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/libs/convexApi";
 import { useOnboarding, useUpdateOnboardingState } from "@/hooks";
-import { Button } from "@heroui/button";
-import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Radio, RadioGroup } from "@heroui/radio";
-import { Spinner } from "@heroui/spinner";
-import { addToast } from "@heroui/toast";
 import { Icon } from "@iconify/react";
 import { trackOnboardingAction, trackOnboardingView } from "@/libs/analytics";
-import { formatDate } from "@/libs/utils/format";
 import { useSetAtom } from "jotai";
 import { setNavigationPendingAtom } from "@/store/onboarding";
 
@@ -89,12 +84,7 @@ export default function AccountSelectionClient() {
       router.push("/onboarding/products");
     } catch (error) {
       console.error("Failed to set primary account:", error);
-      addToast({
-        title: "Failed to set account",
-        description: "Please try again",
-        color: "danger",
-        timeout: 3000,
-      });
+      toast.danger("Failed to set account", { description: "Please try again", timeout: 3000 });
       setIsLoading(false);
     }
   };
@@ -112,10 +102,10 @@ export default function AccountSelectionClient() {
   if (!adAccounts) {
     return (
       <Card>
-        <CardBody className="flex flex-col items-center justify-center py-12">
+        <Card.Content className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" />
-          <p className="mt-4 text-default-600">Loading ad accounts...</p>
-        </CardBody>
+          <p className="mt-4 text-muted">Loading ad accounts...</p>
+        </Card.Content>
       </Card>
     );
   }
@@ -124,24 +114,24 @@ export default function AccountSelectionClient() {
   if (adAccounts.length === 0) {
     return (
       <Card>
-        <CardBody className="text-center py-12">
+        <Card.Content className="text-center py-12">
           <Icon
             icon="solar:user-cross-bold-duotone"
-            className="w-16 h-16 mx-auto mb-4 text-default-400"
+            className="w-16 h-16 mx-auto mb-4 text-muted"
           />
           <h3 className="text-lg font-semibold mb-2">No Ad Accounts Found</h3>
-          <p className="text-default-600 mb-6">
+          <p className="text-muted mb-6">
             We couldn&apos;t find any ad accounts associated with your Meta connection.
             You can skip this step and continue.
           </p>
-          <Button
-            color="primary"
+          <Button variant="primary"
+           
             onPress={handleSkip}
-            endContent={<Icon icon="solar:arrow-right-line-duotone" width={18} />}
+           
           >
             Continue to Products
           </Button>
-        </CardBody>
+        </Card.Content>
       </Card>
     );
   }
@@ -149,7 +139,7 @@ export default function AccountSelectionClient() {
   return (
     <>
       <Card>
-        <CardHeader>
+        <Card.Header>
           <div className="flex items-center gap-2">
             <Icon
               icon="logos:meta-icon"
@@ -157,13 +147,11 @@ export default function AccountSelectionClient() {
             />
             <h2 className="text-lg font-semibold">Meta Ad Accounts</h2>
           </div>
-        </CardHeader>
-        <CardBody>
+        </Card.Header>
+        <Card.Content>
           <RadioGroup
-            label="Select your primary ad account"
-            description={hasPrimarySet ? "Primary account has been set for this onboarding" : "This account will be used for main analytics and reporting"}
-            value={selectedAccount}
-            onValueChange={hasPrimarySet ? undefined : (v) => {
+                                    value={selectedAccount}
+            onChange={hasPrimarySet ? undefined : (v) => {
               setSelectedAccount(v);
               trackOnboardingAction("accounts", "select_account", { accountId: v });
             }}
@@ -173,16 +161,11 @@ export default function AccountSelectionClient() {
               <Radio
                 key={account.accountId}
                 value={account.accountId}
-                description={
-                  account.lastSyncAt
-                    ? `Last synced: ${formatDate(account.lastSyncAt)}`
-                    : "Not synced yet"
-                }
-              >
+                              >
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{account.accountName}</span>
                   {account.isPrimary && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+                    <span className="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded">
                       Current Primary
                     </span>
                   )}
@@ -190,26 +173,24 @@ export default function AccountSelectionClient() {
               </Radio>
             ))}
           </RadioGroup>
-        </CardBody>
+        </Card.Content>
       </Card>
 
       {/* Action Buttons */}
       <div className="flex justify-between items-center">
         <Button
-          variant="light"
+          variant="tertiary"
           onPress={handleSkip}
           isDisabled={isLoading}
         >
           Skip this step
         </Button>
-        <Button
-          color="primary"
+        <Button variant="primary"
+         
           onPress={hasPrimarySet ? () => router.push("/onboarding/products") : handleContinue}
-          isLoading={isLoading && !hasPrimarySet}
+          isPending={isLoading && !hasPrimarySet}
           isDisabled={!selectedAccount && !hasPrimarySet}
-          endContent={
-            !isLoading && <Icon icon="solar:arrow-right-line-duotone" width={18} />
-          }
+         
         >
           {hasPrimarySet ? "Continue to Products" : isLoading ? "Saving..." : "Set Primary & Continue"}
         </Button>

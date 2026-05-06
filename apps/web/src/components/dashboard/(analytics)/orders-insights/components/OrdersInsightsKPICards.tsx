@@ -47,7 +47,7 @@ export function OrdersInsightsKPICards({
         value: formatPercent(normalizedKpis.prepaidRate.value),
         change: normalizedKpis.prepaidRate.change,
         icon: "solar:bill-list-bold-duotone",
-        iconColor: "text-primary",
+        iconColor: "text-accent",
         tooltip: "Percentage of orders paid upfront within the selected range.",
       },
       {
@@ -79,7 +79,7 @@ export function OrdersInsightsKPICards({
         value: formatPercent(normalizedKpis.fulfillmentRate.value),
         change: normalizedKpis.fulfillmentRate.change,
         icon: "solar:delivery-bold-duotone",
-        iconColor: "text-default-500",
+        iconColor: "text-muted",
         tooltip: "Percentage of orders successfully fulfilled.",
       },
     ];

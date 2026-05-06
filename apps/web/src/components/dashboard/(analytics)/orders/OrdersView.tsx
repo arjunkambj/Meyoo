@@ -1,7 +1,6 @@
 "use client";
 
-import { Skeleton } from "@heroui/skeleton";
-import { Spacer } from "@heroui/spacer";
+import { Skeleton } from "@heroui/react";
 import { memo, useCallback, useEffect, useState } from "react";
 import { AnalyticsHeader } from "@/components/shared/AnalyticsHeader";
 import { FilterBar } from "@/components/shared/filters/FilterBar";
@@ -77,7 +76,7 @@ export const OrdersView = memo(function OrdersView() {
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}
-      <Spacer y={0.5} />
+      <div className="h-2" />
       <AnalyticsHeader
         leftActions={
           <div className="flex items-center gap-2">

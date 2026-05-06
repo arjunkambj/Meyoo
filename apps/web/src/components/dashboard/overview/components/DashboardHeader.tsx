@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Icon } from '@iconify/react';
+import { Button } from "@heroui/react";
 import { AnalyticsHeader } from '@/components/shared/AnalyticsHeader';
 import GlobalDateRangePicker from '@/components/shared/GlobalDateRangePicker';
 import type { CalendarDateRange, DateRangePresetKey } from '@/libs/dateRangePresets';
@@ -33,9 +32,9 @@ export function DashboardHeader({
       rightActions={
         <div className="flex items-center gap-2">
           <Button
-            color="primary"
-            startContent={<Icon icon="solar:widget-bold-duotone" width={18} />}
-            variant="solid"
+           
+           
+            variant="primary"
             onPress={onCustomize}
           >
             Customize

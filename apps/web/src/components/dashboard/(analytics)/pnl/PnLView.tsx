@@ -1,6 +1,5 @@
 "use client";
 
-import { Spacer } from "@heroui/spacer";
 import { memo } from "react";
 import { AnalyticsHeader } from "@/components/shared/AnalyticsHeader";
 import GlobalDateRangePicker from "@/components/shared/GlobalDateRangePicker";
@@ -29,7 +28,7 @@ export const PnLView = memo(function PnLView() {
 
   return (
     <div className="flex flex-col space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <Spacer y={0.5} />
+      <div className="h-2" />
       <AnalyticsHeader
         leftActions={
           <GlobalDateRangePicker

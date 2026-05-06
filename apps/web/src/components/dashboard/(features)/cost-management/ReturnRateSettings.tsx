@@ -1,9 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-import { Skeleton } from "@heroui/skeleton";
-import { addToast } from "@heroui/toast";
+import { Button, Input, Skeleton, toast } from "@heroui/react";
 import { useEffect, useMemo, useState } from "react";
 
 import { useManualReturnRate, useSetManualReturnRate } from "@/hooks";
@@ -55,9 +52,9 @@ export default function ReturnRateSettings() {
     setSaving(true);
     try {
       await setManualReturnRate({ ratePercent: parsedRate });
-      addToast({ title: "Return rate updated", color: "success", timeout: 2400 });
+      toast.success("Return rate updated", { timeout: 2400 });
     } catch (_error) {
-      addToast({ title: "Failed to update", color: "danger", timeout: 2600 });
+      toast.danger("Failed to update", { timeout: 2600 });
     } finally {
       setSaving(false);
     }
@@ -66,10 +63,10 @@ export default function ReturnRateSettings() {
   const topContent = (
     <div className="flex items-center justify-between">
       <h2 className="text-xl font-semibold">RTO & Return Rate Override</h2>
-      <Button
-        color="primary"
+      <Button variant="primary"
+       
         className="font-semibold"
-        isLoading={saving}
+        isPending={saving}
         isDisabled={saveDisabled || loading}
         onPress={handleSave}
       >
@@ -95,7 +92,7 @@ export default function ReturnRateSettings() {
       {topContent}
       <div className="space-y-6 max-w-2xl">
         <div>
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             Use this percentage to estimate revenue lost to undetected returns/RTO. Leave the
             field empty to disable the manual adjustment.
           </p>
@@ -103,23 +100,16 @@ export default function ReturnRateSettings() {
 
         <div className="grid gap-4 sm:max-w-md">
           <Input
-            label="Average monthly return/RTO rate"
-            labelPlacement="outside"
-            placeholder="e.g. 5"
-            description="Only set this if Shopify doesn't capture returns/RTO automatically."
-            type="number"
+                                    placeholder="e.g. 5"
+                        type="number"
             inputMode="decimal"
             min={0}
             max={100}
             step="0.1"
-            size="lg"
-            endContent={<span className="text-default-400 text-base font-medium">%</span>}
-            value={rateInput}
-            isInvalid={hasInvalidInput}
-            errorMessage={hasInvalidInput ? "Enter a percentage between 0 and 100" : undefined}
-            onValueChange={(value) => setRateInput(sanitizePercentage(value))}
+                        value={rateInput}
+                                    onChange={(event) => { const value = event.currentTarget.value; setRateInput(sanitizePercentage(value))}}
           />
-          <span className="text-xs text-default-400">
+          <span className="text-xs text-muted">
             Leave empty and save to clear the manual override.
           </span>
         </div>

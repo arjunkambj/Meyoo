@@ -1,12 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Icon } from "@iconify/react";
+import { Button, Card, Chip } from "@heroui/react";
 import React from "react";
 
-import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
-import { Card, CardBody } from "@heroui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { designSystem } from "@/libs/design-system";
@@ -32,18 +28,18 @@ const Hero = () => {
             {/* Category Chip */}
             <Chip
               className="mb-6 text-xs  uppercase tracking-[0.05em] font-medium px-2"
-              variant="flat"
+              variant="soft"
             >
               Built for D2C brands
             </Chip>
             {/* Header  */}
-            <h1 className="mb-6 flex max-w-3xl flex-col text-pretty font-semibold leading-[1.02] tracking-normal text-default-900">
+            <h1 className="mb-6 flex max-w-3xl flex-col text-pretty font-semibold leading-[1.02] tracking-normal text-muted">
               <span className="block text-balance text-5xl sm:text-6xl lg:text-7xl">
                 Make Better Decisions
               </span>
 
-              <span className="block text-balance text-4xl font-medium leading-[1.08] text-default-800 sm:text-5xl lg:text-6xl">
-                For your <span className="text-primary">Shopify store</span>
+              <span className="block text-balance text-4xl font-medium leading-[1.08] text-muted sm:text-5xl lg:text-6xl">
+                For your <span className="text-accent">Shopify store</span>
               </span>
             </h1>
 
@@ -56,30 +52,30 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="mt-10 sm:mt-12 flex flex-row flex-wrap justify-center sm:justify-start items-center gap-4">
-              <Button
-                as={Link}
-                href="/signin"
-                className="w-auto font-semibold h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
-                color="primary"
-                endContent={<Icon icon="solar:arrow-right-linear" width={18} />}
-                size="lg"
-              >
-                Start 28-day Trial
-              </Button>
-              <Button
-                as={Link}
-                href="#pricing"
-                variant="flat"
-                size="lg"
-                className="w-auto h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
-              >
-                View pricing
-              </Button>
+              <Link href="/sign-in">
+                <Button variant="primary"
+                  className="w-auto font-semibold h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
+                 
+                 
+                  size="lg"
+                >
+                  Start 28-day Trial
+                </Button>
+              </Link>
+              <Link href="#pricing">
+                <Button
+                  variant="tertiary"
+                  size="lg"
+                  className="w-auto h-10 sm:h-11 transition-all duration-200 active:scale-100 text-sm sm:text-base"
+                >
+                  View pricing
+                </Button>
+              </Link>
             </div>
 
             {/* Trust line */}
             <div className="mt-8 sm:mt-10">
-              <div className="inline-flex items-center text-xs sm:text-sm text-default-600">
+              <div className="inline-flex items-center text-xs sm:text-sm text-muted">
                 <span className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 font-medium sm:justify-start sm:gap-x-4">
                   <span>Fast setup</span>
                   <span>28-day free trial</span>
@@ -90,19 +86,10 @@ const Hero = () => {
           </div>
 
           {/* Right Column - Dashboard Preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              ease: [0.16, 1, 0.3, 1],
-              duration: 0.9,
-              delay: 0.1,
-            }}
-            className="relative flex justify-center lg:justify-end px-2 sm:px-0"
-          >
-            <Card className="relative h-[320px] shadow-none w-full max-w-[720px] rounded-2xl sm:rounded-3xl bg-gradient-to-br from-muted/40 to-muted/20 p-1 sm:p-1.5 backdrop-blur-sm sm:h-[420px] md:h-[560px] lg:h-[640px] ring-1 ring-default-100">
-              <CardBody className="relative size-full rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-background via-background to-muted/10 overflow-hidden p-0">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 pointer-events-none z-10" />
+          <div className="relative flex justify-center lg:justify-end px-2 sm:px-0 animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <Card className="relative h-[320px] shadow-none w-full max-w-[720px] rounded-2xl sm:rounded-3xl bg-gradient-to-br from-muted/40 to-muted/20 p-1 sm:p-1.5 backdrop-blur-sm sm:h-[420px] md:h-[560px] lg:h-[640px] ring-1 ring-surface-tertiary">
+              <Card.Content className="relative size-full rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-background via-background to-muted/10 overflow-hidden p-0">
+                <div className="absolute inset-0 bg-gradient-to-tr from-accent/5 via-transparent to-accent/5 pointer-events-none z-10" />
                 {/* Light mode preview */}
                 <Image
                   alt="Meyoo dashboard preview (light)"
@@ -119,14 +106,14 @@ const Hero = () => {
                   priority
                   src="/dark.png"
                 />
-              </CardBody>
+              </Card.Content>
             </Card>
-          </motion.div>
+          </div>
         </div>
 
         <div className="mt-20">
           <div className="mx-auto w-full max-w-7xl px-2 sm:px-4">
-            <div className="grid grid-cols-3 sm:flex sm:flex-nowrap items-center justify-between gap-6 sm:gap-8 lg:gap-12 text-default-400">
+            <div className="grid grid-cols-3 sm:flex sm:flex-nowrap items-center justify-between gap-6 sm:gap-8 lg:gap-12 text-muted">
               {d2cBrands.map((brand) => (
                 <div
                   key={brand.name}

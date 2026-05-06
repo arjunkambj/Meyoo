@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@heroui/theme";
+import { cn } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -26,8 +26,8 @@ export const FooterItems = () => {
             "flex items-center gap-3 px-4 rounded-xl transition-all duration-200 min-h-10",
             "no-underline w-full",
             active
-              ? "bg-primary/20 text-primary font-medium"
-              : "text-default-800 hover:text-default-900 hover:bg-default-200"
+              ? "bg-accent/20 text-accent font-medium"
+              : "text-muted hover:text-muted hover:bg-surface-tertiary"
           )}
           href={item.href}
           prefetch={true}
@@ -37,7 +37,7 @@ export const FooterItems = () => {
               aria-hidden
               className={cn(
                 "shrink-0 transition-colors w-5 h-5",
-                active && "text-primary"
+                active && "text-accent"
               )}
               icon={iconName}
             />

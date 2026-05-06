@@ -1,21 +1,7 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
-import { Pagination } from "@heroui/pagination";
-import { Select, SelectItem } from "@heroui/select";
-import { Skeleton } from "@heroui/skeleton";
-import { Spinner } from "@heroui/spinner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@heroui/table";
+import { Button, Card, Chip, Input, ListBox, Select, Skeleton, Spinner, Table } from "@heroui/react";
+import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import {
   useCallback,
@@ -44,15 +30,18 @@ import { sanitizeDecimal } from "@/components/shared/table/sanitize";
 import { NumericInput } from "@/components/shared/table/NumericInput";
 import {
   DATA_TABLE_GROUP_ROW_BORDER_CLASS,
-  DATA_TABLE_HEADER_CLASS,
-  DATA_TABLE_INPUT_CLASS,
-  DATA_TABLE_INPUT_WRAPPER_CLASS,
   DATA_TABLE_ROW_BASE_BG,
   DATA_TABLE_ROW_STRIPE_BG,
   DATA_TABLE_ROW_STRIPE_CHILD_BG,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 import { cn } from "@/libs/utils";
+
+const TableBody = Table.Body;
+const TableCell = Table.Cell;
+const TableColumn = Table.Column;
+const TableHeader = Table.Header;
+const TableRow = Table.Row;
 
 type TableCellElement = ReactElement<ComponentProps<typeof TableCell>>;
 
@@ -94,7 +83,7 @@ export default function VariantCostsClient({
   hideHandling = false,
   hideSearch = false,
   hideRowSave = false,
-  compact = true,
+  compact: _compact = true,
   hideTitle = false,
 }: {
   hideNavigation?: boolean;
@@ -448,7 +437,7 @@ export default function VariantCostsClient({
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 py-16 text-center">
         <Card className="w-full border-warning bg-warning-50/40">
-          <CardBody className="space-y-3 text-default-700">
+          <Card.Content className="space-y-3 text-muted">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 text-warning-500">
                 <Icon icon="solar:refresh-circle-line-duotone" width={28} />
@@ -478,12 +467,12 @@ export default function VariantCostsClient({
                   : "Feel free to grab a coffee—this only needs to finish once."}
               </span>
             </div>
-          </CardBody>
+          </Card.Content>
         </Card>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Button
+          <Button variant="primary"
             size="sm"
-            color="primary"
+           
             onPress={() => router.refresh()}
             isDisabled={isShopifySyncing}
           >
@@ -491,9 +480,9 @@ export default function VariantCostsClient({
           </Button>
           {hasShopifySyncError && (
             <Button
-              variant="solid"
+              variant="primary"
               size="sm"
-              color="warning"
+             
               onPress={() => router.push("/onboarding/shopify")}
             >
               Retry Shopify sync
@@ -509,11 +498,11 @@ export default function VariantCostsClient({
       <div className="flex items-start gap-2">
         <Icon
           icon="solar:box-minimalistic-bold-duotone"
-          className="mt-1 text-primary"
+          className="mt-1 text-accent"
         />
         <div>
           <h2 className="text-xl font-semibold">Variant Costs</h2>
-          <p className="text-xs text-default-500">
+          <p className="text-xs text-muted">
             Set COGS for accurate profit calculation.
           </p>
         </div>
@@ -525,75 +514,64 @@ export default function VariantCostsClient({
             <Skeleton className="h-9 w-48 rounded-lg" />
           ) : (
             <Input
-              size={compact ? "sm" : "md"}
               className="max-w-[12rem]"
-              classNames={{
-                inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                input: DATA_TABLE_INPUT_CLASS,
-              }}
-              placeholder="Search..."
-              startContent={
-                <Icon icon="solar:search-bold-duotone" width={16} />
-              }
-              value={search}
-              onValueChange={setSearch}
+                            placeholder="Search..."
+                            value={search}
+              onChange={(event) => setSearch(event.currentTarget.value)}
             />
           ))}
         <Input
-          size={compact ? "sm" : "md"}
           className="w-32"
-          classNames={{
-            inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-            input: DATA_TABLE_INPUT_CLASS,
-          }}
-          type="number"
+                    type="number"
           placeholder="10"
           value={bulkValue}
-          onValueChange={setBulkValue}
+          onChange={(event) => setBulkValue(event.currentTarget.value)}
         />
         <Select
-          size={compact ? "sm" : "md"}
           className="w-32"
-          classNames={{
-            trigger: DATA_TABLE_INPUT_WRAPPER_CLASS,
-          }}
-          selectedKeys={new Set([bulkType])}
-          onSelectionChange={(keys) => {
-            const value = Array.from(keys)[0] as "percent" | "flat";
-            setBulkType(value);
-          }}
-          aria-label="Bulk operation type"
+          value={bulkType}
+          onChange={(key) => setBulkType(key as "percent" | "flat")}
         >
-          <SelectItem key="percent">Percent</SelectItem>
-          <SelectItem key="flat">Flat</SelectItem>
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox>
+              <ListBox.Item id="percent" textValue="Percent">
+                Percent
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+              <ListBox.Item id="flat" textValue="Flat">
+                Flat
+                <ListBox.ItemIndicator />
+              </ListBox.Item>
+            </ListBox>
+          </Select.Popover>
         </Select>
-        <Button
-          size={compact ? "sm" : "md"}
-          color="primary"
+        <Button variant="primary"
+         
           isDisabled={!bulkValue || isNaN(Number(bulkValue))}
           onPress={handleApplyCogs}
         >
           Apply COGS
         </Button>
-        <Button
-          size={compact ? "sm" : "md"}
-          color="primary"
+        <Button variant="primary"
+         
           isDisabled={!bulkValue || isNaN(Number(bulkValue))}
           onPress={handleApplyTax}
         >
           Apply Tax
         </Button>
-        <Button
-          size={compact ? "sm" : "md"}
-          color="primary"
+        <Button variant="primary"
+         
           isDisabled={!bulkValue || isNaN(Number(bulkValue))}
           onPress={handleApplyHandling}
         >
           Apply Handling
         </Button>
-        <Button
-          size={compact ? "sm" : "md"}
-          color="danger"
+        <Button variant="danger"
+         
           onPress={handleClearAll}
         >
           Clear All
@@ -605,11 +583,10 @@ export default function VariantCostsClient({
   const paginationContent =
     totalPages > 1 ? (
       <div className="flex justify-center pt-2">
-        <Pagination
+        <PaginationControls
           page={currentPage}
           total={totalPages}
           size="sm"
-          showControls
           onChange={setPage}
         />
       </div>
@@ -636,29 +613,24 @@ export default function VariantCostsClient({
         }
 
         return (
-          <Table
-            removeWrapper
-            aria-label="Variant costs table"
-            className={DATA_TABLE_TABLE_CLASS}
-            classNames={{
-              table: compact ? "text-xs" : "",
-              th: DATA_TABLE_HEADER_CLASS,
-              td: "py-2.5 px-3 text-sm text-default-700 align-middle",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn key={column.key}>{column.label}</TableColumn>
-              )}
-            </TableHeader>
-            <TableBody>
+          <Table className={DATA_TABLE_TABLE_CLASS}>
+            <Table.ScrollContainer>
+              <Table.Content aria-label="Variant costs">
+                <TableHeader columns={columns}>
+                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
+                    <TableColumn id={column.key} isRowHeader={column.key === "variant"}>
+                      {column.label}
+                    </TableColumn>
+                  )}
+                </TableHeader>
+                <TableBody>
               {(() => {
                 const list = (data || []) as VariantRow[];
                 if (list.length === 0) {
                   return (
-                    <TableRow key="empty">
+                    <TableRow key="empty" id="empty">
                       <TableCell colSpan={columnCount}>
-                        <div className="p-4 text-center text-default-500 text-sm">
+                        <div className="p-4 text-center text-muted text-sm">
                           No variants found
                         </div>
                       </TableCell>
@@ -730,7 +702,7 @@ export default function VariantCostsClient({
                       <div className="min-w-0 flex items-center gap-3 py-1">
                         <button
                           type="button"
-                          className="flex-none text-default-500 hover:text-default-900 transition"
+                          className="flex-none text-muted hover:text-muted transition"
                           onClick={() => {
                             setExpandedGroups((prev) => {
                               const next = new Set(prev);
@@ -738,9 +710,7 @@ export default function VariantCostsClient({
                               else next.add(grp.key);
                               return next;
                             });
-                          }}
-                          aria-label={isOpen ? "Collapse" : "Expand"}
-                        >
+                          }}                         >
                           <Icon
                             icon={
                               isOpen
@@ -758,15 +728,15 @@ export default function VariantCostsClient({
                             className="w-8 h-8 rounded object-cover flex-none"
                           />
                         ) : (
-                          <div className="w-8 h-8 rounded bg-default-100 flex items-center justify-center text-default-400 flex-none">
+                          <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-muted flex-none">
                             <Icon icon="solar:box-bold-duotone" width={16} />
                           </div>
                         )}
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-default-900">
+                          <div className="truncate text-sm font-medium text-muted">
                             {grp.productName}
                           </div>
-                          <div className="text-xs text-default-500">
+                          <div className="text-xs text-muted">
                             {count} variant{count === 1 ? "" : "s"}
                           </div>
                         </div>
@@ -776,7 +746,7 @@ export default function VariantCostsClient({
                   if (hideRowSave) {
                     headerCells.push(
                       <TableCell key="channel">
-                        <Chip size="sm" variant="flat" color="default">
+                        <Chip size="sm" variant="soft" color="default">
                           Shopify
                         </Chip>
                       </TableCell>
@@ -784,32 +754,20 @@ export default function VariantCostsClient({
                   }
                   headerCells.push(
                     <TableCell key="status">
-                      <Chip color={statusChipColor} size="sm" variant="flat">
+                      <Chip color={statusChipColor} size="sm" variant="soft">
                         {s ? s.charAt(0).toUpperCase() + s.slice(1) : "-"}
                       </Chip>
                     </TableCell>
                   );
                   headerCells.push(
                     <TableCell key="cogs">
-                      <Input
-                        aria-label="COGS (apply to all variants in product)"
-                        type="number"
+                      <Input                         type="number"
                         inputMode="decimal"
                         min={0}
                         step="0.01"
-                        size={compact ? "sm" : "md"}
-                        classNames={{
-                          inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                          input: DATA_TABLE_INPUT_CLASS,
-                        }}
-                        startContent={
-                          <span className="text-default-500">
-                            {currencySymbol}
-                          </span>
-                        }
-                        placeholder="0.00"
+                                                                        placeholder="0.00"
                         value={groupEdits[grp.key]?.cogs ?? avgCogsStr}
-                        onValueChange={(val) => {
+                        onChange={(event) => { const val = event.currentTarget.value;
                           const nextVal = sanitizeDecimal(val);
                           setGroupEdits((prev) => ({
                             ...prev,
@@ -832,22 +790,14 @@ export default function VariantCostsClient({
                   );
                   headerCells.push(
                     <TableCell key="tax">
-                      <Input
-                        aria-label="Tax (apply to all variants in product)"
-                        type="number"
+                      <Input                         type="number"
                         inputMode="decimal"
                         min={0}
                         max={100}
                         step="0.01"
-                        size={compact ? "sm" : "md"}
-                        classNames={{
-                          inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                          input: DATA_TABLE_INPUT_CLASS,
-                        }}
-                        endContent={<span className="text-default-500">%</span>}
-                        placeholder="0"
+                                                                        placeholder="0"
                         value={groupEdits[grp.key]?.tax ?? avgTaxStr}
-                        onValueChange={(val) => {
+                        onChange={(event) => { const val = event.currentTarget.value;
                           const nextVal = sanitizeDecimal(val);
                           setGroupEdits((prev) => ({
                             ...prev,
@@ -871,27 +821,15 @@ export default function VariantCostsClient({
                   if (!hideHandling) {
                     headerCells.push(
                       <TableCell key="handling">
-                        <Input
-                          aria-label="Handling & Overheads (apply to all variants in product)"
-                          type="number"
+                        <Input                           type="number"
                           inputMode="decimal"
                           min={0}
                           step="0.01"
-                          size={compact ? "sm" : "md"}
-                          classNames={{
-                            inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                            input: DATA_TABLE_INPUT_CLASS,
-                          }}
-                          startContent={
-                            <span className="text-default-500">
-                              {currencySymbol}
-                            </span>
-                          }
-                          placeholder="0"
+                                                                              placeholder="0"
                           value={
                             groupEdits[grp.key]?.handling ?? avgHandlingStr
                           }
-                          onValueChange={(val) => {
+                          onChange={(event) => { const val = event.currentTarget.value;
                             const nextVal = sanitizeDecimal(val);
                             setGroupEdits((prev) => ({
                               ...prev,
@@ -932,6 +870,7 @@ export default function VariantCostsClient({
                   const header = (
                     <TableRow
                       key={`grp-h-${grp.key}`}
+                      id={`grp-h-${grp.key}`}
                       className={cn(
                         stripe
                           ? DATA_TABLE_ROW_STRIPE_BG
@@ -951,6 +890,7 @@ export default function VariantCostsClient({
                     rows.push(
                       <TableRow
                         key={String(v._id)}
+                        id={String(v._id)}
                         className={cn(
                           DATA_TABLE_ROW_BASE_BG,
                           stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG
@@ -962,10 +902,10 @@ export default function VariantCostsClient({
                           cells.push(
                             <TableCell key="variant">
                               <div className="min-w-0">
-                                <div className="truncate text-sm text-default-900">
+                                <div className="truncate text-sm text-muted">
                                   {v.title || "Variant"}
                                 </div>
-                                <div className="text-xs text-default-500 truncate">
+                                <div className="text-xs text-muted truncate">
                                   {v.sku || ""}
                                 </div>
                               </div>
@@ -974,7 +914,7 @@ export default function VariantCostsClient({
                           if (hideRowSave) {
                             cells.push(
                               <TableCell key="channel">
-                                <Chip size="sm" variant="flat" color="default">
+                                <Chip size="sm" variant="soft" color="default">
                                   Shopify
                                 </Chip>
                               </TableCell>
@@ -986,7 +926,7 @@ export default function VariantCostsClient({
                               <Chip
                                 color={statusChipColor}
                                 size="sm"
-                                variant="flat"
+                                variant="soft"
                               >
                                 {s
                                   ? s.charAt(0).toUpperCase() + s.slice(1)
@@ -997,28 +937,16 @@ export default function VariantCostsClient({
                           // COGS
                           cells.push(
                             <TableCell key="cogs">
-                              <NumericInput
-                                aria-label="COGS"
-                                min={0}
+                              <NumericInput                                 min={0}
                                 step="0.01"
-                                size={compact ? "sm" : "md"}
-                                classNames={{
-                                  inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                                  input: DATA_TABLE_INPUT_CLASS,
-                                }}
-                                startContent={
-                                  <span className="text-default-500">
-                                    {currencySymbol}
-                                  </span>
-                                }
-                                placeholder="0.00"
+                                                                                                placeholder="0.00"
                                 value={
                                   e.cogs ??
                                   (typeof v.cogsPerUnit === "number"
                                     ? String(v.cogsPerUnit)
                                     : "")
                                 }
-                                onValueChange={(nextVal) => {
+                                onChange={(event) => { const nextVal = event.currentTarget.value;
                                   const id = String(v._id);
                                   setEdits((prev) => {
                                     if ((prev[id]?.cogs ?? "") === nextVal)
@@ -1038,27 +966,17 @@ export default function VariantCostsClient({
                           // Tax
                           cells.push(
                             <TableCell key="tax">
-                              <NumericInput
-                                aria-label="Tax Percent"
-                                min={0}
+                              <NumericInput                                 min={0}
                                 max={100}
                                 step="0.01"
-                                size={compact ? "sm" : "md"}
-                                classNames={{
-                                  inputWrapper: DATA_TABLE_INPUT_WRAPPER_CLASS,
-                                  input: DATA_TABLE_INPUT_CLASS,
-                                }}
-                                endContent={
-                                  <span className="text-default-500">%</span>
-                                }
-                                placeholder="0"
+                                                                                                placeholder="0"
                                 value={
                                   e.tax ??
                                   (typeof v.taxRate === "number"
                                     ? String(v.taxRate)
                                     : "")
                                 }
-                                onValueChange={(nextVal) => {
+                                onChange={(event) => { const nextVal = event.currentTarget.value;
                                   const id = String(v._id);
                                   setEdits((prev) => {
                                     if ((prev[id]?.tax ?? "") === nextVal)
@@ -1079,29 +997,16 @@ export default function VariantCostsClient({
                           if (!hideHandling) {
                             cells.push(
                               <TableCell key="handling">
-                                <NumericInput
-                                  aria-label="Handling & Overheads"
-                                  min={0}
+                                <NumericInput                                   min={0}
                                   step="0.01"
-                                  size={compact ? "sm" : "md"}
-                                  classNames={{
-                                    inputWrapper:
-                                      DATA_TABLE_INPUT_WRAPPER_CLASS,
-                                    input: DATA_TABLE_INPUT_CLASS,
-                                  }}
-                                  startContent={
-                                    <span className="text-default-500">
-                                      {currencySymbol}
-                                    </span>
-                                  }
-                                  placeholder="0"
+                                                                                                      placeholder="0"
                                   value={
                                     e.handling ??
                                     (typeof v.handlingPerUnit === "number"
                                       ? String(v.handlingPerUnit)
                                       : "")
                                   }
-                                  onValueChange={(nextVal) => {
+                                  onChange={(event) => { const nextVal = event.currentTarget.value;
                                     const id = String(v._id);
                                     setEdits((prev) => {
                                       if (
@@ -1132,9 +1037,9 @@ export default function VariantCostsClient({
                           if (!hideRowSave) {
                             cells.push(
                               <TableCell key="save">
-                                <Button
+                                <Button variant="primary"
                                   size="sm"
-                                  color="primary"
+                                 
                                   onPress={() => handleSaveRow(String(v._id))}
                                 >
                                   Save
@@ -1150,7 +1055,9 @@ export default function VariantCostsClient({
                 });
                 return rows;
               })()}
-            </TableBody>
+                </TableBody>
+              </Table.Content>
+            </Table.ScrollContainer>
           </Table>
         );
       })()}

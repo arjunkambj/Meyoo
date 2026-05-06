@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { ScrollShadow } from "@heroui/scroll-shadow";
-import { cn } from "@heroui/theme";
+import { Button, cn, ScrollShadow } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useAtom } from "jotai";
 import Link from "next/link";
@@ -25,7 +23,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
 
   const containerClasses = useMemo(
     () =>
-      `relative flex h-full max-w-66 flex-1 flex-col bg-content2/95 dark:bg-content1 rounded-3xl  transition-all duration-300 ease-in-out ${
+      `relative flex h-full max-w-66 flex-1 flex-col bg-surface-secondary/95 dark:bg-surface rounded-3xl  transition-all duration-300 ease-in-out ${
         isOpen
           ? "w-66 px-5 py-6 opacity-100 overflow-visible ml-6"
           : "w-0 p-0 opacity-0 overflow-hidden"
@@ -51,12 +49,9 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
         <Logo href="/overview" />
         {/* Close button - only visible on mobile */}
         <Button
-          isIconOnly
-          aria-label="Close sidebar"
-          className="sm:hidden absolute right-2 top-2 hover:bg-default-200"
+          isIconOnly           className="sm:hidden absolute right-2 top-2 hover:bg-surface-tertiary"
           size="sm"
-          variant="flat"
-          radius="lg"
+          variant="tertiary"
           onPress={handleCloseClick}
         >
           <Icon icon="solar:close-circle-bold-duotone" width={20} />
@@ -74,8 +69,8 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
           "flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all duration-200",
           "no-underline w-full group",
           pathname === "/overview"
-            ? "bg-primary/20 text-primary-600 font-semibold"
-            : "text-default-700 hover:text-foreground hover:bg-default-200/70",
+            ? "bg-accent/20 text-accent-600 font-semibold"
+            : "text-muted hover:text-foreground hover:bg-surface-tertiary/70",
         )}
         href="/overview"
         prefetch={true}
@@ -85,8 +80,8 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
           className={cn(
             "shrink-0 transition-all w-5 h-5",
             pathname === "/overview"
-              ? "text-primary-600"
-              : "text-default-700 group-hover:text-foreground",
+              ? "text-accent-600"
+              : "text-muted group-hover:text-foreground",
           )}
           icon="solar:home-2-bold-duotone"
         />
@@ -132,7 +127,7 @@ const SidebarContent = React.memo(({ onClose }: SidebarContentProps) => {
       </div>
 
       {/* Footer Items */}
-      <div className="mt-auto pt-5 px-1 border-t border-default-200">
+      <div className="mt-auto pt-5 px-1 border-t border-surface-tertiary">
         {footerItemsContent}
       </div>
     </div>

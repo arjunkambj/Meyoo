@@ -1,10 +1,8 @@
 "use client";
 
+import { Chip, ProgressBar } from "@heroui/react";
 import { useMemo } from "react";
 
-import { Chip } from "@heroui/chip";
-import { Progress } from "@heroui/progress";
-import { Icon } from "@iconify/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 
 import { tiers } from "@/components/home/pricing/constants";
@@ -72,42 +70,37 @@ export default function PlanOverview() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-base font-semibold text-default-800">
+          <h3 className="text-base font-semibold text-muted">
             Current Plan
           </h3>
           <Chip
-            color={currentPlanKey === "free" ? "default" : "primary"}
+            color={currentPlanKey === "free" ? "default" : "accent"}
             size="sm"
-            startContent={
-              currentPlanKey === "free" ? null : (
-                <Icon icon="solar:crown-star-bold-duotone" width={14} />
-              )
-            }
-            variant="flat"
+                        variant="soft"
           >
             {currentTier?.title ?? planLabel.replace(" Plan", "")}
           </Chip>
         </div>
         <div className="text-right">
-          <p className="text-sm font-semibold text-default-800">{planPrice}</p>
-          <p className="text-xs text-default-500">Status: {statusLabel}</p>
+          <p className="text-sm font-semibold text-muted">{planPrice}</p>
+          <p className="text-xs text-muted">Status: {statusLabel}</p>
         </div>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-default-700">Plan Usage (Last 30 Days)</p>
-          <p className="text-sm text-default-600">
+          <p className="text-sm font-medium text-muted">Plan Usage (Last 30 Days)</p>
+          <p className="text-sm text-muted">
             {ordersLast30Days.toLocaleString()} / {orderLimit.toLocaleString()} orders
           </p>
         </div>
-        <Progress
+        <ProgressBar
           value={usagePercentage}
-          color={usagePercentage >= 90 ? "danger" : usagePercentage >= 75 ? "warning" : "primary"}
+          color={usagePercentage >= 90 ? "danger" : usagePercentage >= 75 ? "warning" : "accent"}
           className="w-full"
           size="sm"
         />
-        <p className="text-xs text-default-500">
+        <p className="text-xs text-muted">
           Track up to {orderLimit.toLocaleString()} orders per month with your {currentTier?.title || planLabel.replace(" Plan", "")} plan
         </p>
       </div>

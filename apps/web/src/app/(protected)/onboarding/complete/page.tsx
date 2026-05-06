@@ -8,11 +8,11 @@ export default function CompletePage() {
       <div className="text-center mb-10">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Icon className="text-foreground" icon="solar:check-circle-bold" />
-          <h1 className="text-3xl lg:text-4xl font-bold text-default-900">
+          <h1 className="text-3xl lg:text-4xl font-bold text-muted">
             Setup Complete!
           </h1>
         </div>
-        <p className="text-lg text-default-600">
+        <p className="text-lg text-muted">
           Your account is ready. Let&apos;s calculate your analytics.
         </p>
       </div>

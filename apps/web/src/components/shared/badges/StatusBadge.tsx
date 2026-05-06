@@ -1,8 +1,6 @@
 "use client";
 
-import { Chip } from "@heroui/chip";
-import { cn } from "@heroui/theme";
-import { Icon } from "@iconify/react";
+import { Chip, cn } from "@heroui/react";
 import type React from "react";
 
 export type StatusType =
@@ -239,7 +237,7 @@ export interface StatusBadgeProps {
   status: string;
   config?: Record<string, StatusConfig>;
   size?: "sm" | "md" | "lg";
-  variant?: "solid" | "flat" | "dot" | "bordered";
+  variant?: "primary" | "secondary" | "tertiary" | "soft";
   showIcon?: boolean;
   className?: string;
 }
@@ -248,8 +246,7 @@ export function StatusBadge({
   status,
   config,
   size = "sm",
-  variant = "flat",
-  showIcon = true,
+  variant = "soft",
   className,
 }: StatusBadgeProps) {
   // Normalize status to lowercase for consistent matching
@@ -297,11 +294,6 @@ export function StatusBadge({
     isFulfillmentStatus &&
     (normalizedStatus === "fulfilled" || normalizedStatus === "unfulfilled");
 
-  const shouldShowIcon =
-    showIcon &&
-    statusConfig.icon &&
-    !isFulfilledOrUnfulfilled;
-
   const getColor = (type: StatusType) => {
     switch (type) {
       case "success":
@@ -312,9 +304,9 @@ export function StatusBadge({
         return "danger";
       case "info":
       case "primary":
-        return "primary";
+        return "accent";
       case "secondary":
-        return "secondary";
+        return "default";
       default:
         return "default";
     }
@@ -325,24 +317,12 @@ export function StatusBadge({
       className={cn(
         "capitalize",
         isFulfilledOrUnfulfilled &&
-          "bg-default-200 text-default-700 dark:text-default-500",
+          "bg-surface-tertiary text-muted dark:text-muted",
         className
       )}
       color={isFulfilledOrUnfulfilled ? "default" : getColor(statusConfig.type)}
       size={size}
-      startContent={
-        shouldShowIcon && statusConfig.icon && (
-          <Icon
-            className={cn(
-              size === "sm" && "w-3 h-3",
-              size === "md" && "w-4 h-4",
-              size === "lg" && "w-5 h-5"
-            )}
-            icon={statusConfig.icon}
-          />
-        )
-      }
-      variant={variant}
+            variant={variant}
     >
       {statusConfig.label}
     </Chip>

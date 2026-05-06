@@ -1,9 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Input, Textarea } from "@heroui/input";
-import { Spacer } from "@heroui/spacer";
+import { Button, Card, Input, TextArea } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import React, { useState } from "react";
 
@@ -82,85 +79,43 @@ export default function ContactSupport() {
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="rounded-2xl bg-background shadow-none lg:col-span-2">
-          <CardBody className="px-5">
+          <Card.Content className="px-5">
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Input
-                  isRequired
-                  classNames={{ label: "text-sm font-medium text-foreground mb-2" }}
-                  errorMessage={formErrors.name}
-                  isInvalid={!!formErrors.name}
-                  label="Full Name"
-                  labelPlacement="outside"
-                  placeholder="John Doe"
-                  startContent={
-                    <Icon
-                      className="text-default-400"
-                      icon="solar:user-bold-duotone"
-                      width={18}
-                    />
-                  }
-                  value={formData.name}
+                  required
+                                                                                                            placeholder="John Doe"
+                                    value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                 />
 
                 <Input
-                  isRequired
-                  classNames={{ label: "text-sm font-medium text-foreground mb-2" }}
-                  errorMessage={formErrors.email}
-                  isInvalid={!!formErrors.email}
-                  label="Email Address"
-                  labelPlacement="outside"
-                  placeholder="john@example.com"
-                  startContent={
-                    <Icon
-                      className="text-default-400"
-                      icon="solar:letter-bold-duotone"
-                      width={18}
-                    />
-                  }
-                  type="email"
+                  required
+                                                                                                            placeholder="john@example.com"
+                                    type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
 
-              <Spacer y={4} />
+              <div className="h-16" />
 
               <Input
-                isRequired
-                classNames={{ label: "text-sm font-medium text-foreground mb-2" }}
-                errorMessage={formErrors.subject}
-                isInvalid={!!formErrors.subject}
-                label="Subject"
-                labelPlacement="outside"
-                placeholder="Brief description of your issue"
-                startContent={
-                  <Icon
-                    className="text-default-400"
-                    icon="solar:chat-square-bold-duotone"
-                    width={18}
-                  />
-                }
-                value={formData.subject}
+                required
+                                                                                                placeholder="Brief description of your issue"
+                                value={formData.subject}
                 onChange={(e) => handleInputChange("subject", e.target.value)}
               />
 
-              <Textarea
-                isRequired
-                classNames={{ label: "text-sm font-medium text-foreground mb-2" }}
-                errorMessage={formErrors.message}
-                isInvalid={!!formErrors.message}
-                label="Message"
-                labelPlacement="outside"
-                minRows={8}
+              <TextArea
+                required
                 placeholder="Please provide as much detail as possible about your issue or question..."
                 value={formData.message}
                 onChange={(e) => handleInputChange("message", e.target.value)}
               />
 
               <div className="flex flex-col items-center justify-between gap-3 pt-2 sm:flex-row">
-                <div className="flex items-center gap-3 text-xs text-default-500">
+                <div className="flex items-center gap-3 text-xs text-muted">
                   <div className="flex items-center gap-1">
                     <Icon
                       className="text-success"
@@ -169,10 +124,10 @@ export default function ContactSupport() {
                     />
                     <span>Secure & private</span>
                   </div>
-                  <div className="hidden h-3 w-px bg-divider sm:block" />
+                  <div className="hidden h-3 w-px bg-separator sm:block" />
                   <div className="flex items-center gap-1">
                     <Icon
-                      className="text-primary"
+                      className="text-accent"
                       icon="solar:clock-circle-bold-duotone"
                       width={16}
                     />
@@ -180,46 +135,46 @@ export default function ContactSupport() {
                   </div>
                 </div>
 
-                <Button
+                <Button variant="primary"
                   className="px-6"
-                  color="primary"
+                 
                   size="md"
-                  startContent={<Icon icon="solar:letter-send-bold-duotone" width={18} />}
+                 
                   type="submit"
                 >
                   Send Message
                 </Button>
               </div>
             </form>
-          </CardBody>
+          </Card.Content>
         </Card>
 
-        <Card className="rounded-2xl bg-content2 shadow-none dark:bg-content1">
-          <CardBody className="space-y-4 px-5 py-5">
+        <Card className="rounded-2xl bg-surface-secondary shadow-none dark:bg-surface">
+          <Card.Content className="space-y-4 px-5 py-5">
             <div className="flex items-start gap-3">
               <span className="rounded-md bg-success/10 p-2">
                 <Icon className="text-success" icon="solar:clock-circle-bold" width={18} />
               </span>
               <div>
-                <p className="text-sm font-semibold text-default-800">Response Time</p>
-                <p className="text-xs text-default-700">Typically 2-4 hours (Mon-Fri)</p>
+                <p className="text-sm font-semibold text-muted">Response Time</p>
+                <p className="text-xs text-muted">Typically 2-4 hours (Mon-Fri)</p>
               </div>
             </div>
 
             <a
-              className="flex items-center gap-3 rounded-xl bg-content1 px-4 py-3 transition-colors hover:bg-content2"
+              className="flex items-center gap-3 rounded-xl bg-surface px-4 py-3 transition-colors hover:bg-surface-secondary"
               href={`mailto:${SUPPORT_EMAIL}`}
             >
-              <span className="rounded-md bg-primary/10 p-2">
+              <span className="rounded-md bg-accent/10 p-2">
                 <Icon
-                  className="text-primary"
+                  className="text-accent"
                   icon="solar:letter-bold-duotone"
                   width={18}
                 />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-default-800">Email Support</p>
-                <p className="truncate text-xs text-primary">{SUPPORT_EMAIL}</p>
+                <p className="text-sm font-semibold text-muted">Email Support</p>
+                <p className="truncate text-xs text-accent">{SUPPORT_EMAIL}</p>
               </div>
             </a>
 
@@ -232,11 +187,11 @@ export default function ContactSupport() {
                 />
               </span>
               <div>
-                <p className="text-sm font-semibold text-default-800">Support Hours</p>
-                <p className="text-xs text-default-500">9AM-6PM EST, Monday-Friday</p>
+                <p className="text-sm font-semibold text-muted">Support Hours</p>
+                <p className="text-xs text-muted">9AM-6PM EST, Monday-Friday</p>
               </div>
             </div>
-          </CardBody>
+          </Card.Content>
         </Card>
       </div>
     </div>

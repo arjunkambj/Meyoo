@@ -1,10 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/button";
-import { Card, CardBody } from "@heroui/card";
-import { Spinner } from "@heroui/spinner";
-import { addToast } from "@heroui/toast";
-import { cn } from "@heroui/theme";
+import { Button, Card, cn, Spinner, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -82,15 +78,9 @@ export default function CompleteOnboardingClient() {
     } catch (error) {
       console.error("[ONBOARDING] Failed to complete setup:", error);
       setIsCompleting(false);
-      addToast({
-        title: "Failed to complete setup",
-        description:
-          error instanceof Error
+      toast.danger("Failed to complete setup", { description: error instanceof Error
             ? error.message
-            : "Something went wrong. Please try again.",
-        color: "danger",
-        timeout: 3000,
-      });
+            : "Something went wrong. Please try again.", timeout: 3000 });
     }
   }, [hasShopify, router, finishOnboarding, isCompleting, isCompleted]);
 
@@ -153,7 +143,7 @@ export default function CompleteOnboardingClient() {
     <>
       {activePlatforms.length > 0 && (
         <Card className="border-warning bg-warning-50/40 mb-8">
-          <CardBody className="flex flex-col gap-3 text-default-700">
+          <Card.Content className="flex flex-col gap-3 text-muted">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex-none text-warning-500">
                 <Icon icon="solar:refresh-circle-line-duotone" width={24} />
@@ -195,7 +185,7 @@ export default function CompleteOnboardingClient() {
                 </span>
               </div>
             )}
-          </CardBody>
+          </Card.Content>
         </Card>
       )}
 
@@ -203,7 +193,7 @@ export default function CompleteOnboardingClient() {
 
       {/* Connection Summary */}
       <div>
-        <h2 className="text-lg font-semibold text-default-900 mb-4">
+        <h2 className="text-lg font-semibold text-muted mb-4">
           Your Connections
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
@@ -212,19 +202,19 @@ export default function CompleteOnboardingClient() {
               key={item.name}
               className={cn(
                 "relative",
-                item.connected ? "border-success" : "border-default-200"
+                item.connected ? "border-success" : "border-surface-tertiary"
               )}
             >
-              <CardBody className="p-4">
+              <Card.Content className="p-4">
                 <div key={item.name} className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-default-100">
+                  <div className="p-2 rounded-lg bg-surface-secondary">
                     <Icon
                       className="w-5 h-5 text-foreground"
                       icon={item.icon}
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-default-900">
+                    <p className="text-sm font-medium text-muted">
                       {item.name}
                     </p>
                     <p
@@ -232,7 +222,7 @@ export default function CompleteOnboardingClient() {
                         "text-xs",
                         item.connected
                           ? "text-success font-medium"
-                          : "text-default-500"
+                          : "text-muted"
                       )}
                     >
                       {item.connected ? "Connected" : "Not connected"}
@@ -242,7 +232,7 @@ export default function CompleteOnboardingClient() {
                     <span className="text-xs text-danger">Required</span>
                   )}
                 </div>
-              </CardBody>
+              </Card.Content>
             </Card>
           ))}
         </div>
@@ -251,14 +241,10 @@ export default function CompleteOnboardingClient() {
       {/* Action Button */}
       <div className="text-center">
         <Button
-          color={hasRequiredConnections ? "primary" : "default"}
-          endContent={
-            !isCompleting && (
-              <Icon icon="solar:arrow-right-line-duotone" width={18} />
-            )
-          }
+          variant={hasRequiredConnections ? "primary" : "secondary"}
+         
           isDisabled={!hasRequiredConnections || isCompleted}
-          isLoading={isCompleting}
+          isPending={isCompleting}
           size="lg"
           onPress={handleComplete}
         >
@@ -276,7 +262,7 @@ export default function CompleteOnboardingClient() {
         </Button>
 
         {!hasShopify && (
-          <p className="text-xs text-default-500 mt-4">
+          <p className="text-xs text-muted mt-4">
             <Link
               className="text-foreground font-medium"
               href="/onboarding/shopify"
