@@ -2,6 +2,20 @@
 @import "tw-animate-css";
 @import "@heroui/styles";
 
+@theme {
+  --animate-marquee: marquee var(--duration, 25s) linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-100% - var(--gap, 1rem)));
+    }
+  }
+}
+
 @layer components {
   .button {
     border-radius: 0.75rem;
