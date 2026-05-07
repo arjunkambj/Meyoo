@@ -2,48 +2,13 @@ import { v } from "convex/values";
 import type { MutationCtx } from "../_generated/server";
 import { mutation, query } from "../_generated/server";
 import { createNewUserData } from "./workspaceProvisioning";
+import { ensureActiveMembership } from "./membershipHelpers";
 import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
 
 /**
  * Team Management
  * Handles team member invitations, roles, and permissions
  */
-
-/**
- * Get team statistics for an organization
- */
-export const getTeamStats = query({
-  args: {},
-  returns: v.union(
-    v.null(),
-    v.object({
-      totalMembers: v.number(),
-      activeMembers: v.number(),
-      pendingInvites: v.number(),
-    }),
-  ),
-  handler: async (ctx) => {
-    const auth = await getUserAndOrg(ctx);
-    if (!auth) return null;
-
-    // Count memberships for this organization
-    const orgId = auth.orgId;
-    const memberships = await ctx.db
-      .query("memberships")
-      .withIndex("by_org", (q) => q.eq("organizationId", orgId))
-      .collect();
-
-    const visibleMemberships = memberships.filter(
-      (membership) => membership.status !== "removed",
-    );
-
-    return {
-      totalMembers: visibleMemberships.length,
-      activeMembers: visibleMemberships.filter((m) => m.status === "active").length,
-      pendingInvites: 0,
-    };
-  },
-});
 
 /**
  * Check if current user can manage team
@@ -55,6 +20,46 @@ export const canManageTeam = query({
     const auth = await getUserAndOrg(ctx);
     if (!auth) return false;
     return auth.membership?.role === "StoreOwner";
+  },
+});
+
+/**
+ * Sync an accepted Stack Auth team invitation into Convex membership state.
+ */
+export const syncCurrentStackTeamMembership = mutation({
+  args: {},
+  returns: v.union(
+    v.null(),
+    v.object({
+      role: v.union(v.literal("StoreOwner"), v.literal("StoreTeam")),
+    }),
+  ),
+  handler: async (ctx) => {
+    const { user, orgId, teamId, membership } = await requireUserAndOrg(ctx);
+
+    if (membership?.status === "active") {
+      const role = membership.role === "StoreOwner" ? "StoreOwner" : "StoreTeam";
+      return { role } as const;
+    }
+
+    const organization = await ctx.db.get(orgId);
+    if (!organization || organization.stackTeamId !== teamId) return null;
+
+    const now = Date.now();
+    await ensureActiveMembership(ctx as unknown as MutationCtx, orgId, user._id, "StoreTeam", {
+      assignedAt: now,
+      assignedBy: organization.ownerId,
+    });
+
+    await ctx.db.patch(user._id, {
+      organizationId: orgId,
+      selectedTeamId: teamId,
+      teamIds: Array.from(new Set([...(user.teamIds ?? []), teamId])),
+      status: "active",
+      updatedAt: now,
+    });
+
+    return { role: "StoreTeam" } as const;
   },
 });
 

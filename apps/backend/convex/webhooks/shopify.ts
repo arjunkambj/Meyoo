@@ -379,11 +379,15 @@ async function handleTopicInline(
       if (!organizationId || !storeId) break;
       const order = payload as any;
       const li = Array.isArray(order.line_items) ? order.line_items : [];
+      const orderName = toOptionalString(order.name);
+      const orderNumber = toOptionalString(order.order_number ?? order.number)
+        ?? orderName?.replace(/^#/, "")
+        ?? String(order.id ?? "");
       const orders = [
         {
           shopifyId: String(order.id),
-          orderNumber: String(order.order_number ?? order.number ?? ""),
-          name: String(order.name ?? `#${order.order_number ?? ""}`),
+          orderNumber,
+          name: orderName ?? `#${orderNumber}`,
           customer: order.customer
             ? {
                 shopifyId: String(order.customer.id),

@@ -1,5 +1,4 @@
 import CenteredNavbar from "@/components/home/Navbar";
-import { ThemeSwitch } from "@/components/home/ThemeSwitch";
 import { Footer } from "@/components/home/Footer";
 
 export default function HomeLayout({
@@ -10,7 +9,6 @@ export default function HomeLayout({
   return (
     <div className={`relative flex flex-col w-full min-h-screen bg-background`}>
       <CenteredNavbar />
-      <ThemeSwitch />
       <main className="relative w-full flex-1 z-10">{children}</main>
       <Footer />
     </div>

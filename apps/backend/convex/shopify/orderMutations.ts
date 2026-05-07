@@ -24,6 +24,16 @@ import {
 } from "./processingUtils";
 import { hasCompletedInitialShopifySync } from "./status";
 
+const isPresentShopifyId = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+  return normalized !== "" && normalized !== "undefined" && normalized !== "null";
+};
+
+const isValidOrderPayload = (order: { shopifyId: string; orderNumber: string; name: string }) =>
+  isPresentShopifyId(order.shopifyId) &&
+  [order.orderNumber, order.name]
+    .some((value) => value.trim().replace(/^#$/, "").length > 0);
+
 export const storeOrdersInternal = internalMutation({
   args: {
     organizationId: v.id("organizations"),
@@ -97,7 +107,9 @@ export const storeOrdersInternal = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    if (!args.orders || args.orders.length === 0) {
+    const orders = args.orders.filter(isValidOrderPayload);
+
+    if (orders.length === 0) {
       return null;
     }
 
@@ -145,7 +157,7 @@ export const storeOrdersInternal = internalMutation({
     const orderCreatedAtMap = new Map<string, number>();
     const customerEarliestOrderCreatedAt = new Map<string, number>();
 
-    for (const order of args.orders) {
+    for (const order of orders) {
       if (order.customer) {
         const customerId = order.customer.shopifyId;
         const existing = customerDataMap.get(customerId);
@@ -291,7 +303,7 @@ export const storeOrdersInternal = internalMutation({
     }
 
     // Step 4: Fetch only needed orders by shopifyId to minimize read set
-    const orderShopifyIds = args.orders.map((o) => o.shopifyId);
+    const orderShopifyIds = orders.map((o) => o.shopifyId);
     const existingOrders = new Map();
 
     for (const batch of chunkArray(orderShopifyIds, BULK_OPS.LOOKUP_SIZE)) {
@@ -315,7 +327,7 @@ export const storeOrdersInternal = internalMutation({
     const orderIdMap = new Map();
     const allLineItems = [];
 
-    for (const orderData of args.orders) {
+    for (const orderData of orders) {
       orderCreatedAtMap.set(orderData.shopifyId, orderData.shopifyCreatedAt);
       const customerId = orderData.customer
         ? customerIdMap.get(orderData.customer.shopifyId)
@@ -568,11 +580,12 @@ export const storeOrdersInternal = internalMutation({
       logger.info("Skipped analytics rebuild (no order changes detected)", {
         organizationId: String(organizationId),
         ordersReceived: args.orders.length,
+        validOrders: orders.length,
       });
       return null;
     }
 
-    logger.info(`Processed ${args.orders.length} orders with bulk operations`, {
+    logger.info(`Processed ${orders.length} orders with bulk operations`, {
       mutatedOrders: changedOrders.size,
     });
 

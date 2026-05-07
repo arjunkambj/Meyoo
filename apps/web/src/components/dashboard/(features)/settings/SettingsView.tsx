@@ -2,6 +2,7 @@
 
 import { Tabs } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { useState, type Key, type ReactNode } from "react";
 
 import SettingsLayoutClient from "./SettingsLayoutClient";
 import BillingSettingsView from "./billing/BillingSettingsView";
@@ -9,13 +10,42 @@ import GeneralSettingsView from "./general/GeneralSettingsView";
 import HelpSettingsView from "./help/HelpSettingsView";
 import TeamSettingsView from "./team/TeamSettingsView";
 
+type SettingsTabKey = "general" | "billing" | "team" | "support";
+
+const isSettingsTabKey = (key: Key): key is SettingsTabKey =>
+  ["general", "billing", "team", "support"].includes(String(key));
+
+const VisitedPanel = ({
+  children,
+  isVisited,
+}: {
+  children: ReactNode;
+  isVisited: boolean;
+}) => (isVisited ? children : null);
+
 export default function SettingsView() {
+  const [selectedTab, setSelectedTab] = useState<SettingsTabKey>("general");
+  const [visitedTabs, setVisitedTabs] = useState<Set<SettingsTabKey>>(
+    () => new Set(["general"]),
+  );
+
+  const handleSelectionChange = (key: Key) => {
+    if (!isSettingsTabKey(key)) return;
+    setSelectedTab(key);
+    setVisitedTabs((tabs) => new Set(tabs).add(key));
+  };
+
   return (
     <SettingsLayoutClient>
       <div className="flex flex-col space-y-6 pb-20">
         <div className="h-2" />
 
-        <Tabs variant="primary">
+        <Tabs
+          destroyInactiveTabPanel={false}
+          selectedKey={selectedTab}
+          variant="primary"
+          onSelectionChange={handleSelectionChange}
+        >
           <Tabs.ListContainer>
             <Tabs.List aria-label="Settings sections">
               <Tabs.Tab id="general">
@@ -49,16 +79,24 @@ export default function SettingsView() {
             </Tabs.List>
           </Tabs.ListContainer>
           <Tabs.Panel id="general">
-            <GeneralSettingsView />
+            <VisitedPanel isVisited={visitedTabs.has("general")}>
+              <GeneralSettingsView />
+            </VisitedPanel>
           </Tabs.Panel>
           <Tabs.Panel id="billing">
-            <BillingSettingsView />
+            <VisitedPanel isVisited={visitedTabs.has("billing")}>
+              <BillingSettingsView />
+            </VisitedPanel>
           </Tabs.Panel>
           <Tabs.Panel id="team">
-            <TeamSettingsView />
+            <VisitedPanel isVisited={visitedTabs.has("team")}>
+              <TeamSettingsView />
+            </VisitedPanel>
           </Tabs.Panel>
           <Tabs.Panel id="support">
-            <HelpSettingsView />
+            <VisitedPanel isVisited={visitedTabs.has("support")}>
+              <HelpSettingsView />
+            </VisitedPanel>
           </Tabs.Panel>
         </Tabs>
       </div>

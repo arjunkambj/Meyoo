@@ -34,6 +34,17 @@ type OrdersScanCursor = {
   createdAt: number;
   shopifyId: string;
 };
+
+const isPresentShopifyId = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+  return normalized !== "" && normalized !== "undefined" && normalized !== "null";
+};
+
+const isDisplayableOrder = (order: Doc<"shopifyOrders">) =>
+  isPresentShopifyId(order.shopifyId) &&
+  [order.orderNumber, order.name]
+    .some((value) => value.trim().replace(/^#$/, "").length > 0);
+
 function matchesStatusFilter(
   order: Doc<"shopifyOrders">,
   status: string,
@@ -159,10 +170,14 @@ function buildAnalyticsOrder(
   const updatedAtIso = order.updatedAt
     ? new Date(order.updatedAt).toISOString()
     : createdAtIso;
+  const orderNumber =
+    [order.orderNumber, order.name, order.shopifyId]
+      .map((value) => value?.trim().replace(/^#/, ""))
+      .find((value) => value && value.length > 0) ?? order._id;
 
   return {
     id: order._id,
-    orderNumber: order.orderNumber ?? order.name ?? order.shopifyId,
+    orderNumber,
     customer: {
       name: customerName,
       email: customerEmail,
@@ -577,6 +592,9 @@ export const getOrdersAnalytics = query({
         let customerDoc: Doc<"shopifyCustomers"> | null | undefined = null;
         if (customerKey) {
           customerDoc = customerCache.get(customerKey) ?? null;
+        }
+        if (!isDisplayableOrder(order)) {
+          return false;
         }
         if (!matchesStatusFilter(order, normalizedStatus)) {
           return false;

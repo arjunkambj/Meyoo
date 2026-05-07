@@ -79,6 +79,7 @@ export default function ProfileSection() {
     organizationId,
     organizationName,
     organization,
+    loading: organizationLoading,
     updateOrganizationName,
     updateOrganization,
   } = useOrganization();
@@ -99,21 +100,21 @@ export default function ProfileSection() {
 
   // Update form data when Clerk user or Convex user loads
   useEffect(() => {
-    if (user) {
-      const [firstName = "", lastName = ""] = (user?.name || "").split(" ", 2);
+    if (!user || organizationLoading) return;
 
-      setFormData({
-        firstName,
-        lastName,
-        email: user?.email || "",
-        phone: user?.phone || "",
-        organizationId: organizationId || "",
-        organizationName: organizationName || "",
-        currency: organization?.primaryCurrency || "USD",
-        timezone: organization?.timezone || "UTC",
-      });
-    }
-  }, [user, organizationId, organizationName, organization]);
+    const [firstName = "", lastName = ""] = (user.name || "").split(" ", 2);
+
+    setFormData({
+      firstName,
+      lastName,
+      email: user.email || "",
+      phone: user.phone || "",
+      organizationId: organizationId || "",
+      organizationName: organizationName || "",
+      currency: organization?.primaryCurrency || "USD",
+      timezone: organization?.timezone || "UTC",
+    });
+  }, [user, organizationLoading, organizationId, organizationName, organization]);
 
   const handleSubmit = useCallback(async () => {
     setIsLoading(true);
@@ -239,7 +240,7 @@ export default function ProfileSection() {
   }, []);
 
   // Show skeleton while loading initial data
-  if (!user) {
+  if (!user || organizationLoading) {
     return <FormSkeleton fields={4} showAvatar={true} />;
   }
 

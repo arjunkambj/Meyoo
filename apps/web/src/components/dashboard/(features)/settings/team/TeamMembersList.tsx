@@ -2,6 +2,8 @@
 
 import { Avatar, Button, Chip, Skeleton, Table, toast } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { useUser as useStackUser } from "@stackframe/stack";
+import type { Team } from "@stackframe/stack";
 import { useMutation } from "convex/react";
 import { useCallback, useState } from "react";
 import { useSetAtom } from "jotai";
@@ -21,6 +23,7 @@ const TableRow = Table.Row;
 // Use inferred return type from Convex API; no local TeamMember type
 
 export default function TeamMembersList() {
+  const stackUser = useStackUser();
   const { membershipRole: currentUserRole } = useUser();
   const { teamMembers, canManageTeam, isLoading } =
     useTeamMembersWithManagement();
@@ -30,6 +33,7 @@ export default function TeamMembersList() {
   const setPending = useSetAtom(setSettingsPendingAtom);
 
   const removeTeamMember = useMutation(api.core.teams.removeTeamMember);
+  const canShowPendingInvites = canManageTeam && currentUserRole === "StoreOwner";
 
   const handleRemoveMember = useCallback(
     async (userId: Id<"users">) => {
@@ -211,9 +215,82 @@ export default function TeamMembersList() {
                 </TableCell>
               </TableRow>
             ))}
+            {canShowPendingInvites && stackUser?.selectedTeam ? (
+              <PendingInvitationRows team={stackUser.selectedTeam} />
+            ) : null}
           </TableBody>
         </Table.Content>
       </Table.ScrollContainer>
     </Table>
+  );
+}
+
+function PendingInvitationRows({ team }: { team: Team }) {
+  const invitations = team.useInvitations();
+  const [revokingInvitationId, setRevokingInvitationId] = useState<string | null>(
+    null,
+  );
+
+  const handleRevoke = async (invitation: (typeof invitations)[number]) => {
+    setRevokingInvitationId(invitation.id);
+    try {
+      await invitation.revoke();
+      toast.success("Invitation revoked");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to revoke invitation";
+      toast.danger(message);
+    } finally {
+      setRevokingInvitationId(null);
+    }
+  };
+
+  return (
+    <>
+      {invitations.map((invitation) => (
+        <TableRow key={`invite-${invitation.id}`} id={`invite-${invitation.id}`}>
+          <TableCell>
+            <div className="flex items-center gap-3">
+              <Avatar size="sm">
+                <Avatar.Fallback>
+                  {(invitation.recipientEmail ?? "IN").slice(0, 2).toUpperCase()}
+                </Avatar.Fallback>
+              </Avatar>
+              <div>
+                <p className="text-sm font-medium">Pending invite</p>
+                <p className="text-xs text-foreground">
+                  {invitation.recipientEmail ?? "Unknown email"}
+                </p>
+              </div>
+            </div>
+          </TableCell>
+          <TableCell>
+            <Chip color="default" size="sm">
+              Team
+            </Chip>
+          </TableCell>
+          <TableCell>
+            <Chip color="warning" size="sm" variant="soft">
+              Invited
+            </Chip>
+          </TableCell>
+          <TableCell>
+            <p className="text-sm text-foreground">
+              Expires {formatDate(invitation.expiresAt)}
+            </p>
+          </TableCell>
+          <TableCell>
+            <Button
+              isPending={revokingInvitationId === invitation.id}
+              size="sm"
+              variant="tertiary"
+              onPress={() => handleRevoke(invitation)}
+            >
+              Revoke
+            </Button>
+          </TableCell>
+        </TableRow>
+      ))}
+    </>
   );
 }
