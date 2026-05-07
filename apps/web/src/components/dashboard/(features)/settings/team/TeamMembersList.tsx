@@ -10,6 +10,7 @@ import { api } from "@/libs/convexApi";
 import type { GenericId as Id } from "convex/values";
 import { useTeamMembersWithManagement, useUser } from "@/hooks";
 import { formatDate } from "@/libs/utils/format";
+import { DATA_TABLE_TABLE_CLASS } from "@/components/shared/table/DataTableCard";
 
 const TableBody = Table.Body;
 const TableCell = Table.Cell;
@@ -24,7 +25,7 @@ export default function TeamMembersList() {
   const { teamMembers, canManageTeam, isLoading } =
     useTeamMembersWithManagement();
   const [removingUserId, setRemovingUserId] = useState<Id<"users"> | null>(
-    null
+    null,
   );
   const setPending = useSetAtom(setSettingsPendingAtom);
 
@@ -53,12 +54,12 @@ export default function TeamMembersList() {
         setPending(false);
       }
     },
-    [removeTeamMember, setPending]
+    [removeTeamMember, setPending],
   );
 
   if (isLoading) {
     return (
-      <Table>
+      <Table className={DATA_TABLE_TABLE_CLASS}>
         <Table.ScrollContainer>
           <Table.Content aria-label="Loading team members">
             <TableHeader>
@@ -68,34 +69,36 @@ export default function TeamMembersList() {
               <TableColumn id="role">ROLE</TableColumn>
               <TableColumn id="status">STATUS</TableColumn>
               <TableColumn id="joined">JOINED</TableColumn>
-              <TableColumn id="actions">{canManageTeam ? "ACTIONS" : ""}</TableColumn>
+              <TableColumn id="actions">
+                {canManageTeam ? "ACTIONS" : ""}
+              </TableColumn>
             </TableHeader>
             <TableBody>
-          {Array.from({ length: 3 }).map((_, index) => (
-            <TableRow key={index} id={`skeleton-${index}`}>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32 rounded-lg" />
-                    <Skeleton className="h-3 w-40 rounded-lg" />
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-6 w-16 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-6 w-20 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-24 rounded-lg" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-8 w-20 rounded-lg" />
-              </TableCell>
-            </TableRow>
-          ))}
+              {Array.from({ length: 3 }).map((_, index) => (
+                <TableRow key={index} id={`skeleton-${index}`}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-32 rounded-lg" />
+                        <Skeleton className="h-3 w-40 rounded-lg" />
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24 rounded-lg" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-20 rounded-lg" />
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table.Content>
         </Table.ScrollContainer>
@@ -127,7 +130,7 @@ export default function TeamMembersList() {
   }
 
   return (
-    <Table>
+    <Table className={DATA_TABLE_TABLE_CLASS}>
       <Table.ScrollContainer>
         <Table.Content aria-label="Team members">
           <TableHeader>
@@ -137,72 +140,77 @@ export default function TeamMembersList() {
             <TableColumn id="role">ROLE</TableColumn>
             <TableColumn id="status">STATUS</TableColumn>
             <TableColumn id="joined">JOINED</TableColumn>
-            <TableColumn id="actions">{canManageTeam ? "ACTIONS" : ""}</TableColumn>
+            <TableColumn id="actions">
+              {canManageTeam ? "ACTIONS" : ""}
+            </TableColumn>
           </TableHeader>
           <TableBody>
-        {(teamMembers || []).map((member) => (
-          <TableRow key={member._id} id={member._id}>
-            <TableCell>
-              <div className="flex items-center gap-3">
-                <Avatar
-                  size="sm"
-                >
-                  <Avatar.Image src={member.image} alt={member.name || member.email || "Team member"} />
-                  <Avatar.Fallback>{(member.name || member.email || "TM").slice(0, 2).toUpperCase()}</Avatar.Fallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">
-                    {member.name || "Unnamed"}
+            {(teamMembers || []).map((member) => (
+              <TableRow key={member._id} id={member._id}>
+                <TableCell>
+                  <div className="flex items-center gap-3">
+                    <Avatar size="sm">
+                      <Avatar.Image
+                        src={member.image}
+                        alt={member.name || member.email || "Team member"}
+                      />
+                      <Avatar.Fallback>
+                        {(member.name || member.email || "TM")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </Avatar.Fallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {member.name || "Unnamed"}
+                      </p>
+                      <p className="text-xs text-foreground">{member.email}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    color={member.role === "StoreOwner" ? "accent" : "default"}
+                    size="sm"
+                  >
+                    {member.role === "StoreOwner" ? "Owner" : "Team"}
+                  </Chip>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
+                    <Chip
+                      color={member.status === "active" ? "success" : "warning"}
+                      size="sm"
+                      variant="soft"
+                    >
+                      {member.status === "active" ? "Active" : "Invited"}
+                    </Chip>
+                    {/* Additional invite details removed to align with server types */}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <p className="text-sm text-foreground">
+                    {member.createdAt ? formatDate(member.createdAt) : "—"}
                   </p>
-                  <p className="text-xs text-foreground">{member.email}</p>
-                </div>
-              </div>
-            </TableCell>
-            <TableCell>
-              <Chip
-                color={member.role === "StoreOwner" ? "accent" : "default"}
-                size="sm"
-              >
-                {member.role === "StoreOwner" ? "Owner" : "Team"}
-              </Chip>
-            </TableCell>
-            <TableCell>
-              <div className="flex flex-col gap-1">
-                <Chip
-                  color={member.status === "active" ? "success" : "warning"}
-                  size="sm"
-                  variant="soft"
-                >
-                  {member.status === "active" ? "Active" : "Invited"}
-                </Chip>
-                {/* Additional invite details removed to align with server types */}
-              </div>
-            </TableCell>
-            <TableCell>
-              <p className="text-sm text-foreground">
-                {member.createdAt ? formatDate(member.createdAt) : "—"}
-              </p>
-            </TableCell>
-            <TableCell>
-              {canManageTeam &&
-              member.role !== "StoreOwner" &&
-              currentUserRole === "StoreOwner" ? (
-                <Button
-                 
-                  isPending={removingUserId === member._id}
-                  size="sm"
-                 
-                  variant="tertiary"
-                  onPress={() => handleRemoveMember(member._id)}
-                >
-                  Remove
-                </Button>
-              ) : (
-                <span className="text-xs text-foreground">—</span>
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
+                </TableCell>
+                <TableCell>
+                  {canManageTeam &&
+                  member.role !== "StoreOwner" &&
+                  currentUserRole === "StoreOwner" ? (
+                    <Button
+                      isPending={removingUserId === member._id}
+                      size="sm"
+                      variant="tertiary"
+                      onPress={() => handleRemoveMember(member._id)}
+                    >
+                      Remove
+                    </Button>
+                  ) : (
+                    <span className="text-xs text-foreground">—</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table.Content>
       </Table.ScrollContainer>

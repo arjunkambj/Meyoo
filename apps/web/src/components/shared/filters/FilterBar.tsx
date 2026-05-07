@@ -1,6 +1,15 @@
 "use client";
 
-import { Button, Chip, cn, DatePicker, DateRangePicker, Dropdown, Input, Label } from "@heroui/react";
+import {
+  Button,
+  Chip,
+  cn,
+  DatePicker,
+  DateRangePicker,
+  Dropdown,
+  Input,
+  Label,
+} from "@heroui/react";
 import { parseDate } from "@internationalized/date";
 import React from "react";
 
@@ -16,13 +25,7 @@ export interface FilterOption {
   value: string;
   label: string;
   icon?: string;
-  color?:
-    | "default"
-    | "accent"
-    | "secondary"
-    | "success"
-    | "warning"
-    | "danger";
+  color?: "default" | "accent" | "secondary" | "success" | "warning" | "danger";
 }
 
 export interface Filter {
@@ -184,12 +187,14 @@ export function FilterBar({
       case "number":
         return (
           <Input
+            variant="secondary"
             className={isInline ? "w-32" : "max-w-xs"}
-                        placeholder={filter.placeholder}
-                        type="number"
+            placeholder={filter.placeholder}
+            type="number"
             value={(value || "") as string}
-            onChange={(event) => { const val = event.currentTarget.value;
-              onFilterChange(filter.key, val ? Number(val) : undefined)
+            onChange={(event) => {
+              const val = event.currentTarget.value;
+              onFilterChange(filter.key, val ? Number(val) : undefined);
             }}
           />
         );
@@ -198,7 +203,6 @@ export function FilterBar({
         return (
           <Button
             size={isInline ? "sm" : "md"}
-           
             variant={value ? "primary" : "tertiary"}
             onPress={() => onFilterChange(filter.key, !value)}
           >
@@ -222,12 +226,7 @@ export function FilterBar({
           </React.Fragment>
         ))}
         {activeFilters > 0 && onReset && (
-          <Button
-            size="sm"
-           
-            variant="tertiary"
-            onPress={onReset}
-          >
+          <Button size="sm" variant="tertiary" onPress={onReset}>
             Clear ({activeFilters})
           </Button>
         )}
@@ -245,7 +244,6 @@ export function FilterBar({
             <Button
               key={preset.key}
               size="sm"
-             
               variant="tertiary"
               onPress={() => onPresetSelect?.(preset)}
             >
@@ -271,12 +269,7 @@ export function FilterBar({
               {activeFilters} active
             </Chip>
             {onReset && (
-              <Button
-                size="sm"
-               
-                variant="tertiary"
-                onPress={onReset}
-              >
+              <Button size="sm" variant="tertiary" onPress={onReset}>
                 Reset
               </Button>
             )}

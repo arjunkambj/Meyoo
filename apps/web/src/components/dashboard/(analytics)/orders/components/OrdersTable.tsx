@@ -1,6 +1,6 @@
 "use client";
 
-import { Chip, Skeleton, Table } from "@heroui/react";
+import { Chip, Skeleton } from "@heroui/react";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import React, { useCallback } from "react";
@@ -8,9 +8,6 @@ import React, { useCallback } from "react";
 import { FulfillmentStatusBadge } from "@/components/shared/badges/StatusBadge";
 import { useUser } from "@/hooks";
 import { formatCurrencyPrecise } from "@/libs/utils/dashboard-formatters";
-import {
-  DATA_TABLE_TABLE_CLASS,
-} from "@/components/shared/table/DataTableCard";
 import type { AnalyticsOrder } from "@repo/types";
 
 interface OrdersTableProps {
@@ -33,6 +30,13 @@ const columns = [
   { name: "Payment", uid: "payment" },
   { name: "Ship To", uid: "location" },
 ];
+
+const tableShellClass =
+  "overflow-hidden rounded-2xl border bg-surface shadow-none";
+const headerCellClass =
+  "border-b bg-surface-secondary px-3 py-3 text-xs font-medium text-foreground";
+const bodyCellClass = "border-b px-3 py-2";
+const firstBodyCellClass = "border-b px-3 py-2";
 
 export const OrdersTable = React.memo(function OrdersTable({
   orders,
@@ -67,7 +71,8 @@ export const OrdersTable = React.memo(function OrdersTable({
 
         case "customerEmail": {
           const email =
-            typeof item.customer.email === "string" && item.customer.email.trim().length > 0
+            typeof item.customer.email === "string" &&
+            item.customer.email.trim().length > 0
               ? item.customer.email
               : "Guest Checkout";
           return (
@@ -129,7 +134,7 @@ export const OrdersTable = React.memo(function OrdersTable({
           return null;
       }
     },
-    [primaryCurrency]
+    [primaryCurrency],
   );
 
   const paginationNode =
@@ -142,8 +147,8 @@ export const OrdersTable = React.memo(function OrdersTable({
             1,
             Math.ceil(
               (pagination.estimatedTotal ?? pagination.total) /
-                Math.max(1, pagination.pageSize)
-            )
+                Math.max(1, pagination.pageSize),
+            ),
           )}
           onChange={pagination.setPage}
         />
@@ -153,7 +158,7 @@ export const OrdersTable = React.memo(function OrdersTable({
   return (
     <div className="space-y-4">
       {loading ? (
-        <div className={DATA_TABLE_TABLE_CLASS}>
+        <div className={tableShellClass}>
           <div className="space-y-2 p-4">
             {Array.from({ length: 5 }).map((_, index) => (
               <Skeleton
@@ -164,55 +169,78 @@ export const OrdersTable = React.memo(function OrdersTable({
           </div>
         </div>
       ) : (
-        <Table className={DATA_TABLE_TABLE_CLASS}>
-          <Table.ScrollContainer>
-            <Table.Content aria-label="Orders table">
-              <Table.Header columns={columns}>
-            {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
-              <Table.Column id={column.uid} isRowHeader={column.uid === "order"}>
-                {column.name}
-              </Table.Column>
-            )}
-              </Table.Header>
-              <Table.Body>
-            {orders.length === 0 ? (
-              <Table.Row id="empty">
-                <Table.Cell colSpan={columns.length}>
-                  <div className="py-10 text-center">
-                    <Icon
-                      className="mx-auto mb-4 text-foreground"
-                      icon="solar:cart-large-minimalistic-outline"
-                      width={48}
-                    />
-                    <p className="text-foreground">
-                      No orders found. Orders will sync from Shopify.
-                    </p>
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-            ) : (
-              orders.map((item, index) => {
-                const stripe = index % 2 === 1;
+        <div className={tableShellClass}>
+          <div className="relative w-full max-w-full overflow-x-auto">
+            <table
+              aria-label="Orders table"
+              className="w-full min-w-fit border-separate border-spacing-0 text-sm shadow-none"
+            >
+              <thead className="bg-surface-secondary">
+                <tr>
+                  {columns.map((column) => (
+                    <th
+                      key={column.uid}
+                      scope="col"
+                      className={
+                        column.uid === "order"
+                          ? `${headerCellClass} text-left`
+                          : `${headerCellClass} border-l text-left`
+                      }
+                    >
+                      {column.name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {orders.length === 0 ? (
+                  <tr>
+                    <td colSpan={columns.length} className="border-b px-3 py-2">
+                      <div className="py-10 text-center">
+                        <Icon
+                          className="mx-auto mb-4 text-foreground"
+                          icon="solar:cart-large-minimalistic-outline"
+                          width={48}
+                        />
+                        <p className="text-foreground">
+                          No orders found. Orders will sync from Shopify.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  orders.map((item) => {
+                    return (
+                      <tr
+                        key={item.id}
+                        className="transition-all duration-200 hover:bg-surface [&:last-child>*]:border-b-0"
+                      >
+                        {columns.map((column) => {
+                          const isRowHeader = column.uid === "order";
+                          const Cell = isRowHeader ? "th" : "td";
 
-                return (
-                  <Table.Row
-                    key={item.id}
-                    id={item.id}
-                    className={`${stripe ? "bg-surface-secondary" : "bg-background"} border-t border-default-border`}
-                  >
-                    {columns.map((column) => (
-                      <Table.Cell key={column.uid}>
-                        {renderCell(item, column.uid)}
-                      </Table.Cell>
-                    ))}
-                  </Table.Row>
-                );
-              })
-            )}
-              </Table.Body>
-            </Table.Content>
-          </Table.ScrollContainer>
-        </Table>
+                          return (
+                            <Cell
+                              key={column.uid}
+                              scope={isRowHeader ? "row" : undefined}
+                              className={
+                                isRowHeader
+                                  ? `${firstBodyCellClass} text-left`
+                                  : bodyCellClass
+                              }
+                            >
+                              {renderCell(item, column.uid)}
+                            </Cell>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
       {paginationNode}
     </div>

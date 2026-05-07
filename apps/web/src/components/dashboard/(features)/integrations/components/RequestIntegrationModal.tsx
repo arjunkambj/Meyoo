@@ -114,94 +114,100 @@ export function RequestIntegrationModal({
 
   return (
     <Modal>
-      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <Modal.Backdrop
+        isOpen={isOpen}
+        onOpenChange={(open) => !open && handleClose()}
+      >
         <Modal.Container scroll="inside" size="lg">
           <Modal.Dialog className="bg-surface-secondary">
-        {() => (
-          <>
-            <Modal.Header className="flex items-center gap-2">
-              <Icon
-                className="text-accent"
-                icon="solar:add-square-bold-duotone"
-                width={24}
-              />
-              <span>Request New Integration</span>
-            </Modal.Header>
-
-            <Modal.Body className="bg-surface-secondary gap-6 pb-6">
-              {error && (
-                <div className="bg-danger/10 border border-danger/20 rounded-lg p-3 flex items-start gap-2">
+            {() => (
+              <>
+                <Modal.Header className="flex items-center gap-2">
                   <Icon
-                    className="text-danger mt-0.5"
-                    icon="solar:danger-triangle-bold"
-                    width={18}
+                    className="text-accent"
+                    icon="solar:add-square-bold-duotone"
+                    width={24}
                   />
-                  <p className="text-sm text-danger">{error}</p>
-                </div>
-              )}
+                  <span>Request New Integration</span>
+                </Modal.Header>
 
-              <Input
-                required
-                                                disabled={isSubmitting}
-                                                                placeholder="e.g., QuickBooks, Klaviyo, TikTok Shop"
-                                value={formData.platformName}
-                onChange={(e) =>
-                  handleInputChange("platformName", e.target.value)
-                }
-              />
+                <Modal.Body className="bg-surface-secondary gap-6 pb-6">
+                  {error && (
+                    <div className="bg-danger/10 border border-danger/20 rounded-lg p-3 flex items-start gap-2">
+                      <Icon
+                        className="text-danger mt-0.5"
+                        icon="solar:danger-triangle-bold"
+                        width={18}
+                      />
+                      <p className="text-sm text-danger">{error}</p>
+                    </div>
+                  )}
 
-              <TextArea
-                required
-                                                disabled={isSubmitting}
-                placeholder="Briefly describe what this platform does and why you need it"
-                value={formData.description}
-                onChange={(e) =>
-                  handleInputChange("description", e.target.value)
-                }
-              />
+                  <Input
+                    variant="secondary"
+                    required
+                    disabled={isSubmitting}
+                    placeholder="e.g., QuickBooks, Klaviyo, TikTok Shop"
+                    value={formData.platformName}
+                    onChange={(e) =>
+                      handleInputChange("platformName", e.target.value)
+                    }
+                  />
 
-              {/* Simplified form: no use case, impact, priority or category */}
+                  <TextArea
+                    required
+                    disabled={isSubmitting}
+                    placeholder="Briefly describe what this platform does and why you need it"
+                    value={formData.description}
+                    onChange={(e) =>
+                      handleInputChange("description", e.target.value)
+                    }
+                  />
 
-              <div className="bg-surface-secondary rounded-lg p-3 flex items-start gap-2">
-                <Icon
-                  className="text-foreground mt-0.5"
-                  icon="solar:info-circle-bold"
-                  width={18}
-                />
-                <div className="text-xs text-foreground">
-                  <p className="font-medium mb-1">What happens next?</p>
-                  <ul className="space-y-0.5">
-                    <li>• We&apos;ll review your request within 48 hours</li>
-                    <li>• Popular requests get prioritized in our roadmap</li>
-                    <li>
-                      • You&apos;ll be notified when the integration is
-                      available
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </Modal.Body>
+                  {/* Simplified form: no use case, impact, priority or category */}
 
-            <Modal.Footer>
-              <Button
-               
-                isDisabled={isSubmitting}
-                variant="tertiary"
-                onPress={handleClose}
-              >
-                Cancel
-              </Button>
-              <Button variant="primary"
-               
-                isPending={isSubmitting}
-               
-                onPress={handleSubmit}
-              >
-                {isSubmitting ? "Submitting..." : "Submit Request"}
-              </Button>
-            </Modal.Footer>
-          </>
-        )}
+                  <div className="bg-surface-secondary rounded-lg p-3 flex items-start gap-2">
+                    <Icon
+                      className="text-foreground mt-0.5"
+                      icon="solar:info-circle-bold"
+                      width={18}
+                    />
+                    <div className="text-xs text-foreground">
+                      <p className="font-medium mb-1">What happens next?</p>
+                      <ul className="space-y-0.5">
+                        <li>
+                          • We&apos;ll review your request within 48 hours
+                        </li>
+                        <li>
+                          • Popular requests get prioritized in our roadmap
+                        </li>
+                        <li>
+                          • You&apos;ll be notified when the integration is
+                          available
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </Modal.Body>
+
+                <Modal.Footer>
+                  <Button
+                    isDisabled={isSubmitting}
+                    variant="tertiary"
+                    onPress={handleClose}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    isPending={isSubmitting}
+                    onPress={handleSubmit}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Request"}
+                  </Button>
+                </Modal.Footer>
+              </>
+            )}
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

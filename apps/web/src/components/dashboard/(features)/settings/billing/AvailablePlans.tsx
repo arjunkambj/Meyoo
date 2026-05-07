@@ -92,11 +92,15 @@ export default function AvailablePlans() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-foreground">
-          Upgrade Plan
-        </h3>
-        {/* Frequency Toggle - Inline */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-1">
+          <h3 className="text-base font-semibold text-foreground">
+            Upgrade Plan
+          </h3>
+          <p className="text-xs text-muted">
+            Pick the order volume and support level that fits your store.
+          </p>
+        </div>
         <Tabs onSelectionChange={onFrequencyChange}>
           <Tabs.ListContainer>
             <Tabs.List aria-label="Billing frequency">
@@ -120,7 +124,7 @@ export default function AvailablePlans() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-danger/10 border border-danger/20 rounded-lg p-3">
+        <div className="rounded-xl border border-danger/20 bg-danger/10 p-3">
           <div className="flex gap-2.5">
             <Icon
               className="text-danger shrink-0 mt-0.5"
@@ -147,7 +151,7 @@ export default function AvailablePlans() {
       )}
 
       {/* Plans Grid with Full Features - Matching Home Pricing Style */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         {availablePlans.map((tier) => {
           const planName = SHOPIFY_PLAN_NAME_BY_TIER_KEY[tier.key];
           const isCurrentPlan = tier.key === currentTierKey;
@@ -181,7 +185,7 @@ export default function AvailablePlans() {
               button={{
                 label: buttonLabel,
                 size: "sm",
-                className: "h-9",
+                className: "w-full",
                 color: isCurrentPlan
                   ? "success"
                   : tier.key === TiersEnum.Free
@@ -191,7 +195,7 @@ export default function AvailablePlans() {
                   ? "solid"
                   : tier.mostPopular
                     ? "solid"
-                    : "flat",
+                    : "tertiary",
                 disabled,
                 isLoading: isProcessing,
                 endContent:
@@ -211,7 +215,7 @@ export default function AvailablePlans() {
       </div>
 
       {/* Free Tier Notice - Compact */}
-      <div className="bg-success/10 border border-success/20 rounded-lg p-3">
+      <div className="rounded-xl border border-success/20 bg-success/10 p-3">
         <div className="flex gap-2.5 items-start">
           <Icon
             className="text-success shrink-0 mt-0.5"

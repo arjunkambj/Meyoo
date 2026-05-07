@@ -45,7 +45,7 @@ export function IntegrationCard({
         </div>
       )}
 
-      <Card.Content className="p-5">
+      <Card.Content className="px-2 py-1">
         {/* Header with icon and title */}
         <div className="flex items-start gap-3 mb-4">
           <div
@@ -75,29 +75,24 @@ export function IntegrationCard({
         <div className="mt-auto pt-2">
           {isUpcoming ? (
             <Button
-              className="w-full font-medium"
-             
+              className="w-full bg-surface text-foreground font-medium"
               size="sm"
-             
               variant="tertiary"
               onPress={onNotifyMe}
             >
               {releaseDate}
             </Button>
           ) : isConnected ? (
-            <Button variant="tertiary"
-              className="w-full font-medium"
-             
+            <Button
+              className="w-full bg-success text-success-foreground font-medium"
               size="sm"
-             
+              variant="tertiary"
             >
               Connected
             </Button>
           ) : (
             <Button
               className="w-full font-medium"
-             
-             
               size="sm"
               variant="primary"
               onPress={onConnect}

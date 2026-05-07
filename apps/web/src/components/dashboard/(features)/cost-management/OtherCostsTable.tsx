@@ -1,6 +1,19 @@
 "use client";
 
-import { Button, Calendar, Chip, Input, ListBox, Modal, Popover, Select, Skeleton, Table, toast, useOverlayState } from "@heroui/react";
+import {
+  Button,
+  Calendar,
+  Chip,
+  Input,
+  ListBox,
+  Modal,
+  Popover,
+  Select,
+  Skeleton,
+  Table,
+  toast,
+  useOverlayState,
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useMemo, useState } from "react";
 import { ConfirmationModal } from "@/components/shared/ConfirmationModal";
@@ -17,6 +30,7 @@ import { getCurrencySymbol } from "@/libs/utils/format";
 import { TableSkeleton } from "@/components/shared/skeletons";
 import {
   DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS,
+  DATA_TABLE_SHELL_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 import {
@@ -240,7 +254,10 @@ export default function OtherCostsTable() {
           toast("Operating cost updated", { timeout: 3000 });
           onOpenChange(false);
         } else {
-          toast.danger("Failed to update cost", { description: result.error || "Please try again", timeout: 5000 });
+          toast.danger("Failed to update cost", {
+            description: result.error || "Please try again",
+            timeout: 5000,
+          });
         }
       } else {
         // For new expense, use addCompleteExpense
@@ -260,7 +277,10 @@ export default function OtherCostsTable() {
       }
     } catch (_error) {
       logger.error("Error saving expense:", _error);
-      toast.danger("Failed to save cost", { description: _error instanceof Error ? _error.message : "Unknown error", timeout: 5000 });
+      toast.danger("Failed to save cost", {
+        description: _error instanceof Error ? _error.message : "Unknown error",
+        timeout: 5000,
+      });
     }
   };
 
@@ -287,7 +307,7 @@ export default function OtherCostsTable() {
 
   const effectiveFromCalendarValue = useMemo(
     () => getEffectiveFromCalendarValue(formData.effectiveFrom),
-    [formData.effectiveFrom]
+    [formData.effectiveFrom],
   );
 
   const renderCell = (item: Cost, columnKey: React.Key) => {
@@ -333,7 +353,6 @@ export default function OtherCostsTable() {
             </Button>
             <Button
               isIconOnly
-             
               size="sm"
               variant="tertiary"
               onPress={() => handleDeleteClick(item._id as string)}
@@ -352,12 +371,7 @@ export default function OtherCostsTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Operating Costs</h2>
-        <Button variant="primary"
-         
-         
-          isDisabled={isLoading}
-          onPress={handleAdd}
-        >
+        <Button variant="primary" isDisabled={isLoading} onPress={handleAdd}>
           Add Operating Cost
         </Button>
       </div>
@@ -370,7 +384,7 @@ export default function OtherCostsTable() {
       <div className="space-y-4">
         {topContent}
         {isLoading ? (
-          <div className={DATA_TABLE_TABLE_CLASS}>
+          <div className={DATA_TABLE_SHELL_CLASS}>
             <TableSkeleton
               rows={6}
               columns={4}
@@ -383,23 +397,50 @@ export default function OtherCostsTable() {
             <Table.ScrollContainer>
               <Table.Content aria-label="Operating costs table">
                 <TableHeader columns={columns}>
-                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
-                    <TableColumn id={column.uid} isRowHeader={column.uid === "name"}>
+                  {(column: {
+                    uid?: string;
+                    name?: string;
+                    key?: string;
+                    label?: string;
+                  }) => (
+                    <TableColumn
+                      id={column.uid}
+                      isRowHeader={column.uid === "name"}
+                    >
                       {column.name}
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={(otherCosts || []) as Cost[]}>
-                  {(item: Cost) => (
-                    <TableRow
-                      key={item._id as string}
-                      id={item._id as string}
-                      className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
-                    >
-                      {(columnKey: unknown) => (
-                        <TableCell>{renderCell(item, String(columnKey))}</TableCell>
-                      )}
+                <TableBody>
+                  {((otherCosts || []) as Cost[]).length === 0 ? (
+                    <TableRow id="empty">
+                      <TableCell colSpan={columns.length}>
+                        <div className="py-10 text-center">
+                          <Icon
+                            className="mx-auto mb-4 text-foreground"
+                            icon="solar:wallet-money-outline"
+                            width={48}
+                          />
+                          <p className="text-foreground">
+                            No operating costs found.
+                          </p>
+                        </div>
+                      </TableCell>
                     </TableRow>
+                  ) : (
+                    ((otherCosts || []) as Cost[]).map((item) => (
+                      <TableRow
+                        key={item._id as string}
+                        id={item._id as string}
+                        className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
+                      >
+                        {columns.map((column) => (
+                          <TableCell key={column.uid}>
+                            {renderCell(item, column.uid)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
                   )}
                 </TableBody>
               </Table.Content>
@@ -412,127 +453,135 @@ export default function OtherCostsTable() {
         <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
           <Modal.Container scroll="inside" size="lg">
             <Modal.Dialog>
-          {({ close }) => (
-            <>
-              <Modal.Header className="flex flex-col gap-1 border-b pb-3">
-                <h2 className="text-lg font-semibold">
-                  {formData._id ? "Edit Operating Cost" : "Add Operating Cost"}
-                </h2>
-                <p className="text-sm text-foreground">
-                  Track operational costs for better P&L visibility
-                </p>
-              </Modal.Header>
-              <Modal.Body className="bg-surface-secondary gap-6 py-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Input
-                    required
-                                                            placeholder="e.g., Office Rent, Software Subscription"
-                    value={formData.name || ""}
-                    onChange={(event) => { const value = event.currentTarget.value;
-                      setFormData({ ...formData, name: value })
-                    }}
-                  />
-                </div>
+              {({ close }) => (
+                <>
+                  <Modal.Header className="flex flex-col gap-1 border-b pb-3">
+                    <h2 className="text-lg font-semibold">
+                      {formData._id
+                        ? "Edit Operating Cost"
+                        : "Add Operating Cost"}
+                    </h2>
+                    <p className="text-sm text-foreground">
+                      Track operational costs for better P&L visibility
+                    </p>
+                  </Modal.Header>
+                  <Modal.Body className="bg-surface-secondary gap-6 py-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <Input
+                        variant="secondary"
+                        required
+                        placeholder="e.g., Office Rent, Software Subscription"
+                        value={formData.name || ""}
+                        onChange={(event) => {
+                          const value = event.currentTarget.value;
+                          setFormData({ ...formData, name: value });
+                        }}
+                      />
+                    </div>
 
-                {/* Amount + Frequency/Apply To aligned in one row */}
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <Input
-                    required
-                                                                                step="0.01"
-                    type="number"
-                    value={formData.amount.toString()}
-                    onChange={(event) => { const value = event.currentTarget.value;
-                      setFormData({
-                        ...formData,
-                        amount: parseFloat(value) || 0,
-                      })
-                    }}
-                  />
+                    {/* Amount + Frequency/Apply To aligned in one row */}
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <Input
+                        variant="secondary"
+                        required
+                        step="0.01"
+                        type="number"
+                        value={formData.amount.toString()}
+                        onChange={(event) => {
+                          const value = event.currentTarget.value;
+                          setFormData({
+                            ...formData,
+                            amount: parseFloat(value) || 0,
+                          });
+                        }}
+                      />
 
-                  <Select
-                    value={formData.frequency}
-                    onChange={(key) => {
-                      const nextFrequency = key as CostFrequency | null;
-                      if (!nextFrequency) return;
-                      setFormData((prev) => ({
-                        ...prev,
-                        frequency: nextFrequency,
-                      }));
-                    }}
-                  >
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox>
-                        {frequencies.map((freq) => (
-                          <ListBox.Item
-                            key={freq.key}
-                            id={freq.key}
-                            textValue={freq.label}
-                          >
-                            {freq.label}
-                            <ListBox.ItemIndicator />
-                          </ListBox.Item>
-                        ))}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-foreground">
-                      Effective From
-                    </span>
-                    <Popover
-                      isOpen={isEffectiveFromOpen}
-                      onOpenChange={setIsEffectiveFromOpen}
-                    >
-                      <Button
-                        className="w-full justify-between text-left"
-                        variant="outline"
+                      <Select
+                        variant="secondary"
+                        value={formData.frequency}
+                        onChange={(key) => {
+                          const nextFrequency = key as CostFrequency | null;
+                          if (!nextFrequency) return;
+                          setFormData((prev) => ({
+                            ...prev,
+                            frequency: nextFrequency,
+                          }));
+                        }}
                       >
-                        <span className="flex items-center gap-2">
-                          <Icon icon="solar:calendar-linear" width={16} />
-                          {formatEffectiveFromLabel(formData.effectiveFrom)}
+                        <Select.Trigger>
+                          <Select.Value />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Popover>
+                          <ListBox>
+                            {frequencies.map((freq) => (
+                              <ListBox.Item
+                                key={freq.key}
+                                id={freq.key}
+                                textValue={freq.label}
+                              >
+                                {freq.label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="flex flex-col gap-2">
+                        <span className="text-sm font-medium text-foreground">
+                          Effective From
                         </span>
-                        <Icon icon="solar:alt-arrow-down-bold" width={14} />
-                      </Button>
-                      <Popover.Content>
-                        <Popover.Dialog className="p-2">
-                        <Calendar                           className="w-full"
-                          value={effectiveFromCalendarValue}
-                          onChange={(date: CalendarDate | null) => {
-                            if (!date) return;
-                            setFormData((prev) => ({
-                              ...prev,
-                              effectiveFrom: calendarDateToString(date),
-                            }));
-                            setIsEffectiveFromOpen(false);
-                          }}
-                        />
-                        </Popover.Dialog>
-                      </Popover.Content>
-                    </Popover>
-                  </div>
-                </div>
-              </Modal.Body>
-              <Modal.Footer className="">
-                <Button variant="tertiary" onPress={close}>
-                  Cancel
-                </Button>
-                <Button variant="primary"
-                 
-                  isDisabled={!formData.name || !formData.amount}
-                  onPress={handleSave}
-                >
-                  {formData._id ? "Update" : "Add"}
-                </Button>
-              </Modal.Footer>
-            </>
-          )}
+                        <Popover
+                          isOpen={isEffectiveFromOpen}
+                          onOpenChange={setIsEffectiveFromOpen}
+                        >
+                          <Button
+                            className="w-full justify-between text-left"
+                            variant="outline"
+                          >
+                            <span className="flex items-center gap-2">
+                              <Icon icon="solar:calendar-linear" width={16} />
+                              {formatEffectiveFromLabel(formData.effectiveFrom)}
+                            </span>
+                            <Icon icon="solar:alt-arrow-down-bold" width={14} />
+                          </Button>
+                          <Popover.Content>
+                            <Popover.Dialog className="p-2">
+                              <Calendar
+                                className="w-full"
+                                value={effectiveFromCalendarValue}
+                                onChange={(date: CalendarDate | null) => {
+                                  if (!date) return;
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    effectiveFrom: calendarDateToString(date),
+                                  }));
+                                  setIsEffectiveFromOpen(false);
+                                }}
+                              />
+                            </Popover.Dialog>
+                          </Popover.Content>
+                        </Popover>
+                      </div>
+                    </div>
+                  </Modal.Body>
+                  <Modal.Footer className="">
+                    <Button variant="tertiary" onPress={close}>
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      isDisabled={!formData.name || !formData.amount}
+                      onPress={handleSave}
+                    >
+                      {formData._id ? "Update" : "Add"}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
             </Modal.Dialog>
           </Modal.Container>
         </Modal.Backdrop>

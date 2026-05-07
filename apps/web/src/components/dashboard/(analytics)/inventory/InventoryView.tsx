@@ -133,36 +133,6 @@ export function InventoryView() {
     </div>
   ), [isRefreshing, lastUpdatedLabel]);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
-        <div className="h-2" />
-        {/* Header - Always visible without loading state */}
-        <AnalyticsHeader leftActions={headerLeft} rightActions={headerRight} />
-
-        {/* Overview Cards Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={`card-skeleton-${i}`} className="h-32 rounded-lg" />
-          ))}
-        </div>
-
-        {/* Table Skeleton */}
-        <div className="rounded-2xl border border-surface-tertiary bg-surface-secondary p-6">
-          <div className="space-y-3">
-            {[...Array(8)].map((_, i) => (
-              <Skeleton
-                key={`inventory-table-skeleton-${i + 1}`}
-                className="h-16 w-full rounded-lg"
-              />
-            ))}
-          </div>
-        </div>
-
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Header */}

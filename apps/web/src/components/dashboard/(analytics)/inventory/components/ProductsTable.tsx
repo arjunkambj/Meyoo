@@ -1,6 +1,14 @@
 "use client";
 
-import { Avatar, Button, Chip, Skeleton, Table, toast, Tooltip } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  Chip,
+  Skeleton,
+  Table,
+  toast,
+  Tooltip,
+} from "@heroui/react";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import React, { useCallback, useState } from "react";
@@ -12,6 +20,7 @@ import {
   DATA_TABLE_ROW_BASE_BG,
   DATA_TABLE_ROW_STRIPE_BG,
   DATA_TABLE_ROW_STRIPE_CHILD_BG,
+  DATA_TABLE_SHELL_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 import { cn } from "@/libs/utils";
@@ -106,7 +115,9 @@ export const ProductsTable = React.memo(function ProductsTable({
             <div className="flex items-center gap-3">
               <Avatar size="sm">
                 <Avatar.Image src={item.image} />
-                <Avatar.Fallback>{item.name.substring(0, 2).toUpperCase()}</Avatar.Fallback>
+                <Avatar.Fallback>
+                  {item.name.substring(0, 2).toUpperCase()}
+                </Avatar.Fallback>
               </Avatar>
               <div>
                 <p className="font-medium text-sm">{item.name}</p>
@@ -187,7 +198,10 @@ export const ProductsTable = React.memo(function ProductsTable({
                     size="sm"
                     variant="tertiary"
                     onPress={() => {
-                      toast.info("Working on this feature", { description: "Stock ordering will be available soon", timeout: 3000 });
+                      toast.info("Working on this feature", {
+                        description: "Stock ordering will be available soon",
+                        timeout: 3000,
+                      });
                     }}
                   >
                     <Icon icon="solar:cart-large-2-bold-duotone" width={16} />
@@ -202,7 +216,7 @@ export const ProductsTable = React.memo(function ProductsTable({
           return null;
       }
     },
-    [currencySymbol]
+    [currencySymbol],
   );
 
   const paginationContent =
@@ -219,9 +233,9 @@ export const ProductsTable = React.memo(function ProductsTable({
                 1,
                 Math.ceil(
                   Math.max(pagination.total, 0) /
-                    Math.max(pagination.pageSize ?? 50, 1)
-                )
-              )
+                    Math.max(pagination.pageSize ?? 50, 1),
+                ),
+              ),
             )
           }
           onChange={pagination.setPage}
@@ -232,7 +246,7 @@ export const ProductsTable = React.memo(function ProductsTable({
   return (
     <div className="space-y-4">
       {loading ? (
-        <div className={DATA_TABLE_TABLE_CLASS}>
+        <div className={DATA_TABLE_SHELL_CLASS}>
           <div className="space-y-2 p-4">
             {Array.from({ length: 5 }).map((_, index) => (
               <Skeleton
@@ -248,160 +262,180 @@ export const ProductsTable = React.memo(function ProductsTable({
             <Table.ScrollContainer>
               <Table.Content aria-label="Products table">
                 <TableHeader columns={columns}>
-                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
-                    <TableColumn id={column.uid} isRowHeader={column.uid === "product"}>
+                  {(column: {
+                    uid?: string;
+                    name?: string;
+                    key?: string;
+                    label?: string;
+                  }) => (
+                    <TableColumn
+                      id={column.uid}
+                      isRowHeader={column.uid === "product"}
+                    >
                       {column.name}
                     </TableColumn>
                   )}
                 </TableHeader>
                 <TableBody>
-              {products.length === 0 ? (
-                <TableRow id="empty">
-                  <TableCell colSpan={columns.length}>
-                    <div className="py-10 text-center">
-                      <Icon
-                        className="mx-auto mb-4 text-foreground"
-                        icon="solar:box-outline"
-                        width={48}
-                      />
-                      <p className="text-foreground">
-                        No products found. Products will sync from Shopify.
-                      </p>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                products.flatMap((item, idx) => {
-                  const isOpen = expanded.has(item.id);
-                  const stripe = idx % 2 === 1;
-                  const avgPrice =
-                    Array.isArray(item.variants) && item.variants.length > 0
-                      ? item.variants.reduce(
-                          (sum, v) => sum + (Number(v.price ?? 0) || 0),
-                          0
-                        ) / item.variants.length
-                      : item.price;
-
-                  const header = (
-                    <TableRow
-                      key={`p-h-${item.id}`}
-                      id={`p-h-${item.id}`}
-                      className={cn(
-                        stripe
-                          ? DATA_TABLE_ROW_STRIPE_BG
-                          : DATA_TABLE_ROW_BASE_BG,
-                        DATA_TABLE_GROUP_ROW_BORDER_CLASS
-                      )}
-                    >
-                      <TableCell>
-                        <div className="min-w-0 flex items-center gap-3 py-1">
-                          <button
-                            type="button"
-                            className="flex-none text-foreground transition hover:text-foreground"
-                            onClick={() => {
-                              setExpanded((prev) => {
-                                const next = new Set(prev);
-                                if (next.has(item.id)) next.delete(item.id);
-                                else next.add(item.id);
-                                return next;
-                              });
-                            }}                           >
-                            <Icon
-                              icon={
-                                isOpen
-                                  ? "solar:alt-arrow-up-bold"
-                                  : "solar:alt-arrow-down-bold"
-                              }
-                              width={18}
-                            />
-                          </button>
-                          <Avatar size="sm" className="flex-none rounded-md">
-                            <Avatar.Image src={item.image} />
-                            <Avatar.Fallback>{item.name.substring(0, 2).toUpperCase()}</Avatar.Fallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-foreground">
-                              {item.name}
-                            </p>
-                            <p className="truncate text-xs text-foreground">
-                              {formatVariantLabel(item)}
-                            </p>
-                          </div>
+                  {products.length === 0 ? (
+                    <TableRow id="empty">
+                      <TableCell colSpan={columns.length}>
+                        <div className="py-10 text-center">
+                          <Icon
+                            className="mx-auto mb-4 text-foreground"
+                            icon="solar:box-outline"
+                            width={48}
+                          />
+                          <p className="text-foreground">
+                            No products found. Products will sync from Shopify.
+                          </p>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <span className="text-sm">{item.category}</span>
-                      </TableCell>
-                      <TableCell>
-                        <p className="text-sm font-medium">{item.available}</p>
-                      </TableCell>
-                      <TableCell>{renderCell(item, "status")}</TableCell>
-                      <TableCell>
-                        <p className="text-sm font-medium">
-                          {currencySymbol}
-                          {avgPrice.toFixed(2)}
-                        </p>
-                      </TableCell>
-                      <TableCell>{renderCell(item, "cogs")}</TableCell>
-                      <TableCell>{renderCell(item, "margin")}</TableCell>
-                      <TableCell>{renderCell(item, "unitsSold")}</TableCell>
-                      <TableCell>{renderCell(item, "actions")}</TableCell>
                     </TableRow>
-                  );
+                  ) : (
+                    products.flatMap((item, idx) => {
+                      const isOpen = expanded.has(item.id);
+                      const stripe = idx % 2 === 1;
+                      const avgPrice =
+                        Array.isArray(item.variants) && item.variants.length > 0
+                          ? item.variants.reduce(
+                              (sum, v) => sum + (Number(v.price ?? 0) || 0),
+                              0,
+                            ) / item.variants.length
+                          : item.price;
 
-                  if (!isOpen || !item.variants || item.variants.length === 0) {
-                    return [header];
-                  }
+                      const header = (
+                        <TableRow
+                          key={`p-h-${item.id}`}
+                          id={`p-h-${item.id}`}
+                          className={cn(
+                            stripe
+                              ? DATA_TABLE_ROW_STRIPE_BG
+                              : DATA_TABLE_ROW_BASE_BG,
+                            DATA_TABLE_GROUP_ROW_BORDER_CLASS,
+                          )}
+                        >
+                          <TableCell>
+                            <div className="min-w-0 flex items-center gap-3 py-1">
+                              <button
+                                type="button"
+                                className="flex-none text-foreground transition hover:text-foreground"
+                                onClick={() => {
+                                  setExpanded((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(item.id)) next.delete(item.id);
+                                    else next.add(item.id);
+                                    return next;
+                                  });
+                                }}
+                              >
+                                <Icon
+                                  icon={
+                                    isOpen
+                                      ? "solar:alt-arrow-up-bold"
+                                      : "solar:alt-arrow-down-bold"
+                                  }
+                                  width={18}
+                                />
+                              </button>
+                              <Avatar
+                                size="sm"
+                                className="flex-none rounded-md"
+                              >
+                                <Avatar.Image src={item.image} />
+                                <Avatar.Fallback>
+                                  {item.name.substring(0, 2).toUpperCase()}
+                                </Avatar.Fallback>
+                              </Avatar>
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-medium text-foreground">
+                                  {item.name}
+                                </p>
+                                <p className="truncate text-xs text-foreground">
+                                  {formatVariantLabel(item)}
+                                </p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">{item.category}</span>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-sm font-medium">
+                              {item.available}
+                            </p>
+                          </TableCell>
+                          <TableCell>{renderCell(item, "status")}</TableCell>
+                          <TableCell>
+                            <p className="text-sm font-medium">
+                              {currencySymbol}
+                              {avgPrice.toFixed(2)}
+                            </p>
+                          </TableCell>
+                          <TableCell>{renderCell(item, "cogs")}</TableCell>
+                          <TableCell>{renderCell(item, "margin")}</TableCell>
+                          <TableCell>{renderCell(item, "unitsSold")}</TableCell>
+                          <TableCell>{renderCell(item, "actions")}</TableCell>
+                        </TableRow>
+                      );
 
-                  const children = item.variants.map((v) => (
-                    <TableRow
-                      key={`v-${v.id}`}
-                      id={`v-${v.id}`}
-                      className={cn(
-                        "pointer-events-none",
-                        DATA_TABLE_ROW_BASE_BG,
-                        stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG
-                      )}
-                    >
-                      <TableCell>
-                        <div className="min-w-0">
-                          <div className="truncate text-sm text-foreground">
-                            {v.title || "Variant"}
-                          </div>
-                          <div className="truncate text-xs text-foreground">
-                            {v.sku || ""}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-foreground">
-                          {item.category}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <p className="text-sm font-medium">{v.available}</p>
-                      </TableCell>
-                      <TableCell>{renderCell(item, "status")}</TableCell>
-                      <TableCell>
-                        <p className="text-sm font-medium">
-                          {currencySymbol}
-                          {Number(v.price || 0).toFixed(2)}
-                        </p>
-                      </TableCell>
-                      <TableCell>—</TableCell>
-                      <TableCell>—</TableCell>
-                      <TableCell>
-                        <div className="text-sm font-medium">
-                          {formatNumber(v.unitsSold ?? 0)}
-                        </div>
-                      </TableCell>
-                      <TableCell>—</TableCell>
-                    </TableRow>
-                  ));
+                      if (
+                        !isOpen ||
+                        !item.variants ||
+                        item.variants.length === 0
+                      ) {
+                        return [header];
+                      }
 
-                  return [header, ...children];
-                })
-              )}
+                      const children = item.variants.map((v) => (
+                        <TableRow
+                          key={`v-${v.id}`}
+                          id={`v-${v.id}`}
+                          className={cn(
+                            "pointer-events-none",
+                            DATA_TABLE_ROW_BASE_BG,
+                            stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG,
+                          )}
+                        >
+                          <TableCell>
+                            <div className="min-w-0">
+                              <div className="truncate text-sm text-foreground">
+                                {v.title || "Variant"}
+                              </div>
+                              <div className="truncate text-xs text-foreground">
+                                {v.sku || ""}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-foreground">
+                              {item.category}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-sm font-medium">{v.available}</p>
+                          </TableCell>
+                          <TableCell>{renderCell(item, "status")}</TableCell>
+                          <TableCell>
+                            <p className="text-sm font-medium">
+                              {currencySymbol}
+                              {Number(v.price || 0).toFixed(2)}
+                            </p>
+                          </TableCell>
+                          <TableCell>—</TableCell>
+                          <TableCell>—</TableCell>
+                          <TableCell>
+                            <div className="text-sm font-medium">
+                              {formatNumber(v.unitsSold ?? 0)}
+                            </div>
+                          </TableCell>
+                          <TableCell>—</TableCell>
+                        </TableRow>
+                      ));
+
+                      return [header, ...children];
+                    })
+                  )}
                 </TableBody>
               </Table.Content>
             </Table.ScrollContainer>

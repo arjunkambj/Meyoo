@@ -45,7 +45,10 @@ export default function ContactForm() {
         `Contact form: ${formData.reason}`,
       )}&body=${encodeURIComponent(body)}`;
       setIsSubmitted(true);
-      toast("Message ready", { description: "Your email app should open with the message.", timeout: 5000 });
+      toast("Message ready", {
+        description: "Your email app should open with the message.",
+        timeout: 5000,
+      });
 
       setTimeout(() => {
         setIsSubmitted(false);
@@ -58,7 +61,10 @@ export default function ContactForm() {
         });
       }, 5000);
     } catch {
-      toast.danger("Error", { description: "Something went wrong. Please try again.", timeout: 5000 });
+      toast.danger("Error", {
+        description: "Something went wrong. Please try again.",
+        timeout: 5000,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -89,15 +95,17 @@ export default function ContactForm() {
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
+          variant="secondary"
           required
-                    placeholder="John Doe"
-                    value={formData.name}
+          placeholder="John Doe"
+          value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
         />
         <Input
+          variant="secondary"
           required
-                    placeholder="john@company.com"
-                    type="email"
+          placeholder="john@company.com"
+          type="email"
           value={formData.email}
           onChange={(e) => handleChange("email", e.target.value)}
         />
@@ -105,11 +113,13 @@ export default function ContactForm() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Input
-                    placeholder="Acme Inc."
-                    value={formData.company}
+          variant="secondary"
+          placeholder="Acme Inc."
+          value={formData.company}
           onChange={(e) => handleChange("company", e.target.value)}
         />
         <Select
+          variant="secondary"
           isRequired
           placeholder="Select a reason"
           value={formData.reason || null}
@@ -139,16 +149,15 @@ export default function ContactForm() {
       <TextArea
         required
         placeholder="Tell us how we can help you..."
-                value={formData.message}
+        value={formData.message}
         onChange={(e) => handleChange("message", e.target.value)}
       />
 
-      <Button variant="primary"
+      <Button
+        variant="primary"
         className="w-full font-semibold"
-       
         isPending={isSubmitting}
         size="lg"
-       
         type="submit"
       >
         {isSubmitting ? "Sending..." : "Send"}

@@ -20,7 +20,7 @@ export default function TeamSettingsView() {
           key={i}
           className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary"
         >
-          <Card.Content className="px-5 py-5">
+          <Card.Content className="px-2 py-1">
             <Skeleton className="rounded-lg">
               <div className="h-16 rounded-lg bg-surface-tertiary" />
             </Skeleton>
@@ -51,7 +51,7 @@ export default function TeamSettingsView() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Card className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary">
-            <Card.Content className="px-5 py-5">
+            <Card.Content className="px-2 py-1">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-accent/10 rounded-lg">
                   <Icon
@@ -71,7 +71,7 @@ export default function TeamSettingsView() {
           </Card>
 
           <Card className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary">
-            <Card.Content className="px-5 py-5">
+            <Card.Content className="px-2 py-1">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-success/10 rounded-lg">
                   <Icon
@@ -94,11 +94,7 @@ export default function TeamSettingsView() {
       )}
 
       {/* Team Members List */}
-      <Card className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary">
-        <Card.Content className="p-0">
-          <TeamMembersList />
-        </Card.Content>
-      </Card>
+      <TeamMembersList />
 
       {/* Info for non-owners */}
       {!canManageTeam && (

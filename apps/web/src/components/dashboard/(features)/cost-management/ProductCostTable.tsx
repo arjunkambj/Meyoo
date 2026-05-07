@@ -77,7 +77,7 @@ export default function ProductCostTable() {
 
   const variants = useMemo<VariantRow[]>(
     () => (Array.isArray(variantData) ? (variantData as VariantRow[]) : []),
-    [variantData]
+    [variantData],
   );
 
   const variantGroups = useMemo(() => {
@@ -141,18 +141,12 @@ export default function ProductCostTable() {
       const next = { ...prev } as Record<string, RowEdit>;
       variants.forEach((v) => {
         const id = String(v._id);
-        const original = (
-          prev[id]?.cogs ??
-          v.cogsPerUnit ??
-          ""
-        ).toString();
+        const original = (prev[id]?.cogs ?? v.cogsPerUnit ?? "").toString();
         const originalVal = Number(original || 0);
         if (!isFinite(originalVal) || originalVal === 0) {
           const price = Number(v.price ?? 0) || 0;
           const computed = (price * pct) / 100;
-          const fixed = isFinite(computed)
-            ? computed.toFixed(2)
-            : "0.00";
+          const fixed = isFinite(computed) ? computed.toFixed(2) : "0.00";
           next[id] = { ...(next[id] || {}), cogs: fixed };
         }
       });
@@ -212,7 +206,7 @@ export default function ProductCostTable() {
         (c) =>
           c.cogsPerUnit !== undefined ||
           c.taxPercent !== undefined ||
-          c.handlingPerUnit !== undefined
+          c.handlingPerUnit !== undefined,
       );
       if (filtered.length > 0) {
         await saveAll(filtered);
@@ -231,15 +225,15 @@ export default function ProductCostTable() {
         <div className="flex-1" />
         <div className="flex flex-wrap items-center gap-2">
           <Input
+            variant="secondary"
             className="w-36"
-                        type="number"
+            type="number"
             placeholder="10"
-                        value={bulkPct}
+            value={bulkPct}
             onChange={(event) => setBulkPct(event.currentTarget.value)}
           />
           <Button
             variant="tertiary"
-           
             isDisabled={!bulkPct || isNaN(Number(bulkPct))}
             onPress={handleApplyCogs}
           >
@@ -247,7 +241,6 @@ export default function ProductCostTable() {
           </Button>
           <Button
             variant="tertiary"
-           
             isDisabled={!bulkPct || isNaN(Number(bulkPct))}
             onPress={handleApplyTax}
           >
@@ -255,19 +248,29 @@ export default function ProductCostTable() {
           </Button>
           <Button
             variant="tertiary"
-           
             isDisabled={!bulkPct || isNaN(Number(bulkPct))}
             onPress={handleApplyHandling}
           >
             Apply Handling
           </Button>
-          <Button variant="primary" isPending={savingAll} onPress={handleSaveAll}>
+          <Button
+            variant="primary"
+            isPending={savingAll}
+            onPress={handleSaveAll}
+          >
             Save All Changes
           </Button>
         </div>
       </div>
     ),
-    [bulkPct, savingAll, handleApplyCogs, handleApplyTax, handleApplyHandling, handleSaveAll]
+    [
+      bulkPct,
+      savingAll,
+      handleApplyCogs,
+      handleApplyTax,
+      handleApplyHandling,
+      handleSaveAll,
+    ],
   );
 
   const paginationContent =
@@ -298,359 +301,409 @@ export default function ProductCostTable() {
               <TableColumn id="price">Price</TableColumn>
             </TableHeader>
             <TableBody>
-          {loading ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <TableRow key={`skeleton-${i}`} id={`skeleton-${i}`}>
-                <TableCell colSpan={6}>
-                  <Skeleton className="h-8 rounded-md" />
-                </TableCell>
-              </TableRow>
-            ))
-          ) : variants.length === 0 ? (
-            <TableRow id="empty">
-              <TableCell colSpan={6}>
-                <div className="p-4 text-center text-foreground text-sm">
-                  No variants found
-                </div>
-              </TableCell>
-            </TableRow>
-          ) : (
-            // Group by product with collapsible sections
-            (() => {
-              return variantGroups.flatMap((grp, grpIndex) => {
-                const count = grp.items.length;
-                const isOpen = expandedGroups.has(grp.key);
-                const s = String(grp.productStatus || "").toLowerCase();
-                const statusChipColor: "default" | "success" | "warning" =
-                  s === "active" ? "success" : s ? "warning" : "default";
-                const img = grp.productImage || "";
-                const avgPrice =
-                  count > 0
-                    ? grp.items.reduce(
-                        (sum, v) => sum + (Number(v.price ?? 0) || 0),
-                        0
-                      ) / count
-                    : 0;
-                const stripe = grpIndex % 2 === 1;
-
-                // Averages for default product-level inputs (respect pending edits)
-                const avgFrom = (vals: Array<number | undefined>) => {
-                  const nums = vals.filter(
-                    (n): n is number => typeof n === "number" && isFinite(n)
-                  );
-                  if (nums.length === 0) return "";
-                  const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
-                  return avg.toFixed(2);
-                };
-                const avgCogsStr = avgFrom(
-                  grp.items.map((v) => {
-                    const id = String(v._id);
-                    const e = edits[id];
-                    if (e && e.cogs !== undefined && e.cogs !== "")
-                      return Number(e.cogs);
-                    if (typeof v.cogsPerUnit === "number")
-                      return Number(v.cogsPerUnit);
-                    return undefined;
-                  })
-                );
-                const avgTaxStr = avgFrom(
-                  grp.items.map((v) => {
-                    const id = String(v._id);
-                    const e = edits[id];
-                    if (e && e.tax !== undefined && e.tax !== "")
-                      return Number(e.tax);
-                    if (typeof v.taxRate === "number") return Number(v.taxRate);
-                    return undefined;
-                  })
-                );
-                const avgHandlingStr = avgFrom(
-                  grp.items.map((v) => {
-                    const id = String(v._id);
-                    const e = edits[id];
-                    if (e && e.handling !== undefined && e.handling !== "")
-                      return Number(e.handling);
-                    if (typeof v.handlingPerUnit === "number")
-                      return Number(v.handlingPerUnit);
-                    return undefined;
-                  })
-                );
-
-                // Header cells aligned to table columns
-                const headerCells: TableCellElement[] = [];
-                headerCells.push(
-                  <TableCell key="variant">
-                    <div className="min-w-0 flex items-center gap-3 py-1">
-                      <button
-                        type="button"
-                        className="flex-none text-foreground hover:text-foreground transition"
-                        onClick={() => {
-                          setExpandedGroups((prev) => {
-                            const next = new Set(prev);
-                            if (next.has(grp.key)) next.delete(grp.key);
-                            else next.add(grp.key);
-                            return next;
-                          });
-                        }}                       >
-                        <Icon
-                          icon={
-                            isOpen
-                              ? "solar:alt-arrow-up-bold"
-                              : "solar:alt-arrow-down-bold"
-                          }
-                          width={18}
-                        />
-                      </button>
-                      {img ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={img}
-                          alt={grp.productName}
-                          className="w-8 h-8 rounded object-cover flex-none"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-foreground flex-none">
-                          <Icon icon="solar:box-outline" width={16} />
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-foreground">
-                          {grp.productName}
-                        </div>
-                        <div className="text-xs text-foreground">
-                          {count} variant{count === 1 ? "" : "s"}
-                        </div>
-                      </div>
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={`skeleton-${i}`} id={`skeleton-${i}`}>
+                    <TableCell colSpan={6}>
+                      <Skeleton className="h-8 rounded-md" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : variants.length === 0 ? (
+                <TableRow id="empty">
+                  <TableCell colSpan={6}>
+                    <div className="py-10 text-center">
+                      <Icon
+                        className="mx-auto mb-4 text-foreground"
+                        icon="solar:box-outline"
+                        width={48}
+                      />
+                      <p className="text-foreground">No variants found.</p>
                     </div>
                   </TableCell>
-                );
-                headerCells.push(
-                  <TableCell key="status">
-                    <Chip color={statusChipColor} size="sm">
-                      {s ? s.charAt(0).toUpperCase() + s.slice(1) : "-"}
-                    </Chip>
-                  </TableCell>
-                );
-                headerCells.push(
-                  <TableCell key="cogs">
-                    <Input                       type="number"
-                      inputMode="decimal"
-                      min={0}
-                      step="0.01"
-                                                                  placeholder="0.00"
-                      value={groupEdits[grp.key]?.cogs ?? avgCogsStr}
-                      onChange={(event) => { const val = event.currentTarget.value;
-                        const nextVal = sanitizeDecimal(val);
-                        setGroupEdits((prev) => ({
-                          ...prev,
-                          [grp.key]: {
-                            ...(prev[grp.key] || {}),
-                            cogs: nextVal,
-                          },
-                        }));
-                        setEdits((prev) => {
-                          const next = { ...prev } as Record<string, RowEdit>;
-                          grp.items.forEach((v) => {
-                            const id = String(v._id);
-                            next[id] = { ...(next[id] || {}), cogs: nextVal };
-                          });
-                          return next;
-                        });
-                      }}
-                    />
-                  </TableCell>
-                );
-                headerCells.push(
-                  <TableCell key="tax">
-                    <Input                       type="number"
-                      inputMode="decimal"
-                      min={0}
-                      max={100}
-                      step="0.01"
-                                                                  placeholder="0"
-                      value={groupEdits[grp.key]?.tax ?? avgTaxStr}
-                      onChange={(event) => { const val = event.currentTarget.value;
-                        const nextVal = sanitizeDecimal(val);
-                        setGroupEdits((prev) => ({
-                          ...prev,
-                          [grp.key]: { ...(prev[grp.key] || {}), tax: nextVal },
-                        }));
-                        setEdits((prev) => {
-                          const next = { ...prev } as Record<string, RowEdit>;
-                          grp.items.forEach((v) => {
-                            const id = String(v._id);
-                            next[id] = { ...(next[id] || {}), tax: nextVal };
-                          });
-                          return next;
-                        });
-                      }}
-                    />
-                  </TableCell>
-                );
-                headerCells.push(
-                  <TableCell key="handling">
-                    <Input                       type="number"
-                      inputMode="decimal"
-                      min={0}
-                      step="0.01"
-                                                                  placeholder="0"
-                      value={groupEdits[grp.key]?.handling ?? avgHandlingStr}
-                      onChange={(event) => { const val = event.currentTarget.value;
-                        const nextVal = sanitizeDecimal(val);
-                        setGroupEdits((prev) => ({
-                          ...prev,
-                          [grp.key]: {
-                            ...(prev[grp.key] || {}),
-                            handling: nextVal,
-                          },
-                        }));
-                        setEdits((prev) => {
-                          const next = { ...prev } as Record<string, RowEdit>;
-                          grp.items.forEach((v) => {
-                            const id = String(v._id);
-                            next[id] = {
-                              ...(next[id] || {}),
-                              handling: nextVal,
-                            };
-                          });
-                          return next;
-                        });
-                      }}
-                    />
-                  </TableCell>
-                );
-                headerCells.push(
-                  <TableCell key="price">
-                    {currencySymbol}
-                    {avgPrice.toFixed(2)}
-                  </TableCell>
-                );
+                </TableRow>
+              ) : (
+                // Group by product with collapsible sections
+                (() => {
+                  return variantGroups.flatMap((grp, grpIndex) => {
+                    const count = grp.items.length;
+                    const isOpen = expandedGroups.has(grp.key);
+                    const s = String(grp.productStatus || "").toLowerCase();
+                    const statusChipColor: "default" | "success" | "warning" =
+                      s === "active" ? "success" : s ? "warning" : "default";
+                    const img = grp.productImage || "";
+                    const avgPrice =
+                      count > 0
+                        ? grp.items.reduce(
+                            (sum, v) => sum + (Number(v.price ?? 0) || 0),
+                            0,
+                          ) / count
+                        : 0;
+                    const stripe = grpIndex % 2 === 1;
 
-                const header = (
-                  <TableRow
-                    key={`grp-h-${grp.key}`}
-                    id={`grp-h-${grp.key}`}
-                    className={cn(
-                      stripe
-                        ? DATA_TABLE_ROW_STRIPE_BG
-                        : DATA_TABLE_ROW_BASE_BG,
-                      DATA_TABLE_GROUP_ROW_BORDER_CLASS
-                    )}
-                  >
-                    {headerCells}
-                  </TableRow>
-                );
-                if (!isOpen) return [header];
+                    // Averages for default product-level inputs (respect pending edits)
+                    const avgFrom = (vals: Array<number | undefined>) => {
+                      const nums = vals.filter(
+                        (n): n is number =>
+                          typeof n === "number" && isFinite(n),
+                      );
+                      if (nums.length === 0) return "";
+                      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+                      return avg.toFixed(2);
+                    };
+                    const avgCogsStr = avgFrom(
+                      grp.items.map((v) => {
+                        const id = String(v._id);
+                        const e = edits[id];
+                        if (e && e.cogs !== undefined && e.cogs !== "")
+                          return Number(e.cogs);
+                        if (typeof v.cogsPerUnit === "number")
+                          return Number(v.cogsPerUnit);
+                        return undefined;
+                      }),
+                    );
+                    const avgTaxStr = avgFrom(
+                      grp.items.map((v) => {
+                        const id = String(v._id);
+                        const e = edits[id];
+                        if (e && e.tax !== undefined && e.tax !== "")
+                          return Number(e.tax);
+                        if (typeof v.taxRate === "number")
+                          return Number(v.taxRate);
+                        return undefined;
+                      }),
+                    );
+                    const avgHandlingStr = avgFrom(
+                      grp.items.map((v) => {
+                        const id = String(v._id);
+                        const e = edits[id];
+                        if (e && e.handling !== undefined && e.handling !== "")
+                          return Number(e.handling);
+                        if (typeof v.handlingPerUnit === "number")
+                          return Number(v.handlingPerUnit);
+                        return undefined;
+                      }),
+                    );
 
-                const children = grp.items.map((v) => {
-                  const e = edits[String(v._id)] || {};
-                  return (
-                    <TableRow
-                      key={String(v._id)}
-                      id={String(v._id)}
-                      className={cn(
-                        DATA_TABLE_ROW_BASE_BG,
-                        stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG
-                      )}
-                    >
-                      <TableCell>
-                        <div className="min-w-0">
-                          <div className="truncate text-sm text-foreground">
-                            {v.title || "Variant"}
-                          </div>
-                          <div className="text-xs text-foreground truncate">
-                            {v.sku || ""}
+                    // Header cells aligned to table columns
+                    const headerCells: TableCellElement[] = [];
+                    headerCells.push(
+                      <TableCell key="variant">
+                        <div className="min-w-0 flex items-center gap-3 py-1">
+                          <button
+                            type="button"
+                            className="flex-none text-foreground hover:text-foreground transition"
+                            onClick={() => {
+                              setExpandedGroups((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(grp.key)) next.delete(grp.key);
+                                else next.add(grp.key);
+                                return next;
+                              });
+                            }}
+                          >
+                            <Icon
+                              icon={
+                                isOpen
+                                  ? "solar:alt-arrow-up-bold"
+                                  : "solar:alt-arrow-down-bold"
+                              }
+                              width={18}
+                            />
+                          </button>
+                          {img ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={img}
+                              alt={grp.productName}
+                              className="w-8 h-8 rounded object-cover flex-none"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-foreground flex-none">
+                              <Icon icon="solar:box-outline" width={16} />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-foreground">
+                              {grp.productName}
+                            </div>
+                            <div className="text-xs text-foreground">
+                              {count} variant{count === 1 ? "" : "s"}
+                            </div>
                           </div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Chip color={statusChipColor} size="sm" variant="soft">
+                      </TableCell>,
+                    );
+                    headerCells.push(
+                      <TableCell key="status">
+                        <Chip color={statusChipColor} size="sm">
                           {s ? s.charAt(0).toUpperCase() + s.slice(1) : "-"}
                         </Chip>
-                      </TableCell>
-                      <TableCell>
-                        <Input                           type="number"
+                      </TableCell>,
+                    );
+                    headerCells.push(
+                      <TableCell key="cogs">
+                        <Input
+                          variant="secondary"
+                          type="number"
                           inputMode="decimal"
                           min={0}
                           step="0.01"
-                                                                              placeholder="0.00"
-                          value={
-                            e.cogs ??
-                            (typeof v.cogsPerUnit === "number"
-                              ? String(v.cogsPerUnit)
-                              : "")
-                          }
-                          onChange={(event) => { const val = event.currentTarget.value;
+                          placeholder="0.00"
+                          value={groupEdits[grp.key]?.cogs ?? avgCogsStr}
+                          onChange={(event) => {
+                            const val = event.currentTarget.value;
                             const nextVal = sanitizeDecimal(val);
-                            setEdits((prev) => ({
+                            setGroupEdits((prev) => ({
                               ...prev,
-                              [String(v._id)]: {
-                                ...prev[String(v._id)],
+                              [grp.key]: {
+                                ...(prev[grp.key] || {}),
                                 cogs: nextVal,
                               },
                             }));
+                            setEdits((prev) => {
+                              const next = { ...prev } as Record<
+                                string,
+                                RowEdit
+                              >;
+                              grp.items.forEach((v) => {
+                                const id = String(v._id);
+                                next[id] = {
+                                  ...(next[id] || {}),
+                                  cogs: nextVal,
+                                };
+                              });
+                              return next;
+                            });
                           }}
                         />
-                      </TableCell>
-                      <TableCell>
-                        <Input                           type="number"
+                      </TableCell>,
+                    );
+                    headerCells.push(
+                      <TableCell key="tax">
+                        <Input
+                          variant="secondary"
+                          type="number"
                           inputMode="decimal"
                           min={0}
                           max={100}
                           step="0.01"
-                                                                              placeholder="0"
-                          value={
-                            e.tax ??
-                            (typeof v.taxRate === "number"
-                              ? String(v.taxRate)
-                              : "")
-                          }
-                          onChange={(event) => { const val = event.currentTarget.value;
+                          placeholder="0"
+                          value={groupEdits[grp.key]?.tax ?? avgTaxStr}
+                          onChange={(event) => {
+                            const val = event.currentTarget.value;
                             const nextVal = sanitizeDecimal(val);
-                            setEdits((prev) => ({
+                            setGroupEdits((prev) => ({
                               ...prev,
-                              [String(v._id)]: {
-                                ...prev[String(v._id)],
+                              [grp.key]: {
+                                ...(prev[grp.key] || {}),
                                 tax: nextVal,
                               },
                             }));
+                            setEdits((prev) => {
+                              const next = { ...prev } as Record<
+                                string,
+                                RowEdit
+                              >;
+                              grp.items.forEach((v) => {
+                                const id = String(v._id);
+                                next[id] = {
+                                  ...(next[id] || {}),
+                                  tax: nextVal,
+                                };
+                              });
+                              return next;
+                            });
                           }}
                         />
-                      </TableCell>
-                      <TableCell>
-                        <Input                           type="number"
+                      </TableCell>,
+                    );
+                    headerCells.push(
+                      <TableCell key="handling">
+                        <Input
+                          variant="secondary"
+                          type="number"
                           inputMode="decimal"
                           min={0}
                           step="0.01"
-                                                                              placeholder="0"
+                          placeholder="0"
                           value={
-                            e.handling ??
-                            (typeof v.handlingPerUnit === "number"
-                              ? String(v.handlingPerUnit)
-                              : "")
+                            groupEdits[grp.key]?.handling ?? avgHandlingStr
                           }
-                          onChange={(event) => { const val = event.currentTarget.value;
+                          onChange={(event) => {
+                            const val = event.currentTarget.value;
                             const nextVal = sanitizeDecimal(val);
-                            setEdits((prev) => ({
+                            setGroupEdits((prev) => ({
                               ...prev,
-                              [String(v._id)]: {
-                                ...prev[String(v._id)],
+                              [grp.key]: {
+                                ...(prev[grp.key] || {}),
                                 handling: nextVal,
                               },
                             }));
+                            setEdits((prev) => {
+                              const next = { ...prev } as Record<
+                                string,
+                                RowEdit
+                              >;
+                              grp.items.forEach((v) => {
+                                const id = String(v._id);
+                                next[id] = {
+                                  ...(next[id] || {}),
+                                  handling: nextVal,
+                                };
+                              });
+                              return next;
+                            });
                           }}
                         />
-                      </TableCell>
-                      <TableCell>
+                      </TableCell>,
+                    );
+                    headerCells.push(
+                      <TableCell key="price">
                         {currencySymbol}
-                        {Number(v.price || 0).toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                });
-                return [header, ...children];
-              });
-            })()
-          )}
+                        {avgPrice.toFixed(2)}
+                      </TableCell>,
+                    );
+
+                    const header = (
+                      <TableRow
+                        key={`grp-h-${grp.key}`}
+                        id={`grp-h-${grp.key}`}
+                        className={cn(
+                          stripe
+                            ? DATA_TABLE_ROW_STRIPE_BG
+                            : DATA_TABLE_ROW_BASE_BG,
+                          DATA_TABLE_GROUP_ROW_BORDER_CLASS,
+                        )}
+                      >
+                        {headerCells}
+                      </TableRow>
+                    );
+                    if (!isOpen) return [header];
+
+                    const children = grp.items.map((v) => {
+                      const e = edits[String(v._id)] || {};
+                      return (
+                        <TableRow
+                          key={String(v._id)}
+                          id={String(v._id)}
+                          className={cn(
+                            DATA_TABLE_ROW_BASE_BG,
+                            stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG,
+                          )}
+                        >
+                          <TableCell>
+                            <div className="min-w-0">
+                              <div className="truncate text-sm text-foreground">
+                                {v.title || "Variant"}
+                              </div>
+                              <div className="text-xs text-foreground truncate">
+                                {v.sku || ""}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              color={statusChipColor}
+                              size="sm"
+                              variant="soft"
+                            >
+                              {s ? s.charAt(0).toUpperCase() + s.slice(1) : "-"}
+                            </Chip>
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              variant="secondary"
+                              type="number"
+                              inputMode="decimal"
+                              min={0}
+                              step="0.01"
+                              placeholder="0.00"
+                              value={
+                                e.cogs ??
+                                (typeof v.cogsPerUnit === "number"
+                                  ? String(v.cogsPerUnit)
+                                  : "")
+                              }
+                              onChange={(event) => {
+                                const val = event.currentTarget.value;
+                                const nextVal = sanitizeDecimal(val);
+                                setEdits((prev) => ({
+                                  ...prev,
+                                  [String(v._id)]: {
+                                    ...prev[String(v._id)],
+                                    cogs: nextVal,
+                                  },
+                                }));
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              variant="secondary"
+                              type="number"
+                              inputMode="decimal"
+                              min={0}
+                              max={100}
+                              step="0.01"
+                              placeholder="0"
+                              value={
+                                e.tax ??
+                                (typeof v.taxRate === "number"
+                                  ? String(v.taxRate)
+                                  : "")
+                              }
+                              onChange={(event) => {
+                                const val = event.currentTarget.value;
+                                const nextVal = sanitizeDecimal(val);
+                                setEdits((prev) => ({
+                                  ...prev,
+                                  [String(v._id)]: {
+                                    ...prev[String(v._id)],
+                                    tax: nextVal,
+                                  },
+                                }));
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input
+                              variant="secondary"
+                              type="number"
+                              inputMode="decimal"
+                              min={0}
+                              step="0.01"
+                              placeholder="0"
+                              value={
+                                e.handling ??
+                                (typeof v.handlingPerUnit === "number"
+                                  ? String(v.handlingPerUnit)
+                                  : "")
+                              }
+                              onChange={(event) => {
+                                const val = event.currentTarget.value;
+                                const nextVal = sanitizeDecimal(val);
+                                setEdits((prev) => ({
+                                  ...prev,
+                                  [String(v._id)]: {
+                                    ...prev[String(v._id)],
+                                    handling: nextVal,
+                                  },
+                                }));
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {currencySymbol}
+                            {Number(v.price || 0).toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    });
+                    return [header, ...children];
+                  });
+                })()
+              )}
             </TableBody>
           </Table.Content>
         </Table.ScrollContainer>

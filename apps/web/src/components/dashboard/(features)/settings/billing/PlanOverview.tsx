@@ -1,6 +1,7 @@
 "use client";
 
-import { Chip, ProgressBar } from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { Icon } from "@iconify/react";
 import { useMemo } from "react";
 
 import { useQuery } from "convex-helpers/react/cache/hooks";
@@ -64,46 +65,78 @@ export default function PlanOverview() {
 
   const ordersLast30Days = userUsage?.ordersLast30Days ?? 0;
   const orderLimit = userUsage?.orderLimit ?? 300;
-  const usagePercentage = orderLimit > 0 ? (ordersLast30Days / orderLimit) * 100 : 0;
+  const remainingOrders = Math.max(0, orderLimit - ordersLast30Days);
+  const usageStats = [
+    {
+      label: "Used",
+      value: ordersLast30Days.toLocaleString(),
+      helper: "Last 30 days",
+    },
+    {
+      label: "Limit",
+      value: orderLimit.toLocaleString(),
+      helper: "Orders/month",
+    },
+    {
+      label: "Remaining",
+      value: remainingOrders.toLocaleString(),
+      helper: "Before overage",
+    },
+  ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h3 className="text-base font-semibold text-foreground">
-            Current Plan
-          </h3>
-          <Chip
-            color={currentPlanKey === "free" ? "default" : "accent"}
-            size="sm"
-                        variant="soft"
-          >
-            {currentTier?.title ?? planLabel.replace(" Plan", "")}
-          </Chip>
+    <div className="space-y-3">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-base font-semibold text-foreground">
+              Current Plan
+            </h3>
+            <Chip
+              color={currentPlanKey === "free" ? "default" : "accent"}
+              size="sm"
+              variant="soft"
+            >
+              {currentTier?.title ?? planLabel.replace(" Plan", "")}
+            </Chip>
+            <Chip color="success" size="sm" variant="soft">
+              {statusLabel}
+            </Chip>
+          </div>
+          <p className="text-xs text-muted">
+            Usage resets monthly based on the last 30 days of synced orders.
+          </p>
         </div>
-        <div className="text-right">
-          <p className="text-sm font-semibold text-foreground">{planPrice}</p>
-          <p className="text-xs text-foreground">Status: {statusLabel}</p>
+        <div className="flex items-center gap-2 rounded-xl bg-surface px-3 py-2 md:text-right">
+          <Icon
+            className="text-accent"
+            icon="solar:card-bold-duotone"
+            width={18}
+          />
+          <div>
+            <p className="text-sm font-semibold text-foreground">{planPrice}</p>
+            <p className="text-xs text-muted">
+              {currentTier?.title ?? planLabel.replace(" Plan", "")} billing
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-foreground">Plan Usage (Last 30 Days)</p>
-          <p className="text-sm text-foreground">
-            {ordersLast30Days.toLocaleString()} / {orderLimit.toLocaleString()} orders
-          </p>
-        </div>
-        <ProgressBar
-          value={usagePercentage}
-          color={usagePercentage >= 90 ? "danger" : usagePercentage >= 75 ? "warning" : "accent"}
-          className="w-full"
-          size="sm"
-        />
-        <p className="text-xs text-foreground">
-          Track up to {orderLimit.toLocaleString()} orders per month with your {currentTier?.title || planLabel.replace(" Plan", "")} plan
-        </p>
+      <div className="grid gap-2 sm:grid-cols-3">
+        {usageStats.map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-xl bg-surface px-3 py-2 shadow-none"
+          >
+            <p className="text-xs font-medium text-muted">{stat.label}</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">
+              {stat.value}
+            </p>
+            <p className="text-xs text-muted">{stat.helper}</p>
+          </div>
+        ))}
       </div>
+
     </div>
   );
 }

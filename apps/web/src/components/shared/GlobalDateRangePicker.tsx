@@ -8,7 +8,15 @@ import {
   parseDate,
   today,
 } from "@internationalized/date";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { RangeCalendarStateContext, useLocale } from "react-aria-components";
 import type { AnalyticsDateRange } from "@repo/types";
 import {
   DATE_RANGE_PRESETS,
@@ -61,7 +69,7 @@ const formatRangeLabel = (range?: CalendarDateRange): string => {
 
 const toAnalyticsRange = (
   range: CalendarDateRange,
-  preset?: string | null
+  preset?: string | null,
 ): AnalyticsDateRange => ({
   startDate: calendarDateToString(range.start),
   endDate: calendarDateToString(range.end),
@@ -73,7 +81,7 @@ type CalendarDateConvertible = DateValue & {
 };
 
 const isCalendarDateConvertible = (
-  value: DateValue
+  value: DateValue,
 ): value is CalendarDateConvertible => {
   return (
     typeof value === "object" &&
@@ -92,13 +100,30 @@ function toCalendarDateValue(value: DateValue): CalendarDate {
 
 const areCalendarRangesEqual = (
   a?: CalendarDateRange | null,
-  b?: CalendarDateRange | null
+  b?: CalendarDateRange | null,
 ): boolean => {
   if (!a && !b) return true;
   if (!a || !b) return false;
   return (
     calendarDateToString(a.start) === calendarDateToString(b.start) &&
     calendarDateToString(a.end) === calendarDateToString(b.end)
+  );
+};
+
+const RangeCalendarMonthHeading = ({ offset = 0 }: { offset?: number }) => {
+  const state = useContext(RangeCalendarStateContext);
+  const { locale } = useLocale();
+  const monthDate = state?.visibleRange.start.add({ months: offset });
+
+  if (!monthDate) return null;
+
+  return (
+    <span className="text-xs font-semibold text-default">
+      {new Intl.DateTimeFormat(locale, {
+        month: "long",
+        year: "numeric",
+      }).format(monthDate.toDate(getLocalTimeZone()))}
+    </span>
   );
 };
 
@@ -137,11 +162,11 @@ export default function GlobalDateRangePicker({
   const resolvePresetForRange = useCallback(
     (range: CalendarDateRange) => {
       const match = presets.find((presetKey) =>
-        areCalendarRangesEqual(getPresetRange(presetKey), range)
+        areCalendarRangesEqual(getPresetRange(presetKey), range),
       );
       return match ?? null;
     },
-    [presets]
+    [presets],
   );
 
   const [internalRange, setInternalRange] =
@@ -155,7 +180,7 @@ export default function GlobalDateRangePicker({
         onAnalyticsChange(toAnalyticsRange(range, nextPreset ?? undefined));
       }
     },
-    [onAnalyticsChange]
+    [onAnalyticsChange],
   );
 
   useEffect(() => {
@@ -207,7 +232,7 @@ export default function GlobalDateRangePicker({
       emitChange(presetRange, key);
       setIsOpen(false);
     },
-    [emitChange]
+    [emitChange],
   );
 
   const handleCalendarChange = useCallback(
@@ -232,7 +257,7 @@ export default function GlobalDateRangePicker({
         setIsOpen(false);
       }
     },
-    [preset, emitChange]
+    [preset, emitChange],
   );
 
   const handleInputChange = useCallback(
@@ -259,7 +284,7 @@ export default function GlobalDateRangePicker({
         console.error("Invalid date input", error);
       }
     },
-    [draftRange, preset, emitChange]
+    [draftRange, preset, emitChange],
   );
 
   const presetItems = useMemo(() => {
@@ -294,11 +319,7 @@ export default function GlobalDateRangePicker({
 
   return (
     <Popover isOpen={isOpen} onOpenChange={setIsOpen}>
-      <Button
-        className={className}
-        size={size}
-        variant="outline"
-      >
+      <Button className={className} size={size} variant="outline">
         {label ? (
           <div className="flex flex-col items-start">
             <span className="text-xs text-muted">{label}</span>
@@ -310,52 +331,115 @@ export default function GlobalDateRangePicker({
           </span>
         )}
       </Button>
-      <Popover.Content className="w-auto overflow-hidden rounded-2xl p-0" placement="bottom start">
+      <Popover.Content
+        className="w-auto max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl p-0"
+        placement="bottom start"
+      >
         <Popover.Dialog className="p-0">
           <div className="flex">
-          <div className="w-44 shrink-0 border-r border-surface-tertiary bg-surface-secondary p-4">
-            <p className="mb-3 text-xs font-semibold uppercase text-muted">
-              Quick ranges
-            </p>
-            <div className="flex flex-col gap-1">
-              {presetItems.map((presetItem) => {
-                const isActive = selectedPreset === presetItem.key;
-                return (
-                  <Button
-                    key={presetItem.key}
-                    size="sm"
-                    variant={isActive ? "secondary" : "tertiary"}
-                    className="justify-start text-sm"
-                   
-                    onPress={() => handlePresetChange(presetItem.key)}
-                  >
-                    {presetItem.label}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="flex-1 bg-surface px-2 pr-4 py-4">
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <Input
-                placeholder="Start date"
-                                value={calendarDateToString(draftRange.start)}
-                onChange={(event) => { const input = event.currentTarget.value; handleInputChange("start", input)}}
-                              />
-              <Input
-                placeholder="End date"
-                                value={calendarDateToString(draftRange.end)}
-                onChange={(event) => { const input = event.currentTarget.value; handleInputChange("end", input)}}
-                              />
+            <div className="w-32 shrink-0 border-r border-surface-tertiary bg-surface-secondary p-3">
+              <p className="mb-2 text-xs font-semibold uppercase text-muted">
+                Quick ranges
+              </p>
+              <div className="flex flex-col gap-0.5">
+                {presetItems.map((presetItem) => {
+                  const isActive = selectedPreset === presetItem.key;
+                  return (
+                    <Button
+                      key={presetItem.key}
+                      size="sm"
+                      variant={isActive ? "secondary" : "tertiary"}
+                      className="h-7 justify-start bg-transparent px-3 py-0 text-xs"
+                      onPress={() => handlePresetChange(presetItem.key)}
+                    >
+                      {presetItem.label}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
 
-            <RangeCalendar               minValue={minDate}
-              maxValue={maxDate ?? today(getLocalTimeZone())}
-              value={draftRange}
-              onChange={handleCalendarChange}
-                          />
-          </div>
+            <div className="w-[26.5rem] shrink-0 bg-surface p-3">
+              <div className="mb-3 grid grid-cols-2 gap-2">
+                <Input
+                  variant="secondary"
+                  className="h-9 text-sm"
+                  placeholder="Start date"
+                  value={calendarDateToString(draftRange.start)}
+                  onChange={(event) => {
+                    const input = event.currentTarget.value;
+                    handleInputChange("start", input);
+                  }}
+                />
+                <Input
+                  variant="secondary"
+                  className="h-9 text-sm"
+                  placeholder="End date"
+                  value={calendarDateToString(draftRange.end)}
+                  onChange={(event) => {
+                    const input = event.currentTarget.value;
+                    handleInputChange("end", input);
+                  }}
+                />
+              </div>
+
+              <RangeCalendar
+                aria-label="Date range"
+                className="w-full max-w-none overflow-visible [&_.range-calendar__cell-button]:!size-6 [&_.range-calendar__cell-button]:!text-xs [&_.range-calendar__cell]:!my-0 [&_.range-calendar__grid]:!w-[11.75rem] [&_.range-calendar__header-cell]:!pb-1 [&_.range-calendar__header-cell]:!text-[11px] [&_.range-calendar__header]:!pb-2 [&_.range-calendar__nav-button-icon]:!size-3.5 [&_.range-calendar__nav-button]:!size-5"
+                firstDayOfWeek="mon"
+                minValue={minDate}
+                maxValue={maxDate ?? today(getLocalTimeZone())}
+                visibleDuration={{ months: 2 }}
+                value={draftRange}
+                onChange={handleCalendarChange}
+              >
+                <RangeCalendar.Heading className="sr-only" />
+                <div className="flex gap-2">
+                  <div className="w-[11.75rem] shrink-0">
+                    <RangeCalendar.Header>
+                      <RangeCalendar.NavButton slot="previous" />
+                      <RangeCalendarMonthHeading />
+                      <div className="size-5" />
+                    </RangeCalendar.Header>
+                    <RangeCalendar.Grid>
+                      <RangeCalendar.GridHeader>
+                        {(day) => (
+                          <RangeCalendar.HeaderCell>{day}</RangeCalendar.HeaderCell>
+                        )}
+                      </RangeCalendar.GridHeader>
+                      <RangeCalendar.GridBody>
+                        {(date) => <RangeCalendar.Cell date={date} />}
+                      </RangeCalendar.GridBody>
+                    </RangeCalendar.Grid>
+                  </div>
+
+                  <div className="w-[11.75rem] shrink-0">
+                    <RangeCalendar.Header>
+                      <div className="size-5" />
+                      <RangeCalendarMonthHeading offset={1} />
+                      <RangeCalendar.NavButton slot="next" />
+                    </RangeCalendar.Header>
+                    <RangeCalendar.Grid offset={{ months: 1 }}>
+                      <RangeCalendar.GridHeader>
+                        {(day) => (
+                          <RangeCalendar.HeaderCell>{day}</RangeCalendar.HeaderCell>
+                        )}
+                      </RangeCalendar.GridHeader>
+                      <RangeCalendar.GridBody>
+                        {(date) => <RangeCalendar.Cell date={date} />}
+                      </RangeCalendar.GridBody>
+                    </RangeCalendar.Grid>
+                  </div>
+                </div>
+                <RangeCalendar.YearPickerGrid>
+                  <RangeCalendar.YearPickerGridBody>
+                    {({ year }) => (
+                      <RangeCalendar.YearPickerCell year={year} />
+                    )}
+                  </RangeCalendar.YearPickerGridBody>
+                </RangeCalendar.YearPickerGrid>
+              </RangeCalendar>
+            </div>
           </div>
         </Popover.Dialog>
       </Popover.Content>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@heroui/react";
+import { Pagination } from "@heroui/react";
 
 interface PaginationControlsProps {
   page: number;
@@ -25,33 +25,40 @@ export function PaginationControls({
   const current = Math.min(Math.max(1, page), safeTotal);
 
   return (
-    <div className="flex items-center justify-center gap-1">
-      <Button
-        isIconOnly         isDisabled={current <= 1}
-        size={size}
-        variant="tertiary"
-        onPress={() => onChange(current - 1)}
-      >
-        Prev
-      </Button>
-      {getPages(current, safeTotal).map((item) => (
-        <Button
-          key={item}
-          isIconOnly           size={size}
-          variant={item === current ? "primary" : "tertiary"}
-          onPress={() => onChange(item)}
-        >
-          {item}
-        </Button>
-      ))}
-      <Button
-        isIconOnly         isDisabled={current >= safeTotal}
-        size={size}
-        variant="tertiary"
-        onPress={() => onChange(current + 1)}
-      >
-        Next
-      </Button>
-    </div>
+    <Pagination className="justify-center" size={size}>
+      <Pagination.Content className="gap-1 rounded-xl bg-content1 px-1 py-1">
+        <Pagination.Item>
+          <Pagination.Previous
+            aria-label="Previous page"
+            className="!size-7 !min-w-7 !gap-0 !rounded-[10px] !px-0"
+            isDisabled={current === 1}
+            onPress={() => onChange(current - 1)}
+          >
+            <Pagination.PreviousIcon />
+          </Pagination.Previous>
+        </Pagination.Item>
+        {getPages(current, safeTotal).map((item) => (
+          <Pagination.Item key={item}>
+            <Pagination.Link
+              className="!size-7 !rounded-[10px] data-[active=true]:!bg-accent data-[active=true]:!text-white"
+              isActive={item === current}
+              onPress={() => onChange(item)}
+            >
+              {item}
+            </Pagination.Link>
+          </Pagination.Item>
+        ))}
+        <Pagination.Item>
+          <Pagination.Next
+            aria-label="Next page"
+            className="!size-7 !min-w-7 !gap-0 !rounded-[10px] !px-0"
+            isDisabled={current === safeTotal}
+            onPress={() => onChange(current + 1)}
+          >
+            <Pagination.NextIcon />
+          </Pagination.Next>
+        </Pagination.Item>
+      </Pagination.Content>
+    </Pagination>
   );
 }

@@ -84,7 +84,7 @@ export const CustomerJourney = memo(function CustomerJourney({
             Track customer progression through your sales funnel
           </p>
         </div>
-        <div className="text-sm bg-background border border-surface-tertiary rounded-full px-4 py-2 text-foreground">
+        <div className="text-sm bg-surface border border-surface-tertiary rounded-full px-4 py-2 text-foreground">
           <span className="font-medium">
             {formatNumber(safeVisitors)}
           </span>
@@ -105,7 +105,7 @@ export const CustomerJourney = memo(function CustomerJourney({
                       <div className="h-px bg-surface-secondary w-full" />
                     </div>
                   )}
-                  <div className="relative z-10 rounded-xl border border-surface-tertiary/70 bg-background p-4">
+                  <div className="relative z-10 rounded-xl border border-surface-tertiary/70 bg-surface p-4">
                     <div className="flex flex-col items-center text-center space-y-3">
                       <div
                         className={`flex h-10 w-10 items-center justify-center rounded-xl ${stage.bgColor}`}
@@ -144,7 +144,7 @@ export const CustomerJourney = memo(function CustomerJourney({
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-surface-tertiary/70 bg-background p-6 text-center text-sm text-foreground">
+            <div className="rounded-xl border border-surface-tertiary/70 bg-surface p-6 text-center text-sm text-foreground">
               No customer journey data is available for the selected period yet.
             </div>
           )}
@@ -152,7 +152,7 @@ export const CustomerJourney = memo(function CustomerJourney({
 
         {/* Key Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+          <div className="rounded-xl p-4 border bg-surface border-surface-tertiary">
             <p className="text-xs font-medium text-foreground mb-2">
               Overall Conversion
             </p>
@@ -166,7 +166,7 @@ export const CustomerJourney = memo(function CustomerJourney({
               From awareness to purchase
             </p>
           </div>
-          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+          <div className="rounded-xl p-4 border bg-surface border-surface-tertiary">
             <p className="text-xs font-medium text-foreground mb-2">
               Meta Conversion
             </p>
@@ -177,7 +177,7 @@ export const CustomerJourney = memo(function CustomerJourney({
               Landing page conversion from ads
             </p>
           </div>
-          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+          <div className="rounded-xl p-4 border bg-surface border-surface-tertiary">
             <p className="text-xs font-medium text-foreground mb-2">
               Cancel Rate
             </p>
@@ -188,7 +188,7 @@ export const CustomerJourney = memo(function CustomerJourney({
               Orders cancelled before fulfillment
             </p>
           </div>
-          <div className="rounded-xl p-4 border bg-background border-surface-tertiary">
+          <div className="rounded-xl p-4 border bg-surface border-surface-tertiary">
             <p className="text-xs font-medium text-foreground mb-2">
               Return / RTO Rate
             </p>

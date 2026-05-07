@@ -5,6 +5,7 @@ import type { Id } from "../_generated/dataModel";
 import { internalMutation, mutation } from "../_generated/server";
 import { logger } from "./shared";
 import { findShopifyStoreByDomain } from "../utils/shop";
+import { toOptionalString } from "./processingUtils";
 
 export const webhooks = {
   /**
@@ -172,8 +173,8 @@ export const webhooks = {
         orderId: order._id,
         shopifyId: payload.id,
         shopifyOrderId: payload.order_id,
-        note: payload.note,
-        userId: payload.user_id,
+        note: toOptionalString(payload.note),
+        userId: toOptionalString(payload.user_id),
         totalRefunded: parseFloat(payload.amount || "0"),
         refundLineItems:
           payload.refund_line_items?.map(

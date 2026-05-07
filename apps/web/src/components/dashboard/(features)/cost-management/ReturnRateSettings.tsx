@@ -29,7 +29,10 @@ export default function ReturnRateSettings() {
       return;
     }
 
-    if (manualReturnRate.isActive && typeof manualReturnRate.ratePercent === "number") {
+    if (
+      manualReturnRate.isActive &&
+      typeof manualReturnRate.ratePercent === "number"
+    ) {
       setRateInput(String(manualReturnRate.ratePercent));
     } else {
       setRateInput("");
@@ -63,8 +66,8 @@ export default function ReturnRateSettings() {
   const topContent = (
     <div className="flex items-center justify-between">
       <h2 className="text-xl font-semibold">RTO & Return Rate Override</h2>
-      <Button variant="primary"
-       
+      <Button
+        variant="primary"
         className="font-semibold"
         isPending={saving}
         isDisabled={saveDisabled || loading}
@@ -93,21 +96,25 @@ export default function ReturnRateSettings() {
       <div className="space-y-6 max-w-2xl">
         <div>
           <p className="text-sm text-foreground">
-            Use this percentage to estimate revenue lost to undetected returns/RTO. Leave the
-            field empty to disable the manual adjustment.
+            Use this percentage to estimate revenue lost to undetected
+            returns/RTO. Leave the field empty to disable the manual adjustment.
           </p>
         </div>
 
         <div className="grid gap-4 sm:max-w-md">
           <Input
-                                    placeholder="e.g. 5"
-                        type="number"
+            variant="secondary"
+            placeholder="e.g. 5"
+            type="number"
             inputMode="decimal"
             min={0}
             max={100}
             step="0.1"
-                        value={rateInput}
-                                    onChange={(event) => { const value = event.currentTarget.value; setRateInput(sanitizePercentage(value))}}
+            value={rateInput}
+            onChange={(event) => {
+              const value = event.currentTarget.value;
+              setRateInput(sanitizePercentage(value));
+            }}
           />
           <span className="text-xs text-foreground">
             Leave empty and save to clear the manual override.

@@ -1,6 +1,16 @@
 "use client";
 
-import { Button, Card, Chip, Input, ListBox, Select, Skeleton, Spinner, Table } from "@heroui/react";
+import {
+  Button,
+  Card,
+  Chip,
+  Input,
+  ListBox,
+  Select,
+  Skeleton,
+  Spinner,
+  Table,
+} from "@heroui/react";
 import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import {
@@ -33,6 +43,7 @@ import {
   DATA_TABLE_ROW_BASE_BG,
   DATA_TABLE_ROW_STRIPE_BG,
   DATA_TABLE_ROW_STRIPE_CHILD_BG,
+  DATA_TABLE_SHELL_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 import { cn } from "@/libs/utils";
@@ -104,7 +115,7 @@ export default function VariantCostsClient({
     useShopifyProductVariantsPaginated(
       page,
       pageSize,
-      hideSearch ? undefined : search
+      hideSearch ? undefined : search,
     );
 
   useEffect(() => {
@@ -315,7 +326,7 @@ export default function VariantCostsClient({
         // swallow; navigation will be prevented by onNext if save fails
       }
     },
-    [edits, upsert, hideHandling]
+    [edits, upsert, hideHandling],
   );
 
   const handleApplyCogs = useCallback(() => {
@@ -470,9 +481,9 @@ export default function VariantCostsClient({
           </Card.Content>
         </Card>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Button variant="primary"
+          <Button
+            variant="primary"
             size="sm"
-           
             onPress={() => router.refresh()}
             isDisabled={isShopifySyncing}
           >
@@ -482,7 +493,6 @@ export default function VariantCostsClient({
             <Button
               variant="primary"
               size="sm"
-             
               onPress={() => router.push("/onboarding/shopify")}
             >
               Retry Shopify sync
@@ -514,20 +524,23 @@ export default function VariantCostsClient({
             <Skeleton className="h-9 w-48 rounded-lg" />
           ) : (
             <Input
+              variant="secondary"
               className="max-w-[12rem]"
-                            placeholder="Search..."
-                            value={search}
+              placeholder="Search..."
+              value={search}
               onChange={(event) => setSearch(event.currentTarget.value)}
             />
           ))}
         <Input
+          variant="secondary"
           className="w-32"
-                    type="number"
+          type="number"
           placeholder="10"
           value={bulkValue}
           onChange={(event) => setBulkValue(event.currentTarget.value)}
         />
         <Select
+          variant="secondary"
           className="w-32"
           value={bulkType}
           onChange={(key) => setBulkType(key as "percent" | "flat")}
@@ -549,31 +562,28 @@ export default function VariantCostsClient({
             </ListBox>
           </Select.Popover>
         </Select>
-        <Button variant="primary"
-         
+        <Button
+          variant="primary"
           isDisabled={!bulkValue || isNaN(Number(bulkValue))}
           onPress={handleApplyCogs}
         >
           Apply COGS
         </Button>
-        <Button variant="primary"
-         
+        <Button
+          variant="primary"
           isDisabled={!bulkValue || isNaN(Number(bulkValue))}
           onPress={handleApplyTax}
         >
           Apply Tax
         </Button>
-        <Button variant="primary"
-         
+        <Button
+          variant="primary"
           isDisabled={!bulkValue || isNaN(Number(bulkValue))}
           onPress={handleApplyHandling}
         >
           Apply Handling
         </Button>
-        <Button variant="danger"
-         
-          onPress={handleClearAll}
-        >
+        <Button variant="danger" onPress={handleClearAll}>
           Clear All
         </Button>
       </div>
@@ -599,7 +609,7 @@ export default function VariantCostsClient({
         const columnCount = columns.length;
         if (loading) {
           return (
-            <div className={DATA_TABLE_TABLE_CLASS}>
+            <div className={DATA_TABLE_SHELL_CLASS}>
               <div className="space-y-2 p-4">
                 {Array.from({ length: 5 }).map((_, index) => (
                   <Skeleton
@@ -617,444 +627,504 @@ export default function VariantCostsClient({
             <Table.ScrollContainer>
               <Table.Content aria-label="Variant costs">
                 <TableHeader columns={columns}>
-                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
-                    <TableColumn id={column.key} isRowHeader={column.key === "variant"}>
+                  {(column: {
+                    uid?: string;
+                    name?: string;
+                    key?: string;
+                    label?: string;
+                  }) => (
+                    <TableColumn
+                      id={column.key}
+                      isRowHeader={column.key === "variant"}
+                    >
                       {column.label}
                     </TableColumn>
                   )}
                 </TableHeader>
                 <TableBody>
-              {(() => {
-                const list = (data || []) as VariantRow[];
-                if (list.length === 0) {
-                  return (
-                    <TableRow key="empty" id="empty">
-                      <TableCell colSpan={columnCount}>
-                        <div className="p-4 text-center text-muted text-sm">
-                          No variants found
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                }
+                  {(() => {
+                    const list = (data || []) as VariantRow[];
+                    if (list.length === 0) {
+                      return (
+                        <TableRow key="empty" id="empty">
+                          <TableCell colSpan={columnCount}>
+                            <div className="p-4 text-center text-muted text-sm">
+                              No variants found
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    }
 
-                const rows: RowElement<VariantRow>[] = [];
-                grouped.forEach((grp, grpIndex) => {
-                  const count = grp.items.length;
-                  const isOpen = expandedGroups.has(grp.key);
-                  const s = String(grp.productStatus || "").toLowerCase();
-                  const statusChipColor: "default" | "success" | "warning" =
-                    s === "active" ? "success" : s ? "warning" : "default";
-                  const img = grp.productImage || "";
-                  const avgPrice =
-                    count > 0
-                      ? grp.items.reduce(
-                          (sum, v) => sum + (Number(v.price ?? 0) || 0),
-                          0
-                        ) / count
-                      : 0;
-                  // Averages for default product-level inputs (respect pending edits if present)
-                  const avgFrom = (vals: Array<number | undefined>) => {
-                    const nums = vals.filter(
-                      (n): n is number => typeof n === "number" && isFinite(n)
-                    );
-                    if (nums.length === 0) return "";
-                    const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
-                    return avg.toFixed(2);
-                  };
-                  const avgCogsStr = avgFrom(
-                    grp.items.map((v) => {
-                      const id = String(v._id);
-                      const e = edits[id];
-                      if (e && e.cogs !== undefined && e.cogs !== "")
-                        return Number(e.cogs);
-                      if (typeof v.cogsPerUnit === "number")
-                        return Number(v.cogsPerUnit);
-                      return undefined;
-                    })
-                  );
-                  const avgTaxStr = avgFrom(
-                    grp.items.map((v) => {
-                      const id = String(v._id);
-                      const e = edits[id];
-                      if (e && e.tax !== undefined && e.tax !== "")
-                        return Number(e.tax);
-                      if (typeof v.taxRate === "number")
-                        return Number(v.taxRate);
-                      return undefined;
-                    })
-                  );
-                  const avgHandlingStr = avgFrom(
-                    grp.items.map((v) => {
-                      const id = String(v._id);
-                      const e = edits[id];
-                      if (e && e.handling !== undefined && e.handling !== "")
-                        return Number(e.handling);
-                      if (typeof v.handlingPerUnit === "number")
-                        return Number(v.handlingPerUnit);
-                      return undefined;
-                    })
-                  );
-                  // Product header row renders the same columns
-                  const headerCells: TableCellElement[] = [];
-                  headerCells.push(
-                    <TableCell key="variant">
-                      <div className="min-w-0 flex items-center gap-3 py-1">
-                        <button
-                          type="button"
-                          className="flex-none text-muted hover:text-muted transition"
-                          onClick={() => {
-                            setExpandedGroups((prev) => {
-                              const next = new Set(prev);
-                              if (next.has(grp.key)) next.delete(grp.key);
-                              else next.add(grp.key);
-                              return next;
-                            });
-                          }}                         >
-                          <Icon
-                            icon={
-                              isOpen
-                                ? "solar:alt-arrow-up-bold"
-                                : "solar:alt-arrow-down-bold"
-                            }
-                            width={18}
-                          />
-                        </button>
-                        {img ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={img}
-                            alt={grp.productName}
-                            className="w-8 h-8 rounded object-cover flex-none"
-                          />
-                        ) : (
-                          <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-muted flex-none">
-                            <Icon icon="solar:box-bold-duotone" width={16} />
-                          </div>
-                        )}
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-muted">
-                            {grp.productName}
-                          </div>
-                          <div className="text-xs text-muted">
-                            {count} variant{count === 1 ? "" : "s"}
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                  );
-                  if (hideRowSave) {
-                    headerCells.push(
-                      <TableCell key="channel">
-                        <Chip size="sm" variant="soft" color="default">
-                          Shopify
-                        </Chip>
-                      </TableCell>
-                    );
-                  }
-                  headerCells.push(
-                    <TableCell key="status">
-                      <Chip color={statusChipColor} size="sm" variant="soft">
-                        {s ? s.charAt(0).toUpperCase() + s.slice(1) : "-"}
-                      </Chip>
-                    </TableCell>
-                  );
-                  headerCells.push(
-                    <TableCell key="cogs">
-                      <Input                         type="number"
-                        inputMode="decimal"
-                        min={0}
-                        step="0.01"
-                                                                        placeholder="0.00"
-                        value={groupEdits[grp.key]?.cogs ?? avgCogsStr}
-                        onChange={(event) => { const val = event.currentTarget.value;
-                          const nextVal = sanitizeDecimal(val);
-                          setGroupEdits((prev) => ({
-                            ...prev,
-                            [grp.key]: {
-                              ...(prev[grp.key] || {}),
-                              cogs: nextVal,
-                            },
-                          }));
-                          setEdits((prev) => {
-                            const next = { ...prev } as Record<string, RowEdit>;
-                            grp.items.forEach((v) => {
-                              const id = String(v._id);
-                              next[id] = { ...(next[id] || {}), cogs: nextVal };
-                            });
-                            return next;
-                          });
-                        }}
-                      />
-                    </TableCell>
-                  );
-                  headerCells.push(
-                    <TableCell key="tax">
-                      <Input                         type="number"
-                        inputMode="decimal"
-                        min={0}
-                        max={100}
-                        step="0.01"
-                                                                        placeholder="0"
-                        value={groupEdits[grp.key]?.tax ?? avgTaxStr}
-                        onChange={(event) => { const val = event.currentTarget.value;
-                          const nextVal = sanitizeDecimal(val);
-                          setGroupEdits((prev) => ({
-                            ...prev,
-                            [grp.key]: {
-                              ...(prev[grp.key] || {}),
-                              tax: nextVal,
-                            },
-                          }));
-                          setEdits((prev) => {
-                            const next = { ...prev } as Record<string, RowEdit>;
-                            grp.items.forEach((v) => {
-                              const id = String(v._id);
-                              next[id] = { ...(next[id] || {}), tax: nextVal };
-                            });
-                            return next;
-                          });
-                        }}
-                      />
-                    </TableCell>
-                  );
-                  if (!hideHandling) {
-                    headerCells.push(
-                      <TableCell key="handling">
-                        <Input                           type="number"
-                          inputMode="decimal"
-                          min={0}
-                          step="0.01"
-                                                                              placeholder="0"
-                          value={
-                            groupEdits[grp.key]?.handling ?? avgHandlingStr
-                          }
-                          onChange={(event) => { const val = event.currentTarget.value;
-                            const nextVal = sanitizeDecimal(val);
-                            setGroupEdits((prev) => ({
-                              ...prev,
-                              [grp.key]: {
-                                ...(prev[grp.key] || {}),
-                                handling: nextVal,
-                              },
-                            }));
-                            setEdits((prev) => {
-                              const next = { ...prev } as Record<
-                                string,
-                                RowEdit
-                              >;
-                              grp.items.forEach((v) => {
-                                const id = String(v._id);
-                                next[id] = {
-                                  ...(next[id] || {}),
-                                  handling: nextVal,
-                                };
-                              });
-                              return next;
-                            });
-                          }}
-                        />
-                      </TableCell>
-                    );
-                  }
-                  headerCells.push(
-                    <TableCell key="price">
-                      {currencySymbol}
-                      {avgPrice.toFixed(2)}
-                    </TableCell>
-                  );
-                  if (!hideRowSave)
-                    headerCells.push(<TableCell key="save">—</TableCell>);
-
-                  const stripe = grpIndex % 2 === 1;
-                  const header = (
-                    <TableRow
-                      key={`grp-h-${grp.key}`}
-                      id={`grp-h-${grp.key}`}
-                      className={cn(
-                        stripe
-                          ? DATA_TABLE_ROW_STRIPE_BG
-                          : DATA_TABLE_ROW_BASE_BG,
-                        DATA_TABLE_GROUP_ROW_BORDER_CLASS
-                      )}
-                    >
-                      {headerCells}
-                    </TableRow>
-                  );
-
-                  rows.push(header);
-
-                  if (!isOpen) return;
-                  grp.items.forEach((v) => {
-                    const e = edits[String(v._id)] || {};
-                    rows.push(
-                      <TableRow
-                        key={String(v._id)}
-                        id={String(v._id)}
-                        className={cn(
-                          DATA_TABLE_ROW_BASE_BG,
-                          stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG
-                        )}
-                      >
-                        {(() => {
-                          const cells: TableCellElement[] = [];
-                          // Variant (only variant-specific text since product info is in header)
-                          cells.push(
-                            <TableCell key="variant">
-                              <div className="min-w-0">
-                                <div className="truncate text-sm text-muted">
-                                  {v.title || "Variant"}
-                                </div>
-                                <div className="text-xs text-muted truncate">
-                                  {v.sku || ""}
-                                </div>
-                              </div>
-                            </TableCell>
-                          );
-                          if (hideRowSave) {
-                            cells.push(
-                              <TableCell key="channel">
-                                <Chip size="sm" variant="soft" color="default">
-                                  Shopify
-                                </Chip>
-                              </TableCell>
-                            );
-                          }
-                          // Status follows product status
-                          cells.push(
-                            <TableCell key="status">
-                              <Chip
-                                color={statusChipColor}
-                                size="sm"
-                                variant="soft"
-                              >
-                                {s
-                                  ? s.charAt(0).toUpperCase() + s.slice(1)
-                                  : "-"}
-                              </Chip>
-                            </TableCell>
-                          );
-                          // COGS
-                          cells.push(
-                            <TableCell key="cogs">
-                              <NumericInput                                 min={0}
-                                step="0.01"
-                                                                                                placeholder="0.00"
-                                value={
-                                  e.cogs ??
-                                  (typeof v.cogsPerUnit === "number"
-                                    ? String(v.cogsPerUnit)
-                                    : "")
+                    const rows: RowElement<VariantRow>[] = [];
+                    grouped.forEach((grp, grpIndex) => {
+                      const count = grp.items.length;
+                      const isOpen = expandedGroups.has(grp.key);
+                      const s = String(grp.productStatus || "").toLowerCase();
+                      const statusChipColor: "default" | "success" | "warning" =
+                        s === "active" ? "success" : s ? "warning" : "default";
+                      const img = grp.productImage || "";
+                      const avgPrice =
+                        count > 0
+                          ? grp.items.reduce(
+                              (sum, v) => sum + (Number(v.price ?? 0) || 0),
+                              0,
+                            ) / count
+                          : 0;
+                      // Averages for default product-level inputs (respect pending edits if present)
+                      const avgFrom = (vals: Array<number | undefined>) => {
+                        const nums = vals.filter(
+                          (n): n is number =>
+                            typeof n === "number" && isFinite(n),
+                        );
+                        if (nums.length === 0) return "";
+                        const avg =
+                          nums.reduce((a, b) => a + b, 0) / nums.length;
+                        return avg.toFixed(2);
+                      };
+                      const avgCogsStr = avgFrom(
+                        grp.items.map((v) => {
+                          const id = String(v._id);
+                          const e = edits[id];
+                          if (e && e.cogs !== undefined && e.cogs !== "")
+                            return Number(e.cogs);
+                          if (typeof v.cogsPerUnit === "number")
+                            return Number(v.cogsPerUnit);
+                          return undefined;
+                        }),
+                      );
+                      const avgTaxStr = avgFrom(
+                        grp.items.map((v) => {
+                          const id = String(v._id);
+                          const e = edits[id];
+                          if (e && e.tax !== undefined && e.tax !== "")
+                            return Number(e.tax);
+                          if (typeof v.taxRate === "number")
+                            return Number(v.taxRate);
+                          return undefined;
+                        }),
+                      );
+                      const avgHandlingStr = avgFrom(
+                        grp.items.map((v) => {
+                          const id = String(v._id);
+                          const e = edits[id];
+                          if (
+                            e &&
+                            e.handling !== undefined &&
+                            e.handling !== ""
+                          )
+                            return Number(e.handling);
+                          if (typeof v.handlingPerUnit === "number")
+                            return Number(v.handlingPerUnit);
+                          return undefined;
+                        }),
+                      );
+                      // Product header row renders the same columns
+                      const headerCells: TableCellElement[] = [];
+                      headerCells.push(
+                        <TableCell key="variant">
+                          <div className="min-w-0 flex items-center gap-3 py-1">
+                            <button
+                              type="button"
+                              className="flex-none text-muted hover:text-muted transition"
+                              onClick={() => {
+                                setExpandedGroups((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(grp.key)) next.delete(grp.key);
+                                  else next.add(grp.key);
+                                  return next;
+                                });
+                              }}
+                            >
+                              <Icon
+                                icon={
+                                  isOpen
+                                    ? "solar:alt-arrow-up-bold"
+                                    : "solar:alt-arrow-down-bold"
                                 }
-                                onChange={(event) => { const nextVal = event.currentTarget.value;
-                                  const id = String(v._id);
-                                  setEdits((prev) => {
-                                    if ((prev[id]?.cogs ?? "") === nextVal)
-                                      return prev;
-                                    return {
-                                      ...prev,
-                                      [id]: {
-                                        ...prev[id],
-                                        cogs: nextVal,
-                                      },
-                                    };
-                                  });
-                                }}
+                                width={18}
                               />
-                            </TableCell>
-                          );
-                          // Tax
-                          cells.push(
-                            <TableCell key="tax">
-                              <NumericInput                                 min={0}
-                                max={100}
-                                step="0.01"
-                                                                                                placeholder="0"
-                                value={
-                                  e.tax ??
-                                  (typeof v.taxRate === "number"
-                                    ? String(v.taxRate)
-                                    : "")
-                                }
-                                onChange={(event) => { const nextVal = event.currentTarget.value;
-                                  const id = String(v._id);
-                                  setEdits((prev) => {
-                                    if ((prev[id]?.tax ?? "") === nextVal)
-                                      return prev;
-                                    return {
-                                      ...prev,
-                                      [id]: {
-                                        ...prev[id],
-                                        tax: nextVal,
-                                      },
-                                    };
-                                  });
-                                }}
+                            </button>
+                            {img ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={img}
+                                alt={grp.productName}
+                                className="w-8 h-8 rounded object-cover flex-none"
                               />
-                            </TableCell>
-                          );
-                          // Handling
-                          if (!hideHandling) {
-                            cells.push(
-                              <TableCell key="handling">
-                                <NumericInput                                   min={0}
-                                  step="0.01"
-                                                                                                      placeholder="0"
-                                  value={
-                                    e.handling ??
-                                    (typeof v.handlingPerUnit === "number"
-                                      ? String(v.handlingPerUnit)
-                                      : "")
-                                  }
-                                  onChange={(event) => { const nextVal = event.currentTarget.value;
-                                    const id = String(v._id);
-                                    setEdits((prev) => {
-                                      if (
-                                        (prev[id]?.handling ?? "") === nextVal
-                                      )
-                                        return prev;
-                                      return {
-                                        ...prev,
-                                        [id]: {
-                                          ...prev[id],
-                                          handling: nextVal,
-                                        },
-                                      };
-                                    });
-                                  }}
+                            ) : (
+                              <div className="w-8 h-8 rounded bg-surface-secondary flex items-center justify-center text-muted flex-none">
+                                <Icon
+                                  icon="solar:box-bold-duotone"
+                                  width={16}
                                 />
-                              </TableCell>
-                            );
-                          }
-                          // Price
-                          cells.push(
-                            <TableCell key="price">
-                              {currencySymbol}
-                              {Number(v.price || 0).toFixed(2)}
-                            </TableCell>
-                          );
-                          // Row save
-                          if (!hideRowSave) {
-                            cells.push(
-                              <TableCell key="save">
-                                <Button variant="primary"
-                                  size="sm"
-                                 
-                                  onPress={() => handleSaveRow(String(v._id))}
-                                >
-                                  Save
-                                </Button>
-                              </TableCell>
-                            );
-                          }
-                          return cells;
-                        })()}
-                      </TableRow>
-                    );
-                  });
-                });
-                return rows;
-              })()}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-medium text-muted">
+                                {grp.productName}
+                              </div>
+                              <div className="text-xs text-muted">
+                                {count} variant{count === 1 ? "" : "s"}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>,
+                      );
+                      if (hideRowSave) {
+                        headerCells.push(
+                          <TableCell key="channel">
+                            <Chip size="sm" variant="soft" color="default">
+                              Shopify
+                            </Chip>
+                          </TableCell>,
+                        );
+                      }
+                      headerCells.push(
+                        <TableCell key="status">
+                          <Chip
+                            color={statusChipColor}
+                            size="sm"
+                            variant="soft"
+                          >
+                            {s ? s.charAt(0).toUpperCase() + s.slice(1) : "-"}
+                          </Chip>
+                        </TableCell>,
+                      );
+                      headerCells.push(
+                        <TableCell key="cogs">
+                          <Input
+                            variant="secondary"
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            step="0.01"
+                            placeholder="0.00"
+                            value={groupEdits[grp.key]?.cogs ?? avgCogsStr}
+                            onChange={(event) => {
+                              const val = event.currentTarget.value;
+                              const nextVal = sanitizeDecimal(val);
+                              setGroupEdits((prev) => ({
+                                ...prev,
+                                [grp.key]: {
+                                  ...(prev[grp.key] || {}),
+                                  cogs: nextVal,
+                                },
+                              }));
+                              setEdits((prev) => {
+                                const next = { ...prev } as Record<
+                                  string,
+                                  RowEdit
+                                >;
+                                grp.items.forEach((v) => {
+                                  const id = String(v._id);
+                                  next[id] = {
+                                    ...(next[id] || {}),
+                                    cogs: nextVal,
+                                  };
+                                });
+                                return next;
+                              });
+                            }}
+                          />
+                        </TableCell>,
+                      );
+                      headerCells.push(
+                        <TableCell key="tax">
+                          <Input
+                            variant="secondary"
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            max={100}
+                            step="0.01"
+                            placeholder="0"
+                            value={groupEdits[grp.key]?.tax ?? avgTaxStr}
+                            onChange={(event) => {
+                              const val = event.currentTarget.value;
+                              const nextVal = sanitizeDecimal(val);
+                              setGroupEdits((prev) => ({
+                                ...prev,
+                                [grp.key]: {
+                                  ...(prev[grp.key] || {}),
+                                  tax: nextVal,
+                                },
+                              }));
+                              setEdits((prev) => {
+                                const next = { ...prev } as Record<
+                                  string,
+                                  RowEdit
+                                >;
+                                grp.items.forEach((v) => {
+                                  const id = String(v._id);
+                                  next[id] = {
+                                    ...(next[id] || {}),
+                                    tax: nextVal,
+                                  };
+                                });
+                                return next;
+                              });
+                            }}
+                          />
+                        </TableCell>,
+                      );
+                      if (!hideHandling) {
+                        headerCells.push(
+                          <TableCell key="handling">
+                            <Input
+                              variant="secondary"
+                              type="number"
+                              inputMode="decimal"
+                              min={0}
+                              step="0.01"
+                              placeholder="0"
+                              value={
+                                groupEdits[grp.key]?.handling ?? avgHandlingStr
+                              }
+                              onChange={(event) => {
+                                const val = event.currentTarget.value;
+                                const nextVal = sanitizeDecimal(val);
+                                setGroupEdits((prev) => ({
+                                  ...prev,
+                                  [grp.key]: {
+                                    ...(prev[grp.key] || {}),
+                                    handling: nextVal,
+                                  },
+                                }));
+                                setEdits((prev) => {
+                                  const next = { ...prev } as Record<
+                                    string,
+                                    RowEdit
+                                  >;
+                                  grp.items.forEach((v) => {
+                                    const id = String(v._id);
+                                    next[id] = {
+                                      ...(next[id] || {}),
+                                      handling: nextVal,
+                                    };
+                                  });
+                                  return next;
+                                });
+                              }}
+                            />
+                          </TableCell>,
+                        );
+                      }
+                      headerCells.push(
+                        <TableCell key="price">
+                          {currencySymbol}
+                          {avgPrice.toFixed(2)}
+                        </TableCell>,
+                      );
+                      if (!hideRowSave)
+                        headerCells.push(<TableCell key="save">—</TableCell>);
+
+                      const stripe = grpIndex % 2 === 1;
+                      const header = (
+                        <TableRow
+                          key={`grp-h-${grp.key}`}
+                          id={`grp-h-${grp.key}`}
+                          className={cn(
+                            stripe
+                              ? DATA_TABLE_ROW_STRIPE_BG
+                              : DATA_TABLE_ROW_BASE_BG,
+                            DATA_TABLE_GROUP_ROW_BORDER_CLASS,
+                          )}
+                        >
+                          {headerCells}
+                        </TableRow>
+                      );
+
+                      rows.push(header);
+
+                      if (!isOpen) return;
+                      grp.items.forEach((v) => {
+                        const e = edits[String(v._id)] || {};
+                        rows.push(
+                          <TableRow
+                            key={String(v._id)}
+                            id={String(v._id)}
+                            className={cn(
+                              DATA_TABLE_ROW_BASE_BG,
+                              stripe && DATA_TABLE_ROW_STRIPE_CHILD_BG,
+                            )}
+                          >
+                            {(() => {
+                              const cells: TableCellElement[] = [];
+                              // Variant (only variant-specific text since product info is in header)
+                              cells.push(
+                                <TableCell key="variant">
+                                  <div className="min-w-0">
+                                    <div className="truncate text-sm text-muted">
+                                      {v.title || "Variant"}
+                                    </div>
+                                    <div className="text-xs text-muted truncate">
+                                      {v.sku || ""}
+                                    </div>
+                                  </div>
+                                </TableCell>,
+                              );
+                              if (hideRowSave) {
+                                cells.push(
+                                  <TableCell key="channel">
+                                    <Chip
+                                      size="sm"
+                                      variant="soft"
+                                      color="default"
+                                    >
+                                      Shopify
+                                    </Chip>
+                                  </TableCell>,
+                                );
+                              }
+                              // Status follows product status
+                              cells.push(
+                                <TableCell key="status">
+                                  <Chip
+                                    color={statusChipColor}
+                                    size="sm"
+                                    variant="soft"
+                                  >
+                                    {s
+                                      ? s.charAt(0).toUpperCase() + s.slice(1)
+                                      : "-"}
+                                  </Chip>
+                                </TableCell>,
+                              );
+                              // COGS
+                              cells.push(
+                                <TableCell key="cogs">
+                                  <NumericInput
+                                    variant="secondary"
+                                    min={0}
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    value={
+                                      e.cogs ??
+                                      (typeof v.cogsPerUnit === "number"
+                                        ? String(v.cogsPerUnit)
+                                        : "")
+                                    }
+                                    onChange={(event) => {
+                                      const nextVal = event.currentTarget.value;
+                                      const id = String(v._id);
+                                      setEdits((prev) => {
+                                        if ((prev[id]?.cogs ?? "") === nextVal)
+                                          return prev;
+                                        return {
+                                          ...prev,
+                                          [id]: {
+                                            ...prev[id],
+                                            cogs: nextVal,
+                                          },
+                                        };
+                                      });
+                                    }}
+                                  />
+                                </TableCell>,
+                              );
+                              // Tax
+                              cells.push(
+                                <TableCell key="tax">
+                                  <NumericInput
+                                    variant="secondary"
+                                    min={0}
+                                    max={100}
+                                    step="0.01"
+                                    placeholder="0"
+                                    value={
+                                      e.tax ??
+                                      (typeof v.taxRate === "number"
+                                        ? String(v.taxRate)
+                                        : "")
+                                    }
+                                    onChange={(event) => {
+                                      const nextVal = event.currentTarget.value;
+                                      const id = String(v._id);
+                                      setEdits((prev) => {
+                                        if ((prev[id]?.tax ?? "") === nextVal)
+                                          return prev;
+                                        return {
+                                          ...prev,
+                                          [id]: {
+                                            ...prev[id],
+                                            tax: nextVal,
+                                          },
+                                        };
+                                      });
+                                    }}
+                                  />
+                                </TableCell>,
+                              );
+                              // Handling
+                              if (!hideHandling) {
+                                cells.push(
+                                  <TableCell key="handling">
+                                    <NumericInput
+                                      variant="secondary"
+                                      min={0}
+                                      step="0.01"
+                                      placeholder="0"
+                                      value={
+                                        e.handling ??
+                                        (typeof v.handlingPerUnit === "number"
+                                          ? String(v.handlingPerUnit)
+                                          : "")
+                                      }
+                                      onChange={(event) => {
+                                        const nextVal =
+                                          event.currentTarget.value;
+                                        const id = String(v._id);
+                                        setEdits((prev) => {
+                                          if (
+                                            (prev[id]?.handling ?? "") ===
+                                            nextVal
+                                          )
+                                            return prev;
+                                          return {
+                                            ...prev,
+                                            [id]: {
+                                              ...prev[id],
+                                              handling: nextVal,
+                                            },
+                                          };
+                                        });
+                                      }}
+                                    />
+                                  </TableCell>,
+                                );
+                              }
+                              // Price
+                              cells.push(
+                                <TableCell key="price">
+                                  {currencySymbol}
+                                  {Number(v.price || 0).toFixed(2)}
+                                </TableCell>,
+                              );
+                              // Row save
+                              if (!hideRowSave) {
+                                cells.push(
+                                  <TableCell key="save">
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onPress={() =>
+                                        handleSaveRow(String(v._id))
+                                      }
+                                    >
+                                      Save
+                                    </Button>
+                                  </TableCell>,
+                                );
+                              }
+                              return cells;
+                            })()}
+                          </TableRow>,
+                        );
+                      });
+                    });
+                    return rows;
+                  })()}
                 </TableBody>
               </Table.Content>
             </Table.ScrollContainer>
@@ -1073,11 +1143,11 @@ export default function VariantCostsClient({
             const variantIds = Object.keys(edits);
             console.log(
               "[VariantCostsClient] onNext called, edits count:",
-              variantIds.length
+              variantIds.length,
             );
             if (variantIds.length === 0) {
               console.log(
-                "[VariantCostsClient] No edits to save, proceeding to next step"
+                "[VariantCostsClient] No edits to save, proceeding to next step",
               );
               return true;
             }
@@ -1109,13 +1179,13 @@ export default function VariantCostsClient({
                 (c) =>
                   c.cogsPerUnit !== undefined ||
                   c.taxPercent !== undefined ||
-                  c.handlingPerUnit !== undefined
+                  c.handlingPerUnit !== undefined,
               );
               if (filtered.length > 0) {
                 console.log(
                   "[VariantCostsClient] Saving",
                   filtered.length,
-                  "cost updates"
+                  "cost updates",
                 );
                 const res = await saveAll(filtered);
                 console.log("[VariantCostsClient] Save result:", res);
@@ -1125,7 +1195,7 @@ export default function VariantCostsClient({
                 }
               }
               console.log(
-                "[VariantCostsClient] Save successful, proceeding to next step"
+                "[VariantCostsClient] Save successful, proceeding to next step",
               );
               return true;
             } catch (error) {

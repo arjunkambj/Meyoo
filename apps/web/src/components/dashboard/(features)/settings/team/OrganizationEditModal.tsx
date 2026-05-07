@@ -26,7 +26,10 @@ export default function OrganizationEditModal({
 
   const handleSave = async () => {
     if (!name.trim()) {
-      toast.danger("Name is required", { description: "Please enter a valid organization name", timeout: 3000 });
+      toast.danger("Name is required", {
+        description: "Please enter a valid organization name",
+        timeout: 3000,
+      });
 
       return;
     }
@@ -42,14 +45,21 @@ export default function OrganizationEditModal({
       // Update organization name in Convex
       await updateOrganizationName({ name: name.trim() });
 
-      toast("Organization updated", { description: "Organization name has been updated successfully", timeout: 3000 });
+      toast("Organization updated", {
+        description: "Organization name has been updated successfully",
+        timeout: 3000,
+      });
 
       // Close modal
       onClose();
     } catch (error) {
-      toast.danger("Update failed", { description: error instanceof Error
+      toast.danger("Update failed", {
+        description:
+          error instanceof Error
             ? error.message
-            : "Failed to update organization name", timeout: 3000 });
+            : "Failed to update organization name",
+        timeout: 3000,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +67,10 @@ export default function OrganizationEditModal({
 
   return (
     <Modal>
-      <Modal.Backdrop isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Modal.Backdrop
+        isOpen={isOpen}
+        onOpenChange={(open) => !open && onClose()}
+      >
         <Modal.Container>
           <Modal.Dialog>
             <Modal.Header className="flex flex-col gap-1">
@@ -65,22 +78,25 @@ export default function OrganizationEditModal({
             </Modal.Header>
             <Modal.Body>
               <Input
-                                        placeholder="Enter organization name"
+                variant="secondary"
+                placeholder="Enter organization name"
                 value={name}
-                
                 onChange={(e) => setName(e.target.value)}
               />
             </Modal.Body>
             <Modal.Footer>
               <Button
-               
                 isDisabled={isLoading}
                 variant="tertiary"
                 onPress={onClose}
               >
                 Cancel
               </Button>
-              <Button variant="primary" isPending={isLoading} onPress={handleSave}>
+              <Button
+                variant="primary"
+                isPending={isLoading}
+                onPress={handleSave}
+              >
                 Save Changes
               </Button>
             </Modal.Footer>

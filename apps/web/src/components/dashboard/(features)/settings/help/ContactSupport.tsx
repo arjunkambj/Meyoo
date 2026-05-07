@@ -78,44 +78,46 @@ export default function ContactSupport() {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="rounded-2xl bg-background shadow-none lg:col-span-2">
-          <Card.Content className="px-5">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <Card className="rounded-2xl border border-surface-tertiary bg-surface-secondary shadow-none lg:col-span-2">
+          <Card.Content className="p-3">
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Input
+                  className="shadow-none"
                   required
-                                                                                                            placeholder="John Doe"
-                                    value={formData.name}
+                  placeholder="John Doe"
+                  value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                 />
 
                 <Input
+                  className="shadow-none"
                   required
-                                                                                                            placeholder="john@example.com"
-                                    type="email"
+                  placeholder="john@example.com"
+                  type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
 
-              <div className="h-16" />
-
               <Input
+                className="shadow-none"
                 required
-                                                                                                placeholder="Brief description of your issue"
-                                value={formData.subject}
+                placeholder="Brief description of your issue"
+                value={formData.subject}
                 onChange={(e) => handleInputChange("subject", e.target.value)}
               />
 
               <TextArea
+                className="shadow-none"
                 required
                 placeholder="Please provide as much detail as possible about your issue or question..."
                 value={formData.message}
                 onChange={(e) => handleInputChange("message", e.target.value)}
               />
 
-              <div className="flex flex-col items-center justify-between gap-3 pt-2 sm:flex-row">
-                <div className="flex items-center gap-3 text-xs text-foreground">
+              <div className="flex flex-col justify-between gap-3 pt-1 sm:flex-row sm:items-center">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-foreground">
                   <div className="flex items-center gap-1">
                     <Icon
                       className="text-success"
@@ -135,11 +137,10 @@ export default function ContactSupport() {
                   </div>
                 </div>
 
-                <Button variant="primary"
+                <Button
+                  variant="primary"
                   className="px-6"
-                 
                   size="md"
-                 
                   type="submit"
                 >
                   Send Message
@@ -149,20 +150,28 @@ export default function ContactSupport() {
           </Card.Content>
         </Card>
 
-        <Card className="rounded-2xl bg-surface-secondary shadow-none">
-          <Card.Content className="space-y-4 px-5 py-5">
-            <div className="flex items-start gap-3">
+        <Card className="rounded-2xl border border-surface-tertiary bg-surface-secondary shadow-none">
+          <Card.Content className="space-y-4 px-3 py-2">
+            <div className="flex items-start gap-3 rounded-xl bg-surface px-4 py-3">
               <span className="rounded-md bg-success/10 p-2">
-                <Icon className="text-success" icon="solar:clock-circle-bold" width={18} />
+                <Icon
+                  className="text-success"
+                  icon="solar:clock-circle-bold"
+                  width={18}
+                />
               </span>
               <div>
-                <p className="text-sm font-semibold text-foreground">Response Time</p>
-                <p className="text-xs text-foreground">Typically 2-4 hours (Mon-Fri)</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Response Time
+                </p>
+                <p className="text-xs text-foreground">
+                  Typically 2-4 hours (Mon-Fri)
+                </p>
               </div>
             </div>
 
             <a
-              className="flex items-center gap-3 rounded-xl bg-surface px-4 py-3 transition-colors hover:bg-surface-secondary"
+              className="flex items-center gap-3 rounded-xl bg-surface px-4 py-3 transition-colors hover:bg-background"
               href={`mailto:${SUPPORT_EMAIL}`}
             >
               <span className="rounded-md bg-accent/10 p-2">
@@ -173,12 +182,14 @@ export default function ContactSupport() {
                 />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-foreground">Email Support</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Email Support
+                </p>
                 <p className="truncate text-xs text-accent">{SUPPORT_EMAIL}</p>
               </div>
             </a>
 
-            <div className="flex items-start gap-3">
+            <div className="flex items-start gap-3 rounded-xl bg-surface px-4 py-3">
               <span className="rounded-md bg-warning/10 p-2">
                 <Icon
                   className="text-warning"
@@ -187,8 +198,12 @@ export default function ContactSupport() {
                 />
               </span>
               <div>
-                <p className="text-sm font-semibold text-foreground">Support Hours</p>
-                <p className="text-xs text-foreground">9AM-6PM EST, Monday-Friday</p>
+                <p className="text-sm font-semibold text-foreground">
+                  Support Hours
+                </p>
+                <p className="text-xs text-foreground">
+                  9AM-6PM EST, Monday-Friday
+                </p>
               </div>
             </div>
           </Card.Content>

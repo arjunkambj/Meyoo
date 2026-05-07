@@ -1,11 +1,24 @@
 "use client";
 
-import { Button, Chip, Input, Modal, Radio, RadioGroup, useOverlayState } from "@heroui/react";
+import {
+  Button,
+  Chip,
+  Input,
+  Modal,
+  Radio,
+  RadioGroup,
+  useOverlayState,
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { useDevTools, useIntegrationStatus, useIsOnboarded, useUser } from "@/hooks";
+import {
+  useDevTools,
+  useIntegrationStatus,
+  useIsOnboarded,
+  useUser,
+} from "@/hooks";
 
 import { ConfirmationDialog } from "./ConfimationDialog";
 
@@ -21,11 +34,17 @@ export function DevTools() {
     error,
   } = useDevTools();
 
-  const [buttonLoading, setButtonLoading] = useState<Record<string, boolean>>({});
+  const [buttonLoading, setButtonLoading] = useState<Record<string, boolean>>(
+    {},
+  );
   const [recalcMessage, setRecalcMessage] = useState<string | null>(null);
   const [recalcError, setRecalcError] = useState<string | null>(null);
-  const [deleteMetricsMessage, setDeleteMetricsMessage] = useState<string | null>(null);
-  const [deleteMetricsError, setDeleteMetricsError] = useState<string | null>(null);
+  const [deleteMetricsMessage, setDeleteMetricsMessage] = useState<
+    string | null
+  >(null);
+  const [deleteMetricsError, setDeleteMetricsError] = useState<string | null>(
+    null,
+  );
   const { user } = useUser();
   const { hasShopify, hasMeta } = useIntegrationStatus();
   const isOnboarded = useIsOnboarded();
@@ -75,9 +94,12 @@ export function DevTools() {
     setRecalcError(null);
     try {
       const result = await recalcAnalytics(resolvedDaysBack);
-      setRecalcMessage(result.message ?? `Rebuilt ${result.updated} daily metrics.`);
+      setRecalcMessage(
+        result.message ?? `Rebuilt ${result.updated} daily metrics.`,
+      );
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to recalculate analytics";
+      const msg =
+        err instanceof Error ? err.message : "Failed to recalculate analytics";
       setRecalcError(msg);
     } finally {
       setButtonLoading((prev) => ({ ...prev, ["recalc-analytics"]: false }));
@@ -88,7 +110,9 @@ export function DevTools() {
   if (!user) {
     return (
       <div className="bg-surface-secondary rounded-2xl border border-surface-tertiary/50 p-6">
-        <p className="text-sm text-foreground">Loading user authentication...</p>
+        <p className="text-sm text-foreground">
+          Loading user authentication...
+        </p>
       </div>
     );
   }
@@ -127,7 +151,9 @@ export function DevTools() {
             />
             Developer Tools
           </h3>
-          <p className="text-sm text-foreground">Dangerous operations for development only</p>
+          <p className="text-sm text-foreground">
+            Dangerous operations for development only
+          </p>
         </div>
         <Chip color="warning" size="sm" variant="soft">
           Dev Only
@@ -137,11 +163,9 @@ export function DevTools() {
       <div className="grid grid-cols-2 gap-4">
         <Button
           className="justify-start"
-         
           isDisabled={!isOnboarded}
           isPending={buttonLoading["recalc-analytics"]}
           size="lg"
-         
           variant="primary"
           onPress={() => {
             setRecalcMessage(null);
@@ -154,11 +178,9 @@ export function DevTools() {
 
         <Button
           className="justify-start"
-         
           isDisabled={!isOnboarded}
           isPending={buttonLoading["delete-metrics"]}
           size="lg"
-         
           variant="primary"
           onPress={() =>
             handleConfirm(
@@ -168,13 +190,17 @@ export function DevTools() {
                 try {
                   const result = await deleteAnalytics();
                   setDeleteMetricsMessage(
-                    `Deleted ${result.deleted} analytics snapshots (${Object.entries(result.tables)
+                    `Deleted ${result.deleted} analytics snapshots (${Object.entries(
+                      result.tables,
+                    )
                       .map(([table, count]) => `${table}: ${count}`)
                       .join(", ")}).`,
                   );
                 } catch (err) {
                   const msg =
-                    err instanceof Error ? err.message : "Failed to delete analytics metrics";
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to delete analytics metrics";
                   setDeleteMetricsError(msg);
                 }
               },
@@ -189,11 +215,9 @@ export function DevTools() {
 
         <Button
           className="justify-start"
-         
           isDisabled={!isOnboarded}
           isPending={buttonLoading["reset-all"]}
           size="lg"
-         
           variant="primary"
           onPress={() =>
             handleConfirm(
@@ -215,7 +239,6 @@ export function DevTools() {
           isDisabled={!hasShopify}
           isPending={buttonLoading["disconnect-shopify"]}
           size="lg"
-         
           variant="primary"
           onPress={() =>
             handleConfirm(
@@ -234,7 +257,6 @@ export function DevTools() {
           isDisabled={!hasMeta}
           isPending={buttonLoading["disconnect-meta"]}
           size="lg"
-         
           variant="primary"
           onPress={() =>
             handleConfirm(
@@ -252,8 +274,12 @@ export function DevTools() {
       <div className="mt-4 space-y-2 text-xs">
         {recalcMessage && <p className="text-success-500">{recalcMessage}</p>}
         {recalcError && <p className="text-danger">{recalcError}</p>}
-        {deleteMetricsMessage && <p className="text-warning-500">{deleteMetricsMessage}</p>}
-        {deleteMetricsError && <p className="text-danger">{deleteMetricsError}</p>}
+        {deleteMetricsMessage && (
+          <p className="text-warning-500">{deleteMetricsMessage}</p>
+        )}
+        {deleteMetricsError && (
+          <p className="text-danger">{deleteMetricsError}</p>
+        )}
         {error && <p className="text-danger">{error}</p>}
         {globalLoading && !Object.values(buttonLoading).some(Boolean) && (
           <p className="text-foreground">Running requested operation…</p>
@@ -262,7 +288,7 @@ export function DevTools() {
 
       <ConfirmationDialog
         confirmText="Confirm"
-                isOpen={confirmDialog.isOpen}
+        isOpen={confirmDialog.isOpen}
         description={confirmDialog.description}
         title={confirmDialog.title}
         variant="danger"
@@ -274,45 +300,48 @@ export function DevTools() {
         <Modal.Backdrop isOpen={isRecalcOpen} onOpenChange={onRecalcOpenChange}>
           <Modal.Container placement="center">
             <Modal.Dialog>
-          {({ close }) => (
-            <>
-              <Modal.Header className="flex flex-col gap-1">
-                Recalculate Analytics
-              </Modal.Header>
-              <Modal.Body className="space-y-4">
-                <RadioGroup
-                                    orientation="vertical"
-                  value={range}
-                  onChange={(value) => setRange(value as typeof range)}
-                >
-                  <Radio value="60">Last 60 days</Radio>
-                  <Radio value="30">Last 30 days</Radio>
-                  <Radio value="all">All history</Radio>
-                  <Radio value="custom">Custom</Radio>
-                </RadioGroup>
-                {range === "custom" && (
-                  <Input
-                                        placeholder="e.g. 7"
-                    type="number"
-                    value={customDays}
-                    onChange={(event) => setCustomDays(event.currentTarget.value)}
-                  />
-                )}
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="tertiary" onPress={close}>
-                  Cancel
-                </Button>
-                <Button variant="primary"
-                 
-                  isDisabled={buttonLoading["recalc-analytics"]}
-                  onPress={handleRecalcConfirm}
-                >
-                  Recalculate
-                </Button>
-              </Modal.Footer>
-            </>
-          )}
+              {({ close }) => (
+                <>
+                  <Modal.Header className="flex flex-col gap-1">
+                    Recalculate Analytics
+                  </Modal.Header>
+                  <Modal.Body className="space-y-4">
+                    <RadioGroup
+                      orientation="vertical"
+                      value={range}
+                      onChange={(value) => setRange(value as typeof range)}
+                    >
+                      <Radio value="60">Last 60 days</Radio>
+                      <Radio value="30">Last 30 days</Radio>
+                      <Radio value="all">All history</Radio>
+                      <Radio value="custom">Custom</Radio>
+                    </RadioGroup>
+                    {range === "custom" && (
+                      <Input
+                        variant="secondary"
+                        placeholder="e.g. 7"
+                        type="number"
+                        value={customDays}
+                        onChange={(event) =>
+                          setCustomDays(event.currentTarget.value)
+                        }
+                      />
+                    )}
+                  </Modal.Body>
+                  <Modal.Footer>
+                    <Button variant="tertiary" onPress={close}>
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      isDisabled={buttonLoading["recalc-analytics"]}
+                      onPress={handleRecalcConfirm}
+                    >
+                      Recalculate
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
             </Modal.Dialog>
           </Modal.Container>
         </Modal.Backdrop>

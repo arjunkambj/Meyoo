@@ -123,7 +123,7 @@ export default function ProfileSection() {
       const fullName = `${formData.firstName} ${formData.lastName}`.trim();
       const [currentFirst = "", currentLast = ""] = (user?.name || "").split(
         " ",
-        2
+        2,
       );
 
       const nameChanged =
@@ -198,32 +198,32 @@ export default function ProfileSection() {
   const fullName = useMemo(
     () =>
       user?.name || `${formData.firstName} ${formData.lastName}`.trim() || "",
-    [user, formData]
+    [user, formData],
   );
 
   // Form field change handlers
   const handleFirstNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setFormData((prev) => ({ ...prev, firstName: e.target.value })),
-    []
+    [],
   );
 
   const handleLastNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setFormData((prev) => ({ ...prev, lastName: e.target.value })),
-    []
+    [],
   );
 
   const handlePhoneChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setFormData((prev) => ({ ...prev, phone: e.target.value })),
-    []
+    [],
   );
 
   const handleOrganizationNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) =>
       setFormData((prev) => ({ ...prev, organizationName: e.target.value })),
-    []
+    [],
   );
 
   const handleCurrencyChange = useCallback((key: React.Key | null) => {
@@ -252,8 +252,13 @@ export default function ProfileSection() {
             className="h-20 w-20 border-2 border-background"
             variant="soft"
           >
-            <Avatar.Image src={user?.image || ""} alt={fullName || formData.email} />
-            <Avatar.Fallback>{(fullName || formData.email).slice(0, 2).toUpperCase()}</Avatar.Fallback>
+            <Avatar.Image
+              src={user?.image || ""}
+              alt={fullName || formData.email}
+            />
+            <Avatar.Fallback>
+              {(fullName || formData.email).slice(0, 2).toUpperCase()}
+            </Avatar.Fallback>
           </Avatar>
         </div>
         <div className="space-y-2">
@@ -269,29 +274,34 @@ export default function ProfileSection() {
       {/* Form Fields */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Input
-                    disabled={isLoading}
-                              placeholder="Enter your first name"
+          variant="secondary"
+          disabled={isLoading}
+          placeholder="Enter your first name"
           value={formData.firstName}
           onChange={handleFirstNameChange}
         />
         <Input
-                    disabled={isLoading}
-                              placeholder="Enter your last name"
+          variant="secondary"
+          disabled={isLoading}
+          placeholder="Enter your last name"
           value={formData.lastName}
           onChange={handleLastNameChange}
         />
         <Input
-                                        readOnly
-                              placeholder="Organization ID"
+          variant="secondary"
+          readOnly
+          placeholder="Organization ID"
           value={formData.organizationId}
         />
         <Input
-                              disabled={isLoading}
-                              placeholder="Enter organization name"
+          variant="secondary"
+          disabled={isLoading}
+          placeholder="Enter organization name"
           value={formData.organizationName}
           onChange={handleOrganizationNameChange}
         />
         <Select
+          variant="secondary"
           isDisabled={isLoading}
           placeholder="Select a currency"
           value={formData.currency || null}
@@ -317,6 +327,7 @@ export default function ProfileSection() {
           </Select.Popover>
         </Select>
         <Select
+          variant="secondary"
           isDisabled={isLoading}
           placeholder="Select a timezone"
           value={formData.timezone || null}
@@ -343,16 +354,18 @@ export default function ProfileSection() {
         </Select>
         <div className="flex flex-col gap-2">
           <Input
-                                                readOnly
-                                    placeholder="your@email.com"
+            variant="secondary"
+            readOnly
+            placeholder="your@email.com"
             type="email"
             value={formData.email}
           />
         </div>
         <div className="flex flex-col gap-2">
           <Input
-                        disabled={isLoading}
-                                    placeholder="+1 (555) 123-4567"
+            variant="secondary"
+            disabled={isLoading}
+            placeholder="+1 (555) 123-4567"
             type="tel"
             value={formData.phone}
             onChange={handlePhoneChange}
@@ -362,8 +375,8 @@ export default function ProfileSection() {
 
       {/* Action Buttons */}
       <div className="flex justify-end flex-wrap gap-3 pt-4">
-        <Button variant="primary"
-         
+        <Button
+          variant="primary"
           isDisabled={!hasChanges}
           isPending={isLoading}
           onPress={handleSubmit}
@@ -371,7 +384,6 @@ export default function ProfileSection() {
           Save Changes
         </Button>
       </div>
-
     </>
   );
 }

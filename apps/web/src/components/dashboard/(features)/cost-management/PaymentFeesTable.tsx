@@ -1,6 +1,14 @@
 "use client";
 
-import { Button, Input, Modal, Skeleton, Table, toast, useOverlayState } from "@heroui/react";
+import {
+  Button,
+  Input,
+  Modal,
+  Skeleton,
+  Table,
+  toast,
+  useOverlayState,
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import { useCreateTransactionFee, useTransactionFees } from "@/hooks";
@@ -13,6 +21,7 @@ const TableHeader = Table.Header;
 const TableRow = Table.Row;
 import {
   DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS,
+  DATA_TABLE_SHELL_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 // Local types to avoid tight coupling to domain Cost
@@ -72,7 +81,9 @@ export default function PaymentFeesTable() {
         calculation: "PERCENTAGE",
         description: formData.description,
       });
-      toast(formData._id ? "Payment fee updated" : "Payment fee added", { timeout: 3000 });
+      toast(formData._id ? "Payment fee updated" : "Payment fee added", {
+        timeout: 3000,
+      });
       onOpenChange(false);
     } catch (_error) {
       toast.danger("Failed to save", { timeout: 3000 });
@@ -133,12 +144,7 @@ export default function PaymentFeesTable() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Payment Processing Fee</h2>
         {(transactionCosts?.length || 0) === 0 ? (
-          <Button variant="primary"
-           
-           
-            isDisabled={loading}
-            onPress={handleAdd}
-          >
+          <Button variant="primary" isDisabled={loading} onPress={handleAdd}>
             Set Fee
           </Button>
         ) : null}
@@ -152,7 +158,7 @@ export default function PaymentFeesTable() {
       <div className="space-y-4">
         {topContent}
         {loading ? (
-          <div className={DATA_TABLE_TABLE_CLASS}>
+          <div className={DATA_TABLE_SHELL_CLASS}>
             <TableSkeleton
               rows={3}
               columns={3}
@@ -165,23 +171,53 @@ export default function PaymentFeesTable() {
             <Table.ScrollContainer>
               <Table.Content aria-label="Payment fees table">
                 <TableHeader columns={columns}>
-                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
-                    <TableColumn id={column.uid} isRowHeader={column.uid === "name"}>
+                  {(column: {
+                    uid?: string;
+                    name?: string;
+                    key?: string;
+                    label?: string;
+                  }) => (
+                    <TableColumn
+                      id={column.uid}
+                      isRowHeader={column.uid === "name"}
+                    >
                       {column.name}
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={(transactionCosts as TransactionCost[]) || []}>
-                  {(item: TransactionCost) => (
-                    <TableRow
-                      key={item._id}
-                      id={item._id}
-                      className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
-                    >
-                      {(columnKey: unknown) => (
-                        <TableCell>{renderCell(item, String(columnKey))}</TableCell>
-                      )}
+                <TableBody>
+                  {((transactionCosts as TransactionCost[]) || []).length ===
+                  0 ? (
+                    <TableRow id="empty">
+                      <TableCell colSpan={columns.length}>
+                        <div className="py-10 text-center">
+                          <Icon
+                            className="mx-auto mb-4 text-foreground"
+                            icon="solar:card-transfer-outline"
+                            width={48}
+                          />
+                          <p className="text-foreground">
+                            No payment fees found.
+                          </p>
+                        </div>
+                      </TableCell>
                     </TableRow>
+                  ) : (
+                    ((transactionCosts as TransactionCost[]) || []).map(
+                      (item) => (
+                        <TableRow
+                          key={item._id}
+                          id={item._id}
+                          className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
+                        >
+                          {columns.map((column) => (
+                            <TableCell key={column.uid}>
+                              {renderCell(item, column.uid)}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ),
+                    )
                   )}
                 </TableBody>
               </Table.Content>
@@ -194,50 +230,58 @@ export default function PaymentFeesTable() {
         <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
           <Modal.Container size="lg">
             <Modal.Dialog>
-          {({ close }) => (
-            <>
-              <Modal.Header className="">
-                {formData._id ? "Edit Payment Fee" : "Set Payment Fee"}
-              </Modal.Header>
-              <Modal.Body className="gap-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    required
-                                                            value={formData.name || ""}
-                    onChange={(event) => { const value = event.currentTarget.value;
-                      setFormData({ ...formData, name: value })
-                    }}
-                  />
-                  <Input
-                    required
-                                                                                step="0.01"
-                    type="number"
-                    value={
-                      formData.value != null ? formData.value.toString() : ""
-                    }
-                    onChange={(event) => { const value = event.currentTarget.value;
-                      setFormData({
-                        ...formData,
-                        value: parseFloat(value) || 0,
-                      })
-                    }}
-                  />
-                </div>
-              </Modal.Body>
-              <Modal.Footer className="">
-                <Button variant="tertiary" onPress={close}>
-                  Cancel
-                </Button>
-                <Button variant="primary"
-                 
-                  isDisabled={!formData.name || !((formData.value ?? 0) > 0)}
-                  onPress={handleSave}
-                >
-                  {formData._id ? "Update" : "Add"}
-                </Button>
-              </Modal.Footer>
-            </>
-          )}
+              {({ close }) => (
+                <>
+                  <Modal.Header className="">
+                    {formData._id ? "Edit Payment Fee" : "Set Payment Fee"}
+                  </Modal.Header>
+                  <Modal.Body className="gap-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        variant="secondary"
+                        required
+                        value={formData.name || ""}
+                        onChange={(event) => {
+                          const value = event.currentTarget.value;
+                          setFormData({ ...formData, name: value });
+                        }}
+                      />
+                      <Input
+                        variant="secondary"
+                        required
+                        step="0.01"
+                        type="number"
+                        value={
+                          formData.value != null
+                            ? formData.value.toString()
+                            : ""
+                        }
+                        onChange={(event) => {
+                          const value = event.currentTarget.value;
+                          setFormData({
+                            ...formData,
+                            value: parseFloat(value) || 0,
+                          });
+                        }}
+                      />
+                    </div>
+                  </Modal.Body>
+                  <Modal.Footer className="">
+                    <Button variant="tertiary" onPress={close}>
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      isDisabled={
+                        !formData.name || !((formData.value ?? 0) > 0)
+                      }
+                      onPress={handleSave}
+                    >
+                      {formData._id ? "Update" : "Add"}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
             </Modal.Dialog>
           </Modal.Container>
         </Modal.Backdrop>

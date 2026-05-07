@@ -14,7 +14,9 @@ export default function SignInPage() {
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get("returnUrl");
   const safeReturnUrl =
-    returnUrl?.startsWith("/") && !returnUrl.startsWith("//") ? returnUrl : null;
+    returnUrl?.startsWith("/") && !returnUrl.startsWith("//")
+      ? returnUrl
+      : null;
 
   const [email, setEmail] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");
@@ -110,11 +112,11 @@ export default function SignInPage() {
           }}
         >
           <Input
+            variant="secondary"
             className="h-10 w-full"
-            isDisabled={isAuthLoading}
+            disabled={isAuthLoading}
             placeholder="you@example.com"
             type="email"
-            variant="secondary"
             value={email}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setEmail(e.target.value)

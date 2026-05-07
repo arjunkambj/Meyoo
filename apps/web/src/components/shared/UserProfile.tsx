@@ -93,8 +93,8 @@ const UserProfile = React.memo(
               className="gap-2 py-2"
               textValue="Appearance"
             >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-2">
+              <div className="flex w-full items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-2">
                   <Icon
                     icon={theme === "dark" ? "solar:moon-bold" : "solar:sun-bold"}
                     width={18}

@@ -1,6 +1,14 @@
 "use client";
 
-import { Button, Input, Modal, Skeleton, Table, toast, useOverlayState } from "@heroui/react";
+import {
+  Button,
+  Input,
+  Modal,
+  Skeleton,
+  Table,
+  toast,
+  useOverlayState,
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 // Delete flow removed; only edit/set single shipping cost
@@ -21,6 +29,7 @@ const TableHeader = Table.Header;
 const TableRow = Table.Row;
 import {
   DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS,
+  DATA_TABLE_SHELL_CLASS,
   DATA_TABLE_TABLE_CLASS,
 } from "@/components/shared/table/DataTableCard";
 
@@ -103,7 +112,9 @@ export default function ShippingCostTable() {
           });
         }
       }
-      toast(formData._id ? "Shipping rate updated" : "Shipping rate set", { timeout: 3000 });
+      toast(formData._id ? "Shipping rate updated" : "Shipping rate set", {
+        timeout: 3000,
+      });
       onOpenChange(false);
     } catch (_error) {
       toast.danger("Failed to save", { timeout: 3000 });
@@ -152,12 +163,7 @@ export default function ShippingCostTable() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Shipping Rates</h2>
         {shippingCosts.length === 0 ? (
-          <Button variant="primary"
-           
-           
-            isDisabled={loading}
-            onPress={handleAdd}
-          >
+          <Button variant="primary" isDisabled={loading} onPress={handleAdd}>
             Set Shipping Rate
           </Button>
         ) : null}
@@ -171,7 +177,7 @@ export default function ShippingCostTable() {
       <div className="space-y-4">
         {topContent}
         {loading ? (
-          <div className={DATA_TABLE_TABLE_CLASS}>
+          <div className={DATA_TABLE_SHELL_CLASS}>
             <TableSkeleton
               rows={3}
               columns={2}
@@ -184,23 +190,50 @@ export default function ShippingCostTable() {
             <Table.ScrollContainer>
               <Table.Content aria-label="Shipping costs table">
                 <TableHeader columns={columns}>
-                  {(column: { uid?: string; name?: string; key?: string; label?: string }) => (
-                    <TableColumn id={column.uid} isRowHeader={column.uid === "name"}>
+                  {(column: {
+                    uid?: string;
+                    name?: string;
+                    key?: string;
+                    label?: string;
+                  }) => (
+                    <TableColumn
+                      id={column.uid}
+                      isRowHeader={column.uid === "name"}
+                    >
                       {column.name}
                     </TableColumn>
                   )}
                 </TableHeader>
-                <TableBody items={shippingCosts || []}>
-                  {(item: ShippingCostItem) => (
-                    <TableRow
-                      key={item._id}
-                      id={item._id}
-                      className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
-                    >
-                      {(columnKey: unknown) => (
-                        <TableCell>{renderCell(item, String(columnKey))}</TableCell>
-                      )}
+                <TableBody>
+                  {shippingCosts.length === 0 ? (
+                    <TableRow id="empty">
+                      <TableCell colSpan={columns.length}>
+                        <div className="py-10 text-center">
+                          <Icon
+                            className="mx-auto mb-4 text-foreground"
+                            icon="solar:delivery-outline"
+                            width={48}
+                          />
+                          <p className="text-foreground">
+                            No shipping rate set yet.
+                          </p>
+                        </div>
+                      </TableCell>
                     </TableRow>
+                  ) : (
+                    shippingCosts.map((item) => (
+                      <TableRow
+                        key={item._id}
+                        id={item._id}
+                        className={DATA_TABLE_SIMPLE_ROW_STRIPE_CLASS}
+                      >
+                        {columns.map((column) => (
+                          <TableCell key={column.uid}>
+                            {renderCell(item, column.uid)}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
                   )}
                 </TableBody>
               </Table.Content>
@@ -213,47 +246,51 @@ export default function ShippingCostTable() {
         <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
           <Modal.Container size="lg">
             <Modal.Dialog>
-          {({ close }) => (
-            <>
-              <Modal.Header className="mb-3">
-                {formData._id ? "Edit Shipping Rate" : "Set Shipping Rate"}
-              </Modal.Header>
-              <Modal.Body className="gap-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    required
-                                                            value={formData.name || ""}
-                    onChange={(event) => { const value = event.currentTarget.value;
-                      setFormData({ ...formData, name: value })
-                    }}
-                  />
-                  <Input
-                    required
-                                                                                type="number"
-                    value={formData.baseRate?.toString() || ""}
-                    onChange={(event) => { const value = event.currentTarget.value;
-                      setFormData({
-                        ...formData,
-                        baseRate: parseFloat(value) || 0,
-                      })
-                    }}
-                  />
-                </div>
-              </Modal.Body>
-              <Modal.Footer className="">
-                <Button variant="tertiary" onPress={close}>
-                  Cancel
-                </Button>
-                <Button variant="primary"
-                 
-                  isDisabled={!formData.name}
-                  onPress={handleSave}
-                >
-                  {formData._id ? "Update" : "Add"}
-                </Button>
-              </Modal.Footer>
-            </>
-          )}
+              {({ close }) => (
+                <>
+                  <Modal.Header className="mb-3">
+                    {formData._id ? "Edit Shipping Rate" : "Set Shipping Rate"}
+                  </Modal.Header>
+                  <Modal.Body className="gap-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <Input
+                        variant="secondary"
+                        required
+                        value={formData.name || ""}
+                        onChange={(event) => {
+                          const value = event.currentTarget.value;
+                          setFormData({ ...formData, name: value });
+                        }}
+                      />
+                      <Input
+                        variant="secondary"
+                        required
+                        type="number"
+                        value={formData.baseRate?.toString() || ""}
+                        onChange={(event) => {
+                          const value = event.currentTarget.value;
+                          setFormData({
+                            ...formData,
+                            baseRate: parseFloat(value) || 0,
+                          });
+                        }}
+                      />
+                    </div>
+                  </Modal.Body>
+                  <Modal.Footer className="">
+                    <Button variant="tertiary" onPress={close}>
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      isDisabled={!formData.name}
+                      onPress={handleSave}
+                    >
+                      {formData._id ? "Update" : "Add"}
+                    </Button>
+                  </Modal.Footer>
+                </>
+              )}
             </Modal.Dialog>
           </Modal.Container>
         </Modal.Backdrop>

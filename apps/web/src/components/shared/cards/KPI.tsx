@@ -34,7 +34,7 @@ export interface KPISkeletonProps {
 }
 
 const KPI_CARD_BASE_CLASS =
-  "bg-surface-secondary rounded-2xl w-full overflow-hidden shadow-none";
+  "w-full overflow-hidden rounded-2xl bg-surface-secondary shadow-none";
 const KPI_CARD_PADDING = "py-4 px-5";
 const KPI_SIZE_CLASSES: Record<KPISize, string> = {
   small: "col-span-1",
@@ -127,7 +127,7 @@ export const KPISkeleton = React.memo(function KPISkeleton({
           )}
         </div>
 
-        <Separator className="mt-3.5 mb-1.5 bg-surface-tertiary" />
+        <Separator className="mt-3.5 mb-1.5" />
 
         {showChangeIndicator && (
           <div className="flex items-center justify-between">
@@ -256,7 +256,7 @@ const KPI = React.memo(function KPI({
         {/* Change indicator at bottom */}
         {changeData && (
           <>
-            <Separator className="mb-2 bg-surface-tertiary" />
+            <Separator className="mb-2" />
             <div className="flex items-center justify-between">
               <div className="text-xs font-medium text-foreground">
                 vs last period

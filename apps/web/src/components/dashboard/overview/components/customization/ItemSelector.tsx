@@ -37,9 +37,10 @@ export function ItemSelector({
   return (
     <div className={cn("px-4 overflow-hidden", className)}>
       <Input
+        variant="secondary"
         className="mb-4"
         placeholder={placeholder}
-                value={searchQuery}
+        value={searchQuery}
         onChange={(event) => onSearchChange(event.currentTarget.value)}
       />
       <ScrollShadow hideScrollBar className="h-[420px]">

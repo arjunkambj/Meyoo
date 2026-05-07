@@ -414,7 +414,7 @@ export const PnLTable = React.memo(function PnLTable({
         <tr
           key={metricKey}
           className={`
-            border-b
+            [&:last-child>*]:border-b-0
             transition-all duration-200
             ${isBoldRow ? "font-semibold" : ""}
             ${rowTintClass}
@@ -423,7 +423,7 @@ export const PnLTable = React.memo(function PnLTable({
         >
           <td
             className={`
-            py-2 sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.02)]
+            py-2 sticky left-0 z-10 border-b shadow-[2px_0_4px_rgba(0,0,0,0.02)]
             ${isSubItem ? "pl-8 pr-3 bg-background" : "px-3 bg-background"}
           `}
           >
@@ -466,7 +466,7 @@ export const PnLTable = React.memo(function PnLTable({
             return (
               <td
                 key={period.label}
-                className="text-right py-2 px-3 border-r"
+                className="border-b border-l px-3 py-2 text-right"
               >
                 <span
                   className={`
@@ -482,7 +482,7 @@ export const PnLTable = React.memo(function PnLTable({
           })}
           {totalPeriod && (
             <td
-              className={`sticky right-0 text-right py-2 px-3 border-l-4 border-accent-200 dark:border-accent-600 z-10 shadow-[-2px_0_4px_rgba(0,0,0,0.02)] ${isBoldRow ? "bg-accent-100 dark:bg-accent-100/10" : "bg-surface"}`}
+              className={`sticky right-0 z-10 border-b border-l-4 border-accent-200 px-3 py-2 text-right shadow-[-2px_0_4px_rgba(0,0,0,0.02)] dark:border-accent-600 ${isBoldRow ? "bg-accent-100 dark:bg-accent-100/10" : "bg-surface"}`}
             >
               <span
                 className={`
@@ -525,10 +525,10 @@ export const PnLTable = React.memo(function PnLTable({
 
     return (
       <div className="relative w-full max-w-full overflow-x-auto rounded-2xl border">
-        <table className="w-full text-sm  min-w-fit">
+        <table className="w-full min-w-fit border-separate border-spacing-0 text-sm">
           <thead className="sticky top-0 z-20">
             <tr className="bg-surface-secondary">
-              <th className="text-left py-3 px-3 font-semibold text-foreground sticky left-0 bg-surface-secondary min-w-[180px] max-w-[200px] z-30 border-b-2 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
+              <th className="sticky left-0 z-30 min-w-[180px] max-w-[200px] border-b bg-surface-secondary px-3 py-3 text-left font-semibold text-foreground shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
                 <div className="flex items-center gap-1.5">
                   <Icon
                     icon="solar:chart-square-bold-duotone"
@@ -541,13 +541,13 @@ export const PnLTable = React.memo(function PnLTable({
               {displayPeriods.map((period) => (
                 <th
                   key={period.label}
-                  className="text-right py-3 px-3 font-medium text-xs text-foreground min-w-[110px] border-r border-b-2"
+                  className="min-w-[110px] border-b border-l px-3 py-3 text-right text-xs font-medium text-foreground"
                 >
                   {formatPeriodLabel(period)}
                 </th>
               ))}
               {totalPeriod && (
-                <th className="sticky right-0 text-right py-3 px-3 font-bold text-xs text-accent-700 dark:text-accent-300 bg-accent-50 dark:bg-accent-100/10 min-w-[100px] border-l-4 border-accent-500 border-b-2 z-30 shadow-[-2px_0_4px_rgba(0,0,0,0.05)]">
+                <th className="sticky right-0 z-30 min-w-[100px] border-b border-l-4 border-accent-500 bg-accent-50 px-3 py-3 text-right text-xs font-bold text-accent-700 shadow-[-2px_0_4px_rgba(0,0,0,0.05)] dark:bg-accent-100/10 dark:text-accent-300">
                   TOTAL
                 </th>
               )}
@@ -583,7 +583,7 @@ export const PnLTable = React.memo(function PnLTable({
             </tr>
 
             {/* COGS Section */}
-            <tr className="bg-danger dark:bg-danger/10">
+            <tr className="bg-danger-50 dark:bg-danger-100/10">
               <td
                 colSpan={displayPeriods.length + 1 + (totalPeriod ? 1 : 0)}
                 className="px-4 py-2.5 border-b"

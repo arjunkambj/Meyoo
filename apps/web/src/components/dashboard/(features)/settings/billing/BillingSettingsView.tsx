@@ -9,22 +9,14 @@ export default function BillingSettingsView() {
     <div className="space-y-6 pb-8">
       {/* Current Plan - Moved to top */}
       <Card className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary">
-        <Card.Content className="px-5 py-5">
+        <Card.Content className="px-2 py-1">
           <PlanOverview />
         </Card.Content>
       </Card>
 
-      {/* Billing History */}
-      <Card className="rounded-2xl border border-surface-tertiary shadow-none bg-surface-secondary">
-        <Card.Content className="p-0">
-          <InvoicesList />
-        </Card.Content>
-      </Card>
+      <AvailablePlans />
 
-      {/* Available Plans (Pricing) - Moved below invoices */}
-      <div>
-        <AvailablePlans />
-      </div>
+      <InvoicesList />
     </div>
   );
 }

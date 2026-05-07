@@ -53,7 +53,7 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
             "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200",
             "no-underline group",
             active
-              ? "bg-accent/20 text-accent-600 font-semibold"
+              ? "bg-accent/20 text-foreground font-semibold"
               : "text-foreground hover:text-foreground hover:bg-surface-tertiary/70"
           )}
           href={item.href}
@@ -65,7 +65,7 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
               className={cn(
                 "shrink-0 transition-all w-5 h-5",
                 active
-                  ? "text-accent-600"
+                  ? "text-foreground"
                   : "text-foreground group-hover:text-foreground"
               )}
               icon={item.icon}
@@ -132,14 +132,13 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
         className="gap-4 divide-y-0 bg-transparent px-0 [&_[role=separator]]:hidden"
         allowsMultipleExpanded
         defaultExpandedKeys={defaultExpandedKeys}
-        dividerProps={{ className: "hidden" }}
+        hideSeparator
         itemClasses={{
           base: "!border-none bg-transparent shadow-none",
           content: "bg-transparent p-0",
           heading: "!border-none bg-transparent",
           trigger: "bg-transparent hover:bg-transparent",
         }}
-        showDivider={false}
       >
         {items.map(renderCategory)}
       </Accordion>

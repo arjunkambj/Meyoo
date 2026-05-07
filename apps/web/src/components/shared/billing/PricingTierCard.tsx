@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, Separator } from "@heroui/react";
+import { Button, Card } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
 import type { Frequency, Tier } from "@/components/home/pricing/types";
@@ -31,8 +31,13 @@ const highlightClassNames: Record<
   NonNullable<PricingTierCardProps["highlight"]>,
   string
 > = {
-  active: "border-success ring-2 ring-success/20",
-  popular: "border-accent/70 ring-2 ring-accent/20",
+  active: "ring-2 ring-success/20",
+  popular: "ring-2 ring-accent/20",
+};
+
+const parsePrice = (price: string) => {
+  const numeric = Number(price.replace(/[^0-9.]/g, ""));
+  return Number.isNaN(numeric) ? null : numeric;
 };
 
 export function PricingTierCard({
@@ -43,7 +48,7 @@ export function PricingTierCard({
   className,
 }: PricingTierCardProps) {
   const {
-    color: _color,
+    color,
     disabled,
     fullWidth: _fullWidth,
     isLoading,
@@ -55,7 +60,7 @@ export function PricingTierCard({
     variant === "solid"
       ? "primary"
       : variant === "flat"
-        ? "secondary"
+        ? "tertiary"
         : variant;
   const price =
     typeof tier.price === "string"
@@ -65,61 +70,70 @@ export function PricingTierCard({
     tier.period?.[selectedFrequency.key] ??
     tier.priceSuffix ??
     selectedFrequency.priceSuffix;
+  const priceValue = parsePrice(price);
 
   const cardClassName = cn(
-    "flex h-full w-full flex-col rounded-2xl border bg-surface-secondary dark:bg-surface shadow-none transition duration-300",
-    highlight
-      ? highlightClassNames[highlight]
-      : "border-surface-tertiary hover:border-accent/30",
+    "flex h-full w-full flex-col rounded-[2rem] bg-surface-secondary px-5 py-5 shadow-none transition-all duration-300",
+    highlight ? highlightClassNames[highlight] : null,
     className
   );
 
   return (
     <Card className={cardClassName}>
-      <Card.Header className="flex flex-col gap-4 py-6">
-        <div className="flex items-center gap-3">
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-center tracking-tight text-foreground">
-              {tier.title}
-            </h3>
+      <Card.Content className="flex h-full flex-col p-0">
+        <div className="flex flex-col gap-2">
+          <h3 className="text-xl font-medium tracking-tight text-foreground">
+            {tier.title}
+          </h3>
+
+          <div>
+            <div className="flex items-end gap-1.5 text-4xl font-bold tracking-tight text-foreground">
+              {priceValue === null ? (
+                <span className="text-2xl font-medium text-muted">{price}</span>
+              ) : (
+                <>
+                  <span className="text-2xl font-medium text-muted">$</span>
+                  <span>{priceValue}</span>
+                </>
+              )}
+            </div>
+            <div className="mt-1 text-xs font-medium text-muted">
+              {periodCopy}
+            </div>
             {tier.description ? (
-              <p className="text-sm text-center text-muted">
+              <p className="mt-1 text-xs leading-relaxed text-muted">
                 {tier.description}
               </p>
             ) : null}
           </div>
+
+          <Button
+            {...buttonProps}
+            className={cn(
+              "h-10 w-full font-semibold transition-all duration-200 active:scale-100",
+              button.className
+            )}
+            isDisabled={disabled}
+            isPending={isLoading}
+            color={color}
+            size={button.size ?? "md"}
+            variant={buttonVariant}
+          >
+            {label}
+          </Button>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <div className="text-3xl font-semibold text-center tracking-tight text-foreground">
-            {price}
-          </div>
-          <div className="text-xs font-medium text-center text-muted">
-            {periodCopy}
-          </div>
-        </div>
-
-        <Button
-          {...buttonProps}
-          className={cn("mt-2", button.className)}
-          isDisabled={disabled}
-          isPending={isLoading}
-          variant={buttonVariant}
-        >
-          {label}
-        </Button>
-      </Card.Header>
-
-      {tier.features && tier.features.length > 0 ? (
-        <>
-          <Separator className="my-2 bg-surface-tertiary" />
-          <Card.Content className="flex flex-col px-6 pb-6 pt-2">
+        {tier.features && tier.features.length > 0 ? (
+          <div className="mt-6 flex-1">
+            <p className="mb-3 text-xs font-medium uppercase tracking-[0.08em] text-muted">
+              Included
+            </p>
             <ul className="space-y-3">
               {tier.features.map((feature) => (
-                <li key={feature} className="flex items-start gap-3">
+                <li key={feature} className="flex items-start gap-2">
                   <Icon
                     icon="hugeicons:tick-02"
-                    className="mt-0.5 size-5 text-accent/60"
+                    className="mt-0.5 size-4 shrink-0 text-foreground"
                   />
                   <span className="text-sm leading-relaxed text-muted">
                     {feature}
@@ -127,9 +141,9 @@ export function PricingTierCard({
                 </li>
               ))}
             </ul>
-          </Card.Content>
-        </>
-      ) : null}
+          </div>
+        ) : null}
+      </Card.Content>
     </Card>
   );
 }

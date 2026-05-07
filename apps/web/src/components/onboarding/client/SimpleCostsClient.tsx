@@ -86,7 +86,7 @@ export default function SimpleCostsClient() {
           .sort(
             (a, b) =>
               (b.updatedAt || b.createdAt || 0) -
-              (a.updatedAt || a.createdAt || 0)
+              (a.updatedAt || a.createdAt || 0),
           )[0];
         if (op?.value !== undefined) {
           next = { ...next, operatingCosts: String(op.value) };
@@ -100,7 +100,7 @@ export default function SimpleCostsClient() {
           .sort(
             (a, b) =>
               (b.updatedAt || b.createdAt || 0) -
-              (a.updatedAt || a.createdAt || 0)
+              (a.updatedAt || a.createdAt || 0),
           )[0];
         if (ship?.value !== undefined) {
           next = { ...next, shippingCost: String(ship.value) };
@@ -114,7 +114,7 @@ export default function SimpleCostsClient() {
           .sort(
             (a, b) =>
               (b.updatedAt || b.createdAt || 0) -
-              (a.updatedAt || a.createdAt || 0)
+              (a.updatedAt || a.createdAt || 0),
           )[0];
         if (pay?.value !== undefined) {
           next = { ...next, paymentFeePercent: String(pay.value) };
@@ -204,9 +204,13 @@ export default function SimpleCostsClient() {
         throw new Error("Cost setup did not complete");
       }
     } catch (error) {
-      toast.danger("Failed to save", { description: error instanceof Error
+      toast.danger("Failed to save", {
+        description:
+          error instanceof Error
             ? error.message
-            : "Please try again in a moment.", timeout: 3500 });
+            : "Please try again in a moment.",
+        timeout: 3500,
+      });
     } finally {
       setSaving(false);
     }
@@ -252,7 +256,6 @@ export default function SimpleCostsClient() {
           <Button
             variant="tertiary"
             size="sm"
-           
             onPress={() => router.refresh()}
             isDisabled={isShopifySyncing}
           >
@@ -262,7 +265,6 @@ export default function SimpleCostsClient() {
             <Button
               variant="primary"
               size="sm"
-             
               onPress={() => router.push("/onboarding/shopify")}
             >
               Retry Shopify sync
@@ -297,56 +299,67 @@ export default function SimpleCostsClient() {
       {/* Form */}
       <div className="grid grid-cols-1 gap-8 mt-8">
         <Input
+          variant="secondary"
           className="max-w-md"
-                                                  placeholder="5000"
+          placeholder="5000"
           type="number"
           inputMode="decimal"
           min={0}
           step="0.01"
           value={form.operatingCosts}
-          onChange={(event) => onChange("operatingCosts")(event.currentTarget.value)}
+          onChange={(event) =>
+            onChange("operatingCosts")(event.currentTarget.value)
+          }
         />
 
         <Input
+          variant="secondary"
           className="max-w-md"
-                                                  placeholder="e.g. 2.9"
+          placeholder="e.g. 2.9"
           type="number"
           inputMode="decimal"
           min={0}
           max={100}
           step="0.01"
           value={form.paymentFeePercent}
-          onChange={(event) => onChange("paymentFeePercent")(event.currentTarget.value)}
+          onChange={(event) =>
+            onChange("paymentFeePercent")(event.currentTarget.value)
+          }
         />
 
         <Input
+          variant="secondary"
           className="max-w-md"
-                                                  placeholder="e.g. 25"
+          placeholder="e.g. 25"
           type="number"
           inputMode="decimal"
           min={0}
           step="0.01"
           value={form.shippingCost}
-          onChange={(event) => onChange("shippingCost")(event.currentTarget.value)}
+          onChange={(event) =>
+            onChange("shippingCost")(event.currentTarget.value)
+          }
         />
 
         <Input
+          variant="secondary"
           className="max-w-md"
-                                                  placeholder="e.g. 5"
+          placeholder="e.g. 5"
           type="number"
           inputMode="decimal"
           min={0}
           max={100}
           step="0.1"
           value={form.manualReturnRate}
-          onChange={(event) => onChange("manualReturnRate")(event.currentTarget.value)}
+          onChange={(event) =>
+            onChange("manualReturnRate")(event.currentTarget.value)
+          }
         />
       </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-4 border-t border-surface-tertiary">
         <Button
-         
           variant="tertiary"
           size="lg"
           isDisabled={saving}
@@ -362,13 +375,12 @@ export default function SimpleCostsClient() {
         >
           Back
         </Button>
-        <Button variant="primary"
-         
+        <Button
+          variant="primary"
           size="lg"
           isPending={saving}
           className="font-bold min-w-40"
           onPress={handleSave}
-         
         >
           Save & Continue
         </Button>
