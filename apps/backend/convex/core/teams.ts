@@ -38,7 +38,8 @@ export const syncCurrentStackTeamMembership = mutation({
     const { user, orgId, teamId, membership } = await requireUserAndOrg(ctx);
 
     if (membership?.status === "active") {
-      const role = membership.role === "StoreOwner" ? "StoreOwner" : "StoreTeam";
+      const role =
+        membership.role === "StoreOwner" ? "StoreOwner" : "StoreTeam";
       return { role } as const;
     }
 
@@ -46,10 +47,16 @@ export const syncCurrentStackTeamMembership = mutation({
     if (!organization || organization.stackTeamId !== teamId) return null;
 
     const now = Date.now();
-    await ensureActiveMembership(ctx as unknown as MutationCtx, orgId, user._id, "StoreTeam", {
-      assignedAt: now,
-      assignedBy: organization.ownerId,
-    });
+    await ensureActiveMembership(
+      ctx as unknown as MutationCtx,
+      orgId,
+      user._id,
+      "StoreTeam",
+      {
+        assignedAt: now,
+        assignedBy: organization.ownerId,
+      },
+    );
 
     await ctx.db.patch(user._id, {
       organizationId: orgId,
@@ -76,12 +83,16 @@ export const getTeamMembers = query({
     // Actions (invite/remove) are controlled separately by role checks
 
     const orgId = auth.orgId;
-    const memberships = (await ctx.db
-      .query("memberships")
-      .withIndex("by_org", (q) => q.eq("organizationId", orgId))
-      .collect()).filter((membership) => membership.status !== "removed");
+    const memberships = (
+      await ctx.db
+        .query("memberships")
+        .withIndex("by_org", (q) => q.eq("organizationId", orgId))
+        .collect()
+    ).filter((membership) => membership.status !== "removed");
 
-    const users = await Promise.all(memberships.map((m) => ctx.db.get(m.userId)));
+    const users = await Promise.all(
+      memberships.map((m) => ctx.db.get(m.userId)),
+    );
 
     return memberships.map((m, i) => {
       const u = users[i]!;
@@ -98,6 +109,69 @@ export const getTeamMembers = query({
         updatedAt: u.updatedAt,
       };
     });
+  },
+});
+
+/**
+ * Get team membership stats for the current organization
+ */
+export const getTeamStats = query({
+  args: {},
+  returns: v.object({
+    totalMembers: v.number(),
+    activeMembers: v.number(),
+    suspendedMembers: v.number(),
+    owners: v.number(),
+    teamMembers: v.number(),
+    freeSeats: v.number(),
+    paidSeats: v.number(),
+    aiSeats: v.number(),
+  }),
+  handler: async (ctx) => {
+    const auth = await getUserAndOrg(ctx);
+    if (!auth) {
+      return {
+        totalMembers: 0,
+        activeMembers: 0,
+        suspendedMembers: 0,
+        owners: 0,
+        teamMembers: 0,
+        freeSeats: 0,
+        paidSeats: 0,
+        aiSeats: 0,
+      };
+    }
+
+    const memberships = (
+      await ctx.db
+        .query("memberships")
+        .withIndex("by_org", (q) => q.eq("organizationId", auth.orgId))
+        .collect()
+    ).filter((membership) => membership.status !== "removed");
+
+    return {
+      totalMembers: memberships.length,
+      activeMembers: memberships.filter(
+        (membership) => membership.status === "active",
+      ).length,
+      suspendedMembers: memberships.filter(
+        (membership) => membership.status === "suspended",
+      ).length,
+      owners: memberships.filter(
+        (membership) => membership.role === "StoreOwner",
+      ).length,
+      teamMembers: memberships.filter(
+        (membership) => membership.role === "StoreTeam",
+      ).length,
+      freeSeats: memberships.filter(
+        (membership) => membership.seatType === "free",
+      ).length,
+      paidSeats: memberships.filter(
+        (membership) => membership.seatType === "paid",
+      ).length,
+      aiSeats: memberships.filter((membership) => membership.hasAIAccess)
+        .length,
+    };
   },
 });
 
@@ -134,9 +208,7 @@ export const removeTeamMember = mutation({
     const memberMembership = await ctx.db
       .query("memberships")
       .withIndex("by_org_user", (q) =>
-        q
-          .eq("organizationId", orgId)
-          .eq("userId", args.memberId),
+        q.eq("organizationId", orgId).eq("userId", args.memberId),
       )
       .first();
     if (memberMembership && memberMembership.role === "StoreOwner") {
@@ -189,9 +261,7 @@ export const leaveOrganization = mutation({
     const existingMembership = await ctx.db
       .query("memberships")
       .withIndex("by_org_user", (q) =>
-        q
-          .eq("organizationId", orgId)
-          .eq("userId", user._id),
+        q.eq("organizationId", orgId).eq("userId", user._id),
       )
       .first();
     const now = Date.now();
