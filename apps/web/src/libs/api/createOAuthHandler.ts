@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { createLogger } from "@/libs/logging/Logger";
+import { stackConvexToken } from "@/libs/stackConvex";
 
 interface OAuthHandlerOptions {
   platform: string;
@@ -32,15 +33,15 @@ export function createOAuthHandler(options: OAuthHandlerOptions) {
     try {
       logger.info(`Starting ${platform} OAuth flow`);
 
-      // Check if user is authenticated from cookie or header
-      const token =
-        req.cookies.get("convex-auth-token")?.value ||
-        req.headers.get("Authorization")?.replace("Bearer ", "");
+      const token = await stackConvexToken(req);
 
-      // Log token existence for debugging
       logger.info(`Token check for ${platform} OAuth`, {
         hasToken: !!token,
       });
+
+      if (!token) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
 
       // Create state parameter for CSRF protection
       const state = Math.random().toString(36).substring(7);

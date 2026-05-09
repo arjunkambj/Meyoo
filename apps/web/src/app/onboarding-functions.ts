@@ -23,13 +23,14 @@ export async function ensureOnboarded() {
 
   const token = await stackServerApp.getConvexHttpClientAuth({
     tokenStore: "nextjs-cookie",
-  }).catch(() => null);
-  const syncedMembership = token
+  });
+  const selectedTeamId = user.selectedTeam?.id;
+  const syncedMembership = selectedTeamId
     ? await fetchMutation(
         api.core.teams.syncCurrentStackTeamMembership,
-        {},
+        { teamId: selectedTeamId },
         { token },
-      ).catch(() => null)
+      )
     : null;
 
   const shouldAutoOnboardTeamMember =
@@ -44,7 +45,10 @@ export async function ensureOnboarded() {
     });
   }
 
-  if (!shouldAutoOnboardTeamMember && !getOnboarded(user.clientReadOnlyMetadata)) {
+  if (
+    !shouldAutoOnboardTeamMember &&
+    !getOnboarded(user.clientReadOnlyMetadata)
+  ) {
     redirect("/onboarding");
   }
 }

@@ -3,7 +3,11 @@ import type { MutationCtx } from "../_generated/server";
 import { mutation, query } from "../_generated/server";
 import { createNewUserData } from "./workspaceProvisioning";
 import { ensureActiveMembership } from "./membershipHelpers";
-import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
+import {
+  getStackIdentity,
+  getUserAndOrg,
+  requireUserAndOrg,
+} from "../utils/auth";
 
 /**
  * Team Management
@@ -27,15 +31,38 @@ export const canManageTeam = query({
  * Sync an accepted Stack Auth team invitation into Convex membership state.
  */
 export const syncCurrentStackTeamMembership = mutation({
-  args: {},
+  args: {
+    teamId: v.string(),
+  },
   returns: v.union(
     v.null(),
     v.object({
       role: v.union(v.literal("StoreOwner"), v.literal("StoreTeam")),
     }),
   ),
-  handler: async (ctx) => {
-    const { user, orgId, teamId, membership } = await requireUserAndOrg(ctx);
+  handler: async (ctx, args) => {
+    const stack = await getStackIdentity(ctx);
+    if (!stack)
+      throw new Error("User must be signed in to sync team membership");
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_stack_id", (q) => q.eq("stackId", stack.stackId))
+      .first();
+    if (!user) throw new Error("User not found");
+
+    const organization = await ctx.db
+      .query("organizations")
+      .withIndex("by_stack_team", (q) => q.eq("stackTeamId", args.teamId))
+      .first();
+    if (!organization) return null;
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_org_user", (q) =>
+        q.eq("organizationId", organization._id).eq("userId", user._id),
+      )
+      .first();
 
     if (membership?.status === "active") {
       const role =
@@ -43,13 +70,10 @@ export const syncCurrentStackTeamMembership = mutation({
       return { role } as const;
     }
 
-    const organization = await ctx.db.get(orgId);
-    if (!organization || organization.stackTeamId !== teamId) return null;
-
     const now = Date.now();
     await ensureActiveMembership(
       ctx as unknown as MutationCtx,
-      orgId,
+      organization._id,
       user._id,
       "StoreTeam",
       {
@@ -59,9 +83,9 @@ export const syncCurrentStackTeamMembership = mutation({
     );
 
     await ctx.db.patch(user._id, {
-      organizationId: orgId,
-      selectedTeamId: teamId,
-      teamIds: Array.from(new Set([...(user.teamIds ?? []), teamId])),
+      organizationId: organization._id,
+      selectedTeamId: args.teamId,
+      teamIds: Array.from(new Set([...(user.teamIds ?? []), args.teamId])),
       status: "active",
       updatedAt: now,
     });

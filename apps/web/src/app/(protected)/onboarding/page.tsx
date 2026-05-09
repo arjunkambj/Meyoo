@@ -7,34 +7,27 @@ import { stackServerApp } from "@/stack/server";
 export default async function OnboardingIndexPage() {
   const user = await stackServerApp.getUser();
 
+  if (!user) {
+    redirect("/sign-in");
+  }
+
   if (user?.clientReadOnlyMetadata?.onboarded) {
     redirect("/overview");
   }
 
-  let status:
-    | Awaited<ReturnType<typeof fetchQuery<typeof api.core.onboarding.getOnboardingStatus>>>
-    | null
-    | undefined;
+  const token = await stackServerApp.getConvexHttpClientAuth({
+    tokenStore: "nextjs-cookie",
+  });
 
-  try {
-    const token = await stackServerApp.getConvexHttpClientAuth({
-      tokenStore: "nextjs-cookie",
-    }).catch(() => null);
-    if (token) {
-      status = await fetchQuery(
-        api.core.onboarding.getOnboardingStatus,
-        {},
-        { token },
-      );
-    } else {
-      status = await fetchQuery(
-        api.core.onboarding.getOnboardingStatus,
-        {},
-      );
-    }
-  } catch {
-    status = null;
+  if (token === "") {
+    redirect("/sign-in");
   }
+
+  const status = await fetchQuery(
+    api.core.onboarding.getOnboardingStatus,
+    {},
+    { token },
+  );
 
   // No Shopify connection yet -> Shopify connect
   if (!status?.connections?.shopify) {
@@ -47,7 +40,7 @@ export default async function OnboardingIndexPage() {
   }
 
   // Check current step and redirect accordingly
-  const currentStep = status?.currentStep || 1;
+  const currentStep = status.currentStep ?? 1;
 
   if (currentStep === 1) {
     redirect("/onboarding/shopify");
