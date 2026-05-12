@@ -1,4 +1,3 @@
-
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
@@ -11,6 +10,14 @@ import {
   fetchExistingVariantsByShopifyIds,
 } from "./shared";
 import { toOptionalString } from "./processingUtils";
+
+const searchText = (...values: unknown[]) =>
+  values
+    .flatMap((value) => (Array.isArray(value) ? value : [value]))
+    .map((value) => toOptionalString(value))
+    .filter((value): value is string => Boolean(value))
+    .join(" ")
+    .toLowerCase();
 
 export const storeProductsInternal = internalMutation({
   args: {
@@ -30,7 +37,7 @@ export const storeProductsInternal = internalMutation({
     let store: Doc<"shopifyStores"> | null = null;
 
     if (args.storeId) {
-      store = await ctx.db.get(args.storeId);
+      store = await ctx.db.get("shopifyStores", args.storeId);
     }
 
     if (!store) {
@@ -39,7 +46,7 @@ export const storeProductsInternal = internalMutation({
         .withIndex("by_organization_and_active", (q) =>
           q
             .eq("organizationId", args.organizationId as Id<"organizations">)
-            .eq("isActive", true)
+            .eq("isActive", true),
         )
         .first();
     }
@@ -52,15 +59,18 @@ export const storeProductsInternal = internalMutation({
 
       if (args.syncSessionId) {
         try {
-          await ctx.runMutation(internal.jobs.helpers.patchSyncSessionMetadata, {
-            sessionId: args.syncSessionId,
-            metadata: {
-              stageStatus: { products: "failed" },
-              lastBatchError: "Shopify store inactive or uninstalled",
-              failureReason: "shopify_store_inactive",
-              partialSync: true,
-            } as any,
-          });
+          await ctx.runMutation(
+            internal.jobs.helpers.patchSyncSessionMetadata,
+            {
+              sessionId: args.syncSessionId,
+              metadata: {
+                stageStatus: { products: "failed" },
+                lastBatchError: "Shopify store inactive or uninstalled",
+                failureReason: "shopify_store_inactive",
+                partialSync: true,
+              } as any,
+            },
+          );
 
           await ctx.runMutation(internal.jobs.helpers.updateSyncSession, {
             sessionId: args.syncSessionId,
@@ -133,7 +143,7 @@ export const storeProductsInternal = internalMutation({
       let productId: Id<"shopifyProducts">;
 
       if (existing) {
-        await ctx.db.patch(existing._id, productToStore);
+        await ctx.db.patch("shopifyProducts", existing._id, productToStore);
         productId = existing._id;
       } else {
         productId = await ctx.db.insert("shopifyProducts", productToStore);
@@ -149,6 +159,25 @@ export const storeProductsInternal = internalMutation({
           productId,
           shopifyProductId: productData.shopifyId,
           organizationId: args.organizationId,
+          productTitle: productToStore.title,
+          productHandle: productToStore.handle,
+          productVendor: productToStore.vendor,
+          productType: productToStore.productType,
+          productStatus: productToStore.status,
+          productImage: productToStore.featuredImage,
+          searchText: searchText(
+            productToStore.title,
+            productToStore.handle,
+            productToStore.vendor,
+            productToStore.productType,
+            productToStore.tags,
+            variant.title,
+            variant.sku,
+            variant.barcode,
+            variant.option1,
+            variant.option2,
+            variant.option3,
+          ),
         });
       }
     }
@@ -192,21 +221,33 @@ export const storeProductsInternal = internalMutation({
       const variantToStore = {
         organizationId: args.organizationId as Id<"organizations">,
         productId: variant.productId,
+        productTitle: variant.productTitle,
+        productHandle: variant.productHandle,
+        productVendor: variant.productVendor,
+        productType: variant.productType,
+        productStatus: variant.productStatus,
+        productImage: variant.productImage,
+        searchText: variant.searchText,
         shopifyId: variant.shopifyId,
         shopifyProductId: variant.shopifyProductId,
         title: toOptionalString(variant.title) ?? "",
         sku: toOptionalString(variant.sku),
         barcode: toOptionalString(variant.barcode),
         position:
-          typeof variant.position === "number" && Number.isFinite(variant.position)
+          typeof variant.position === "number" &&
+          Number.isFinite(variant.position)
             ? variant.position
             : 0,
         price: variant.price,
         compareAtPrice: variant.compareAtPrice,
         inventoryQuantity: variant.inventoryQuantity,
-        available: typeof variant.available === "boolean" ? variant.available : undefined, // Add the available field
+        available:
+          typeof variant.available === "boolean"
+            ? variant.available
+            : undefined, // Add the available field
         inventoryItemId: toOptionalString(variant.inventoryItemId),
-        taxable: typeof variant.taxable === "boolean" ? variant.taxable : undefined,
+        taxable:
+          typeof variant.taxable === "boolean" ? variant.taxable : undefined,
         weight: variant.weight,
         weightUnit: toOptionalString(variant.weightUnit),
         option1: toOptionalString(variant.option1),
@@ -220,12 +261,16 @@ export const storeProductsInternal = internalMutation({
       let variantId: Id<"shopifyProductVariants">;
 
       if (existingVariant) {
-        await ctx.db.patch(existingVariant._id, variantToStore);
+        await ctx.db.patch(
+          "shopifyProductVariants",
+          existingVariant._id,
+          variantToStore,
+        );
         variantId = existingVariant._id;
       } else {
         variantId = await ctx.db.insert(
           "shopifyProductVariants",
-          variantToStore
+          variantToStore,
         );
       }
 
@@ -279,7 +324,7 @@ export const storeProductsInternal = internalMutation({
     // Step 5: Bulk process inventory levels
     if (inventoryToStore.length > 0) {
       const inventoryKeys = inventoryToStore.map(
-        (inv) => `${inv.variantId}-${inv.locationId}`
+        (inv) => `${inv.variantId}-${inv.locationId}`,
       );
       const inventoryKeySet = new Set(inventoryKeys);
 
@@ -287,13 +332,16 @@ export const storeProductsInternal = internalMutation({
       const variantIds = Array.from(touchedVariantIds);
 
       if (variantIds.length > 0) {
-        for (const variantChunk of chunkArray(variantIds, BULK_OPS.LOOKUP_SIZE)) {
+        for (const variantChunk of chunkArray(
+          variantIds,
+          BULK_OPS.LOOKUP_SIZE,
+        )) {
           const chunkResults = await Promise.all(
             variantChunk.map((variantId) =>
               ctx.db
                 .query("shopifyInventory")
                 .withIndex("by_variant", (q) => q.eq("variantId", variantId))
-                .collect()
+                .collect(),
             ),
           );
 
@@ -317,7 +365,7 @@ export const storeProductsInternal = internalMutation({
         };
 
         if (existing) {
-          await ctx.db.patch(existing._id, inventoryData);
+          await ctx.db.patch("shopifyInventory", existing._id, inventoryData);
         } else {
           await (ctx.db.insert as any)("shopifyInventory", inventoryData);
         }
@@ -325,7 +373,7 @@ export const storeProductsInternal = internalMutation({
 
       for (const [key, existing] of existingInventoryMap.entries()) {
         if (!inventoryKeySet.has(key)) {
-          await ctx.db.delete(existing._id);
+          await ctx.db.delete("shopifyInventory", existing._id);
         }
       }
     }
@@ -351,7 +399,11 @@ export const storeProductsInternal = internalMutation({
             };
 
             if (existingTotals) {
-              await ctx.db.patch(existingTotals._id, totalPayload);
+              await ctx.db.patch(
+                "shopifyInventoryTotals",
+                existingTotals._id,
+                totalPayload,
+              );
             } else {
               await (ctx.db.insert as any)(
                 "shopifyInventoryTotals",
@@ -364,7 +416,7 @@ export const storeProductsInternal = internalMutation({
     }
 
     logger.info(
-      `Processed ${args.products.length} products with bulk operations`
+      `Processed ${args.products.length} products with bulk operations`,
     );
 
     return null;
@@ -384,7 +436,7 @@ export const updateProductInternal = internalMutation({
       .first();
 
     if (existing) {
-      await ctx.db.patch(existing._id, {
+      await ctx.db.patch("shopifyProducts", existing._id, {
         ...args.product,
         syncedAt: Date.now(),
       });
@@ -419,20 +471,21 @@ export const deleteProductByShopifyIdInternal = internalMutation({
         .query("shopifyInventory")
         .withIndex("by_variant", (q) => q.eq("variantId", vdoc._id))
         .collect();
-      for (const inv of invRows) await ctx.db.delete(inv._id);
+      for (const inv of invRows)
+        await ctx.db.delete("shopifyInventory", inv._id);
 
       const totalsDoc = await ctx.db
         .query("shopifyInventoryTotals")
         .withIndex("by_variant", (q) => q.eq("variantId", vdoc._id))
         .first();
       if (totalsDoc) {
-        await ctx.db.delete(totalsDoc._id);
+        await ctx.db.delete("shopifyInventoryTotals", totalsDoc._id);
       }
 
-      await ctx.db.delete(vdoc._id);
+      await ctx.db.delete("shopifyProductVariants", vdoc._id);
     }
 
-    await ctx.db.delete(product._id);
+    await ctx.db.delete("shopifyProducts", product._id);
     return null;
   },
 });
@@ -454,7 +507,7 @@ export const deleteProductInternal = internalMutation({
       .first();
 
     if (product) {
-      await ctx.db.delete(product._id);
+      await ctx.db.delete("shopifyProducts", product._id);
     }
 
     return null;

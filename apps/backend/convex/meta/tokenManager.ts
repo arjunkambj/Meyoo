@@ -1,5 +1,9 @@
 import { v } from "convex/values";
-import { internalAction, internalMutation, internalQuery } from "../_generated/server";
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+} from "../_generated/server";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { createSimpleLogger } from "../../libs/logging/simple";
@@ -95,7 +99,8 @@ async function getValidAccessTokenImpl(
                 tokenKind: "long",
                 lastRefreshedAt: now,
                 shortLivedAccessToken:
-                  session.metadata?.shortLivedAccessToken || session.accessToken,
+                  session.metadata?.shortLivedAccessToken ||
+                  session.accessToken,
               },
             },
           );
@@ -184,7 +189,7 @@ export const updateSessionTokenInternal = internalMutation({
     metadata: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.sessionId, {
+    await ctx.db.patch("integrationSessions", args.sessionId, {
       accessToken: args.accessToken,
       refreshToken: args.refreshToken,
       expiresAt: args.expiresAt,

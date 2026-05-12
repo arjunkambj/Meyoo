@@ -114,7 +114,10 @@ export type ShopifyFulfillmentOrder = {
   assignedLocation?: {
     location?: { id?: string | null } | null;
   } | null;
-  deliveryMethod?: { methodType?: string | null; serviceName?: string | null } | null;
+  deliveryMethod?: {
+    methodType?: string | null;
+    serviceName?: string | null;
+  } | null;
   lineItems?: {
     edges?: Array<{
       node?: {

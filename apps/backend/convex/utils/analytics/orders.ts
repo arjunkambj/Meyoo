@@ -5,15 +5,15 @@ import type {
   OrdersAnalyticsResult,
   OrdersFulfillmentMetrics,
   OrdersOverviewMetrics,
-} from '@repo/types';
+} from "@repo/types";
 
-import type { AnyRecord } from './shared';
+import type { AnyRecord } from "./shared";
 import {
   ensureDataset,
   percentageChange,
   safeNumber,
   toStringId,
-} from './shared';
+} from "./shared";
 
 export interface OrdersAnalyticsOptions {
   status?: string;
@@ -61,9 +61,15 @@ function matchesStatus(order: AnalyticsOrder, status?: string): boolean {
     case "unfulfilled":
       return fulfillment === "" || fulfillment === "unfulfilled";
     case "partial":
-      return isPartialStatus(order.fulfillmentStatus) || isPartialStatus(order.status);
+      return (
+        isPartialStatus(order.fulfillmentStatus) ||
+        isPartialStatus(order.status)
+      );
     case "fulfilled":
-      return isFulfilledStatus(order.fulfillmentStatus) || isFulfilledStatus(order.status);
+      return (
+        isFulfilledStatus(order.fulfillmentStatus) ||
+        isFulfilledStatus(order.status)
+      );
     case "cancelled":
       return overall.includes("cancel") || financial.includes("void");
     case "refunded":
@@ -90,7 +96,10 @@ function sortOrders(
   sortOrder: "asc" | "desc" = "desc",
 ): AnalyticsOrder[] {
   if (!sortBy) {
-    return [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return [...orders].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   }
 
   const modifier = sortOrder === "asc" ? 1 : -1;
@@ -107,8 +116,9 @@ function sortOrders(
         return a.status.localeCompare(b.status) * modifier;
       default:
         return (
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        ) * modifier;
+          (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) *
+          modifier
+        );
     }
   });
 }
@@ -187,7 +197,9 @@ export function deriveAnalyticsOrders(
         .filter((status): status is string => Boolean(status));
     };
 
-    const flattenEdgeStatuses = (edgeContainer: AnyRecord | undefined): string[] => {
+    const flattenEdgeStatuses = (
+      edgeContainer: AnyRecord | undefined,
+    ): string[] => {
       if (!edgeContainer || typeof edgeContainer !== "object") return [];
       const edges = (edgeContainer as AnyRecord).edges;
       if (!Array.isArray(edges)) return [];
@@ -213,16 +225,20 @@ export function deriveAnalyticsOrders(
     statusBuckets.push(
       ...collectStatuses(orderRaw.fulfillments as AnyRecord[] | undefined),
       ...collectStatuses(orderRaw.fulfillmentOrders as AnyRecord[] | undefined),
-      ...collectStatuses(orderRaw.fulfillment_orders as AnyRecord[] | undefined),
+      ...collectStatuses(
+        orderRaw.fulfillment_orders as AnyRecord[] | undefined,
+      ),
       ...flattenEdgeStatuses(orderRaw.fulfillments as AnyRecord | undefined),
-      ...flattenEdgeStatuses(orderRaw.fulfillmentOrders as AnyRecord | undefined),
-      ...flattenEdgeStatuses(orderRaw.fulfillment_orders as AnyRecord | undefined),
+      ...flattenEdgeStatuses(
+        orderRaw.fulfillmentOrders as AnyRecord | undefined,
+      ),
+      ...flattenEdgeStatuses(
+        orderRaw.fulfillment_orders as AnyRecord | undefined,
+      ),
     );
 
     if (!statusBuckets.length && Array.isArray(orderRaw.lineItems)) {
-      statusBuckets.push(
-        ...collectStatuses(orderRaw.lineItems as AnyRecord[]),
-      );
+      statusBuckets.push(...collectStatuses(orderRaw.lineItems as AnyRecord[]));
     }
 
     const slugs = statusBuckets.map(toStatusSlug).filter(Boolean);
@@ -233,7 +249,10 @@ export function deriveAnalyticsOrders(
     const has = (match: string) => slugs.some((slug) => slug.includes(match));
     const all = (match: string) => slugs.every((slug) => slug.includes(match));
 
-    if (all("fulfilled") || (has("success") && !has("open") && !has("pending"))) {
+    if (
+      all("fulfilled") ||
+      (has("success") && !has("open") && !has("pending"))
+    ) {
       return "fulfilled";
     }
 
@@ -401,7 +420,8 @@ export function deriveAnalyticsOrders(
       }
     };
 
-    const shippingLinesArray = orderRaw.shippingLines ?? orderRaw.shipping_lines;
+    const shippingLinesArray =
+      orderRaw.shippingLines ?? orderRaw.shipping_lines;
     if (Array.isArray(shippingLinesArray)) {
       considerCollection(shippingLinesArray as AnyRecord[]);
     }
@@ -425,7 +445,8 @@ export function deriveAnalyticsOrders(
       considerCollection(nodes);
     }
 
-    const adjustments = orderRaw.shippingAdjustments ?? orderRaw.shipping_adjustments;
+    const adjustments =
+      orderRaw.shippingAdjustments ?? orderRaw.shipping_adjustments;
     if (Array.isArray(adjustments)) {
       considerCollection(adjustments as AnyRecord[]);
     }
@@ -439,7 +460,10 @@ export function deriveAnalyticsOrders(
 
   const variantMap = new Map<string, AnyRecord>();
   for (const variant of variants) {
-    variantMap.set(toStringId(variant._id ?? variant.id ?? variant.variantId), variant);
+    variantMap.set(
+      toStringId(variant._id ?? variant.id ?? variant.variantId),
+      variant,
+    );
   }
 
   const componentMap = new Map<string, AnyRecord>();
@@ -447,8 +471,12 @@ export function deriveAnalyticsOrders(
     const variantId = toStringId(component.variantId ?? component.variant_id);
     if (!variantId) continue;
     const current = componentMap.get(variantId);
-    const currentTime = safeNumber(current?.updatedAt ?? current?.createdAt ?? 0);
-    const componentTime = safeNumber(component.updatedAt ?? component.createdAt ?? 0);
+    const currentTime = safeNumber(
+      current?.updatedAt ?? current?.createdAt ?? 0,
+    );
+    const componentTime = safeNumber(
+      component.updatedAt ?? component.createdAt ?? 0,
+    );
     if (!current || componentTime > currentTime) {
       componentMap.set(variantId, component);
     }
@@ -482,7 +510,9 @@ export function deriveAnalyticsOrders(
       const component = componentMap.get(variantId);
       const perUnit = safeNumber(component?.cogsPerUnit ?? 0);
       return {
-        id: toStringId(item._id ?? item.id ?? `${orderId}-${item.sku ?? item.title}`),
+        id: toStringId(
+          item._id ?? item.id ?? `${orderId}-${item.sku ?? item.title}`,
+        ),
         name: String(item.title ?? item.productTitle ?? "Item"),
         quantity: safeNumber(item.quantity),
         price: safeNumber(item.price),
@@ -494,12 +524,18 @@ export function deriveAnalyticsOrders(
     const shippingCost = resolveShippingCost(orderRaw);
     const taxAmount = safeNumber(orderRaw.taxesCollected ?? 0);
     const cogsAmount = lineItems.reduce((total, item) => total + item.cost, 0);
-    const transactionFee = txs.reduce((total, tx) => total + safeNumber(tx.fee), 0);
+    const transactionFee = txs.reduce(
+      (total, tx) => total + safeNumber(tx.fee),
+      0,
+    );
 
     const totalCost = cogsAmount + shippingCost + taxAmount + transactionFee;
     const profit = revenue - totalCost;
     const profitMargin = revenue > 0 ? (profit / revenue) * 100 : 0;
-    const itemCount = lineItems.reduce((total, item) => total + item.quantity, 0);
+    const itemCount = lineItems.reduce(
+      (total, item) => total + item.quantity,
+      0,
+    );
 
     const shippingAddressRaw =
       (orderRaw.shippingAddress as AnyRecord | undefined) ??
@@ -516,7 +552,10 @@ export function deriveAnalyticsOrders(
         record.name,
         record.displayName,
         record.display_name,
-        [record.firstName ?? record.first_name ?? "", record.lastName ?? record.last_name ?? ""].join(" "),
+        [
+          record.firstName ?? record.first_name ?? "",
+          record.lastName ?? record.last_name ?? "",
+        ].join(" "),
       ];
       for (const candidate of nameCandidates) {
         if (typeof candidate !== "string") continue;
@@ -545,7 +584,10 @@ export function deriveAnalyticsOrders(
       customerRecord?.displayName,
       customerRecord?.display_name,
       customerRecord?.name,
-      [customerRecord?.firstName ?? customerRecord?.first_name ?? "", customerRecord?.lastName ?? customerRecord?.last_name ?? ""].join(" "),
+      [
+        customerRecord?.firstName ?? customerRecord?.first_name ?? "",
+        customerRecord?.lastName ?? customerRecord?.last_name ?? "",
+      ].join(" "),
       extractName(shippingAddressRaw),
       extractName(billingAddressRaw),
       orderRaw.contactName,
@@ -553,7 +595,9 @@ export function deriveAnalyticsOrders(
     ];
 
     let resolvedCustomerName = customerNameCandidates
-      .map((candidate) => (typeof candidate === "string" ? candidate.trim() : ""))
+      .map((candidate) =>
+        typeof candidate === "string" ? candidate.trim() : "",
+      )
       .find((candidate) => candidate.length > 0);
 
     if (!resolvedCustomerName) {
@@ -581,10 +625,7 @@ export function deriveAnalyticsOrders(
     return {
       id: orderId,
       orderNumber: String(
-        orderRaw.orderNumber ??
-          orderRaw.name ??
-          orderRaw.shopifyId ??
-          orderId,
+        orderRaw.orderNumber ?? orderRaw.name ?? orderRaw.shopifyId ?? orderId,
       ),
       customer: {
         name: String(resolvedCustomerName),
@@ -600,17 +641,25 @@ export function deriveAnalyticsOrders(
       profitMargin,
       taxAmount,
       shippingCost,
-      paymentMethod: String(txs[0]?.gateway ?? txs[0]?.paymentMethod ?? fallbackPayment ?? ""),
+      paymentMethod: String(
+        txs[0]?.gateway ?? txs[0]?.paymentMethod ?? fallbackPayment ?? "",
+      ),
       tags: tagsArray,
       shippingAddress: {
         city: String(shippingAddress.city ?? shippingAddress.province ?? ""),
-        country: String(shippingAddress.country ?? shippingAddress.countryCode ?? ""),
+        country: String(
+          shippingAddress.country ?? shippingAddress.countryCode ?? "",
+        ),
       },
       createdAt: new Date(
         safeNumber(orderRaw.shopifyCreatedAt ?? orderRaw.createdAt),
       ).toISOString(),
       updatedAt: new Date(
-        safeNumber(orderRaw.shopifyUpdatedAt ?? orderRaw.updatedAt ?? orderRaw.shopifyCreatedAt),
+        safeNumber(
+          orderRaw.shopifyUpdatedAt ??
+            orderRaw.updatedAt ??
+            orderRaw.shopifyCreatedAt,
+        ),
       ).toISOString(),
       lineItems,
     } satisfies AnalyticsOrder;
@@ -663,7 +712,8 @@ function aggregateOrdersMetrics(
     totalTax += order.taxAmount;
     shippingTotal += order.shippingCost;
 
-    const orderCogs = order.lineItems?.reduce((sum, item) => sum + item.cost, 0) ?? 0;
+    const orderCogs =
+      order.lineItems?.reduce((sum, item) => sum + item.cost, 0) ?? 0;
     cogsTotal += orderCogs;
 
     if (isFulfilledStatus(order.fulfillmentStatus)) {
@@ -676,9 +726,11 @@ function aggregateOrdersMetrics(
   }
 
   const totalOrders = orders.length;
-  const grossMargin = totalRevenue > 0 ? ((totalRevenue - cogsTotal) / totalRevenue) * 100 : 0;
+  const grossMargin =
+    totalRevenue > 0 ? ((totalRevenue - cogsTotal) / totalRevenue) * 100 : 0;
   const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-  const fulfillmentRate = totalOrders > 0 ? (fulfilledCount / totalOrders) * 100 : 0;
+  const fulfillmentRate =
+    totalOrders > 0 ? (fulfilledCount / totalOrders) * 100 : 0;
   const avgFulfillmentCost = totalOrders > 0 ? shippingTotal / totalOrders : 0;
   const returnRate = totalOrders > 0 ? (returnCount / totalOrders) * 100 : 0;
   const prepaidRate = 0;
@@ -726,13 +778,20 @@ export function computeOrdersAnalytics(
     } satisfies OrdersAnalyticsResult;
   }
 
-  const { orders: analyticsOrders, refundedOrderIds } = deriveAnalyticsOrders(data);
+  const { orders: analyticsOrders, refundedOrderIds } =
+    deriveAnalyticsOrders(data);
 
   const filtered = analyticsOrders.filter(
-    (order) => matchesStatus(order, options.status) && matchesSearch(order, options.searchTerm),
+    (order) =>
+      matchesStatus(order, options.status) &&
+      matchesSearch(order, options.searchTerm),
   );
 
-  const sorted = sortOrders(filtered, options.sortBy, options.sortOrder ?? "desc");
+  const sorted = sortOrders(
+    filtered,
+    options.sortBy,
+    options.sortOrder ?? "desc",
+  );
 
   const total = sorted.length;
   const pageSize = Math.max(1, options.pageSize ?? 50);
@@ -750,9 +809,14 @@ export function computeOrdersAnalytics(
       const { orders: previousOrders, refundedOrderIds: previousRefunded } =
         deriveAnalyticsOrders(previousData);
       const previousFiltered = previousOrders.filter(
-        (order) => matchesStatus(order, options.status) && matchesSearch(order, options.searchTerm),
+        (order) =>
+          matchesStatus(order, options.status) &&
+          matchesSearch(order, options.searchTerm),
       );
-      previousAggregates = aggregateOrdersMetrics(previousFiltered, previousRefunded);
+      previousAggregates = aggregateOrdersMetrics(
+        previousFiltered,
+        previousRefunded,
+      );
     }
   }
 

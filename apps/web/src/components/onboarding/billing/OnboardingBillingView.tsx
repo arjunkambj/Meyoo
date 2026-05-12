@@ -39,7 +39,7 @@ export default function OnboardingBillingView() {
 
   // Get current shop domain from database
   const shopDomainData = useQuery(
-    api.core.shopDomainHelper.getCurrentShopDomain
+    api.core.shopDomainHelper.getCurrentShopDomain,
   );
 
   // Live onboarding status via shared provider to avoid duplicate queries
@@ -48,7 +48,7 @@ export default function OnboardingBillingView() {
     onboardingStatus?.hasShopifySubscription ?? false;
 
   const [selectedFrequency, setSelectedFrequency] = useState<Frequency>(
-    (frequencies[0] as Frequency) ?? (frequencies[0] as Frequency)
+    (frequencies[0] as Frequency) ?? (frequencies[0] as Frequency),
   );
 
   // Prefetch next pages to make redirects snappy
@@ -90,9 +90,12 @@ export default function OnboardingBillingView() {
       const shopDomain = shopFromUrl || shopDomainData;
 
       if (!shopDomain) {
-        toast.danger("Shopify connection required", { description: "Please connect your Shopify store first", timeout: 5000 });
+        toast.danger("Shopify connection required", {
+          description: "Please connect your Shopify store first",
+          timeout: 5000,
+        });
         console.error(
-          "No shop domain found for billing - ensure Shopify is connected"
+          "No shop domain found for billing - ensure Shopify is connected",
         );
 
         return;
@@ -103,12 +106,16 @@ export default function OnboardingBillingView() {
         "Selecting plan via Shopify Managed Pricing:",
         planName,
         "Shop:",
-        shopDomain
+        shopDomain,
       );
       await upgradePlan(plan, shopDomain, "/onboarding/marketing");
     } catch (error) {
       console.error("Plan upgrade failed:", error);
-      toast.danger("Plan selection failed", { description: error instanceof Error ? error.message : "Please try again", timeout: 5000 });
+      toast.danger("Plan selection failed", {
+        description:
+          error instanceof Error ? error.message : "Please try again",
+        timeout: 5000,
+      });
       // Only clear pending state if we handled the error locally (no redirect)
       setNavigationPending(false);
     } finally {
@@ -119,7 +126,7 @@ export default function OnboardingBillingView() {
   const onFrequencyChange = (selectedKey: React.Key) => {
     const frequencyIndex = frequencies.findIndex((f) => f.key === selectedKey);
     setSelectedFrequency(
-      (frequencies[frequencyIndex] ?? frequencies[0]) as Frequency
+      (frequencies[frequencyIndex] ?? frequencies[0]) as Frequency,
     );
   };
 
@@ -154,7 +161,7 @@ export default function OnboardingBillingView() {
           isSelected={selectedFrequency.key === FrequencyEnum.Yearly}
           onChange={(isSelected) => {
             onFrequencyChange(
-              isSelected ? FrequencyEnum.Yearly : FrequencyEnum.Monthly
+              isSelected ? FrequencyEnum.Yearly : FrequencyEnum.Monthly,
             );
           }}
           size="sm"
@@ -192,16 +199,11 @@ export default function OnboardingBillingView() {
                         ? "Continue with Free"
                         : "Select Free Plan"
                       : `Select ${tier.title}`,
-                color: isActive
-                  ? "success"
-                  : tier.key === TiersEnum.Free
-                    ? "default"
-                    : "primary",
                 variant: isActive
-                  ? "solid"
+                  ? "secondary"
                   : tier.key === TiersEnum.Free
-                    ? "flat"
-                    : "flat",
+                    ? "tertiary"
+                    : "primary",
                 disabled: isActive || isLoadingTier,
                 isLoading: isLoadingTier,
                 endContent:
@@ -231,9 +233,10 @@ export default function OnboardingBillingView() {
               growth: "Growth Plan",
               business: "Business Plan",
             };
-            const label = hasShopifySubscription && currentPlan
-              ? map[String(currentPlan)] || String(currentPlan)
-              : null;
+            const label =
+              hasShopifySubscription && currentPlan
+                ? map[String(currentPlan)] || String(currentPlan)
+                : null;
             return `Current Plan: ${label ?? "Not selected"}`;
           })()}
         </Chip>

@@ -15,9 +15,9 @@ export const getShopTimeInfo = action({
     timezoneIana: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    let orgId: Id<"organizations"> | undefined = args.organizationId as Id<
-      "organizations"
-    > | undefined;
+    let orgId: Id<"organizations"> | undefined = args.organizationId as
+      | Id<"organizations">
+      | undefined;
 
     if (!orgId) {
       const auth = await getUserAndOrg(ctx);
@@ -25,7 +25,11 @@ export const getShopTimeInfo = action({
     }
 
     if (!orgId) {
-      return { offsetMinutes: 0, timezoneAbbreviation: undefined, timezoneIana: undefined };
+      return {
+        offsetMinutes: 0,
+        timezoneAbbreviation: undefined,
+        timezoneIana: undefined,
+      };
     }
 
     const info = await fetchShopTimeInfo(ctx, String(orgId));
@@ -49,10 +53,13 @@ export const refreshOrganizationTimezone = internalAction({
     try {
       const info = await fetchShopTimeInfo(ctx, String(args.organizationId));
       if (info.timezoneIana) {
-        await ctx.runMutation(internal.core.organizations.setOrganizationTimezoneInternal, {
-          organizationId: args.organizationId,
-          timezone: info.timezoneIana,
-        });
+        await ctx.runMutation(
+          internal.core.organizations.setOrganizationTimezoneInternal,
+          {
+            organizationId: args.organizationId,
+            timezone: info.timezoneIana,
+          },
+        );
         return {
           success: true,
           timezone: info.timezoneIana,

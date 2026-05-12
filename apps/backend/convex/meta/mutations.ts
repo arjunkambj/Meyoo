@@ -27,7 +27,9 @@ export const connectMeta = mutation({
       platform: "meta",
       accessToken: args.accessToken,
       refreshToken: args.refreshToken,
-      expiresAt: args.expiresIn ? Date.now() + args.expiresIn * 1000 : undefined,
+      expiresAt: args.expiresIn
+        ? Date.now() + args.expiresIn * 1000
+        : undefined,
       scope: args.scope,
       accountId: args.userId,
       accountName: args.userName,
@@ -64,13 +66,13 @@ export const connectMeta = mutation({
       .first();
 
     if (onboarding) {
-      await ctx.db.patch(onboarding._id, {
+      await ctx.db.patch("onboarding", onboarding._id, {
         hasMetaConnection: true,
         updatedAt: Date.now(),
       });
     }
 
-    await ctx.db.patch(user._id, { updatedAt: Date.now() });
+    await ctx.db.patch("users", user._id, { updatedAt: Date.now() });
 
     return { success: true };
   },
@@ -95,11 +97,14 @@ export const setPrimaryAdAccount = mutation({
     const currentPrimary = accounts.find((acc) => acc.isPrimary);
 
     if (!target.isPrimary) {
-      await ctx.db.patch(target._id, { isPrimary: true, updatedAt: Date.now() });
+      await ctx.db.patch("metaAdAccounts", target._id, {
+        isPrimary: true,
+        updatedAt: Date.now(),
+      });
     }
 
     if (currentPrimary && currentPrimary._id !== target._id) {
-      await ctx.db.patch(currentPrimary._id, {
+      await ctx.db.patch("metaAdAccounts", currentPrimary._id, {
         isPrimary: false,
         updatedAt: Date.now(),
       });
@@ -115,7 +120,7 @@ export const setPrimaryAdAccount = mutation({
       .first();
 
     if (onboarding && onboarding.onboardingStep === 4) {
-      await ctx.db.patch(onboarding._id, {
+      await ctx.db.patch("onboarding", onboarding._id, {
         onboardingStep: 5,
         updatedAt: Date.now(),
       });
@@ -133,22 +138,18 @@ export const setPrimaryAdAccount = mutation({
         .first();
 
       const oneHourAgo = Date.now() - 60 * 60 * 1000;
-      const shouldSync = !recentSync?.syncedAt || recentSync.syncedAt < oneHourAgo;
+      const shouldSync =
+        !recentSync?.syncedAt || recentSync.syncedAt < oneHourAgo;
 
       if (shouldSync) {
         try {
-          await createJob(
-            ctx as any,
-            "sync:initial",
-            PRIORITY.HIGH,
-            {
-              organizationId: orgId as Id<"organizations">,
-              platform: "meta",
-              syncType: "initial",
-              dateRange: { daysBack: 60 },
-              accountId: args.accountId,
-            } as SyncJobData,
-          );
+          await createJob(ctx as any, "sync:initial", PRIORITY.HIGH, {
+            organizationId: orgId as Id<"organizations">,
+            platform: "meta",
+            syncType: "initial",
+            dateRange: { daysBack: 60 },
+            accountId: args.accountId,
+          } as SyncJobData);
           jobScheduled = true;
         } catch (error) {
           console.warn("[Meta] Failed to schedule initial fetch job", error);
@@ -166,19 +167,22 @@ export const storeAdAccountsFromCallback = mutation({
   handler: async (ctx, args) => {
     const { orgId } = await requireUserAndOrg(ctx);
 
-    const normalized = (args.accounts as MetaAdAccount[]).map((account) => ({
-      id: account.id,
-      name: account.name,
-      currency: account.currency,
-      timezone_name: account.timezone ?? account.timezone_name,
-      account_status: account.accountStatus ?? account.account_status,
-      spend_cap: account.spendCap ?? account.spend_cap,
-      amount_spent: account.amountSpent ?? account.amount_spent,
-      business_id: account.business_id ?? account.business?.id,
-      business_name: account.business_name ?? account.business?.name,
-      timezone_offset_hours_utc: account.timezone_offset_hours_utc,
-      disable_reason: account.disable_reason,
-    } as MetaAdAccount));
+    const normalized = (args.accounts as MetaAdAccount[]).map(
+      (account) =>
+        ({
+          id: account.id,
+          name: account.name,
+          currency: account.currency,
+          timezone_name: account.timezone ?? account.timezone_name,
+          account_status: account.accountStatus ?? account.account_status,
+          spend_cap: account.spendCap ?? account.spend_cap,
+          amount_spent: account.amountSpent ?? account.amount_spent,
+          business_id: account.business_id ?? account.business?.id,
+          business_name: account.business_name ?? account.business?.name,
+          timezone_offset_hours_utc: account.timezone_offset_hours_utc,
+          disable_reason: account.disable_reason,
+        }) as MetaAdAccount,
+    );
 
     await storeAdAccounts(ctx as any, orgId as Id<"organizations">, normalized);
 

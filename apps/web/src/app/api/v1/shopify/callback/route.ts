@@ -59,28 +59,30 @@ export async function GET(req: NextRequest) {
       (session.scope || "")
         .split(",")
         .map((s) => s.trim())
-        .filter(Boolean)
+        .filter(Boolean),
     );
 
     // Normalize scopes: if write_products is granted, consider read_products as granted too
     const normalizedScopes = new Set(grantedScopes);
-    if (grantedScopes.has('write_products')) {
-      normalizedScopes.add('read_products');
+    if (grantedScopes.has("write_products")) {
+      normalizedScopes.add("read_products");
     }
-    if (grantedScopes.has('write_orders')) {
-      normalizedScopes.add('read_orders');
+    if (grantedScopes.has("write_orders")) {
+      normalizedScopes.add("read_orders");
     }
 
     // Check if all configured scopes are granted (using normalized set)
-    const missingScopes = configuredScopes.filter(scope => !normalizedScopes.has(scope));
-    
+    const missingScopes = configuredScopes.filter(
+      (scope) => !normalizedScopes.has(scope),
+    );
+
     // Only log scopes in debug mode
     if (SHOPIFY_WEBHOOK_DEBUG) {
-      logger.info("Scope validation", { 
+      logger.info("Scope validation", {
         configured: configuredScopes,
         granted: Array.from(grantedScopes),
         normalized: Array.from(normalizedScopes),
-        missing: missingScopes 
+        missing: missingScopes,
       });
     }
 
@@ -90,19 +92,23 @@ export async function GET(req: NextRequest) {
         missing: missingScopes,
         granted: Array.from(grantedScopes),
         normalized: Array.from(normalizedScopes),
-        shop: session.shop
+        shop: session.shop,
       });
-      
+
       // For critical missing scopes, we should request a re-authorization
-      const criticalMissing = missingScopes.filter(s => 
-        s === 'read_products' || s === 'read_orders'
+      const criticalMissing = missingScopes.filter(
+        (s) => s === "read_products" || s === "read_orders",
       );
-      
-      if (criticalMissing.length > 0 && !normalizedScopes.has('write_products') && !normalizedScopes.has('write_orders')) {
+
+      if (
+        criticalMissing.length > 0 &&
+        !normalizedScopes.has("write_products") &&
+        !normalizedScopes.has("write_orders")
+      ) {
         // Only fail if we don't have the write permissions either
         logger.error("Critical scopes missing, app needs reinstallation", {
           critical: criticalMissing,
-          shop: session.shop
+          shop: session.shop,
         });
       }
     }
@@ -125,7 +131,6 @@ export async function GET(req: NextRequest) {
 
       // Before connecting, check if this shop already belongs to a different organization
       const shopDomain = normalizeShopDomain(session.shop);
-
 
       try {
         const { fetchQuery } = await import("convex/nextjs");
@@ -194,7 +199,11 @@ export async function GET(req: NextRequest) {
       // Success logging only in debug mode
       if (SHOPIFY_WEBHOOK_DEBUG) {
         const userTag = tagFromToken(token) || "anon";
-        logger.info("Shopify connected", { user: userTag, connected: true, requestId });
+        logger.info("Shopify connected", {
+          user: userTag,
+          connected: true,
+          requestId,
+        });
       }
 
       // Decide next step based on billing state
@@ -218,17 +227,14 @@ export async function GET(req: NextRequest) {
 
       const _provision = await withRetry(
         () =>
-          fetchMutation(
-            api.installations.createOrAttachFromShopifyOAuth,
-            {
-              shop: session.shop,
-              accessToken: session.accessToken || "",
-              scope: session.scope || "",
-              shopData,
-              nonce,
-              sig,
-            },
-          ),
+          fetchMutation(api.installations.createOrAttachFromShopifyOAuth, {
+            shop: session.shop,
+            accessToken: session.accessToken || "",
+            scope: session.scope || "",
+            shopData,
+            nonce,
+            sig,
+          }),
         "provisioning user/org",
       );
 

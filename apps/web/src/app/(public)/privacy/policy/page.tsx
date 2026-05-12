@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, Separator } from "@heroui/react";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
@@ -91,11 +89,11 @@ export default function PrivacyPage() {
               icon="solar:shield-check-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-medium text-muted">
-              Legal
-            </span>
+            <span className="text-sm font-medium text-muted">Legal</span>
           </div>
-          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Privacy Policy</h1>
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">
+            Privacy Policy
+          </h1>
           <p className="text-base text-muted sm:text-lg">
             Last updated: {lastUpdated}
           </p>
@@ -248,8 +246,8 @@ export default function PrivacyPage() {
                     abuse, and security incidents
                   </li>
                   <li>
-                    • <strong>Compliance:</strong> To meet legal obligations
-                    and enforce our terms
+                    • <strong>Compliance:</strong> To meet legal obligations and
+                    enforce our terms
                   </li>
                   <li>
                     • <strong>Analytics:</strong> To understand usage patterns
@@ -392,9 +390,7 @@ export default function PrivacyPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-medium mb-3">
-                        Technical Safeguards
-                      </h3>
+                      <h3 className="font-medium mb-3">Technical Safeguards</h3>
                       <ul className="space-y-1 text-sm">
                         <li>• 256-bit SSL encryption</li>
                         <li>• Encrypted data storage</li>
@@ -406,9 +402,7 @@ export default function PrivacyPage() {
 
                   <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-6">
-                      <h3 className="font-medium mb-3">
-                        Operational Security
-                      </h3>
+                      <h3 className="font-medium mb-3">Operational Security</h3>
                       <ul className="space-y-1 text-sm">
                         <li>• Access controls and authentication</li>
                         <li>• Regular backups</li>
@@ -441,9 +435,7 @@ export default function PrivacyPage() {
                 <div className="space-y-3 transition-transform">
                   <Card className="bg-surface rounded-[2rem] shadow-none">
                     <Card.Content className="p-4">
-                      <h3 className="font-medium mb-2">
-                        Access & Portability
-                      </h3>
+                      <h3 className="font-medium mb-2">Access & Portability</h3>
                       <p className="text-sm">
                         Request a copy of your personal data in a structured,
                         machine-readable format.
@@ -511,9 +503,7 @@ export default function PrivacyPage() {
 
                 <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-medium mb-3">
-                      Data Usage Limitations
-                    </h3>
+                    <h3 className="font-medium mb-3">Data Usage Limitations</h3>
                     <ul className="space-y-2 text-sm">
                       <li>
                         • We only access data necessary for providing our
@@ -525,8 +515,7 @@ export default function PrivacyPage() {
                       </li>
                       <li>• We do not contact your customers directly</li>
                       <li>
-                        • We do not share your Shopify data with other
-                        merchants
+                        • We do not share your Shopify data with other merchants
                       </li>
                     </ul>
                   </Card.Content>
@@ -553,10 +542,7 @@ export default function PrivacyPage() {
             {/* Meta Platform Compliance */}
             <section id="meta-compliance">
               <h2 className="text-2xl font-medium mb-3 flex items-center gap-2">
-                <Icon
-                  className="w-6 h-6 text-accent"
-                  icon="logos:meta-icon"
-                />
+                <Icon className="w-6 h-6 text-accent" icon="logos:meta-icon" />
                 Meta Platform Compliance
               </h2>
               <div className="space-y-4 text-muted">
@@ -572,8 +558,7 @@ export default function PrivacyPage() {
                     </h3>
                     <ul className="space-y-2 text-sm">
                       <li>
-                        • We only request permissions necessary for our
-                        services
+                        • We only request permissions necessary for our services
                       </li>
                       <li>
                         • Ad data is used exclusively for analytics and
@@ -583,8 +568,8 @@ export default function PrivacyPage() {
                         • We do not store Meta user passwords or credentials
                       </li>
                       <li>
-                        • We comply with Meta&apos;s data retention and
-                        deletion policies
+                        • We comply with Meta&apos;s data retention and deletion
+                        policies
                       </li>
                       <li>
                         • We follow all Facebook Business SDK guidelines and
@@ -613,8 +598,7 @@ export default function PrivacyPage() {
                         measures as Facebook data
                       </li>
                       <li>
-                        • We comply with Instagram Platform Policy
-                        requirements
+                        • We comply with Instagram Platform Policy requirements
                       </li>
                     </ul>
                   </Card.Content>
@@ -625,12 +609,11 @@ export default function PrivacyPage() {
                     <h3 className="font-medium mb-3">Prohibited Uses</h3>
                     <ul className="space-y-2 text-sm">
                       <li>
-                        • We do not sell or transfer Meta data to third
-                        parties
+                        • We do not sell or transfer Meta data to third parties
                       </li>
                       <li>
-                        • We do not use data for surveillance or
-                        discriminatory purposes
+                        • We do not use data for surveillance or discriminatory
+                        purposes
                       </li>
                       <li>
                         • We do not create derivative databases from Meta data
@@ -685,21 +668,19 @@ export default function PrivacyPage() {
               <div className="space-y-4">
                 <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-medium mb-3">
-                      GDPR (European Users)
-                    </h3>
+                    <h3 className="font-medium mb-3">GDPR (European Users)</h3>
                     <ul className="space-y-2 text-sm text-muted">
                       <li>
-                        • <strong>Legal Basis:</strong> Legitimate interests
-                        and consent
+                        • <strong>Legal Basis:</strong> Legitimate interests and
+                        consent
                       </li>
                       <li>
                         • <strong>Data Controller:</strong> Pyro Labs Private
                         Limited
                       </li>
                       <li>
-                        • <strong>Data Retention:</strong> As long as account
-                        is active + 90 days
+                        • <strong>Data Retention:</strong> As long as account is
+                        active + 90 days
                       </li>
                       <li>
                         • <strong>International Transfers:</strong> Standard
@@ -719,12 +700,12 @@ export default function PrivacyPage() {
                     </h3>
                     <ul className="space-y-2 text-sm text-muted">
                       <li>
-                        • <strong>Right to Know:</strong> Request disclosure
-                        of data collected
+                        • <strong>Right to Know:</strong> Request disclosure of
+                        data collected
                       </li>
                       <li>
-                        • <strong>Right to Delete:</strong> Request deletion
-                        of personal information
+                        • <strong>Right to Delete:</strong> Request deletion of
+                        personal information
                       </li>
                       <li>
                         • <strong>Right to Opt-Out:</strong> We do not sell
@@ -769,8 +750,8 @@ export default function PrivacyPage() {
                         management and reporting
                       </li>
                       <li>
-                        • Customer data is processed according to
-                        Google&apos;s Customer Data Usage policies
+                        • Customer data is processed according to Google&apos;s
+                        Customer Data Usage policies
                       </li>
                       <li>
                         • We implement required minimum functionality for app
@@ -794,16 +775,16 @@ export default function PrivacyPage() {
                     </h3>
                     <ul className="space-y-2 text-sm">
                       <li>
-                        • We only upload first-party customer data that you
-                        have collected directly
+                        • We only upload first-party customer data that you have
+                        collected directly
                       </li>
                       <li>
                         • Customer Match data is hashed and encrypted before
                         transmission
                       </li>
                       <li>
-                        • We comply with minimum user thresholds for
-                        remarketing audiences
+                        • We comply with minimum user thresholds for remarketing
+                        audiences
                       </li>
                       <li>
                         • User consent is verified before any data upload to
@@ -824,8 +805,8 @@ export default function PrivacyPage() {
                     </h3>
                     <ul className="space-y-2 text-sm">
                       <li>
-                        • Google Ads data is retained only as long as
-                        necessary for service provision
+                        • Google Ads data is retained only as long as necessary
+                        for service provision
                       </li>
                       <li>
                         • Campaign data is deleted within 90 days of account
@@ -836,8 +817,8 @@ export default function PrivacyPage() {
                         request
                       </li>
                       <li>
-                        • We comply with Google&apos;s data retention limits
-                        for different data types
+                        • We comply with Google&apos;s data retention limits for
+                        different data types
                       </li>
                     </ul>
                   </Card.Content>
@@ -850,8 +831,8 @@ export default function PrivacyPage() {
                     </h3>
                     <ul className="space-y-2 text-sm">
                       <li>
-                        • We implement policy validation parameter handling
-                        for ad creatives
+                        • We implement policy validation parameter handling for
+                        ad creatives
                       </li>
                       <li>
                         • Policy violation exemptions are requested only when
@@ -899,8 +880,8 @@ export default function PrivacyPage() {
                         consent and proper scopes
                       </li>
                       <li>
-                        • We do not access customer personal information
-                        beyond what&apos;s necessary for analytics
+                        • We do not access customer personal information beyond
+                        what&apos;s necessary for analytics
                       </li>
                       <li>
                         • All customer data is aggregated and anonymized for
@@ -910,8 +891,8 @@ export default function PrivacyPage() {
                         • We do not contact merchants&apos; customers directly
                       </li>
                       <li>
-                        • Store data is not shared with other merchants or
-                        third parties
+                        • Store data is not shared with other merchants or third
+                        parties
                       </li>
                     </ul>
                   </Card.Content>
@@ -928,8 +909,7 @@ export default function PrivacyPage() {
                         guidelines
                       </li>
                       <li>
-                        • Our app undergoes regular security audits and
-                        updates
+                        • Our app undergoes regular security audits and updates
                       </li>
                       <li>
                         • We respond to Shopify audit requests within required
@@ -962,12 +942,12 @@ export default function PrivacyPage() {
                         required timeframes
                       </li>
                       <li>
-                        • API usage complies with Shopify&apos;s rate limits
-                        and best practices
+                        • API usage complies with Shopify&apos;s rate limits and
+                        best practices
                       </li>
                       <li>
-                        • We validate webhook authenticity using
-                        Shopify&apos;s verification methods
+                        • We validate webhook authenticity using Shopify&apos;s
+                        verification methods
                       </li>
                     </ul>
                   </Card.Content>

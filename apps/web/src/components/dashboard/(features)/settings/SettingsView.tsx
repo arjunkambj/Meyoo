@@ -41,7 +41,6 @@ export default function SettingsView() {
         <div className="h-2" />
 
         <Tabs
-          destroyInactiveTabPanel={false}
           selectedKey={selectedTab}
           variant="primary"
           onSelectionChange={handleSelectionChange}
@@ -49,31 +48,34 @@ export default function SettingsView() {
           <Tabs.ListContainer>
             <Tabs.List aria-label="Settings sections">
               <Tabs.Tab id="general">
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:user-bold-duotone" width={18} />
-                <span>General</span>
-              </div>
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:user-bold-duotone" width={18} />
+                  <span>General</span>
+                </div>
                 <Tabs.Indicator />
               </Tabs.Tab>
               <Tabs.Tab id="billing">
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:card-bold-duotone" width={18} />
-                <span>Billing &amp; Invoices</span>
-              </div>
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:card-bold-duotone" width={18} />
+                  <span>Billing &amp; Invoices</span>
+                </div>
                 <Tabs.Indicator />
               </Tabs.Tab>
               <Tabs.Tab id="team">
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:users-group-rounded-bold-duotone" width={18} />
-                <span>Team</span>
-              </div>
+                <div className="flex items-center gap-2">
+                  <Icon
+                    icon="solar:users-group-rounded-bold-duotone"
+                    width={18}
+                  />
+                  <span>Team</span>
+                </div>
                 <Tabs.Indicator />
               </Tabs.Tab>
               <Tabs.Tab id="support">
-              <div className="flex items-center gap-2">
-                <Icon icon="solar:question-circle-bold-duotone" width={18} />
-                <span>Help &amp; Support</span>
-              </div>
+                <div className="flex items-center gap-2">
+                  <Icon icon="solar:question-circle-bold-duotone" width={18} />
+                  <span>Help &amp; Support</span>
+                </div>
                 <Tabs.Indicator />
               </Tabs.Tab>
             </Tabs.List>

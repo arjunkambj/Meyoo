@@ -24,7 +24,7 @@ function toComparableId(id: Id<"organizations">): string {
 
 export async function resolveOrgIdForContext(
   ctx: AnyActionCtx,
-  { organizationId, shopDomain, url }: OrgResolutionContext = {}
+  { organizationId, shopDomain, url }: OrgResolutionContext = {},
 ): Promise<ResolutionResult> {
   const auth = await getUserAndOrg(ctx);
 
@@ -45,7 +45,7 @@ export async function resolveOrgIdForContext(
   if (normalizedShopDomain) {
     storeOrgId = await ctx.runQuery(
       api.core.organizationLookup.getOrganizationByShopDomain,
-      { shopDomain: normalizedShopDomain }
+      { shopDomain: normalizedShopDomain },
     );
 
     if (!storeOrgId) {
@@ -53,8 +53,11 @@ export async function resolveOrgIdForContext(
     }
   }
 
-  const candidates = [auth?.orgId ?? null, organizationId ?? null, storeOrgId]
-    .filter(Boolean) as Array<Id<"organizations">>;
+  const candidates = [
+    auth?.orgId ?? null,
+    organizationId ?? null,
+    storeOrgId,
+  ].filter(Boolean) as Array<Id<"organizations">>;
 
   if (candidates.length === 0) {
     throw new ConvexError("Not authenticated");

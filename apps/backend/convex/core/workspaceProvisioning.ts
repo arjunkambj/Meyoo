@@ -28,7 +28,7 @@ export async function createNewUserData(
     updatedAt: now,
   });
 
-  await ctx.db.patch(userId, {
+  await ctx.db.patch("users", userId, {
     organizationId: orgId,
     status: "active",
     isOnboarded: false,

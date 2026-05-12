@@ -11,7 +11,8 @@ import { siteConfig } from "@/constants/config/site";
 
 const description =
   "Meyoo gives D2C teams one clean view of revenue, ad spend, costs, and true profit.";
-const ogImageUrl = "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNnKyY0SOVxEvhuNrTFGK39MspOgHXizj2kSPl";
+const ogImageUrl =
+  "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNnKyY0SOVxEvhuNrTFGK39MspOgHXizj2kSPl";
 
 const inter = Inter({
   subsets: ["latin"],

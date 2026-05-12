@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { designSystem } from "@/libs/design-system";
@@ -23,9 +21,7 @@ const values = [
   },
 ];
 
-const milestones = [
-  { year: "October 2025", event: "Public launch" },
-];
+const milestones = [{ year: "October 2025", event: "Public launch" }];
 
 export default function AboutPage() {
   return (
@@ -44,7 +40,9 @@ export default function AboutPage() {
           <p className={designSystem.typography.sectionSubtitle}>
             Helping e‑commerce brands track what really matters.
             <br />
-            <span className="text-accent font-medium">Launching October 2025</span>
+            <span className="text-accent font-medium">
+              Launching October 2025
+            </span>
           </p>
         </div>
       </section>
@@ -54,7 +52,9 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto">
           {/* Our Story */}
           <div className="mb-8">
-            <h2 className="text-2xl font-medium mb-6 text-foreground">Our Story</h2>
+            <h2 className="text-2xl font-medium mb-6 text-foreground">
+              Our Story
+            </h2>
             <Card className="rounded-[2rem] bg-surface shadow-none">
               <Card.Content className="p-6 sm:p-8">
                 <div className="space-y-4 text-muted leading-relaxed">
@@ -79,7 +79,9 @@ export default function AboutPage() {
 
           {/* Our Values */}
           <div className="mb-8">
-            <h2 className="text-2xl font-medium mb-6 text-foreground">Values</h2>
+            <h2 className="text-2xl font-medium mb-6 text-foreground">
+              Values
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {values.map((value) => (
                 <Card
@@ -110,7 +112,9 @@ export default function AboutPage() {
 
           {/* Timeline */}
           <div className="mb-8">
-            <h2 className="text-2xl font-medium mb-6 text-foreground">Timeline</h2>
+            <h2 className="text-2xl font-medium mb-6 text-foreground">
+              Timeline
+            </h2>
             <div className="space-y-4">
               {milestones.map((milestone) => (
                 <div
@@ -120,7 +124,10 @@ export default function AboutPage() {
                   <div className="w-16 text-accent font-bold">
                     {milestone.year}
                   </div>
-                  <Separator className="h-6 bg-surface-secondary" orientation="vertical" />
+                  <Separator
+                    className="h-6 bg-surface-secondary"
+                    orientation="vertical"
+                  />
                   <p className="text-muted">{milestone.event}</p>
                 </div>
               ))}
@@ -153,9 +160,13 @@ export default function AboutPage() {
                   Be first to try Meyoo
                 </h3>
                 <p className="text-muted mb-6">
-                  Launching October 2025 — join the waitlist and we’ll notify you when we open access.
+                  Launching October 2025 — join the waitlist and we’ll notify
+                  you when we open access.
                 </p>
-                <CTAButton endIcon="solar:alt-arrow-right-linear" href="/signup">
+                <CTAButton
+                  endIcon="solar:alt-arrow-right-linear"
+                  href="/signup"
+                >
                   Join the waitlist
                 </CTAButton>
               </Card.Content>

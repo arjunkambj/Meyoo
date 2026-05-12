@@ -54,7 +54,7 @@ export const updateDashboardLayout = mutation({
 
     if (userDashboard) {
       // Update existing user-specific dashboard
-      await ctx.db.patch(userDashboard._id, {
+      await ctx.db.patch("dashboards", userDashboard._id, {
         config: {
           kpis: args.kpis,
           widgets: args.widgets,

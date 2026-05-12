@@ -44,7 +44,10 @@ export function msToDateString(
     }
   }
 
-  if (typeof options?.offsetMinutes === "number" && Number.isFinite(options.offsetMinutes)) {
+  if (
+    typeof options?.offsetMinutes === "number" &&
+    Number.isFinite(options.offsetMinutes)
+  ) {
     return formatDateWithOffset(date, options.offsetMinutes);
   }
 
@@ -82,7 +85,8 @@ function utcMidnightForLocalDate(
   const year = Number(yearStr);
   const month = Number(monthStr);
   const day = Number(dayStr);
-  const offsetMinutes = typeof options?.offsetMinutes === "number" ? options.offsetMinutes : 0;
+  const offsetMinutes =
+    typeof options?.offsetMinutes === "number" ? options.offsetMinutes : 0;
 
   return new Date(Date.UTC(year, month - 1, day) - offsetMinutes * 60_000);
 }

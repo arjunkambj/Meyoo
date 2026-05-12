@@ -9,7 +9,7 @@ Convex backend layout
 - meyoo — admin APIs used by the Meyoo backoffice
 - webhooks — HTTP handlers for Shopify + GDPR
 - sync — HTTP endpoints for sync triggers (manual sync disabled)
-- _generated — convex generated types (do not edit)
+- \_generated — convex generated types (do not edit)
 
 Conventions
 

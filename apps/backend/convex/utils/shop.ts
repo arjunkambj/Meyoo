@@ -1,8 +1,5 @@
 import type { Doc } from "../_generated/dataModel";
-import type {
-  DatabaseReader,
-  DatabaseWriter,
-} from "../_generated/server";
+import type { DatabaseReader, DatabaseWriter } from "../_generated/server";
 
 // Utilities for handling Shopify shop domains consistently
 // Normalize to a canonical form: lowercase, no protocol, no trailing slash

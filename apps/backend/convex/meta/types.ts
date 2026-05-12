@@ -59,4 +59,3 @@ export interface MetaCampaign {
   created_time?: string;
   updated_time?: string;
 }
-

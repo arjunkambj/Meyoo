@@ -116,16 +116,13 @@ export const handleInitialSync = internalAction({
 
       switch (args.platform) {
         case "shopify":
-          result = (await ctx.runAction(
-            internal.shopify.sync.initial,
-            {
-              organizationId: args.organizationId,
-              dateRange: {
-                daysBack: args.dateRange?.daysBack || 60,
-              },
-              syncSessionId: sessionId as Id<"syncSessions">,
+          result = (await ctx.runAction(internal.shopify.sync.initial, {
+            organizationId: args.organizationId,
+            dateRange: {
+              daysBack: args.dateRange?.daysBack || 60,
             },
-          )) as any;
+            syncSessionId: sessionId as Id<"syncSessions">,
+          })) as any;
           // Ensure platform field present
           result = { ...result, platform: args.platform };
 
@@ -193,16 +190,13 @@ export const handleInitialSync = internalAction({
           }
           break;
         case "meta":
-          result = (await ctx.runAction(
-            internal.meta.sync.initial,
-            {
-              organizationId: args.organizationId,
-              accountId: args.accountId,
-              dateRange: {
-                daysBack: args.dateRange?.daysBack || 60,
-              },
+          result = (await ctx.runAction(internal.meta.sync.initial, {
+            organizationId: args.organizationId,
+            accountId: args.accountId,
+            dateRange: {
+              daysBack: args.dateRange?.daysBack || 60,
             },
-          )) as any;
+          })) as any;
           result = { ...result, platform: args.platform };
           break;
 
@@ -217,7 +211,9 @@ export const handleInitialSync = internalAction({
           recordsProcessed: result.recordsProcessed || 0,
           completedAt: Date.now(),
           duration: Date.now() - startTime,
-          error: result.success ? undefined : result.error || result.errors?.[0],
+          error: result.success
+            ? undefined
+            : result.error || result.errors?.[0],
         });
       }
 
@@ -323,12 +319,15 @@ export const handleShopifyOrdersBatch = internalAction({
 
     try {
       if (args.orders.length > 0) {
-        await ctx.runMutation(internal.shopify.orderMutations.storeOrdersInternal, {
-          organizationId: args.organizationId,
-          storeId: args.storeId,
-          orders: args.orders as any,
-          shouldScheduleAnalytics: await ensureAnalyticsEligibility(),
-        });
+        await ctx.runMutation(
+          internal.shopify.orderMutations.storeOrdersInternal,
+          {
+            organizationId: args.organizationId,
+            storeId: args.storeId,
+            orders: args.orders as any,
+            shouldScheduleAnalytics: await ensureAnalyticsEligibility(),
+          },
+        );
       }
 
       if (args.transactions && args.transactions.length > 0) {
@@ -343,11 +342,14 @@ export const handleShopifyOrdersBatch = internalAction({
       }
 
       if (args.refunds && args.refunds.length > 0) {
-        await ctx.runMutation(internal.shopify.orderMutations.storeRefundsInternal, {
-          organizationId: args.organizationId,
-          refunds: args.refunds as any,
-          shouldScheduleAnalytics: await ensureAnalyticsEligibility(),
-        });
+        await ctx.runMutation(
+          internal.shopify.orderMutations.storeRefundsInternal,
+          {
+            organizationId: args.organizationId,
+            refunds: args.refunds as any,
+            shouldScheduleAnalytics: await ensureAnalyticsEligibility(),
+          },
+        );
       }
 
       if (args.fulfillments && args.fulfillments.length > 0) {
@@ -383,13 +385,16 @@ export const handleShopifyOrdersBatch = internalAction({
           progress.totalBatches > 0 &&
           progress.completedBatches >= progress.totalBatches
         ) {
-          await ctx.runMutation(internal.jobs.helpers.patchSyncSessionMetadata, {
-            sessionId: args.syncSessionId,
-            metadata: {
-              stageStatus: { orders: "completed" },
-              syncedEntities: ["orders"],
+          await ctx.runMutation(
+            internal.jobs.helpers.patchSyncSessionMetadata,
+            {
+              sessionId: args.syncSessionId,
+              metadata: {
+                stageStatus: { orders: "completed" },
+                syncedEntities: ["orders"],
+              },
             },
-          });
+          );
 
           await ctx.runMutation(internal.jobs.helpers.updateSyncSession, {
             sessionId: args.syncSessionId,
@@ -399,17 +404,20 @@ export const handleShopifyOrdersBatch = internalAction({
             duration: Date.now() - (progress.startedAt || Date.now()),
           });
 
-          await ctx.runMutation(internal.engine.syncJobs.onInitialSyncComplete, {
-            workId: `shopifyOrdersBatch:${String(args.syncSessionId)}:${args.batchNumber}`,
-            context: {
-              organizationId: args.organizationId,
-              platform: "shopify",
-              sessionId: args.syncSessionId,
+          await ctx.runMutation(
+            internal.engine.syncJobs.onInitialSyncComplete,
+            {
+              workId: `shopifyOrdersBatch:${String(args.syncSessionId)}:${args.batchNumber}`,
+              context: {
+                organizationId: args.organizationId,
+                platform: "shopify",
+                sessionId: args.syncSessionId,
+              },
+              result: {
+                recordsProcessed: progress.recordsProcessed,
+              },
             },
-            result: {
-              recordsProcessed: progress.recordsProcessed,
-            },
-          });
+          );
 
           await ctx.runMutation(
             internal.core.onboarding.triggerMonitorIfOnboardingComplete,
@@ -427,8 +435,12 @@ export const handleShopifyOrdersBatch = internalAction({
         duration: Date.now() - start,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`[BATCH] Batch ${args.batchNumber} failed for org ${args.organizationId}:`, errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error(
+        `[BATCH] Batch ${args.batchNumber} failed for org ${args.organizationId}:`,
+        errorMessage,
+      );
 
       if (args.syncSessionId) {
         // Still increment progress even on failure so session can eventually complete
@@ -438,21 +450,26 @@ export const handleShopifyOrdersBatch = internalAction({
           {
             sessionId: args.syncSessionId,
             batchesCompletedDelta: 1, // Count as "completed" (even if failed)
-            recordsProcessedDelta: 0,  // Don't count records since they failed
+            recordsProcessedDelta: 0, // Don't count records since they failed
           },
         );
 
-        console.error(`[BATCH] Updated progress despite failure: ${progress?.completedBatches}/${progress?.totalBatches} batches`);
+        console.error(
+          `[BATCH] Updated progress despite failure: ${progress?.completedBatches}/${progress?.totalBatches} batches`,
+        );
 
         // If this was the last batch, mark stage as failed
         if (progress && progress.completedBatches >= progress.totalBatches) {
-          await ctx.runMutation(internal.jobs.helpers.patchSyncSessionMetadata, {
-            sessionId: args.syncSessionId,
-            metadata: {
-              stageStatus: { orders: "failed" },
-              lastBatchError: errorMessage,
-            } as any,
-          });
+          await ctx.runMutation(
+            internal.jobs.helpers.patchSyncSessionMetadata,
+            {
+              sessionId: args.syncSessionId,
+              metadata: {
+                stageStatus: { orders: "failed" },
+                lastBatchError: errorMessage,
+              } as any,
+            },
+          );
           await ctx.runMutation(internal.jobs.helpers.updateSyncSession, {
             sessionId: args.syncSessionId,
             status: "failed",

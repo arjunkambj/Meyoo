@@ -34,7 +34,7 @@ export default function AvailablePlans() {
 
   // Get current shop domain
   const shopDomainData = useQuery(
-    api.core.shopDomainHelper.getCurrentShopDomain
+    api.core.shopDomainHelper.getCurrentShopDomain,
   );
 
   const currentTierKey = useMemo(() => {
@@ -42,7 +42,7 @@ export default function AvailablePlans() {
     return tier ?? TiersEnum.Free;
   }, [currentPlan]);
   const [selectedFrequency, setSelectedFrequency] = useState<Frequency>(
-    (frequencies[0] as Frequency) ?? (frequencies[0] as Frequency)
+    (frequencies[0] as Frequency) ?? (frequencies[0] as Frequency),
   );
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
   const setPending = useSetAtom(setSettingsPendingAtom);
@@ -64,7 +64,7 @@ export default function AvailablePlans() {
 
     if (!shopDomain) {
       console.error(
-        "No shop domain found for billing - ensure Shopify is connected"
+        "No shop domain found for billing - ensure Shopify is connected",
       );
 
       return;
@@ -83,7 +83,7 @@ export default function AvailablePlans() {
   const onFrequencyChange = (selectedKey: React.Key) => {
     const frequencyIndex = frequencies.findIndex((f) => f.key === selectedKey);
     setSelectedFrequency(
-      (frequencies[frequencyIndex] ?? frequencies[0]) as Frequency
+      (frequencies[frequencyIndex] ?? frequencies[0]) as Frequency,
     );
   };
 
@@ -136,9 +136,7 @@ export default function AvailablePlans() {
                 Billing Error: {error}
               </p>
               <Button
-               
                 size="sm"
-               
                 variant="tertiary"
                 className="h-6 text-xs px-2"
                 onPress={clearError}
@@ -186,24 +184,17 @@ export default function AvailablePlans() {
                 label: buttonLabel,
                 size: "sm",
                 className: "w-full",
-                color: isCurrentPlan
-                  ? "success"
-                  : tier.key === TiersEnum.Free
-                    ? "default"
-                    : "primary",
                 variant: isCurrentPlan
-                  ? "solid"
+                  ? "secondary"
                   : tier.mostPopular
-                    ? "solid"
+                    ? "primary"
                     : "tertiary",
                 disabled,
                 isLoading: isProcessing,
                 endContent:
-                  disabled || !planName || isCurrentPlan
-                    ? undefined
-                    : (
-                        <Icon icon="solar:arrow-right-line-duotone" width={14} />
-                      ),
+                  disabled || !planName || isCurrentPlan ? undefined : (
+                    <Icon icon="solar:arrow-right-line-duotone" width={14} />
+                  ),
                 onPress: () => {
                   if (!planName || disabled) return;
                   void handlePlanUpgrade(planName);

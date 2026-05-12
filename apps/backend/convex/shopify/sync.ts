@@ -44,7 +44,7 @@ const shortenText = (input: string, maxWords: number) => {
 };
 
 const summarizeGraphQLErrors = (
-  errors: Array<{ message?: string; extensions?: { code?: string } }>
+  errors: Array<{ message?: string; extensions?: { code?: string } }>,
 ) => {
   if (!errors.length) {
     return { count: 0, codes: [], samples: [] };
@@ -78,7 +78,7 @@ const summarizeGraphQLErrors = (
 
 function mapOrderNodeToPersistence(
   order: ShopifyOrderNode,
-  organizationId: Id<"organizations">
+  organizationId: Id<"organizations">,
 ): OrderPersistencePayload {
   const orderId = String(order.id).replace("gid://shopify/Order/", "");
 
@@ -102,7 +102,7 @@ function mapOrderNodeToPersistence(
     totalPrice: parseMoney(order.currentTotalPriceSet?.shopMoney?.amount),
     subtotalPrice: parseMoney(order.currentSubtotalPriceSet?.shopMoney?.amount),
     totalDiscounts: parseMoney(
-      order.currentTotalDiscountsSet?.shopMoney?.amount
+      order.currentTotalDiscountsSet?.shopMoney?.amount,
     ),
     totalTip: order.totalTipReceivedSet
       ? parseMoney(order.totalTipReceivedSet.shopMoney?.amount)
@@ -134,7 +134,7 @@ function mapOrderNodeToPersistence(
       ? {
           shopifyId: String(order.customer.id).replace(
             "gid://shopify/Customer/",
-            ""
+            "",
           ),
           email: toOptional(order.customer.email),
           firstName: toOptional(order.customer.firstName),
@@ -152,14 +152,14 @@ function mapOrderNodeToPersistence(
       order.lineItems?.edges?.map((itemEdge: { node: ShopifyLineItem }) => {
         const item = itemEdge.node;
         const basePrice = parseMoney(
-          item.originalUnitPriceSet?.shopMoney?.amount
+          item.originalUnitPriceSet?.shopMoney?.amount,
         );
         const discounted = item.discountedUnitPriceSet
           ? parseMoney(item.discountedUnitPriceSet.shopMoney?.amount)
           : undefined;
         const quantity = item.quantity ?? 0;
         const rawDiscount = parseMoney(
-          item.totalDiscountSet?.shopMoney?.amount
+          item.totalDiscountSet?.shopMoney?.amount,
         );
         const perUnitDiscount =
           discounted !== undefined ? Math.max(0, basePrice - discounted) : 0;
@@ -177,13 +177,13 @@ function mapOrderNodeToPersistence(
           shopifyVariantId: item.variant?.id
             ? String(item.variant.id).replace(
                 "gid://shopify/ProductVariant/",
-                ""
+                "",
               )
             : undefined,
           shopifyProductId: (item.variant as any)?.product?.id
             ? String((item.variant as any).product.id).replace(
                 "gid://shopify/Product/",
-                ""
+                "",
               )
             : undefined,
           price: basePrice,
@@ -205,13 +205,13 @@ function mapOrderNodeToPersistence(
         shopifyOrderId: orderId,
         shopifyId: transaction.id.replace(
           "gid://shopify/OrderTransaction/",
-          ""
+          "",
         ),
         kind: transaction.kind,
         status: transaction.status,
         gateway: transaction.gateway,
         amount: parseMoney(
-          String(transaction.amountSet?.shopMoney?.amount ?? "0")
+          String(transaction.amountSet?.shopMoney?.amount ?? "0"),
         ),
         fee:
           transaction.fees && transaction.fees.length > 0
@@ -244,7 +244,7 @@ function mapOrderNodeToPersistence(
               lineItemId: item.lineItem?.id
                 ? String(item.lineItem.id).replace(
                     "gid://shopify/LineItem/",
-                    ""
+                    "",
                   )
                 : "",
               quantity: item.quantity || 0,
@@ -252,7 +252,7 @@ function mapOrderNodeToPersistence(
             };
           }) || [],
         shopifyCreatedAt: Date.parse(
-          String(refund.createdAt || new Date().toISOString())
+          String(refund.createdAt || new Date().toISOString()),
         ),
         processedAt: refund.processedAt
           ? Date.parse(String(refund.processedAt))
@@ -279,7 +279,7 @@ function mapOrderNodeToPersistence(
       const locationId = fulfillmentOrder.assignedLocation?.location?.id
         ? String(fulfillmentOrder.assignedLocation.location.id).replace(
             "gid://shopify/Location/",
-            ""
+            "",
           )
         : undefined;
       const serviceName = fulfillmentOrder.deliveryMethod?.serviceName
@@ -295,7 +295,7 @@ function mapOrderNodeToPersistence(
           const orderLineId = lineNode?.lineItem?.id
             ? String(lineNode.lineItem.id).replace(
                 "gid://shopify/LineItem/",
-                ""
+                "",
               )
             : undefined;
           if (!orderLineId) continue;
@@ -318,10 +318,10 @@ function mapOrderNodeToPersistence(
   if (order.fulfillments && Array.isArray(order.fulfillments)) {
     for (const fulfillment of order.fulfillments) {
       const trackingNumbers = toStringArray(
-        fulfillment.trackingInfo?.map((t) => t.number)
+        fulfillment.trackingInfo?.map((t) => t.number),
       );
       const trackingUrls = toStringArray(
-        fulfillment.trackingInfo?.map((t) => t.url)
+        fulfillment.trackingInfo?.map((t) => t.url),
       );
       const locationId =
         typeof fulfillment.location?.id === "string"
@@ -333,7 +333,7 @@ function mapOrderNodeToPersistence(
               .serviceName || undefined
           : (fulfillment.service ?? undefined);
       const trackingCompany = toOptional(
-        fulfillment.trackingInfo?.[0]?.company
+        fulfillment.trackingInfo?.[0]?.company,
       );
       let derivedLocationId = locationId;
       let derivedServiceName = serviceName;
@@ -388,7 +388,7 @@ function mapOrderNodeToPersistence(
         service: toOptional(derivedServiceName),
         lineItems: normalizedLineItems,
         shopifyCreatedAt: Date.parse(
-          String(fulfillment.createdAt || new Date().toISOString())
+          String(fulfillment.createdAt || new Date().toISOString()),
         ),
         shopifyUpdatedAt: fulfillment.updatedAt
           ? Date.parse(String(fulfillment.updatedAt))
@@ -415,12 +415,12 @@ export const initial = internalAction({
     dateRange: v.optional(
       v.object({
         daysBack: v.number(),
-      })
+      }),
     ),
   },
   handler: async (
     ctx,
-    args
+    args,
   ): Promise<{
     success: boolean;
     recordsProcessed: number;
@@ -470,7 +470,7 @@ export const initial = internalAction({
         internal.shopify.internalQueries.getActiveStoreInternal,
         {
           organizationId: args.organizationId,
-        }
+        },
       );
 
       if (!store) {
@@ -540,7 +540,7 @@ export const initial = internalAction({
             const response: any = await client.getProducts(
               SHOPIFY_CONFIG.QUERIES.PRODUCTS_BATCH_SIZE,
               cursor,
-              undefined
+              undefined,
             );
 
             // Log the full response structure for debugging
@@ -561,7 +561,7 @@ export const initial = internalAction({
                 extensions: response.extensions,
               });
               throw new Error(
-                `GraphQL errors: ${JSON.stringify(response.errors)}`
+                `GraphQL errors: ${JSON.stringify(response.errors)}`,
               );
             }
 
@@ -582,7 +582,7 @@ export const initial = internalAction({
               response.data.products.edges.length > 0
             ) {
               logger.info(
-                `Processing ${response.data.products.edges.length} products from page ${pageCount}`
+                `Processing ${response.data.products.edges.length} products from page ${pageCount}`,
               );
               // Map product edges
               const batch = response.data.products.edges.map(
@@ -602,14 +602,14 @@ export const initial = internalAction({
 
                       const unitCost = variant.inventoryItem?.unitCost?.amount
                         ? parseMoney(
-                            String(variant.inventoryItem.unitCost.amount)
+                            String(variant.inventoryItem.unitCost.amount),
                           )
                         : undefined;
 
                       const variantData = {
                         shopifyId: String(variant.id).replace(
                           "gid://shopify/ProductVariant/",
-                          ""
+                          "",
                         ),
                         title: variant.title,
                         sku: variant.sku || undefined,
@@ -625,7 +625,7 @@ export const initial = internalAction({
                         inventoryItemId:
                           variant.inventoryItem?.id?.replace(
                             "gid://shopify/InventoryItem/",
-                            ""
+                            "",
                           ) || undefined,
                         weight:
                           variant.inventoryItem?.measurement?.weight?.value ||
@@ -658,7 +658,7 @@ export const initial = internalAction({
                     storeId,
                     shopifyId: String(product.id).replace(
                       "gid://shopify/Product/",
-                      ""
+                      "",
                     ),
                     handle: product.handle,
                     title: product.title,
@@ -679,7 +679,7 @@ export const initial = internalAction({
                     syncedAt: Date.now(),
                     variants,
                   };
-                }
+                },
               );
 
               products.push(...batch);
@@ -724,7 +724,7 @@ export const initial = internalAction({
             }
 
             logger.debug(
-              `Found ${inventoryItemIds.length} inventory items to fetch`
+              `Found ${inventoryItemIds.length} inventory items to fetch`,
             );
 
             // Fetch inventory in batches
@@ -739,7 +739,7 @@ export const initial = internalAction({
                   batchSize: batch.length,
                   from: i,
                   to: Math.min(i + batchSize, inventoryItemIds.length),
-                }
+                },
               );
 
               try {
@@ -788,13 +788,13 @@ export const initial = internalAction({
                             locationId:
                               location?.id?.replace(
                                 "gid://shopify/Location/",
-                                ""
+                                "",
                               ) || "",
                             available: availableValue,
                             incoming: incomingValue,
                             committed: reservedValue,
                           };
-                        }
+                        },
                       );
                     }
                   }
@@ -822,7 +822,7 @@ export const initial = internalAction({
                 organizationId: args.organizationId as Id<"organizations">,
                 storeId, // pass through to avoid race on active store lookup
                 products,
-              }
+              },
             );
 
             // Calculate COGS coverage statistics
@@ -951,7 +951,7 @@ export const initial = internalAction({
                 transactions: transactionsPayload,
                 refunds: refundsPayload,
                 fulfillments: fulfillmentsPayload,
-              }
+              },
             );
 
             logger.info(`Created order batch job ${batchNum}`, {
@@ -971,7 +971,7 @@ export const initial = internalAction({
                     currentPage: pageCount,
                     totalOrdersSeen,
                   },
-                }
+                },
               );
             }
 
@@ -991,13 +991,13 @@ export const initial = internalAction({
               {
                 cursor,
                 dateQuery,
-              }
+              },
             );
 
             const response: any = await client.getOrders(
               currentPageSize,
               cursor,
-              dateQuery
+              dateQuery,
             );
 
             const errorSummary =
@@ -1021,19 +1021,19 @@ export const initial = internalAction({
 
               const costError = response.errors.find(
                 (error: { extensions?: { code?: string } }) =>
-                  error.extensions?.code === "MAX_COST_EXCEEDED"
+                  error.extensions?.code === "MAX_COST_EXCEEDED",
               );
 
               if (costError) {
                 const previousPageSize = currentPageSize;
                 const nextPageSize = Math.max(
                   MIN_ORDERS_PAGE_SIZE,
-                  Math.floor(previousPageSize / 2)
+                  Math.floor(previousPageSize / 2),
                 );
 
                 if (nextPageSize === previousPageSize) {
                   throw new Error(
-                    `Shopify orders query exceeded cost limit even at minimum page size ${MIN_ORDERS_PAGE_SIZE}`
+                    `Shopify orders query exceeded cost limit even at minimum page size ${MIN_ORDERS_PAGE_SIZE}`,
                   );
                 }
 
@@ -1044,7 +1044,7 @@ export const initial = internalAction({
                     previousPageSize,
                     nextPageSize,
                     dateQuery,
-                  }
+                  },
                 );
                 // Retry the same cursor with the smaller page size
                 await sleep(COST_BACKOFF_MS);
@@ -1069,7 +1069,7 @@ export const initial = internalAction({
                   {
                     organizationId: args.organizationId as Id<"organizations">,
                     pageCount,
-                  }
+                  },
                 );
               }
 
@@ -1081,7 +1081,7 @@ export const initial = internalAction({
                   fulfillments,
                 } = mapOrderNodeToPersistence(
                   edge.node,
-                  args.organizationId as Id<"organizations">
+                  args.organizationId as Id<"organizations">,
                 );
 
                 ordersBatch.push(mappedOrder);
@@ -1122,7 +1122,7 @@ export const initial = internalAction({
                   totalPages: pageCount,
                   totalOrdersSeen,
                 },
-              }
+              },
             );
           }
 
@@ -1177,11 +1177,11 @@ export const initial = internalAction({
               : Number.POSITIVE_INFINITY;
           const persistBatchSize = Math.max(
             1,
-            SHOPIFY_CONFIG.SYNC?.CUSTOMERS_PERSIST_BATCH_SIZE ?? 200
+            SHOPIFY_CONFIG.SYNC?.CUSTOMERS_PERSIST_BATCH_SIZE ?? 200,
           );
           const pageSizeBase = Math.max(
             1,
-            SHOPIFY_CONFIG.QUERIES?.CUSTOMERS_BATCH_SIZE ?? 200
+            SHOPIFY_CONFIG.QUERIES?.CUSTOMERS_BATCH_SIZE ?? 200,
           );
 
           let hasNextPage = true;
@@ -1199,7 +1199,7 @@ export const initial = internalAction({
               {
                 organizationId: args.organizationId,
                 customers: batchToPersist,
-              }
+              },
             );
 
             totalPersisted += batchToPersist.length;
@@ -1237,7 +1237,7 @@ export const initial = internalAction({
                   const customer = edge.node;
                   const customerId = String(customer.id).replace(
                     "gid://shopify/Customer/",
-                    ""
+                    "",
                   );
 
                   return {
@@ -1250,10 +1250,10 @@ export const initial = internalAction({
                     lastName: customer.lastName || undefined,
                     ordersCount: parseInt(
                       String((customer as any).numberOfOrders?.count || 0),
-                      10
+                      10,
                     ),
                     totalSpent: parseMoney(
-                      String((customer as any).amountSpent?.amount)
+                      String((customer as any).amountSpent?.amount),
                     ),
                     state: customer.state || undefined,
                     verifiedEmail: customer.verifiedEmail || false,
@@ -1279,7 +1279,7 @@ export const initial = internalAction({
                     shopifyUpdatedAt: Date.parse(String(customer.updatedAt)),
                     syncedAt: Date.now(),
                   };
-                }
+                },
               );
 
               if (batch.length) {
@@ -1304,7 +1304,7 @@ export const initial = internalAction({
             const remainingCapacity = maxCustomers - totalPersisted;
             if (remainingCapacity > 0) {
               await persistCustomers(
-                Math.min(pending.length, remainingCapacity)
+                Math.min(pending.length, remainingCapacity),
               );
             }
           }
@@ -1371,7 +1371,7 @@ export const initial = internalAction({
           {
             storeId,
             timestamp: Date.now(),
-          }
+          },
         );
       } catch (error) {
         logger.warn("Failed to update store last sync timestamp", {
@@ -1385,7 +1385,7 @@ export const initial = internalAction({
         internal.core.costs.validateCostDataCompleteness,
         {
           organizationId: args.organizationId,
-        }
+        },
       );
 
       if (validationReport) {
@@ -1442,7 +1442,7 @@ export const incremental = internalAction({
         internal.shopify.internalQueries.getActiveStoreInternal,
         {
           organizationId: args.organizationId,
-        }
+        },
       );
 
       if (!store) {
@@ -1473,7 +1473,7 @@ export const incremental = internalAction({
         const response: any = await client.getOrders(
           SHOPIFY_CONFIG.QUERIES.ORDERS_BATCH_SIZE,
           cursor,
-          `updated_at:>=${sinceIso}`
+          `updated_at:>=${sinceIso}`,
         );
 
         if (response.errors && response.errors.length > 0) {
@@ -1494,7 +1494,7 @@ export const incremental = internalAction({
             fulfillments: ffs,
           } = mapOrderNodeToPersistence(
             edge.node,
-            args.organizationId as Id<"organizations">
+            args.organizationId as Id<"organizations">,
           );
 
           orders.push(order);
@@ -1515,7 +1515,7 @@ export const incremental = internalAction({
             internal.shopify.status.getInitialSyncStatusInternal,
             {
               organizationId: args.organizationId,
-            }
+            },
           );
         }
 
@@ -1530,7 +1530,7 @@ export const incremental = internalAction({
             storeId,
             orders,
             shouldScheduleAnalytics: await ensureAnalyticsEligibility(),
-          }
+          },
         );
       }
 
@@ -1541,7 +1541,7 @@ export const incremental = internalAction({
             organizationId: args.organizationId,
             transactions,
             shouldScheduleAnalytics: await ensureAnalyticsEligibility(),
-          }
+          },
         );
       }
 
@@ -1552,7 +1552,7 @@ export const incremental = internalAction({
             organizationId: args.organizationId,
             refunds,
             shouldScheduleAnalytics: await ensureAnalyticsEligibility(),
-          }
+          },
         );
       }
 
@@ -1562,7 +1562,7 @@ export const incremental = internalAction({
           {
             organizationId: args.organizationId,
             fulfillments,
-          }
+          },
         );
       }
 
@@ -1571,7 +1571,7 @@ export const incremental = internalAction({
         {
           storeId,
           timestamp: Date.now(),
-        }
+        },
       );
 
       const recordsProcessed = orders.length;

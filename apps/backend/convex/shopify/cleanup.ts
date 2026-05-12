@@ -1,4 +1,3 @@
-
 import { DEFAULT_DASHBOARD_CONFIG } from "@repo/types";
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
@@ -203,7 +202,7 @@ const deleteStoreTablePage = async (
   });
 
   for (const record of page.page) {
-    await ctx.db.delete(record._id);
+    await ctx.db.delete(args.table, record._id as any);
   }
 
   return {
@@ -242,7 +241,7 @@ export const deleteOrganizationDataBatch = internalMutation({
     });
 
     for (const record of page.page) {
-      await ctx.db.delete(record._id);
+      await ctx.db.delete(table, record._id as any);
     }
 
     if (!page.isDone) {
@@ -379,16 +378,20 @@ export const deleteDashboardsBatch = internalMutation({
     });
 
     for (const dashboard of page.page) {
-      await ctx.db.delete(dashboard._id);
+      await ctx.db.delete("dashboards", dashboard._id);
     }
 
     if (!page.isDone) {
-      await ctx.scheduler.runAfter(0, internal.shopify.cleanup.deleteDashboardsBatch, {
-        organizationId: args.organizationId,
-        ownerId: args.ownerId,
-        cursor: page.continueCursor,
-        batchSize,
-      });
+      await ctx.scheduler.runAfter(
+        0,
+        internal.shopify.cleanup.deleteDashboardsBatch,
+        {
+          organizationId: args.organizationId,
+          ownerId: args.ownerId,
+          cursor: page.continueCursor,
+          batchSize,
+        },
+      );
     } else if (args.ownerId) {
       // Recreate the default dashboard once the cleanup is complete
       const existingDefault = await ctx.db
@@ -486,7 +489,7 @@ export const deleteShopifyStoreIfEmpty = internalMutation({
       return { deleted: false, rescheduled: true };
     }
 
-    await ctx.db.delete(args.storeId);
+    await ctx.db.delete("shopifyStores", args.storeId);
 
     logger.info("Deleted Shopify store after dependent data removal", {
       storeId: args.storeId,

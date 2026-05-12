@@ -29,7 +29,7 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
     (href: string) => {
       return pathname === href;
     },
-    [pathname]
+    [pathname],
   );
 
   // Memoize defaultExpandedKeys to prevent hydration issues
@@ -54,7 +54,7 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
             "no-underline group",
             active
               ? "bg-accent/20 text-foreground font-semibold"
-              : "text-foreground hover:text-foreground hover:bg-surface-tertiary/70"
+              : "text-foreground hover:text-foreground hover:bg-surface-tertiary/70",
           )}
           href={item.href}
           prefetch={true}
@@ -66,7 +66,7 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
                 "shrink-0 transition-all w-5 h-5",
                 active
                   ? "text-foreground"
-                  : "text-foreground group-hover:text-foreground"
+                  : "text-foreground group-hover:text-foreground",
               )}
               icon={item.icon}
             />
@@ -75,34 +75,30 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
         </Link>
       );
     },
-    [isActive]
+    [isActive],
   );
 
   const renderCategory = useCallback(
     (category: SidebarItem) => (
       <Accordion.Item
         key={category.key}
-        className="border-none"
-        classNames={{
-          base: "!border-none bg-transparent shadow-none",
-          heading: "!border-none bg-transparent",
-        }}
+        className="border-none bg-transparent shadow-none"
         id={category.key}
       >
         <Accordion.Heading>
           <Accordion.Trigger className="flex h-10 w-full items-center justify-between gap-2.5 px-3">
             <div className="flex items-center gap-2.5">
-            {category.icon && (
-              <Icon
-                aria-hidden
-                className="text-foreground"
-                icon={category.icon}
-                width={18}
-              />
-            )}
-            <span className="text-xs font-bold text-foreground uppercase tracking-wider">
-              {category.title}
-            </span>
+              {category.icon && (
+                <Icon
+                  aria-hidden
+                  className="text-foreground"
+                  icon={category.icon}
+                  width={18}
+                />
+              )}
+              <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                {category.title}
+              </span>
             </div>
             <Accordion.Indicator>
               <Icon
@@ -123,7 +119,7 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
         </Accordion.Panel>
       </Accordion.Item>
     ),
-    [renderMenuItem]
+    [renderMenuItem],
   );
 
   const accordionContent = useMemo(
@@ -133,17 +129,11 @@ const SidebarMenu = ({ items, className }: SidebarMenuProps) => {
         allowsMultipleExpanded
         defaultExpandedKeys={defaultExpandedKeys}
         hideSeparator
-        itemClasses={{
-          base: "!border-none bg-transparent shadow-none",
-          content: "bg-transparent p-0",
-          heading: "!border-none bg-transparent",
-          trigger: "bg-transparent hover:bg-transparent",
-        }}
       >
         {items.map(renderCategory)}
       </Accordion>
     ),
-    [defaultExpandedKeys, items, renderCategory]
+    [defaultExpandedKeys, items, renderCategory],
   );
 
   return <nav className={cn("w-full", className)}>{accordionContent}</nav>;

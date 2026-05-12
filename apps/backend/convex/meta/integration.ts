@@ -71,7 +71,8 @@ export const meta: Integration = createIntegration({
           try {
             const campaigns = await fetchCampaigns(client, account.accountId, {
               startDate:
-                dateRange.startDate || new Date().toISOString().substring(0, 10),
+                dateRange.startDate ||
+                new Date().toISOString().substring(0, 10),
               endDate:
                 dateRange.endDate || new Date().toISOString().substring(0, 10),
             });
@@ -88,7 +89,8 @@ export const meta: Integration = createIntegration({
 
             const insights = await fetchInsights(client, account.accountId, {
               startDate:
-                dateRange.startDate || new Date().toISOString().substring(0, 10),
+                dateRange.startDate ||
+                new Date().toISOString().substring(0, 10),
               endDate:
                 dateRange.endDate || new Date().toISOString().substring(0, 10),
             });
@@ -155,12 +157,9 @@ export const meta: Integration = createIntegration({
         const client = await initializeMetaClient(session);
         const lastSync =
           args.since ||
-          (await ctx.runQuery(
-            internal.meta.internal.getLastSyncTimeInternal,
-            {
-              organizationId: args.organizationId as Id<"organizations">,
-            },
-          ));
+          (await ctx.runQuery(internal.meta.internal.getLastSyncTimeInternal, {
+            organizationId: args.organizationId as Id<"organizations">,
+          }));
 
         let recordsProcessed = 0;
 
@@ -255,4 +254,3 @@ export const meta: Integration = createIntegration({
 
   apiCost: 0.0001,
 });
-

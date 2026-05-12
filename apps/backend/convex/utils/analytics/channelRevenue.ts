@@ -1,13 +1,10 @@
 import type {
   AnalyticsSourceResponse,
   ChannelRevenueBreakdown,
-} from '@repo/types';
+} from "@repo/types";
 
-import type { AnyRecord } from './shared';
-import {
-  ensureDataset,
-  safeNumber,
-} from './shared';
+import type { AnyRecord } from "./shared";
+import { ensureDataset, safeNumber } from "./shared";
 
 export function computeChannelRevenue(
   response: AnalyticsSourceResponse<any> | null | undefined,
@@ -23,10 +20,7 @@ export function computeChannelRevenue(
   const channelMap = new Map<string, { revenue: number; orders: number }>();
 
   for (const order of orders) {
-    const rawSource =
-      order.utmSource ??
-      order.utm_source ??
-      "Direct";
+    const rawSource = order.utmSource ?? order.utm_source ?? "Direct";
     const channel = String(rawSource || "Direct").trim() || "Direct";
     const stats = channelMap.get(channel) ?? { revenue: 0, orders: 0 };
     stats.revenue += safeNumber(order.totalPrice);
@@ -45,4 +39,3 @@ export function computeChannelRevenue(
 
   return { channels };
 }
-

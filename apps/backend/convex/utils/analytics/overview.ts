@@ -3,9 +3,9 @@ import type {
   MetricValue,
   OverviewComputation,
   OverviewSummary,
-} from '@repo/types';
+} from "@repo/types";
 
-import type { AnyRecord } from './shared';
+import type { AnyRecord } from "./shared";
 import {
   computeCostOverlap,
   computeCostRetentionFactor,
@@ -19,7 +19,7 @@ import {
   safeNumber,
   sumBy,
   toStringId,
-} from './shared';
+} from "./shared";
 
 function computeOverviewBaseline(
   response: AnalyticsSourceResponse<any> | null | undefined,
@@ -168,11 +168,19 @@ function computeOverviewBaseline(
       end: rangeEndMs,
     }).ratePercent;
   } else {
-    manualReturnRatePercent = resolveManualReturnRate(manualReturnRateEntries).ratePercent;
+    manualReturnRatePercent = resolveManualReturnRate(
+      manualReturnRateEntries,
+    ).ratePercent;
   }
 
   const toOrderKey = (order: AnyRecord): string =>
-    toStringId(order._id ?? order.id ?? order.orderId ?? order.shopifyId ?? order.order_id);
+    toStringId(
+      order._id ??
+        order.id ??
+        order.orderId ??
+        order.shopifyId ??
+        order.order_id,
+    );
 
   const isCancelledOrder = (order: AnyRecord): boolean => {
     const candidates = [
@@ -202,32 +210,44 @@ function computeOverviewBaseline(
     }
   }
 
-  const activeOrders = orders.filter((order) => !cancelledOrderIds.has(toOrderKey(order)));
+  const activeOrders = orders.filter(
+    (order) => !cancelledOrderIds.has(toOrderKey(order)),
+  );
   const activeOrderCount = activeOrders.length;
 
   const revenue = sumBy(activeOrders, (order) => safeNumber(order.totalPrice));
-  const grossSales = sumBy(activeOrders, (order) => safeNumber(order.subtotalPrice ?? order.totalPrice));
-  const discounts = sumBy(activeOrders, (order) => safeNumber(order.totalDiscounts));
+  const grossSales = sumBy(activeOrders, (order) =>
+    safeNumber(order.subtotalPrice ?? order.totalPrice),
+  );
+  const discounts = sumBy(activeOrders, (order) =>
+    safeNumber(order.totalDiscounts),
+  );
   // Start with order-level shipping costs as the base
-  const shippingCostsFromOrders = sumBy(
-    activeOrders,
-    (order) => safeNumber(order.shippingCosts ?? 0),
+  const shippingCostsFromOrders = sumBy(activeOrders, (order) =>
+    safeNumber(order.shippingCosts ?? 0),
   );
   let shippingCosts = shippingCostsFromOrders;
-  let taxesCollected = sumBy(
-    activeOrders,
-    (order) => safeNumber(order.taxesCollected ?? 0),
+  let taxesCollected = sumBy(activeOrders, (order) =>
+    safeNumber(order.taxesCollected ?? 0),
   );
   const refundsAmountFromDocs = refunds.length
-    ? sumBy(refunds, (refund) => safeNumber(refund.totalRefunded ?? refund.amount))
+    ? sumBy(refunds, (refund) =>
+        safeNumber(refund.totalRefunded ?? refund.amount),
+      )
     : 0;
-  const refundsAmountFromOrders = sumBy(orders, (order) => safeNumber(order.totalRefunded ?? order.totalRefunds));
-  const refundsAmount = refunds.length ? refundsAmountFromDocs : refundsAmountFromOrders;
+  const refundsAmountFromOrders = sumBy(orders, (order) =>
+    safeNumber(order.totalRefunded ?? order.totalRefunds),
+  );
+  const refundsAmount = refunds.length
+    ? refundsAmountFromDocs
+    : refundsAmountFromOrders;
 
   const variantMap = new Map<string, AnyRecord>();
   const variantByShopifyId = new Map<string, AnyRecord>();
   for (const variant of variants) {
-    const internalId = toStringId(variant._id ?? variant.id ?? variant.variantId);
+    const internalId = toStringId(
+      variant._id ?? variant.id ?? variant.variantId,
+    );
     if (internalId) {
       variantMap.set(internalId, variant);
     }
@@ -238,7 +258,10 @@ function computeOverviewBaseline(
       variant.shopifyVariant ??
       variant.shopifyId ??
       variant.shopify_id;
-    if (typeof shopifyVariantId === "string" && shopifyVariantId.trim().length > 0) {
+    if (
+      typeof shopifyVariantId === "string" &&
+      shopifyVariantId.trim().length > 0
+    ) {
       variantByShopifyId.set(shopifyVariantId.trim(), variant);
     }
   }
@@ -250,8 +273,12 @@ function computeOverviewBaseline(
     // Don't filter by isActive - if variant was sold, calculate its costs
     // For variants with multiple cost records, use the most recently updated one
     const current = componentMap.get(variantId);
-    const currentTime = safeNumber(current?.updatedAt ?? current?.createdAt ?? 0);
-    const componentTime = safeNumber(component.updatedAt ?? component.createdAt ?? 0);
+    const currentTime = safeNumber(
+      current?.updatedAt ?? current?.createdAt ?? 0,
+    );
+    const componentTime = safeNumber(
+      component.updatedAt ?? component.createdAt ?? 0,
+    );
     if (!current || componentTime > currentTime) {
       componentMap.set(variantId, component);
     }
@@ -262,11 +289,19 @@ function computeOverviewBaseline(
     if (direct && (componentMap.has(direct) || variantMap.has(direct))) {
       return direct;
     }
-    const shopifyVariantId = item.shopifyVariantId ?? item.shopify_variant_id ?? item.variantShopifyId;
-    if (typeof shopifyVariantId === "string" && shopifyVariantId.trim().length > 0) {
+    const shopifyVariantId =
+      item.shopifyVariantId ?? item.shopify_variant_id ?? item.variantShopifyId;
+    if (
+      typeof shopifyVariantId === "string" &&
+      shopifyVariantId.trim().length > 0
+    ) {
       const matchingVariant = variantByShopifyId.get(shopifyVariantId.trim());
       if (matchingVariant) {
-        return toStringId(matchingVariant._id ?? matchingVariant.id ?? matchingVariant.variantId);
+        return toStringId(
+          matchingVariant._id ??
+            matchingVariant.id ??
+            matchingVariant.variantId,
+        );
       }
     }
     return direct;
@@ -322,22 +357,20 @@ function computeOverviewBaseline(
         // If taxPercent is greater than 1, treat as percentage (e.g., 10 for 10%)
         // If less than or equal to 1, treat as decimal (e.g., 0.1 for 10%)
         const taxMultiplier = taxPercent > 1 ? taxPercent / 100 : taxPercent;
-        taxFromComponents += (itemPrice * quantity) * taxMultiplier;
+        taxFromComponents += itemPrice * quantity * taxMultiplier;
       }
     }
   }
 
   if (unitsSold === 0) {
-    unitsSold = sumBy(
-      activeOrders,
-      (order) =>
-        safeNumber(
+    unitsSold = sumBy(activeOrders, (order) =>
+      safeNumber(
+        order.totalQuantity ??
+          order.totalQuantityOrdered ??
           order.totalQuantity ??
-            order.totalQuantityOrdered ??
-            order.totalQuantity ??
-            order.totalItems ??
-            0,
-        ),
+          order.totalItems ??
+          0,
+      ),
     );
   }
 
@@ -356,14 +389,20 @@ function computeOverviewBaseline(
 
   const customersById = new Map<string, AnyRecord>();
   for (const customer of customers) {
-    customersById.set(toStringId(customer._id ?? customer.id ?? customer.customerId), customer);
+    customersById.set(
+      toStringId(customer._id ?? customer.id ?? customer.customerId),
+      customer,
+    );
   }
 
   const ordersPerCustomer = new Map<string, number>();
   for (const order of activeOrders) {
     const customerId = toStringId(order.customerId ?? order.customer_id);
     if (!customerId) continue;
-    ordersPerCustomer.set(customerId, (ordersPerCustomer.get(customerId) ?? 0) + 1);
+    ordersPerCustomer.set(
+      customerId,
+      (ordersPerCustomer.get(customerId) ?? 0) + 1,
+    );
   }
 
   const uniqueCustomerIds = new Set<string>(ordersPerCustomer.keys());
@@ -426,7 +465,11 @@ function computeOverviewBaseline(
     }
 
     const mode = toCostMode(cost);
-    const { overlapMs, windowMs } = computeCostOverlap(cost, rangeStart, rangeEnd);
+    const { overlapMs, windowMs } = computeCostOverlap(
+      cost,
+      rangeStart,
+      rangeEnd,
+    );
     if (overlapMs <= 0) {
       return 0;
     }
@@ -464,7 +507,8 @@ function computeOverviewBaseline(
   const handlingCostTotal = handlingFromComponents;
 
   // Use global costs primarily, fallback to order-level only if global costs are zero
-  shippingCosts = shippingCostTotal > 0 ? shippingCostTotal : shippingCostsFromOrders;
+  shippingCosts =
+    shippingCostTotal > 0 ? shippingCostTotal : shippingCostsFromOrders;
 
   // Debug logging for cost calculations
   if (process.env.DEBUG_COSTS === "true") {
@@ -484,38 +528,42 @@ function computeOverviewBaseline(
     });
   }
 
-  const transactionFeesFromTransactions = sumBy(
-    transactions,
-    (tx) => Math.abs(safeNumber(tx.fee ?? tx.applicationFee ?? tx.totalFees ?? 0)),
+  const transactionFeesFromTransactions = sumBy(transactions, (tx) =>
+    Math.abs(safeNumber(tx.fee ?? tx.applicationFee ?? tx.totalFees ?? 0)),
   );
   const transactionFees = transactionFeesFromTransactions + paymentCostTotal;
 
-  const metaAdSpend = sumBy(accountMetaInsights, (insight) => safeNumber(insight.spend));
-  const metaClicksAccount = sumBy(accountMetaInsights, (insight) => safeNumber(insight.clicks));
-  const metaUniqueClicksAccount = sumBy(
-    accountMetaInsights,
-    (insight) => safeNumber(insight.uniqueClicks ?? insight.clicks),
+  const metaAdSpend = sumBy(accountMetaInsights, (insight) =>
+    safeNumber(insight.spend),
   );
-  const metaClicksAny = sumBy(metaInsights, (insight) => safeNumber(insight.clicks));
-  const metaUniqueClicksAny = sumBy(
-    metaInsights,
-    (insight) => safeNumber(insight.uniqueClicks ?? insight.clicks),
+  const metaClicksAccount = sumBy(accountMetaInsights, (insight) =>
+    safeNumber(insight.clicks),
+  );
+  const metaUniqueClicksAccount = sumBy(accountMetaInsights, (insight) =>
+    safeNumber(insight.uniqueClicks ?? insight.clicks),
+  );
+  const metaClicksAny = sumBy(metaInsights, (insight) =>
+    safeNumber(insight.clicks),
+  );
+  const metaUniqueClicksAny = sumBy(metaInsights, (insight) =>
+    safeNumber(insight.uniqueClicks ?? insight.clicks),
   );
   const metaClicks = metaClicksAccount > 0 ? metaClicksAccount : metaClicksAny;
-  const metaUniqueClicks = metaUniqueClicksAccount > 0 ? metaUniqueClicksAccount : metaUniqueClicksAny;
-  const metaConversionValue = sumBy(
-    accountMetaInsights,
-    (insight) => safeNumber(insight.conversionValue),
+  const metaUniqueClicks =
+    metaUniqueClicksAccount > 0 ? metaUniqueClicksAccount : metaUniqueClicksAny;
+  const metaConversionValue = sumBy(accountMetaInsights, (insight) =>
+    safeNumber(insight.conversionValue),
   );
 
   const totalAdSpend = metaAdSpend;
 
-  const rtoRevenueLost = manualReturnRatePercent > 0
-    ? Math.min(
-        Math.max((revenue * manualReturnRatePercent) / 100, 0),
-        Math.max(revenue, 0),
-      )
-    : 0;
+  const rtoRevenueLost =
+    manualReturnRatePercent > 0
+      ? Math.min(
+          Math.max((revenue * manualReturnRatePercent) / 100, 0),
+          Math.max(revenue, 0),
+        )
+      : 0;
   const costRetentionFactor = computeCostRetentionFactor({
     revenue,
     refunds: refundsAmount,
@@ -538,48 +586,75 @@ function computeOverviewBaseline(
   const netProfit = netRevenue - totalCostsWithoutAds - totalAdSpend;
   const operatingProfit = netRevenue - totalCostsWithoutAds;
   const grossProfit = netRevenue - adjustedCogs;
-  const contributionProfit = netRevenue - (
-    adjustedCogs +
-    shippingCosts +
-    transactionFees +
-    adjustedHandlingCostTotal +
-    customCostTotal
-  );
+  const contributionProfit =
+    netRevenue -
+    (adjustedCogs +
+      shippingCosts +
+      transactionFees +
+      adjustedHandlingCostTotal +
+      customCostTotal);
 
   const profitMargin = netRevenue > 0 ? (netProfit / netRevenue) * 100 : 0;
-  const operatingMargin = netRevenue > 0 ? (operatingProfit / netRevenue) * 100 : 0;
-  const grossProfitMargin = netRevenue > 0 ? (grossProfit / netRevenue) * 100 : 0;
-  const contributionMarginPercentage = netRevenue > 0 ? (contributionProfit / netRevenue) * 100 : 0;
-  const averageOrderValue = activeOrderCount > 0 ? netRevenue / activeOrderCount : 0;
-  const averageOrderCost = activeOrderCount > 0 ? (totalCostsWithoutAds + totalAdSpend) / activeOrderCount : 0;
-  const averageOrderProfit = activeOrderCount > 0 ? netProfit / activeOrderCount : 0;
+  const operatingMargin =
+    netRevenue > 0 ? (operatingProfit / netRevenue) * 100 : 0;
+  const grossProfitMargin =
+    netRevenue > 0 ? (grossProfit / netRevenue) * 100 : 0;
+  const contributionMarginPercentage =
+    netRevenue > 0 ? (contributionProfit / netRevenue) * 100 : 0;
+  const averageOrderValue =
+    activeOrderCount > 0 ? netRevenue / activeOrderCount : 0;
+  const averageOrderCost =
+    activeOrderCount > 0
+      ? (totalCostsWithoutAds + totalAdSpend) / activeOrderCount
+      : 0;
+  const averageOrderProfit =
+    activeOrderCount > 0 ? netProfit / activeOrderCount : 0;
   const profitPerUnit = unitsSold > 0 ? netProfit / unitsSold : 0;
-  const adSpendPerOrder = activeOrderCount > 0 ? totalAdSpend / activeOrderCount : 0;
+  const adSpendPerOrder =
+    activeOrderCount > 0 ? totalAdSpend / activeOrderCount : 0;
   const poas = totalAdSpend > 0 ? netProfit / totalAdSpend : 0;
   const blendedRoas = totalAdSpend > 0 ? netRevenue / totalAdSpend : 0;
-  const metaRoas = metaAdSpend > 0 ? (metaConversionValue || netRevenue) / metaAdSpend : 0;
-  const metaSpendPercentage = totalAdSpend > 0 ? (metaAdSpend / totalAdSpend) * 100 : 0;
-  const marketingPercentageOfGross = grossSales > 0 ? (totalAdSpend / grossSales) * 100 : 0;
-  const marketingPercentageOfNet = netRevenue > 0 ? (totalAdSpend / netRevenue) * 100 : 0;
+  const metaRoas =
+    metaAdSpend > 0 ? (metaConversionValue || netRevenue) / metaAdSpend : 0;
+  const metaSpendPercentage =
+    totalAdSpend > 0 ? (metaAdSpend / totalAdSpend) * 100 : 0;
+  const marketingPercentageOfGross =
+    grossSales > 0 ? (totalAdSpend / grossSales) * 100 : 0;
+  const marketingPercentageOfNet =
+    netRevenue > 0 ? (totalAdSpend / netRevenue) * 100 : 0;
 
-  const cogsPercentageOfGross = grossSales > 0 ? (adjustedCogs / grossSales) * 100 : 0;
-  const cogsPercentageOfNet = netRevenue > 0 ? (adjustedCogs / netRevenue) * 100 : 0;
-  const shippingPercentageOfNet = netRevenue > 0 ? (shippingCosts / netRevenue) * 100 : 0;
-  const taxesPercentageOfRevenue = netRevenue > 0 ? (adjustedTaxesCollected / netRevenue) * 100 : 0;
+  const cogsPercentageOfGross =
+    grossSales > 0 ? (adjustedCogs / grossSales) * 100 : 0;
+  const cogsPercentageOfNet =
+    netRevenue > 0 ? (adjustedCogs / netRevenue) * 100 : 0;
+  const shippingPercentageOfNet =
+    netRevenue > 0 ? (shippingCosts / netRevenue) * 100 : 0;
+  const taxesPercentageOfRevenue =
+    netRevenue > 0 ? (adjustedTaxesCollected / netRevenue) * 100 : 0;
 
-  const returnRate = activeOrderCount > 0 ? (refunds.length / activeOrderCount) * 100 : 0;
+  const returnRate =
+    activeOrderCount > 0 ? (refunds.length / activeOrderCount) * 100 : 0;
   const paidCustomersCount = uniqueCustomerIds.size;
   const totalCustomersCount = paidCustomersCount;
-  const repeatCustomerRate = paidCustomersCount > 0
-    ? (repeatCustomersInPeriod / paidCustomersCount) * 100
-    : 0;
+  const repeatCustomerRate =
+    paidCustomersCount > 0
+      ? (repeatCustomersInPeriod / paidCustomersCount) * 100
+      : 0;
   const customerAcquisitionCost = adSpendPerOrder;
-  const cacPercentageOfAOV = averageOrderValue > 0 ? (customerAcquisitionCost / averageOrderValue) * 100 : 0;
-  const operatingCostPercentage = netRevenue > 0 ? (customCostTotal / netRevenue) * 100 : 0;
-  const abandonedCustomers = Math.max(totalCustomersCount - paidCustomersCount, 0);
-  const abandonedRate = totalCustomersCount > 0
-    ? (abandonedCustomers / totalCustomersCount) * 100
-    : 0;
+  const cacPercentageOfAOV =
+    averageOrderValue > 0
+      ? (customerAcquisitionCost / averageOrderValue) * 100
+      : 0;
+  const operatingCostPercentage =
+    netRevenue > 0 ? (customCostTotal / netRevenue) * 100 : 0;
+  const abandonedCustomers = Math.max(
+    totalCustomersCount - paidCustomersCount,
+    0,
+  );
+  const abandonedRate =
+    totalCustomersCount > 0
+      ? (abandonedCustomers / totalCustomersCount) * 100
+      : 0;
 
   const summary: OverviewComputation["summary"] = {
     revenue,
@@ -706,11 +781,15 @@ function computeOverviewBaseline(
     manualReturnRate: defaultMetric(manualReturnRatePercent, 0),
   };
 
-  const metaClickDenominator = metaUniqueClicks > 0 ? metaUniqueClicks : metaClicks;
-  const blendedSessionConversionRate = metaClickDenominator > 0
-    ? (activeOrderCount / metaClickDenominator) * 100
-    : 0;
-  const uniqueVisitors = sumBy(analytics, (entry) => safeNumber(entry.visitors ?? entry.sessions ?? entry.visits));
+  const metaClickDenominator =
+    metaUniqueClicks > 0 ? metaUniqueClicks : metaClicks;
+  const blendedSessionConversionRate =
+    metaClickDenominator > 0
+      ? (activeOrderCount / metaClickDenominator) * 100
+      : 0;
+  const uniqueVisitors = sumBy(analytics, (entry) =>
+    safeNumber(entry.visitors ?? entry.sessions ?? entry.visits),
+  );
 
   return {
     summary,
@@ -723,15 +802,19 @@ function computeOverviewBaseline(
   } satisfies OverviewComputation;
 }
 
-function applySummaryChanges(current: OverviewSummary, previous: OverviewSummary): void {
+function applySummaryChanges(
+  current: OverviewSummary,
+  previous: OverviewSummary,
+): void {
   const summaryRecord = current as unknown as Record<string, number>;
   for (const key of Object.keys(current) as Array<keyof OverviewSummary>) {
-    if (!String(key).endsWith('Change')) continue;
+    if (!String(key).endsWith("Change")) continue;
     const baseKey = String(key).slice(0, -6) as keyof OverviewSummary;
     if (!(baseKey in current) || !(baseKey in previous)) continue;
     const currentValue = current[baseKey];
     const previousValue = previous[baseKey];
-    if (typeof currentValue !== 'number' || typeof previousValue !== 'number') continue;
+    if (typeof currentValue !== "number" || typeof previousValue !== "number")
+      continue;
     summaryRecord[String(key)] = percentageChange(currentValue, previousValue);
   }
 }
@@ -744,7 +827,10 @@ function applyMetricChanges(
     const previousMetric = previous[key];
     if (!previousMetric) continue;
     metric.change = percentageChange(metric.value, previousMetric.value);
-    if (typeof previousMetric.value === 'number' && Number.isFinite(previousMetric.value)) {
+    if (
+      typeof previousMetric.value === "number" &&
+      Number.isFinite(previousMetric.value)
+    ) {
       metric.previousValue = previousMetric.value;
     }
   }

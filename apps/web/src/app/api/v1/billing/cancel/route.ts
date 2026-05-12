@@ -78,7 +78,9 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (error) {
     const requestId = genRequestId(req);
-    logger.error("Error cancelling subscription", error as Error, { requestId });
+    logger.error("Error cancelling subscription", error as Error, {
+      requestId,
+    });
     const res = NextResponse.json(
       { error: "Failed to cancel subscription", requestId },
       { status: 500 },

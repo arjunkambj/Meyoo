@@ -82,7 +82,7 @@ export const syncCurrentStackTeamMembership = mutation({
       },
     );
 
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch("users", user._id, {
       organizationId: organization._id,
       selectedTeamId: args.teamId,
       teamIds: Array.from(new Set([...(user.teamIds ?? []), args.teamId])),
@@ -115,7 +115,7 @@ export const getTeamMembers = query({
     ).filter((membership) => membership.status !== "removed");
 
     const users = await Promise.all(
-      memberships.map((m) => ctx.db.get(m.userId)),
+      memberships.map((m) => ctx.db.get("users", m.userId)),
     );
 
     return memberships.map((m, i) => {
@@ -217,7 +217,7 @@ export const removeTeamMember = mutation({
       throw new Error("Only the store owner can remove team members");
     }
 
-    const memberToRemove = await ctx.db.get(args.memberId);
+    const memberToRemove = await ctx.db.get("users", args.memberId);
 
     if (!memberToRemove) {
       throw new Error("Member not found");
@@ -248,7 +248,7 @@ export const removeTeamMember = mutation({
 
     // Mark membership removed before resetting the user's workspace context
     if (memberMembership && memberMembership.status !== "removed") {
-      await ctx.db.patch(memberMembership._id, {
+      await ctx.db.patch("memberships", memberMembership._id, {
         status: "removed",
         updatedAt: now,
       });
@@ -291,7 +291,7 @@ export const leaveOrganization = mutation({
     const now = Date.now();
 
     if (existingMembership && existingMembership.status !== "removed") {
-      await ctx.db.patch(existingMembership._id, {
+      await ctx.db.patch("memberships", existingMembership._id, {
         status: "removed",
         updatedAt: now,
       });

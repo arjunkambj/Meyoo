@@ -177,7 +177,10 @@ function createSyncHandler(config: {
 
       // Validate sync type
       const syncType: string =
-        body.syncType ?? config.defaultSyncType ?? config.validSyncTypes[0] ?? "";
+        body.syncType ??
+        config.defaultSyncType ??
+        config.validSyncTypes[0] ??
+        "";
       if (!config.validSyncTypes.includes(syncType)) {
         return new Response(
           JSON.stringify({

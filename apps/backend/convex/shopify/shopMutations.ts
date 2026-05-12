@@ -1,4 +1,3 @@
-
 import { v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import { internalMutation } from "../_generated/server";
@@ -17,12 +16,12 @@ export const updateShopDetailsInternal = internalMutation({
       .withIndex("by_organization_and_active", (q) =>
         q
           .eq("organizationId", args.organizationId as Id<"organizations">)
-          .eq("isActive", true)
+          .eq("isActive", true),
       )
       .first();
 
     if (store) {
-      await ctx.db.patch(store._id, {
+      await ctx.db.patch("shopifyStores", store._id, {
         shopDomain: args.domain,
         // Note: planName is not in the schema, would need to add it if required
         updatedAt: Date.now(),

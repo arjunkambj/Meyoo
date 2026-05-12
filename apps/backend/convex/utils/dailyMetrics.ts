@@ -86,7 +86,10 @@ function resolveManualReturnRate(
     const isActive = entry.isActive;
     const from = toNumber(entry.effectiveFrom ?? entry.createdAt ?? 0);
     const toRaw = entry.effectiveTo;
-    const to = toRaw === undefined || toRaw === null ? Number.POSITIVE_INFINITY : toNumber(toRaw);
+    const to =
+      toRaw === undefined || toRaw === null
+        ? Number.POSITIVE_INFINITY
+        : toNumber(toRaw);
 
     if (isActive === false && !window) {
       return false;
@@ -100,13 +103,19 @@ function resolveManualReturnRate(
   }
 
   filtered.sort((a, b) => {
-    const aTimestamp = toNumber(a.updatedAt ?? a.effectiveFrom ?? a.createdAt ?? 0);
-    const bTimestamp = toNumber(b.updatedAt ?? b.effectiveFrom ?? b.createdAt ?? 0);
+    const aTimestamp = toNumber(
+      a.updatedAt ?? a.effectiveFrom ?? a.createdAt ?? 0,
+    );
+    const bTimestamp = toNumber(
+      b.updatedAt ?? b.effectiveFrom ?? b.createdAt ?? 0,
+    );
     return bTimestamp - aTimestamp;
   });
 
   const selected = filtered[0]!;
-  const rawRate = toNumber(selected.ratePercent ?? selected.rate ?? selected.value ?? 0);
+  const rawRate = toNumber(
+    selected.ratePercent ?? selected.rate ?? selected.value ?? 0,
+  );
   return clampPercentage(rawRate);
 }
 
@@ -244,10 +253,15 @@ function createEmptyMetaTotals(): MetaInsightsTotals {
   return { ...EMPTY_META_TOTALS };
 }
 
-function accumulateMetaTotals(target: MetaInsightsTotals, record: AnyRecord): void {
+function accumulateMetaTotals(
+  target: MetaInsightsTotals,
+  record: AnyRecord,
+): void {
   target.spend += toNumber((record as { spend?: unknown }).spend);
   target.reach += toNumber((record as { reach?: unknown }).reach);
-  target.impressions += toNumber((record as { impressions?: unknown }).impressions);
+  target.impressions += toNumber(
+    (record as { impressions?: unknown }).impressions,
+  );
 
   const clicks = toNumber((record as { clicks?: unknown }).clicks);
   target.clicks += clicks;
@@ -258,22 +272,32 @@ function accumulateMetaTotals(target: MetaInsightsTotals, record: AnyRecord): vo
   );
   target.uniqueClicks += uniqueClicks;
 
-  target.conversions += toNumber((record as { conversions?: unknown }).conversions);
-  target.conversionValue += toNumber((record as { conversionValue?: unknown }).conversionValue);
+  target.conversions += toNumber(
+    (record as { conversions?: unknown }).conversions,
+  );
+  target.conversionValue += toNumber(
+    (record as { conversionValue?: unknown }).conversionValue,
+  );
   target.addToCart += toNumber((record as { addToCart?: unknown }).addToCart);
   target.initiateCheckout += toNumber(
     (record as { initiateCheckout?: unknown }).initiateCheckout,
   );
   target.pageViews += toNumber((record as { pageViews?: unknown }).pageViews);
-  target.viewContent += toNumber((record as { viewContent?: unknown }).viewContent);
-  target.linkClicks += toNumber((record as { linkClicks?: unknown }).linkClicks);
+  target.viewContent += toNumber(
+    (record as { viewContent?: unknown }).viewContent,
+  );
+  target.linkClicks += toNumber(
+    (record as { linkClicks?: unknown }).linkClicks,
+  );
   target.outboundClicks += toNumber(
     (record as { outboundClicks?: unknown }).outboundClicks,
   );
   target.landingPageViews += toNumber(
     (record as { landingPageViews?: unknown }).landingPageViews,
   );
-  target.videoViews += toNumber((record as { videoViews?: unknown }).videoViews);
+  target.videoViews += toNumber(
+    (record as { videoViews?: unknown }).videoViews,
+  );
   target.video3SecViews += toNumber(
     (record as { video3SecViews?: unknown }).video3SecViews,
   );
@@ -292,7 +316,9 @@ function hasMetaData(totals: MetaInsightsTotals): boolean {
   );
 }
 
-function deriveMetaSessions(totals: MetaInsightsTotals | null | undefined): number {
+function deriveMetaSessions(
+  totals: MetaInsightsTotals | null | undefined,
+): number {
   if (!totals) {
     return 0;
   }
@@ -303,7 +329,6 @@ function deriveMetaSessions(totals: MetaInsightsTotals | null | undefined): numb
 
   return totals.clicks > 0 ? totals.clicks : 0;
 }
-
 
 const EMPTY_PNL_METRICS: PnLMetrics = {
   grossSales: 0,
@@ -374,12 +399,9 @@ function getCostFrequencyDurationMs(cost: OperationalCostDoc): number | null {
   }
 }
 
-function toCostMode(cost: OperationalCostDoc):
-  | "fixed"
-  | "perOrder"
-  | "perUnit"
-  | "percentageRevenue"
-  | "timeBound" {
+function toCostMode(
+  cost: OperationalCostDoc,
+): "fixed" | "perOrder" | "perUnit" | "percentageRevenue" | "timeBound" {
   const frequency = String(cost.frequency ?? "").toLowerCase();
   const calculation = String(cost.calculation ?? "fixed").toLowerCase();
 
@@ -397,7 +419,8 @@ function computeCostOverlapForRange(
   rangeStartMs: number,
   rangeEndMs: number,
 ): { overlapMs: number; windowMs: number | null } {
-  const rawStart = typeof cost.effectiveFrom === "number" ? cost.effectiveFrom : null;
+  const rawStart =
+    typeof cost.effectiveFrom === "number" ? cost.effectiveFrom : null;
   const rawEnd = typeof cost.effectiveTo === "number" ? cost.effectiveTo : null;
 
   const start = rawStart ?? rangeStartMs;
@@ -418,12 +441,18 @@ function computeOperationalCostAmount(
   cost: OperationalCostDoc,
   ctx: CostComputationContext,
 ): number {
-  const amount = toNumber(cost.value ?? (cost as Record<string, unknown>).amount ?? 0);
+  const amount = toNumber(
+    cost.value ?? (cost as Record<string, unknown>).amount ?? 0,
+  );
   if (amount === 0) {
     return 0;
   }
 
-  const { overlapMs, windowMs } = computeCostOverlapForRange(cost, ctx.rangeStartMs, ctx.rangeEndMs);
+  const { overlapMs, windowMs } = computeCostOverlapForRange(
+    cost,
+    ctx.rangeStartMs,
+    ctx.rangeEndMs,
+  );
   if (overlapMs <= 0) {
     return 0;
   }
@@ -489,13 +518,13 @@ function applyOperationalCostsToAggregates(
       }
 
       switch (cost.type) {
-        case 'shipping':
+        case "shipping":
           acc.shipping += amount;
           break;
-        case 'payment':
+        case "payment":
           acc.payment += amount;
           break;
-        case 'operational':
+        case "operational":
         default:
           acc.operational += amount;
           break;
@@ -516,8 +545,13 @@ function applyOperationalCostsToAggregates(
       return computed;
     }
     // Treat values within 5% (or $1) as effectively identical to avoid double counting
-    const tolerance = Math.max(1, Math.min(Math.abs(base), Math.abs(computed)) * 0.05);
-    return Math.abs(base - computed) <= tolerance ? base : Math.max(base, computed);
+    const tolerance = Math.max(
+      1,
+      Math.min(Math.abs(base), Math.abs(computed)) * 0.05,
+    );
+    return Math.abs(base - computed) <= tolerance
+      ? base
+      : Math.max(base, computed);
   })();
 
   const transactionFees = (() => {
@@ -530,8 +564,13 @@ function applyOperationalCostsToAggregates(
       return computed;
     }
     // Avoid double counting payment gateway fees when both sources carry the same data.
-    const tolerance = Math.max(1, Math.min(Math.abs(base), Math.abs(computed)) * 0.05);
-    return Math.abs(base - computed) <= tolerance ? base : Math.max(base, computed);
+    const tolerance = Math.max(
+      1,
+      Math.min(Math.abs(base), Math.abs(computed)) * 0.05,
+    );
+    return Math.abs(base - computed) <= tolerance
+      ? base
+      : Math.max(base, computed);
   })();
 
   return {
@@ -576,12 +615,14 @@ function applyManualReturnRateToPnLMetrics(
   const normalizedRate = clampPercentage(manualRatePercent) / 100;
   const refunds = Math.max(metrics.refunds ?? 0, 0);
 
-  const rtoRevenueLost = baseRevenue > 0
-    ? Math.min(baseRevenue * normalizedRate, baseRevenue)
-    : 0;
+  const rtoRevenueLost =
+    baseRevenue > 0 ? Math.min(baseRevenue * normalizedRate, baseRevenue) : 0;
 
   const refundRatio = baseRevenue > 0 ? Math.min(refunds / baseRevenue, 1) : 0;
-  const rtoRatio = baseRevenue > 0 ? Math.min(rtoRevenueLost / baseRevenue, 1) : normalizedRate;
+  const rtoRatio =
+    baseRevenue > 0
+      ? Math.min(rtoRevenueLost / baseRevenue, 1)
+      : normalizedRate;
   const combinedReturnRatio = Math.min(refundRatio + rtoRatio, 1);
   const retentionFactor = Math.max(0, 1 - combinedReturnRatio);
 
@@ -599,14 +640,14 @@ function applyManualReturnRateToPnLMetrics(
 
   const netRevenue = Math.max(baseRevenue - refunds - rtoRevenueLost, 0);
   const grossProfit = netRevenue - adjustedCogs;
-  const netProfit = grossProfit - (
-    shippingCosts +
-    transactionFees +
-    adjustedHandlingFees +
-    adjustedTaxesCollected +
-    customCosts +
-    adSpend
-  );
+  const netProfit =
+    grossProfit -
+    (shippingCosts +
+      transactionFees +
+      adjustedHandlingFees +
+      adjustedTaxesCollected +
+      customCosts +
+      adSpend);
 
   metrics.rtoRevenueLost = rtoRevenueLost;
   metrics.grossRevenue = Math.max(grossRevenue, 0);
@@ -663,7 +704,11 @@ type DailyMetricsFetchResult = {
 function inclusiveDaySpan(range: DateRange): number {
   const start = getRangeStartMs(range);
   const endExclusive = getRangeEndExclusiveMs(range);
-  if (!Number.isFinite(start) || !Number.isFinite(endExclusive) || endExclusive <= start) {
+  if (
+    !Number.isFinite(start) ||
+    !Number.isFinite(endExclusive) ||
+    endExclusive <= start
+  ) {
     return 0;
   }
   const spanMs = endExclusive - start;
@@ -693,13 +738,17 @@ function shiftDateString(date: string, deltaDays: number): string {
 }
 
 function toIsoDateUtc(date: Date): string {
-  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+  )
     .toISOString()
     .slice(0, 10);
 }
 
 function startOfWeekMondayUtc(date: Date): Date {
-  const base = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const base = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+  );
   const day = base.getUTCDay() || 7;
   if (day !== 1) {
     base.setUTCDate(base.getUTCDate() - day + 1);
@@ -707,7 +756,10 @@ function startOfWeekMondayUtc(date: Date): Date {
   return base;
 }
 
-function deriveTableRangeForGranularity(range: DateRange, granularity: PnLGranularity): DateRange {
+function deriveTableRangeForGranularity(
+  range: DateRange,
+  granularity: PnLGranularity,
+): DateRange {
   const startMs = Date.parse(`${range.startDate}T00:00:00.000Z`);
   const endMs = Date.parse(`${range.endDate}T00:00:00.000Z`);
   if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || startMs > endMs) {
@@ -729,8 +781,12 @@ function deriveTableRangeForGranularity(range: DateRange, granularity: PnLGranul
   }
 
   if (granularity === "monthly") {
-    const alignedStart = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1));
-    const alignedEnd = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 0));
+    const alignedStart = new Date(
+      Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), 1),
+    );
+    const alignedEnd = new Date(
+      Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 0),
+    );
     return {
       startDate: toIsoDateUtc(alignedStart),
       endDate: toIsoDateUtc(alignedEnd),
@@ -785,8 +841,12 @@ function buildPeriodDefinitionsForRange(
     return definitions;
   }
 
-  const monthCursor = new Date(Date.UTC(startDateObj.getUTCFullYear(), startDateObj.getUTCMonth(), 1));
-  const endMonth = new Date(Date.UTC(endDateObj.getUTCFullYear(), endDateObj.getUTCMonth(), 1));
+  const monthCursor = new Date(
+    Date.UTC(startDateObj.getUTCFullYear(), startDateObj.getUTCMonth(), 1),
+  );
+  const endMonth = new Date(
+    Date.UTC(endDateObj.getUTCFullYear(), endDateObj.getUTCMonth(), 1),
+  );
   while (monthCursor.getTime() <= endMonth.getTime()) {
     const period = getPnLPeriodKey(monthCursor, granularity);
     definitions.push(period);
@@ -796,7 +856,10 @@ function buildPeriodDefinitionsForRange(
   return definitions;
 }
 
-function calendarMonthBounds(date: Date): { startDate: string; endDate: string } {
+function calendarMonthBounds(date: Date): {
+  startDate: string;
+  endDate: string;
+} {
   const year = date.getUTCFullYear();
   const month = date.getUTCMonth();
   const start = new Date(Date.UTC(year, month, 1));
@@ -813,7 +876,9 @@ function previousCalendarMonth(date: Date): Date {
   return new Date(Date.UTC(year, month - 1, 1));
 }
 
-function isCalendarMonthRange(range: DateRange): { baseDate: Date; bounds: { startDate: string; endDate: string } } | null {
+function isCalendarMonthRange(
+  range: DateRange,
+): { baseDate: Date; bounds: { startDate: string; endDate: string } } | null {
   const startMs = Date.parse(`${range.startDate}T00:00:00.000Z`);
   const endMs = Date.parse(`${range.endDate}T00:00:00.000Z`);
   if (!Number.isFinite(startMs) || !Number.isFinite(endMs)) {
@@ -823,12 +888,18 @@ function isCalendarMonthRange(range: DateRange): { baseDate: Date; bounds: { sta
   const startDate = new Date(startMs);
   const endDate = new Date(endMs);
 
-  if (startDate.getUTCFullYear() !== endDate.getUTCFullYear() || startDate.getUTCMonth() !== endDate.getUTCMonth()) {
+  if (
+    startDate.getUTCFullYear() !== endDate.getUTCFullYear() ||
+    startDate.getUTCMonth() !== endDate.getUTCMonth()
+  ) {
     return null;
   }
 
   const bounds = calendarMonthBounds(startDate);
-  if (bounds.startDate !== range.startDate || bounds.endDate !== range.endDate) {
+  if (
+    bounds.startDate !== range.startDate ||
+    bounds.endDate !== range.endDate
+  ) {
     return null;
   }
 
@@ -849,7 +920,11 @@ async function computeCalendarMoMRevenueGrowth(
   const previousMonthDate = previousCalendarMonth(calendarRange.baseDate);
   const previousBounds = calendarMonthBounds(previousMonthDate);
 
-  const previous = await fetchDailyMetricsDocs(ctx, organizationId, previousBounds);
+  const previous = await fetchDailyMetricsDocs(
+    ctx,
+    organizationId,
+    previousBounds,
+  );
   if (!previous) {
     return 0;
   }
@@ -895,9 +970,10 @@ async function fetchDailyMetricsDocs(
   const coverageEndMs = Date.parse(`${coverageEnd}T00:00:00.000Z`);
 
   const availableDays = uniqueDates.length;
-  const expectedDays = Number.isFinite(rangeStartMs) && Number.isFinite(rangeEndExclusiveMs)
-    ? Math.max(1, Math.round((rangeEndExclusiveMs - rangeStartMs) / DAY_MS))
-    : null;
+  const expectedDays =
+    Number.isFinite(rangeStartMs) && Number.isFinite(rangeEndExclusiveMs)
+      ? Math.max(1, Math.round((rangeEndExclusiveMs - rangeStartMs) / DAY_MS))
+      : null;
 
   const lastRangeDayStart = rangeEndExclusiveMs - DAY_MS;
 
@@ -937,15 +1013,20 @@ function toNumber(value: unknown): number {
 
 type ChannelTotals = Map<string, { revenue: number; orders: number }>;
 
-function aggregateChannelRevenueFromDocs(docs: DailyMetricDoc[]): ChannelTotals {
+function aggregateChannelRevenueFromDocs(
+  docs: DailyMetricDoc[],
+): ChannelTotals {
   const totals: ChannelTotals = new Map();
 
   for (const doc of docs) {
-    const channels = Array.isArray(doc.channelRevenue) ? doc.channelRevenue : [];
+    const channels = Array.isArray(doc.channelRevenue)
+      ? doc.channelRevenue
+      : [];
     for (const entry of channels) {
       if (!entry || typeof entry !== "object") continue;
       const rawName = (entry as { name?: unknown }).name;
-      const name = typeof rawName === "string" && rawName.trim() ? rawName.trim() : null;
+      const name =
+        typeof rawName === "string" && rawName.trim() ? rawName.trim() : null;
       if (!name) continue;
 
       const current = totals.get(name) ?? { revenue: 0, orders: 0 };
@@ -984,7 +1065,9 @@ function buildChannelRevenueBreakdown(
   return { channels };
 }
 
-function extractMetaRevenueFromTotals(totals: ChannelTotals | null | undefined): number {
+function extractMetaRevenueFromTotals(
+  totals: ChannelTotals | null | undefined,
+): number {
   if (!totals) {
     return 0;
   }
@@ -1000,61 +1083,70 @@ function extractMetaRevenueFromTotals(totals: ChannelTotals | null | undefined):
 }
 
 function mergeDailyMetrics(docs: DailyMetricDoc[]): AggregatedDailyMetrics {
-  return docs.reduce<AggregatedDailyMetrics>((acc, doc) => {
-    const revenue = toNumber(doc.totalRevenue);
-    const discounts = toNumber(doc.totalDiscounts);
-    const grossSales = toNumber(doc.grossSales);
-    acc.revenue += revenue;
-    acc.grossSales += grossSales > 0 ? grossSales : revenue + discounts;
-    acc.discounts += discounts;
-    acc.refundsAmount += 0;
-    acc.orders += toNumber(doc.totalOrders);
-    acc.unitsSold += toNumber(doc.unitsSold);
-    acc.cogs += toNumber(doc.totalCogs);
-    acc.shippingCosts += toNumber(doc.totalShippingCost);
-    acc.transactionFees += toNumber(doc.totalTransactionFees);
-    acc.handlingFees += toNumber(doc.totalHandlingFee);
-    acc.taxesCollected += toNumber(doc.totalTaxes);
-    acc.marketingCost += toNumber(doc.blendedMarketingCost);
+  return docs.reduce<AggregatedDailyMetrics>(
+    (acc, doc) => {
+      const revenue = toNumber(doc.totalRevenue);
+      const discounts = toNumber(doc.totalDiscounts);
+      const grossSales = toNumber(doc.grossSales);
+      acc.revenue += revenue;
+      acc.grossSales += grossSales > 0 ? grossSales : revenue + discounts;
+      acc.discounts += discounts;
+      acc.refundsAmount += 0;
+      acc.orders += toNumber(doc.totalOrders);
+      acc.unitsSold += toNumber(doc.unitsSold);
+      acc.cogs += toNumber(doc.totalCogs);
+      acc.shippingCosts += toNumber(doc.totalShippingCost);
+      acc.transactionFees += toNumber(doc.totalTransactionFees);
+      acc.handlingFees += toNumber(doc.totalHandlingFee);
+      acc.taxesCollected += toNumber(doc.totalTaxes);
+      acc.marketingCost += toNumber(doc.blendedMarketingCost);
 
-    const ctr = toNumber(doc.blendedCtr);
-    if (ctr > 0) {
-      acc.blendedCtrSum += ctr;
-      acc.blendedCtrCount += 1;
-    }
+      const ctr = toNumber(doc.blendedCtr);
+      if (ctr > 0) {
+        acc.blendedCtrSum += ctr;
+        acc.blendedCtrCount += 1;
+      }
 
-    acc.paidCustomers += toNumber(doc.paidCustomers);
-    acc.totalCustomers += toNumber(doc.totalCustomers);
+      acc.paidCustomers += toNumber(doc.paidCustomers);
+      acc.totalCustomers += toNumber(doc.totalCustomers);
 
-    if (doc.customerBreakdown) {
-      acc.newCustomers += toNumber(doc.customerBreakdown.newCustomers);
-      acc.returningCustomers += toNumber(doc.customerBreakdown.returningCustomers);
-      acc.repeatCustomers += toNumber(doc.customerBreakdown.repeatCustomers);
-    }
+      if (doc.customerBreakdown) {
+        acc.newCustomers += toNumber(doc.customerBreakdown.newCustomers);
+        acc.returningCustomers += toNumber(
+          doc.customerBreakdown.returningCustomers,
+        );
+        acc.repeatCustomers += toNumber(doc.customerBreakdown.repeatCustomers);
+      }
 
-    if (doc.paymentBreakdown) {
-      acc.prepaidOrders += toNumber(doc.paymentBreakdown.prepaidOrders);
-      acc.codOrders += toNumber(doc.paymentBreakdown.codOrders);
-      acc.otherOrders += toNumber(doc.paymentBreakdown.otherOrders);
-    }
+      if (doc.paymentBreakdown) {
+        acc.prepaidOrders += toNumber(doc.paymentBreakdown.prepaidOrders);
+        acc.codOrders += toNumber(doc.paymentBreakdown.codOrders);
+        acc.otherOrders += toNumber(doc.paymentBreakdown.otherOrders);
+      }
 
-    acc.cancelledOrders += toNumber(doc.cancelledOrders);
-    acc.returnedOrders += toNumber(doc.returnedOrders);
-    if (Object.prototype.hasOwnProperty.call(doc, "fulfilledOrders")) {
-      acc.fulfillmentDataPoints += 1;
-    }
-    acc.fulfilledOrders += toNumber((doc as AnyRecord).fulfilledOrders);
-    acc.sessions += toNumber(doc.sessions);
-    acc.visitors += toNumber(doc.visitors);
-    acc.conversions += toNumber(doc.conversions);
+      acc.cancelledOrders += toNumber(doc.cancelledOrders);
+      acc.returnedOrders += toNumber(doc.returnedOrders);
+      if (Object.prototype.hasOwnProperty.call(doc, "fulfilledOrders")) {
+        acc.fulfillmentDataPoints += 1;
+      }
+      acc.fulfilledOrders += toNumber((doc as AnyRecord).fulfilledOrders);
+      acc.sessions += toNumber(doc.sessions);
+      acc.visitors += toNumber(doc.visitors);
+      acc.conversions += toNumber(doc.conversions);
 
-    return acc;
-  }, { ...EMPTY_AGGREGATES });
+      return acc;
+    },
+    { ...EMPTY_AGGREGATES },
+  );
 }
 
-function makeMetric(value: number, change = 0, previousValue?: number): MetricValue {
+function makeMetric(
+  value: number,
+  change = 0,
+  previousValue?: number,
+): MetricValue {
   const metric: MetricValue = { value, change };
-  if (typeof previousValue === 'number' && Number.isFinite(previousValue)) {
+  if (typeof previousValue === "number" && Number.isFinite(previousValue)) {
     metric.previousValue = previousValue;
   }
   return metric;
@@ -1074,7 +1166,9 @@ function buildOverviewFromAggregates(
   const prevRevenue = prev?.revenue ?? 0;
 
   const grossSales = Math.max(aggregates.grossSales, revenue);
-  const prevGrossSales = prev ? Math.max(prev.grossSales, prev.revenue) : prevRevenue;
+  const prevGrossSales = prev
+    ? Math.max(prev.grossSales, prev.revenue)
+    : prevRevenue;
 
   const discounts = aggregates.discounts;
   const prevDiscounts = prev?.discounts ?? 0;
@@ -1085,20 +1179,41 @@ function buildOverviewFromAggregates(
     manualReturnRatePercentOverride ?? aggregates.manualReturnRatePercent ?? 0,
   );
   const prevManualReturnRatePercent = clampPercentage(
-    previousManualReturnRatePercentOverride ?? prev?.manualReturnRatePercent ?? 0,
+    previousManualReturnRatePercentOverride ??
+      prev?.manualReturnRatePercent ??
+      0,
   );
   const grossRevenueBase = Math.max(grossSales, revenue, 0);
-  const prevGrossRevenueBase = prev ? Math.max(prevGrossSales, prevRevenue, 0) : prevRevenue;
+  const prevGrossRevenueBase = prev
+    ? Math.max(prevGrossSales, prevRevenue, 0)
+    : prevRevenue;
   let rtoRevenueLost = aggregates.rtoRevenueLost;
-  if (rtoRevenueLost <= 0 && manualReturnRatePercent > 0 && grossRevenueBase > 0) {
-    rtoRevenueLost = Math.min((grossRevenueBase * manualReturnRatePercent) / 100, grossRevenueBase);
+  if (
+    rtoRevenueLost <= 0 &&
+    manualReturnRatePercent > 0 &&
+    grossRevenueBase > 0
+  ) {
+    rtoRevenueLost = Math.min(
+      (grossRevenueBase * manualReturnRatePercent) / 100,
+      grossRevenueBase,
+    );
   }
   let prevRtoRevenueLost = prev?.rtoRevenueLost ?? 0;
-  if (prevRtoRevenueLost <= 0 && prevManualReturnRatePercent > 0 && prevGrossRevenueBase > 0) {
-    prevRtoRevenueLost = Math.min((prevGrossRevenueBase * prevManualReturnRatePercent) / 100, prevGrossRevenueBase);
+  if (
+    prevRtoRevenueLost <= 0 &&
+    prevManualReturnRatePercent > 0 &&
+    prevGrossRevenueBase > 0
+  ) {
+    prevRtoRevenueLost = Math.min(
+      (prevGrossRevenueBase * prevManualReturnRatePercent) / 100,
+      prevGrossRevenueBase,
+    );
   }
   const netRevenue = Math.max(revenue - refundsAmount - rtoRevenueLost, 0);
-  const prevNetRevenue = Math.max(prevRevenue - prevRefundsAmount - prevRtoRevenueLost, 0);
+  const prevNetRevenue = Math.max(
+    prevRevenue - prevRefundsAmount - prevRtoRevenueLost,
+    0,
+  );
 
   const orders = aggregates.orders;
   const prevOrders = prev?.orders ?? 0;
@@ -1153,12 +1268,13 @@ function buildOverviewFromAggregates(
   const prevMetaSpend = Math.max(previousMeta.spend, 0);
   const metaConversionValue = Math.max(currentMeta.conversionValue, 0);
   const prevMetaConversionValue = Math.max(previousMeta.conversionValue, 0);
-  const metaSpendPercentage = marketingCost > 0 ? (metaSpend / marketingCost) * 100 : 0;
-  const prevMetaSpendPercentage = prevMarketingCost > 0
-    ? (prevMetaSpend / prevMarketingCost) * 100
-    : 0;
+  const metaSpendPercentage =
+    marketingCost > 0 ? (metaSpend / marketingCost) * 100 : 0;
+  const prevMetaSpendPercentage =
+    prevMarketingCost > 0 ? (prevMetaSpend / prevMarketingCost) * 100 : 0;
   const metaRoas = metaSpend > 0 ? metaConversionValue / metaSpend : 0;
-  const prevMetaRoas = prevMetaSpend > 0 ? prevMetaConversionValue / prevMetaSpend : 0;
+  const prevMetaRoas =
+    prevMetaSpend > 0 ? prevMetaConversionValue / prevMetaSpend : 0;
 
   const paidCustomers = aggregates.paidCustomers;
   const prevPaidCustomers = prev?.paidCustomers ?? 0;
@@ -1181,18 +1297,33 @@ function buildOverviewFromAggregates(
   const cancelledOrders = Math.max(aggregates.cancelledOrders, 0);
   const prevCancelledOrders = Math.max(prev?.cancelledOrders ?? 0, 0);
   const cancellationRate = orders > 0 ? (cancelledOrders / orders) * 100 : 0;
-  const prevCancellationRate = prevOrders > 0 ? (prevCancelledOrders / prevOrders) * 100 : 0;
+  const prevCancellationRate =
+    prevOrders > 0 ? (prevCancelledOrders / prevOrders) * 100 : 0;
 
   const totalCostsWithoutAds =
-    cogs + shippingCosts + transactionFees + handlingFees + taxesCollected + customCosts;
+    cogs +
+    shippingCosts +
+    transactionFees +
+    handlingFees +
+    taxesCollected +
+    customCosts;
   const prevTotalCostsWithoutAds =
-    prevCogs + prevShippingCosts + prevTransactionFees + prevHandlingFees + prevTaxesCollected + prevCustomCosts;
+    prevCogs +
+    prevShippingCosts +
+    prevTransactionFees +
+    prevHandlingFees +
+    prevTaxesCollected +
+    prevCustomCosts;
 
   const totalReturnImpact = refundsAmount + rtoRevenueLost;
   const prevTotalReturnImpact = prevRefundsAmount + prevRtoRevenueLost;
-  const netProfit = revenue - totalCostsWithoutAds - marketingCost - totalReturnImpact;
+  const netProfit =
+    revenue - totalCostsWithoutAds - marketingCost - totalReturnImpact;
   const prevNetProfit =
-    prevRevenue - prevTotalCostsWithoutAds - prevMarketingCost - prevTotalReturnImpact;
+    prevRevenue -
+    prevTotalCostsWithoutAds -
+    prevMarketingCost -
+    prevTotalReturnImpact;
 
   const operatingCosts = totalCostsWithoutAds + totalReturnImpact;
   const prevOperatingCosts = prevTotalCostsWithoutAds + prevTotalReturnImpact;
@@ -1203,24 +1334,32 @@ function buildOverviewFromAggregates(
   const prevGrossProfit = prevRevenue - prevCogs;
 
   const contributionProfit =
-    revenue - (cogs + shippingCosts + transactionFees + handlingFees + customCosts);
+    revenue -
+    (cogs + shippingCosts + transactionFees + handlingFees + customCosts);
   const prevContributionProfit =
-    prevRevenue - (prevCogs + prevShippingCosts + prevTransactionFees + prevHandlingFees + prevCustomCosts);
+    prevRevenue -
+    (prevCogs +
+      prevShippingCosts +
+      prevTransactionFees +
+      prevHandlingFees +
+      prevCustomCosts);
 
-  const contributionMarginPercentage = revenue > 0 ? (contributionProfit / revenue) * 100 : 0;
+  const contributionMarginPercentage =
+    revenue > 0 ? (contributionProfit / revenue) * 100 : 0;
   const prevContributionMarginPercentage =
     prevRevenue > 0 ? (prevContributionProfit / prevRevenue) * 100 : 0;
 
   const profitMargin = revenue > 0 ? (netProfit / revenue) * 100 : 0;
-  const prevProfitMargin = prevRevenue > 0 ? (prevNetProfit / prevRevenue) * 100 : 0;
+  const prevProfitMargin =
+    prevRevenue > 0 ? (prevNetProfit / prevRevenue) * 100 : 0;
 
   const operatingMargin = revenue > 0 ? (operatingProfit / revenue) * 100 : 0;
-  const prevOperatingMargin = prevRevenue > 0
-    ? (prevOperatingProfit / prevRevenue) * 100
-    : 0;
+  const prevOperatingMargin =
+    prevRevenue > 0 ? (prevOperatingProfit / prevRevenue) * 100 : 0;
 
   const grossProfitMargin = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
-  const prevGrossProfitMargin = prevRevenue > 0 ? (prevGrossProfit / prevRevenue) * 100 : 0;
+  const prevGrossProfitMargin =
+    prevRevenue > 0 ? (prevGrossProfit / prevRevenue) * 100 : 0;
 
   const averageOrderValue = orders > 0 ? revenue / orders : 0;
   const prevAverageOrderValue = prevOrders > 0 ? prevRevenue / prevOrders : 0;
@@ -1228,95 +1367,124 @@ function buildOverviewFromAggregates(
   const averageOrderCost =
     orders > 0 ? (totalCostsWithoutAds + marketingCost) / orders : 0;
   const prevAverageOrderCost =
-    prevOrders > 0 ? (prevTotalCostsWithoutAds + prevMarketingCost) / prevOrders : 0;
+    prevOrders > 0
+      ? (prevTotalCostsWithoutAds + prevMarketingCost) / prevOrders
+      : 0;
 
   const averageOrderProfit = orders > 0 ? netProfit / orders : 0;
-  const prevAverageOrderProfit = prevOrders > 0 ? prevNetProfit / prevOrders : 0;
+  const prevAverageOrderProfit =
+    prevOrders > 0 ? prevNetProfit / prevOrders : 0;
 
   const adSpendPerOrder = orders > 0 ? marketingCost / orders : 0;
-  const prevAdSpendPerOrder = prevOrders > 0 ? prevMarketingCost / prevOrders : 0;
+  const prevAdSpendPerOrder =
+    prevOrders > 0 ? prevMarketingCost / prevOrders : 0;
 
   const profitPerUnit = unitsSold > 0 ? netProfit / unitsSold : 0;
-  const prevProfitPerUnit = prevUnitsSold > 0 ? prevNetProfit / prevUnitsSold : 0;
+  const prevProfitPerUnit =
+    prevUnitsSold > 0 ? prevNetProfit / prevUnitsSold : 0;
 
   const blendedRoas = marketingCost > 0 ? revenue / marketingCost : 0;
-  const prevBlendedRoas = prevMarketingCost > 0 ? prevRevenue / prevMarketingCost : 0;
+  const prevBlendedRoas =
+    prevMarketingCost > 0 ? prevRevenue / prevMarketingCost : 0;
 
   const poas = marketingCost > 0 ? netProfit / marketingCost : 0;
-  const prevPoas = prevMarketingCost > 0 ? prevNetProfit / prevMarketingCost : 0;
-
+  const prevPoas =
+    prevMarketingCost > 0 ? prevNetProfit / prevMarketingCost : 0;
 
   const cogsPercentageOfGross = grossSales > 0 ? (cogs / grossSales) * 100 : 0;
-  const prevCogsPercentageOfGross = prevGrossSales > 0 ? (prevCogs / prevGrossSales) * 100 : 0;
+  const prevCogsPercentageOfGross =
+    prevGrossSales > 0 ? (prevCogs / prevGrossSales) * 100 : 0;
 
   const cogsPercentageOfNet = revenue > 0 ? (cogs / revenue) * 100 : 0;
-  const prevCogsPercentageOfNet = prevRevenue > 0 ? (prevCogs / prevRevenue) * 100 : 0;
+  const prevCogsPercentageOfNet =
+    prevRevenue > 0 ? (prevCogs / prevRevenue) * 100 : 0;
 
-  const shippingPercentageOfNet = revenue > 0 ? (shippingCosts / revenue) * 100 : 0;
-  const prevShippingPercentageOfNet = prevRevenue > 0 ? (prevShippingCosts / prevRevenue) * 100 : 0;
+  const shippingPercentageOfNet =
+    revenue > 0 ? (shippingCosts / revenue) * 100 : 0;
+  const prevShippingPercentageOfNet =
+    prevRevenue > 0 ? (prevShippingCosts / prevRevenue) * 100 : 0;
 
-  const taxesPercentageOfRevenue = revenue > 0 ? (taxesCollected / revenue) * 100 : 0;
-  const prevTaxesPercentageOfRevenue = prevRevenue > 0 ? (prevTaxesCollected / prevRevenue) * 100 : 0;
+  const taxesPercentageOfRevenue =
+    revenue > 0 ? (taxesCollected / revenue) * 100 : 0;
+  const prevTaxesPercentageOfRevenue =
+    prevRevenue > 0 ? (prevTaxesCollected / prevRevenue) * 100 : 0;
 
-  const marketingPercentageOfGross = grossSales > 0 ? (marketingCost / grossSales) * 100 : 0;
+  const marketingPercentageOfGross =
+    grossSales > 0 ? (marketingCost / grossSales) * 100 : 0;
   const prevMarketingPercentageOfGross =
     prevGrossSales > 0 ? (prevMarketingCost / prevGrossSales) * 100 : 0;
 
-  const marketingPercentageOfNet = revenue > 0 ? (marketingCost / revenue) * 100 : 0;
+  const marketingPercentageOfNet =
+    revenue > 0 ? (marketingCost / revenue) * 100 : 0;
   const prevMarketingPercentageOfNet =
     prevRevenue > 0 ? (prevMarketingCost / prevRevenue) * 100 : 0;
 
-  const operatingCostPercentage = revenue > 0 ? (customCosts / revenue) * 100 : 0;
+  const operatingCostPercentage =
+    revenue > 0 ? (customCosts / revenue) * 100 : 0;
   const prevOperatingCostPercentage =
     prevRevenue > 0 ? (prevCustomCosts / prevRevenue) * 100 : 0;
 
   const customersCount = totalCustomers > 0 ? totalCustomers : paidCustomers;
-  const prevCustomersCount = prevTotalCustomers > 0 ? prevTotalCustomers : prevPaidCustomers;
+  const prevCustomersCount =
+    prevTotalCustomers > 0 ? prevTotalCustomers : prevPaidCustomers;
 
-  const repeatCustomerBase = customersCount > 0 ? customersCount : paidCustomers;
-  const prevRepeatCustomerBase = prevCustomersCount > 0 ? prevCustomersCount : prevPaidCustomers;
+  const repeatCustomerBase =
+    customersCount > 0 ? customersCount : paidCustomers;
+  const prevRepeatCustomerBase =
+    prevCustomersCount > 0 ? prevCustomersCount : prevPaidCustomers;
 
-  const repeatCustomerRate = repeatCustomerBase > 0
-    ? (repeatCustomers / repeatCustomerBase) * 100
-    : 0;
-  const prevRepeatCustomerRate = prevRepeatCustomerBase > 0
-    ? (prevRepeatCustomers / prevRepeatCustomerBase) * 100
-    : 0;
+  const repeatCustomerRate =
+    repeatCustomerBase > 0 ? (repeatCustomers / repeatCustomerBase) * 100 : 0;
+  const prevRepeatCustomerRate =
+    prevRepeatCustomerBase > 0
+      ? (prevRepeatCustomers / prevRepeatCustomerBase) * 100
+      : 0;
 
   const customerAcquisitionCost = orders > 0 ? marketingCost / orders : 0;
-  const prevCustomerAcquisitionCost = prevOrders > 0
-    ? prevMarketingCost / prevOrders
-    : 0;
+  const prevCustomerAcquisitionCost =
+    prevOrders > 0 ? prevMarketingCost / prevOrders : 0;
 
-  const cacPercentageOfAOV = averageOrderValue > 0
-    ? (customerAcquisitionCost / averageOrderValue) * 100
-    : 0;
-  const prevCacPercentageOfAOV = prevAverageOrderValue > 0
-    ? (prevCustomerAcquisitionCost / prevAverageOrderValue) * 100
-    : 0;
+  const cacPercentageOfAOV =
+    averageOrderValue > 0
+      ? (customerAcquisitionCost / averageOrderValue) * 100
+      : 0;
+  const prevCacPercentageOfAOV =
+    prevAverageOrderValue > 0
+      ? (prevCustomerAcquisitionCost / prevAverageOrderValue) * 100
+      : 0;
 
   const returnRate = orders > 0 ? (returnedOrders / orders) * 100 : 0;
-  const prevReturnRate = prevOrders > 0 ? (prevReturnedOrders / prevOrders) * 100 : 0;
+  const prevReturnRate =
+    prevOrders > 0 ? (prevReturnedOrders / prevOrders) * 100 : 0;
 
-  const customerCountForLtv = customersCount > 0 ? customersCount : totalCustomers;
-  const prevCustomerCountForLtv = prevCustomersCount > 0 ? prevCustomersCount : Math.max(prevTotalCustomers, 0);
-  const lifetimeValue = customerCountForLtv > 0 ? revenue / customerCountForLtv : 0;
-  const prevLifetimeValue = prevCustomerCountForLtv > 0 ? prevRevenue / prevCustomerCountForLtv : 0;
-  const ltvToCac = customerAcquisitionCost > 0 ? lifetimeValue / customerAcquisitionCost : 0;
-  const prevLtvToCac = prevCustomerAcquisitionCost > 0 ? prevLifetimeValue / prevCustomerAcquisitionCost : 0;
+  const customerCountForLtv =
+    customersCount > 0 ? customersCount : totalCustomers;
+  const prevCustomerCountForLtv =
+    prevCustomersCount > 0
+      ? prevCustomersCount
+      : Math.max(prevTotalCustomers, 0);
+  const lifetimeValue =
+    customerCountForLtv > 0 ? revenue / customerCountForLtv : 0;
+  const prevLifetimeValue =
+    prevCustomerCountForLtv > 0 ? prevRevenue / prevCustomerCountForLtv : 0;
+  const ltvToCac =
+    customerAcquisitionCost > 0 ? lifetimeValue / customerAcquisitionCost : 0;
+  const prevLtvToCac =
+    prevCustomerAcquisitionCost > 0
+      ? prevLifetimeValue / prevCustomerAcquisitionCost
+      : 0;
 
   const safeMetaSessions = Math.max(metaSessions, 0);
   const safePrevMetaSessions = Math.max(prevMetaSessions, 0);
-  const blendedSessionConversionRate = safeMetaSessions > 0
-    ? (orders / safeMetaSessions) * 100
-    : 0;
-  const prevBlendedSessionConversionRate = safePrevMetaSessions > 0
-    ? (prevOrders / safePrevMetaSessions) * 100
-    : 0;
+  const blendedSessionConversionRate =
+    safeMetaSessions > 0 ? (orders / safeMetaSessions) * 100 : 0;
+  const prevBlendedSessionConversionRate =
+    safePrevMetaSessions > 0 ? (prevOrders / safePrevMetaSessions) * 100 : 0;
   const uniqueVisitors = Math.max(aggregates.visitors, 0);
 
   const discountRate = revenue > 0 ? (discounts / revenue) * 100 : 0;
-  const prevDiscountRate = prevRevenue > 0 ? (prevDiscounts / prevRevenue) * 100 : 0;
+  const prevDiscountRate =
+    prevRevenue > 0 ? (prevDiscounts / prevRevenue) * 100 : 0;
 
   const summary: OverviewComputation["summary"] = {
     revenue,
@@ -1343,18 +1511,30 @@ function buildOverviewFromAggregates(
     grossProfit,
     grossProfitChange: percentageChange(grossProfit, prevGrossProfit),
     grossProfitMargin,
-    grossProfitMarginChange: percentageChange(grossProfitMargin, prevGrossProfitMargin),
+    grossProfitMarginChange: percentageChange(
+      grossProfitMargin,
+      prevGrossProfitMargin,
+    ),
     contributionMargin: contributionProfit,
-    contributionMarginChange: percentageChange(contributionProfit, prevContributionProfit),
+    contributionMarginChange: percentageChange(
+      contributionProfit,
+      prevContributionProfit,
+    ),
     contributionMarginPercentage,
     contributionMarginPercentageChange: percentageChange(
       contributionMarginPercentage,
       prevContributionMarginPercentage,
     ),
     operatingMargin,
-    operatingMarginChange: percentageChange(operatingMargin, prevOperatingMargin),
+    operatingMarginChange: percentageChange(
+      operatingMargin,
+      prevOperatingMargin,
+    ),
     blendedMarketingCost: marketingCost,
-    blendedMarketingCostChange: percentageChange(marketingCost, prevMarketingCost),
+    blendedMarketingCostChange: percentageChange(
+      marketingCost,
+      prevMarketingCost,
+    ),
     metaAdSpend: metaSpend,
     metaAdSpendChange: percentageChange(metaSpend, prevMetaSpend),
     metaSpendPercentage,
@@ -1385,15 +1565,30 @@ function buildOverviewFromAggregates(
     unitsSold,
     unitsSoldChange: percentageChange(unitsSold, prevUnitsSold),
     avgOrderValue: averageOrderValue,
-    avgOrderValueChange: percentageChange(averageOrderValue, prevAverageOrderValue),
+    avgOrderValueChange: percentageChange(
+      averageOrderValue,
+      prevAverageOrderValue,
+    ),
     avgOrderCost: averageOrderCost,
-    avgOrderCostChange: percentageChange(averageOrderCost, prevAverageOrderCost),
+    avgOrderCostChange: percentageChange(
+      averageOrderCost,
+      prevAverageOrderCost,
+    ),
     avgOrderProfit: averageOrderProfit,
-    avgOrderProfitChange: percentageChange(averageOrderProfit, prevAverageOrderProfit),
+    avgOrderProfitChange: percentageChange(
+      averageOrderProfit,
+      prevAverageOrderProfit,
+    ),
     adSpendPerOrder,
-    adSpendPerOrderChange: percentageChange(adSpendPerOrder, prevAdSpendPerOrder),
+    adSpendPerOrderChange: percentageChange(
+      adSpendPerOrder,
+      prevAdSpendPerOrder,
+    ),
     profitPerOrder: averageOrderProfit,
-    profitPerOrderChange: percentageChange(averageOrderProfit, prevAverageOrderProfit),
+    profitPerOrderChange: percentageChange(
+      averageOrderProfit,
+      prevAverageOrderProfit,
+    ),
     profitPerUnit,
     profitPerUnitChange: percentageChange(profitPerUnit, prevProfitPerUnit),
     fulfillmentCostPerOrder: 0,
@@ -1418,7 +1613,10 @@ function buildOverviewFromAggregates(
       prevShippingPercentageOfNet,
     ),
     transactionFees,
-    transactionFeesChange: percentageChange(transactionFees, prevTransactionFees),
+    transactionFeesChange: percentageChange(
+      transactionFees,
+      prevTransactionFees,
+    ),
     handlingFees,
     handlingFeesChange: percentageChange(handlingFees, prevHandlingFees),
     taxesCollected,
@@ -1440,7 +1638,10 @@ function buildOverviewFromAggregates(
     newCustomers,
     newCustomersChange: percentageChange(newCustomers, prevNewCustomers),
     returningCustomers,
-    returningCustomersChange: percentageChange(returningCustomers, prevReturningCustomers),
+    returningCustomersChange: percentageChange(
+      returningCustomers,
+      prevReturningCustomers,
+    ),
     repeatCustomerRate,
     repeatCustomerRateChange: percentageChange(
       repeatCustomerRate,
@@ -1467,16 +1668,36 @@ function buildOverviewFromAggregates(
   } satisfies OverviewComputation["summary"];
 
   const metrics: OverviewComputation["metrics"] = {
-    revenue: makeMetric(revenue, percentageChange(revenue, prevRevenue), prevRevenue),
-    netRevenue: makeMetric(netRevenue, percentageChange(netRevenue, prevNetRevenue), prevNetRevenue),
-    profit: makeMetric(netProfit, percentageChange(netProfit, prevNetProfit), prevNetProfit),
-    orders: makeMetric(orders, percentageChange(orders, prevOrders), prevOrders),
+    revenue: makeMetric(
+      revenue,
+      percentageChange(revenue, prevRevenue),
+      prevRevenue,
+    ),
+    netRevenue: makeMetric(
+      netRevenue,
+      percentageChange(netRevenue, prevNetRevenue),
+      prevNetRevenue,
+    ),
+    profit: makeMetric(
+      netProfit,
+      percentageChange(netProfit, prevNetProfit),
+      prevNetProfit,
+    ),
+    orders: makeMetric(
+      orders,
+      percentageChange(orders, prevOrders),
+      prevOrders,
+    ),
     avgOrderValue: makeMetric(
       averageOrderValue,
       percentageChange(averageOrderValue, prevAverageOrderValue),
       prevAverageOrderValue,
     ),
-    roas: makeMetric(blendedRoas, percentageChange(blendedRoas, prevBlendedRoas), prevBlendedRoas),
+    roas: makeMetric(
+      blendedRoas,
+      percentageChange(blendedRoas, prevBlendedRoas),
+      prevBlendedRoas,
+    ),
     poas: makeMetric(poas, percentageChange(poas, prevPoas), prevPoas),
     contributionMargin: makeMetric(
       contributionProfit,
@@ -1561,7 +1782,9 @@ function buildOrdersOverviewFromAggregates(
   const totalOrders = aggregates.orders;
   const totalRevenue = aggregates.revenue;
   const refundsAmount = Math.max(aggregates.refundsAmount, 0);
-  const manualReturnRatePercent = clampPercentage(aggregates.manualReturnRatePercent ?? 0);
+  const manualReturnRatePercent = clampPercentage(
+    aggregates.manualReturnRatePercent ?? 0,
+  );
   const rtoRevenueLost = Math.max(aggregates.rtoRevenueLost ?? 0, 0);
   const costRetentionFactor = computeCostRetentionFactor({
     revenue: totalRevenue,
@@ -1589,24 +1812,25 @@ function buildOrdersOverviewFromAggregates(
     rtoRevenueLost;
   const netProfit = totalRevenue - totalCosts;
   const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-  const grossMargin = totalRevenue > 0 ? ((totalRevenue - cogs) / totalRevenue) * 100 : 0;
-  const customerAcquisitionCost = totalOrders > 0
-    ? marketingCost / totalOrders
-    : 0;
+  const grossMargin =
+    totalRevenue > 0 ? ((totalRevenue - cogs) / totalRevenue) * 100 : 0;
+  const customerAcquisitionCost =
+    totalOrders > 0 ? marketingCost / totalOrders : 0;
   const recordedFulfilledOrders = Math.max(aggregates.fulfilledOrders, 0);
   const hasFulfillmentSamples = aggregates.fulfillmentDataPoints > 0;
-  const fallbackFulfilledOrders = totalOrders > 0
-    ? Math.max(0, totalOrders - cancelledOrders)
-    : 0;
+  const fallbackFulfilledOrders =
+    totalOrders > 0 ? Math.max(0, totalOrders - cancelledOrders) : 0;
   const fulfilledOrders = hasFulfillmentSamples
     ? recordedFulfilledOrders
     : fallbackFulfilledOrders;
-  const fulfillmentRate = totalOrders > 0 ? (fulfilledOrders / totalOrders) * 100 : 0;
+  const fulfillmentRate =
+    totalOrders > 0 ? (fulfilledOrders / totalOrders) * 100 : 0;
   const prepaidOrders = Math.max(aggregates.prepaidOrders, 0);
   const prepaidRate = totalOrders > 0 ? (prepaidOrders / totalOrders) * 100 : 0;
   const totalCustomers = Math.max(aggregates.totalCustomers, 0);
   const repeatCustomers = Math.max(aggregates.repeatCustomers, 0);
-  const repeatRate = totalCustomers > 0 ? (repeatCustomers / totalCustomers) * 100 : 0;
+  const repeatRate =
+    totalCustomers > 0 ? (repeatCustomers / totalCustomers) * 100 : 0;
   const abandonedCustomers = Math.max(
     0,
     totalCustomers - Math.max(aggregates.paidCustomers, 0),
@@ -1617,7 +1841,9 @@ function buildOrdersOverviewFromAggregates(
   const prevTotalOrders = prev?.orders ?? 0;
   const prevTotalRevenue = prev?.revenue ?? 0;
   const prevRefundsAmount = Math.max(prev?.refundsAmount ?? 0, 0);
-  const prevManualReturnRatePercent = clampPercentage(prev?.manualReturnRatePercent ?? 0);
+  const prevManualReturnRatePercent = clampPercentage(
+    prev?.manualReturnRatePercent ?? 0,
+  );
   const prevRtoRevenueLost = Math.max(prev?.rtoRevenueLost ?? 0, 0);
   const prevCostRetentionFactor = computeCostRetentionFactor({
     revenue: prevTotalRevenue,
@@ -1629,7 +1855,8 @@ function buildOrdersOverviewFromAggregates(
   const prevShippingCosts = prev?.shippingCosts ?? 0;
   const prevTransactionFees = prev?.transactionFees ?? 0;
   const prevHandlingFees = (prev?.handlingFees ?? 0) * prevCostRetentionFactor;
-  const prevTaxesCollected = (prev?.taxesCollected ?? 0) * prevCostRetentionFactor;
+  const prevTaxesCollected =
+    (prev?.taxesCollected ?? 0) * prevCostRetentionFactor;
   const prevCustomCosts = prev?.customCosts ?? 0;
   const prevMarketingCost = prev?.marketingCost ?? 0;
   const prevTotalCosts =
@@ -1643,34 +1870,35 @@ function buildOrdersOverviewFromAggregates(
     prevRefundsAmount +
     prevRtoRevenueLost;
   const prevNetProfit = prevTotalRevenue - prevTotalCosts;
-  const prevAvgOrderValue = prevTotalOrders > 0 ? prevTotalRevenue / prevTotalOrders : 0;
-  const prevGrossMargin = prevTotalRevenue > 0
-    ? ((prevTotalRevenue - prevCogs) / prevTotalRevenue) * 100
-    : 0;
-  const prevCustomerAcquisitionCost = prevTotalOrders > 0
-    ? prevMarketingCost / prevTotalOrders
-    : 0;
+  const prevAvgOrderValue =
+    prevTotalOrders > 0 ? prevTotalRevenue / prevTotalOrders : 0;
+  const prevGrossMargin =
+    prevTotalRevenue > 0
+      ? ((prevTotalRevenue - prevCogs) / prevTotalRevenue) * 100
+      : 0;
+  const prevCustomerAcquisitionCost =
+    prevTotalOrders > 0 ? prevMarketingCost / prevTotalOrders : 0;
   const prevCancelledOrders = Math.max(prev?.cancelledOrders ?? 0, 0);
   const prevRecordedFulfilledOrders = Math.max(prev?.fulfilledOrders ?? 0, 0);
   const prevHasSamples = (prev?.fulfillmentDataPoints ?? 0) > 0;
-  const prevFallbackFulfilled = prevTotalOrders > 0
-    ? Math.max(0, prevTotalOrders - prevCancelledOrders)
-    : 0;
+  const prevFallbackFulfilled =
+    prevTotalOrders > 0
+      ? Math.max(0, prevTotalOrders - prevCancelledOrders)
+      : 0;
   const prevFulfilledOrders = prevHasSamples
     ? prevRecordedFulfilledOrders
     : prevFallbackFulfilled;
-  const prevFulfillmentRate = prevTotalOrders > 0
-    ? (prevFulfilledOrders / prevTotalOrders) * 100
-    : 0;
+  const prevFulfillmentRate =
+    prevTotalOrders > 0 ? (prevFulfilledOrders / prevTotalOrders) * 100 : 0;
   const prevPrepaidOrders = Math.max(prev?.prepaidOrders ?? 0, 0);
-  const prevPrepaidRate = prevTotalOrders > 0
-    ? (prevPrepaidOrders / prevTotalOrders) * 100
-    : 0;
+  const prevPrepaidRate =
+    prevTotalOrders > 0 ? (prevPrepaidOrders / prevTotalOrders) * 100 : 0;
   const prevTotalCustomers = Math.max(prev?.totalCustomers ?? 0, 0);
   const prevRepeatCustomers = Math.max(prev?.repeatCustomers ?? 0, 0);
-  const prevRepeatRate = prevTotalCustomers > 0
-    ? (prevRepeatCustomers / prevTotalCustomers) * 100
-    : 0;
+  const prevRepeatRate =
+    prevTotalCustomers > 0
+      ? (prevRepeatCustomers / prevTotalCustomers) * 100
+      : 0;
   const prevAbandonedCustomers = Math.max(
     0,
     prevTotalCustomers - Math.max(prev?.paidCustomers ?? 0, 0),
@@ -1696,13 +1924,19 @@ function buildOrdersOverviewFromAggregates(
       revenue: percentageChange(totalRevenue, prevTotalRevenue),
       netProfit: percentageChange(netProfit, prevNetProfit),
       avgOrderValue: percentageChange(avgOrderValue, prevAvgOrderValue),
-      cac: percentageChange(customerAcquisitionCost, prevCustomerAcquisitionCost),
+      cac: percentageChange(
+        customerAcquisitionCost,
+        prevCustomerAcquisitionCost,
+      ),
       margin: percentageChange(grossMargin, prevGrossMargin),
       fulfillmentRate: percentageChange(fulfillmentRate, prevFulfillmentRate),
       prepaidRate: percentageChange(prepaidRate, prevPrepaidRate),
       repeatRate: percentageChange(repeatRate, prevRepeatRate),
       rtoRevenueLoss: percentageChange(rtoRevenueLoss, prevRtoRevenueLost),
-      abandonedCustomers: percentageChange(abandonedCustomers, prevAbandonedCustomers),
+      abandonedCustomers: percentageChange(
+        abandonedCustomers,
+        prevAbandonedCustomers,
+      ),
     },
   } satisfies OrdersOverviewMetrics;
 }
@@ -1807,16 +2041,22 @@ function createEmptyPnLMetrics(): PnLMetrics {
 }
 
 function finalizePnLMetrics(metrics: PnLMetrics): PnLMetrics {
-  const netProfitMargin = metrics.revenue > 0 ? (metrics.netProfit / metrics.revenue) * 100 : 0;
+  const netProfitMargin =
+    metrics.revenue > 0 ? (metrics.netProfit / metrics.revenue) * 100 : 0;
   return {
     ...metrics,
     netProfitMargin,
   };
 }
 
-function aggregatedToPnLMetrics(aggregates: AggregatedDailyMetrics): PnLMetrics {
+function aggregatedToPnLMetrics(
+  aggregates: AggregatedDailyMetrics,
+): PnLMetrics {
   const revenue = aggregates.revenue;
-  const grossSales = Math.max(aggregates.grossSales, revenue + aggregates.discounts);
+  const grossSales = Math.max(
+    aggregates.grossSales,
+    revenue + aggregates.discounts,
+  );
   const discounts = aggregates.discounts;
   const refunds = aggregates.refundsAmount;
   const rtoRevenueLost = aggregates.rtoRevenueLost;
@@ -1835,10 +2075,12 @@ function aggregatedToPnLMetrics(aggregates: AggregatedDailyMetrics): PnLMetrics 
   const normalizedRefunds = Math.max(refunds, 0);
   const normalizedRto = Math.max(rtoRevenueLost, 0);
 
-  const refundRatio = baseRevenue > 0 ? Math.min(normalizedRefunds / baseRevenue, 1) : 0;
-  const rtoRatio = baseRevenue > 0
-    ? Math.min(normalizedRto / baseRevenue, 1)
-    : clampPercentage(manualRatePercent) / 100;
+  const refundRatio =
+    baseRevenue > 0 ? Math.min(normalizedRefunds / baseRevenue, 1) : 0;
+  const rtoRatio =
+    baseRevenue > 0
+      ? Math.min(normalizedRto / baseRevenue, 1)
+      : clampPercentage(manualRatePercent) / 100;
   const combinedReturnRatio = Math.min(refundRatio + rtoRatio, 1);
   const retentionFactor = Math.max(0, 1 - combinedReturnRatio);
 
@@ -1846,16 +2088,19 @@ function aggregatedToPnLMetrics(aggregates: AggregatedDailyMetrics): PnLMetrics 
   const adjustedHandlingFees = handlingFees * retentionFactor;
   const adjustedTaxesCollected = taxesCollected * retentionFactor;
 
-  const netRevenue = Math.max(baseRevenue - normalizedRefunds - normalizedRto, 0);
-  const grossProfit = netRevenue - adjustedCogs;
-  const netProfit = grossProfit - (
-    shippingCosts +
-    transactionFees +
-    adjustedHandlingFees +
-    adjustedTaxesCollected +
-    customCosts +
-    marketingCost
+  const netRevenue = Math.max(
+    baseRevenue - normalizedRefunds - normalizedRto,
+    0,
   );
+  const grossProfit = netRevenue - adjustedCogs;
+  const netProfit =
+    grossProfit -
+    (shippingCosts +
+      transactionFees +
+      adjustedHandlingFees +
+      adjustedTaxesCollected +
+      customCosts +
+      marketingCost);
   const netProfitMargin = netRevenue > 0 ? (netProfit / netRevenue) * 100 : 0;
 
   return {
@@ -1901,7 +2146,10 @@ function accumulatePnLMetrics(target: PnLMetrics, addition: PnLMetrics): void {
 
 function metricsFromDailyMetricDoc(doc: DailyMetricDoc): PnLMetrics {
   const revenue = toNumber(doc.totalRevenue);
-  const discounts = 'totalDiscounts' in doc ? toNumber((doc as Record<string, unknown>).totalDiscounts) : 0;
+  const discounts =
+    "totalDiscounts" in doc
+      ? toNumber((doc as Record<string, unknown>).totalDiscounts)
+      : 0;
   const cogs = toNumber(doc.totalCogs);
   const shippingCosts = toNumber(doc.totalShippingCost);
   const transactionFees = toNumber(doc.totalTransactionFees);
@@ -1916,7 +2164,14 @@ function metricsFromDailyMetricDoc(doc: DailyMetricDoc): PnLMetrics {
 
   const netRevenue = revenue - refunds - rtoRevenueLost;
   const grossProfit = netRevenue - cogs;
-  const netProfit = grossProfit - (shippingCosts + transactionFees + handlingFees + taxesCollected + customCosts + adSpend);
+  const netProfit =
+    grossProfit -
+    (shippingCosts +
+      transactionFees +
+      handlingFees +
+      taxesCollected +
+      customCosts +
+      adSpend);
   const netProfitMargin = netRevenue > 0 ? (netProfit / netRevenue) * 100 : 0;
   const grossRevenue = Math.max(revenue, 0);
 
@@ -1942,7 +2197,9 @@ function metricsFromDailyMetricDoc(doc: DailyMetricDoc): PnLMetrics {
 }
 
 function getPnLPeriodKey(date: Date, granularity: PnLGranularity) {
-  const base = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const base = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+  );
 
   switch (granularity) {
     case "weekly": {
@@ -2002,12 +2259,16 @@ function getPnLPeriodKey(date: Date, granularity: PnLGranularity) {
   }
 }
 
-function buildPnLKpisFromTotals(total: PnLMetrics, previous?: PnLMetrics | null): PnLKPIMetrics {
+function buildPnLKpisFromTotals(
+  total: PnLMetrics,
+  previous?: PnLMetrics | null,
+): PnLKPIMetrics {
   const marketingCost = total.totalAdSpend;
   const operatingExpenses = total.customCosts;
   const ebitda = total.netProfit + marketingCost + total.customCosts;
   const marketingROAS = marketingCost > 0 ? total.revenue / marketingCost : 0;
-  const marketingROI = marketingCost > 0 ? (total.netProfit / marketingCost) * 100 : 0;
+  const marketingROI =
+    marketingCost > 0 ? (total.netProfit / marketingCost) * 100 : 0;
 
   return {
     grossSales: total.grossSales,
@@ -2024,20 +2285,54 @@ function buildPnLKpisFromTotals(total: PnLMetrics, previous?: PnLMetrics | null)
     marketingROI,
     changes: {
       grossSales: percentageChange(total.grossSales, previous?.grossSales ?? 0),
-      grossRevenue: percentageChange(total.grossRevenue, previous?.grossRevenue ?? 0),
+      grossRevenue: percentageChange(
+        total.grossRevenue,
+        previous?.grossRevenue ?? 0,
+      ),
       discountsReturns: percentageChange(
         total.discounts + total.refunds,
         previous ? previous.discounts + previous.refunds : 0,
       ),
       netRevenue: percentageChange(total.revenue, previous?.revenue ?? 0),
-      grossProfit: percentageChange(total.grossProfit, previous?.grossProfit ?? 0),
-      operatingExpenses: percentageChange(operatingExpenses, previous?.customCosts ?? 0),
-      ebitda: percentageChange(ebitda, previous ? previous.netProfit + previous.totalAdSpend + previous.customCosts : 0),
+      grossProfit: percentageChange(
+        total.grossProfit,
+        previous?.grossProfit ?? 0,
+      ),
+      operatingExpenses: percentageChange(
+        operatingExpenses,
+        previous?.customCosts ?? 0,
+      ),
+      ebitda: percentageChange(
+        ebitda,
+        previous
+          ? previous.netProfit + previous.totalAdSpend + previous.customCosts
+          : 0,
+      ),
       netProfit: percentageChange(total.netProfit, previous?.netProfit ?? 0),
-      netMargin: percentageChange(total.netProfitMargin, previous?.netProfitMargin ?? 0),
-      marketingCost: percentageChange(marketingCost, previous?.totalAdSpend ?? 0),
-      marketingROAS: percentageChange(marketingROAS, previous ? (previous.totalAdSpend > 0 ? previous.revenue / previous.totalAdSpend : 0) : 0),
-      marketingROI: percentageChange(marketingROI, previous ? (previous.totalAdSpend > 0 ? (previous.netProfit / previous.totalAdSpend) * 100 : 0) : 0),
+      netMargin: percentageChange(
+        total.netProfitMargin,
+        previous?.netProfitMargin ?? 0,
+      ),
+      marketingCost: percentageChange(
+        marketingCost,
+        previous?.totalAdSpend ?? 0,
+      ),
+      marketingROAS: percentageChange(
+        marketingROAS,
+        previous
+          ? previous.totalAdSpend > 0
+            ? previous.revenue / previous.totalAdSpend
+            : 0
+          : 0,
+      ),
+      marketingROI: percentageChange(
+        marketingROI,
+        previous
+          ? previous.totalAdSpend > 0
+            ? (previous.netProfit / previous.totalAdSpend) * 100
+            : 0
+          : 0,
+      ),
     },
   } satisfies PnLKPIMetrics;
 }
@@ -2083,13 +2378,20 @@ export async function loadOverviewFromDailyMetrics(
     .withIndex("by_organization", (q) => q.eq("organizationId", organizationId))
     .collect()) as AnyRecord[];
 
-  const manualRatePercent = computeManualReturnRateForRange(manualReturnRateDocs, range);
+  const manualRatePercent = computeManualReturnRateForRange(
+    manualReturnRateDocs,
+    range,
+  );
   const aggregatesAdjusted = applyManualReturnRateToAggregates(
     aggregatesWithCosts,
     manualRatePercent,
   );
 
-  const metaTotals = await aggregateMetaInsightsForRange(ctx, organizationId, range);
+  const metaTotals = await aggregateMetaInsightsForRange(
+    ctx,
+    organizationId,
+    range,
+  );
 
   const previousRange = derivePreviousRange(range);
   let previousAggregatesWithCosts: AggregatedDailyMetrics | null = null;
@@ -2098,7 +2400,11 @@ export async function loadOverviewFromDailyMetrics(
   let previousRatePercent = 0;
 
   if (previousRange) {
-    const previousFetched = await fetchDailyMetricsDocs(ctx, organizationId, previousRange);
+    const previousFetched = await fetchDailyMetricsDocs(
+      ctx,
+      organizationId,
+      previousRange,
+    );
     if (previousFetched) {
       const merged = mergeDailyMetrics(previousFetched.docs);
       previousAggregatesWithCosts = applyOperationalCostsToAggregates(
@@ -2114,7 +2420,9 @@ export async function loadOverviewFromDailyMetrics(
         previousAggregatesWithCosts,
         previousRatePercent,
       );
-      previousChannelTotals = aggregateChannelRevenueFromDocs(previousFetched.docs);
+      previousChannelTotals = aggregateChannelRevenueFromDocs(
+        previousFetched.docs,
+      );
     }
     previousMetaTotals = await aggregateMetaInsightsForRange(
       ctx,
@@ -2131,7 +2439,10 @@ export async function loadOverviewFromDailyMetrics(
     manualRatePercent,
     previousRatePercent,
   );
-  const platformMetrics = buildPlatformMetricsFromAggregates(aggregatesAdjusted, metaTotals);
+  const platformMetrics = buildPlatformMetricsFromAggregates(
+    aggregatesAdjusted,
+    metaTotals,
+  );
   const ordersOverview = buildOrdersOverviewFromAggregates(
     aggregatesAdjusted,
     previousAggregatesWithCosts,
@@ -2142,23 +2453,26 @@ export async function loadOverviewFromDailyMetrics(
     organizationId,
     range,
   );
-  const channelRevenue = buildChannelRevenueBreakdown(channelTotals, previousChannelTotals);
-  const metaRevenue = metaTotals.conversionValue > 0
-    ? metaTotals.conversionValue
-    : extractMetaRevenueFromTotals(channelTotals);
-  const prevMetaRevenue = previousMetaTotals && previousMetaTotals.conversionValue > 0
-    ? previousMetaTotals.conversionValue
-    : extractMetaRevenueFromTotals(previousChannelTotals);
+  const channelRevenue = buildChannelRevenueBreakdown(
+    channelTotals,
+    previousChannelTotals,
+  );
+  const metaRevenue =
+    metaTotals.conversionValue > 0
+      ? metaTotals.conversionValue
+      : extractMetaRevenueFromTotals(channelTotals);
+  const prevMetaRevenue =
+    previousMetaTotals && previousMetaTotals.conversionValue > 0
+      ? previousMetaTotals.conversionValue
+      : extractMetaRevenueFromTotals(previousChannelTotals);
 
   if (overview?.summary) {
     const summary = overview.summary;
-    const metaSpend = Math.max(
-      summary.metaAdSpend ?? metaTotals.spend ?? 0,
-      0,
-    );
+    const metaSpend = Math.max(summary.metaAdSpend ?? metaTotals.spend ?? 0, 0);
     const prevMetaSpend = Math.max(previousMetaTotals?.spend ?? 0, 0);
     const metaRoas = metaSpend > 0 ? metaRevenue / metaSpend : 0;
-    const prevMetaRoas = prevMetaSpend > 0 ? prevMetaRevenue / prevMetaSpend : 0;
+    const prevMetaRoas =
+      prevMetaSpend > 0 ? prevMetaRevenue / prevMetaSpend : 0;
     const metaRoasChange = percentageChange(metaRoas, prevMetaRoas);
 
     summary.metaROASChange = metaRoasChange;
@@ -2188,7 +2502,8 @@ export async function loadOverviewFromDailyMetrics(
     summary.newCustomers = currentCustomerMetrics.newCustomers;
     summary.returningCustomers = currentCustomerMetrics.returningCustomers;
     summary.repeatCustomerRate = currentCustomerMetrics.repeatPurchaseRate;
-    summary.customerAcquisitionCost = currentCustomerMetrics.customerAcquisitionCost;
+    summary.customerAcquisitionCost =
+      currentCustomerMetrics.customerAcquisitionCost;
     summary.abandonedCustomers = currentCustomerMetrics.abandonedCartCustomers;
     summary.abandonedRate = currentCustomerMetrics.abandonedRate;
 
@@ -2200,13 +2515,22 @@ export async function loadOverviewFromDailyMetrics(
         )
       : summary.customersChange;
     summary.newCustomersChange = previousMetrics
-      ? percentageChange(currentCustomerMetrics.newCustomers, previousMetrics.newCustomers)
+      ? percentageChange(
+          currentCustomerMetrics.newCustomers,
+          previousMetrics.newCustomers,
+        )
       : summary.newCustomersChange;
     summary.returningCustomersChange = previousMetrics
-      ? percentageChange(currentCustomerMetrics.returningCustomers, previousMetrics.returningCustomers)
+      ? percentageChange(
+          currentCustomerMetrics.returningCustomers,
+          previousMetrics.returningCustomers,
+        )
       : summary.returningCustomersChange;
     summary.repeatCustomerRateChange = previousMetrics
-      ? percentageChange(currentCustomerMetrics.repeatPurchaseRate, previousMetrics.repeatPurchaseRate)
+      ? percentageChange(
+          currentCustomerMetrics.repeatPurchaseRate,
+          previousMetrics.repeatPurchaseRate,
+        )
       : summary.repeatCustomerRateChange;
     summary.customerAcquisitionCostChange = previousMetrics
       ? percentageChange(
@@ -2221,7 +2545,10 @@ export async function loadOverviewFromDailyMetrics(
         )
       : summary.abandonedCustomersChange;
     summary.abandonedRateChange = previousMetrics
-      ? percentageChange(currentCustomerMetrics.abandonedRate, previousMetrics.abandonedRate)
+      ? percentageChange(
+          currentCustomerMetrics.abandonedRate,
+          previousMetrics.abandonedRate,
+        )
       : summary.abandonedRateChange;
 
     if (ordersOverview) {
@@ -2233,8 +2560,11 @@ export async function loadOverviewFromDailyMetrics(
     }
 
     overview.metrics = overview.metrics ?? {};
-    const existingCustomerAcquisitionMetric = overview.metrics.customerAcquisitionCost;
-    const existingPrepaidRateMetric = overview.metrics.prepaidRate as MetricValue | undefined;
+    const existingCustomerAcquisitionMetric =
+      overview.metrics.customerAcquisitionCost;
+    const existingPrepaidRateMetric = overview.metrics.prepaidRate as
+      | MetricValue
+      | undefined;
     overview.metrics.customerAcquisitionCost = {
       value: currentCustomerMetrics.customerAcquisitionCost,
       change: previousMetrics
@@ -2242,7 +2572,7 @@ export async function loadOverviewFromDailyMetrics(
             currentCustomerMetrics.customerAcquisitionCost,
             previousMetrics.customerAcquisitionCost,
           )
-        : overview.metrics.customerAcquisitionCost?.change ?? 0,
+        : (overview.metrics.customerAcquisitionCost?.change ?? 0),
       previousValue: previousMetrics
         ? previousMetrics.customerAcquisitionCost
         : existingCustomerAcquisitionMetric?.previousValue,
@@ -2250,8 +2580,11 @@ export async function loadOverviewFromDailyMetrics(
     overview.metrics.prepaidRate = {
       value: currentCustomerMetrics.prepaidRate,
       change: previousMetrics
-        ? percentageChange(currentCustomerMetrics.prepaidRate, previousMetrics.prepaidRate)
-        : overview.metrics.prepaidRate?.change ?? 0,
+        ? percentageChange(
+            currentCustomerMetrics.prepaidRate,
+            previousMetrics.prepaidRate,
+          )
+        : (overview.metrics.prepaidRate?.change ?? 0),
       previousValue: previousMetrics
         ? previousMetrics.prepaidRate
         : existingPrepaidRateMetric?.previousValue,
@@ -2399,16 +2732,17 @@ function buildCustomerOverviewMetrics(
   const avgOrderValue = orders > 0 ? revenue / orders : 0;
   const avgOrdersPerCustomer = totalCustomers > 0 ? orders / totalCustomers : 0;
   const customerAcquisitionCost = orders > 0 ? marketingCost / orders : 0;
-  const churnRate = totalCustomers > 0 ? (churnedCustomers / totalCustomers) * 100 : 0;
+  const churnRate =
+    totalCustomers > 0 ? (churnedCustomers / totalCustomers) * 100 : 0;
   const periodCustomerCount = activeCustomers;
-  const repeatPurchaseRate = periodCustomerCount > 0
-    ? (repeatCustomers / periodCustomerCount) * 100
-    : 0;
+  const repeatPurchaseRate =
+    periodCustomerCount > 0 ? (repeatCustomers / periodCustomerCount) * 100 : 0;
   const prepaidRate = orders > 0 ? (prepaidOrders / orders) * 100 : 0;
   const abandonedCartCustomers = Math.max(totalCustomers - activeCustomers, 0);
-  const abandonedRate = periodCustomerCount > 0
-    ? (abandonedCartCustomers / periodCustomerCount) * 100
-    : 0;
+  const abandonedRate =
+    periodCustomerCount > 0
+      ? (abandonedCartCustomers / periodCustomerCount) * 100
+      : 0;
 
   return {
     totalCustomers,
@@ -2456,7 +2790,8 @@ function applyCustomerOverviewChanges(
     prevNewCustomers,
   );
 
-  const prevAvgLifetimeValue = prevTotalCustomers > 0 ? prevRevenue / prevTotalCustomers : 0;
+  const prevAvgLifetimeValue =
+    prevTotalCustomers > 0 ? prevRevenue / prevTotalCustomers : 0;
   metrics.changes.lifetimeValue = percentageChange(
     metrics.avgLifetimeValue,
     prevAvgLifetimeValue,
@@ -2500,7 +2835,11 @@ async function loadCustomerRangeStats(
   for (const doc of activityDocs) {
     const key = doc.customerKey;
     if (!key) continue;
-    const entry = customerAggregates.get(key) ?? { orders: 0, prepaidOrders: 0, lifetimeOrders: doc.lifetimeOrders ?? undefined };
+    const entry = customerAggregates.get(key) ?? {
+      orders: 0,
+      prepaidOrders: 0,
+      lifetimeOrders: doc.lifetimeOrders ?? undefined,
+    };
     entry.orders += doc.orders ?? 0;
     entry.prepaidOrders += doc.prepaidOrders ?? 0;
     if (typeof doc.lifetimeOrders === "number") {
@@ -2546,7 +2885,10 @@ async function loadCustomerRangeStats(
     )
     .collect();
 
-  const customersCreated = summaryDocs.reduce((total, doc) => total + (doc.customersCreated ?? 0), 0);
+  const customersCreated = summaryDocs.reduce(
+    (total, doc) => total + (doc.customersCreated ?? 0),
+    0,
+  );
 
   const latestSummary = await ctx.db
     .query("customerDailySummaries")
@@ -2588,10 +2930,16 @@ export async function loadCustomerOverviewFromDailyMetrics(
   const adjustedAggregates: AggregatedDailyMetrics = {
     ...aggregates,
     totalCustomers:
-      totalCustomersSnapshot > 0 ? totalCustomersSnapshot : aggregates.totalCustomers,
+      totalCustomersSnapshot > 0
+        ? totalCustomersSnapshot
+        : aggregates.totalCustomers,
   };
 
-  const activityStats = await loadCustomerRangeStats(ctx, organizationId, range);
+  const activityStats = await loadCustomerRangeStats(
+    ctx,
+    organizationId,
+    range,
+  );
   const totalCustomerUniverse = Math.max(
     activityStats.totalCustomersUniverse,
     adjustedAggregates.totalCustomers,
@@ -2608,44 +2956,66 @@ export async function loadCustomerOverviewFromDailyMetrics(
   metrics.activeCustomers = activeCustomerCount;
   metrics.periodCustomerCount = activeCustomerCount;
   metrics.newCustomers = activityStats.newCustomers;
-  metrics.returningCustomers = Math.max(activeCustomerCount - activityStats.newCustomers, 0);
+  metrics.returningCustomers = Math.max(
+    activeCustomerCount - activityStats.newCustomers,
+    0,
+  );
   const abandonedCustomersInRange = Math.max(
     activityStats.customersCreated - activityStats.newCustomers,
     0,
   );
   metrics.abandonedCartCustomers = abandonedCustomersInRange;
-  metrics.abandonedRate = activeCustomerCount > 0
-    ? (abandonedCustomersInRange / activeCustomerCount) * 100
-    : 0;
+  metrics.abandonedRate =
+    activeCustomerCount > 0
+      ? (abandonedCustomersInRange / activeCustomerCount) * 100
+      : 0;
   metrics.totalCustomers = activeCustomerCount;
   const totalOrdersInRange = Math.max(aggregatesWithCustomers.orders, 0);
-  metrics.prepaidRate = totalOrdersInRange > 0
-    ? (activityStats.prepaidOrders / totalOrdersInRange) * 100
-    : 0;
-  metrics.repeatPurchaseRate = activeCustomerCount > 0
-    ? (activityStats.repeatCustomers / activeCustomerCount) * 100
-    : 0;
-  metrics.churnedCustomers = Math.max(totalCustomerUniverse - activeCustomerCount, 0);
-  metrics.churnRate = totalCustomerUniverse > 0
-    ? (metrics.churnedCustomers / totalCustomerUniverse) * 100
-    : 0;
+  metrics.prepaidRate =
+    totalOrdersInRange > 0
+      ? (activityStats.prepaidOrders / totalOrdersInRange) * 100
+      : 0;
+  metrics.repeatPurchaseRate =
+    activeCustomerCount > 0
+      ? (activityStats.repeatCustomers / activeCustomerCount) * 100
+      : 0;
+  metrics.churnedCustomers = Math.max(
+    totalCustomerUniverse - activeCustomerCount,
+    0,
+  );
+  metrics.churnRate =
+    totalCustomerUniverse > 0
+      ? (metrics.churnedCustomers / totalCustomerUniverse) * 100
+      : 0;
 
   const span = inclusiveDaySpan(range);
-  const previousRange = span > 0
-    ? {
-        startDate: shiftDateString(range.startDate, -span),
-        endDate: shiftDateString(range.startDate, -1),
-      }
-    : null;
+  const previousRange =
+    span > 0
+      ? {
+          startDate: shiftDateString(range.startDate, -span),
+          endDate: shiftDateString(range.startDate, -1),
+        }
+      : null;
 
   let previousAggregates: AggregatedDailyMetrics | null = null;
   if (previousRange) {
-    const previousFetched = await fetchDailyMetricsDocs(ctx, organizationId, previousRange);
+    const previousFetched = await fetchDailyMetricsDocs(
+      ctx,
+      organizationId,
+      previousRange,
+    );
     if (previousFetched) {
       const merged = mergeDailyMetrics(previousFetched.docs);
-      const prevLast = previousFetched.docs[previousFetched.docs.length - 1] ?? null;
-      const prevTotalSnapshot = prevLast ? toNumber(prevLast.totalCustomers) : 0;
-      const previousStats = await loadCustomerRangeStats(ctx, organizationId, previousRange);
+      const prevLast =
+        previousFetched.docs[previousFetched.docs.length - 1] ?? null;
+      const prevTotalSnapshot = prevLast
+        ? toNumber(prevLast.totalCustomers)
+        : 0;
+      const previousStats = await loadCustomerRangeStats(
+        ctx,
+        organizationId,
+        previousRange,
+      );
       previousAggregates = {
         ...merged,
         totalCustomers: Math.max(
@@ -2674,17 +3044,17 @@ export async function loadCustomerOverviewFromDailyMetrics(
     hasFullCoverage: fetched.hasFullCoverage,
     previousRange,
     aggregates: {
-        revenue: aggregatesWithCustomers.revenue,
-        orders: aggregatesWithCustomers.orders,
-        marketingCost: aggregatesWithCustomers.marketingCost,
-        totalCustomers: aggregatesWithCustomers.totalCustomers,
-        paidCustomers: aggregatesWithCustomers.paidCustomers,
-        newCustomers: aggregatesWithCustomers.newCustomers,
-        returningCustomers: aggregatesWithCustomers.returningCustomers,
-        repeatCustomers: aggregatesWithCustomers.repeatCustomers,
-        prepaidOrders: aggregatesWithCustomers.prepaidOrders,
-        codOrders: aggregatesWithCustomers.codOrders,
-        otherOrders: aggregatesWithCustomers.otherOrders,
+      revenue: aggregatesWithCustomers.revenue,
+      orders: aggregatesWithCustomers.orders,
+      marketingCost: aggregatesWithCustomers.marketingCost,
+      totalCustomers: aggregatesWithCustomers.totalCustomers,
+      paidCustomers: aggregatesWithCustomers.paidCustomers,
+      newCustomers: aggregatesWithCustomers.newCustomers,
+      returningCustomers: aggregatesWithCustomers.returningCustomers,
+      repeatCustomers: aggregatesWithCustomers.repeatCustomers,
+      prepaidOrders: aggregatesWithCustomers.prepaidOrders,
+      codOrders: aggregatesWithCustomers.codOrders,
+      otherOrders: aggregatesWithCustomers.otherOrders,
     },
     customerActivity: {
       activeCustomers: activityStats.activeCustomers,
@@ -2750,8 +3120,13 @@ export async function loadPnLAnalyticsFromDailyMetrics(
     .order("asc")
     .collect();
 
-  const periodDefinitions = buildPeriodDefinitionsForRange(tableRange, granularity);
-  const tableUniqueDates = periodDefinitions.map((definition) => definition.date);
+  const periodDefinitions = buildPeriodDefinitionsForRange(
+    tableRange,
+    granularity,
+  );
+  const tableUniqueDates = periodDefinitions.map(
+    (definition) => definition.date,
+  );
 
   const selectedDocs = docs.filter(
     (doc) => doc.date >= range.startDate && doc.date <= range.endDate,
@@ -2761,7 +3136,8 @@ export async function loadPnLAnalyticsFromDailyMetrics(
   );
 
   const coverageStart = selectedUniqueDates[0] ?? null;
-  const coverageEnd = selectedUniqueDates[selectedUniqueDates.length - 1] ?? null;
+  const coverageEnd =
+    selectedUniqueDates[selectedUniqueDates.length - 1] ?? null;
 
   const selectedRangeStartMs = getRangeStartMs(range);
   const selectedRangeEndExclusiveMs = getRangeEndExclusiveMs(range);
@@ -2769,19 +3145,34 @@ export async function loadPnLAnalyticsFromDailyMetrics(
   const tableRangeStartMs = getRangeStartMs(tableRange);
   const tableRangeEndExclusiveMs = getRangeEndExclusiveMs(tableRange);
   const tableRangeEndMs = tableRangeEndExclusiveMs - 1;
-  const coverageStartMs = coverageStart ? Date.parse(`${coverageStart}T00:00:00.000Z`) : null;
-  const coverageEndMs = coverageEnd ? Date.parse(`${coverageEnd}T00:00:00.000Z`) : null;
-
-  const expectedDays = Number.isFinite(selectedRangeStartMs) && Number.isFinite(selectedRangeEndExclusiveMs)
-    ? Math.max(1, Math.round((selectedRangeEndExclusiveMs - selectedRangeStartMs) / DAY_MS))
+  const coverageStartMs = coverageStart
+    ? Date.parse(`${coverageStart}T00:00:00.000Z`)
+    : null;
+  const coverageEndMs = coverageEnd
+    ? Date.parse(`${coverageEnd}T00:00:00.000Z`)
     : null;
 
-  const hasFullCoverage = expectedDays !== null && coverageStartMs !== null && coverageEndMs !== null
-    && Number.isFinite(selectedRangeStartMs) && Number.isFinite(selectedRangeEndExclusiveMs)
-    ? coverageStartMs <= selectedRangeStartMs! &&
-      coverageEndMs >= (selectedRangeEndExclusiveMs! - DAY_MS) &&
-      selectedUniqueDates.length >= expectedDays
-    : null;
+  const expectedDays =
+    Number.isFinite(selectedRangeStartMs) &&
+    Number.isFinite(selectedRangeEndExclusiveMs)
+      ? Math.max(
+          1,
+          Math.round(
+            (selectedRangeEndExclusiveMs - selectedRangeStartMs) / DAY_MS,
+          ),
+        )
+      : null;
+
+  const hasFullCoverage =
+    expectedDays !== null &&
+    coverageStartMs !== null &&
+    coverageEndMs !== null &&
+    Number.isFinite(selectedRangeStartMs) &&
+    Number.isFinite(selectedRangeEndExclusiveMs)
+      ? coverageStartMs <= selectedRangeStartMs! &&
+        coverageEndMs >= selectedRangeEndExclusiveMs! - DAY_MS &&
+        selectedUniqueDates.length >= expectedDays
+      : null;
 
   const selectedHasData = selectedDocs.length > 0;
   const tableTotals = createEmptyPnLMetrics();
@@ -2807,7 +3198,8 @@ export async function loadPnLAnalyticsFromDailyMetrics(
 
   for (const definition of periodDefinitions) {
     const overlapsSelected =
-      Number.isFinite(selectedRangeStartMs) && Number.isFinite(selectedRangeEndMs)
+      Number.isFinite(selectedRangeStartMs) &&
+      Number.isFinite(selectedRangeEndMs)
         ? definition.rangeEndMs >= selectedRangeStartMs! &&
           definition.rangeStartMs <= selectedRangeEndMs!
         : false;
@@ -2852,7 +3244,8 @@ export async function loadPnLAnalyticsFromDailyMetrics(
     let bucket = buckets.get(period.key);
     if (!bucket) {
       const overlapsSelected =
-        Number.isFinite(selectedRangeStartMs) && Number.isFinite(selectedRangeEndMs)
+        Number.isFinite(selectedRangeStartMs) &&
+        Number.isFinite(selectedRangeEndMs)
           ? period.rangeEndMs >= selectedRangeStartMs! &&
             period.rangeStartMs <= selectedRangeEndMs!
           : false;
@@ -2909,8 +3302,12 @@ export async function loadPnLAnalyticsFromDailyMetrics(
         ordersCount: totalOrdersCount,
         unitsSold: totalUnitsSold,
         revenue: totalRevenue,
-        rangeStartMs: Number.isFinite(tableRangeStartMs) ? tableRangeStartMs : 0,
-        rangeEndMs: Number.isFinite(contextEndMs) ? contextEndMs : tableRangeEndExclusiveMs - 1,
+        rangeStartMs: Number.isFinite(tableRangeStartMs)
+          ? tableRangeStartMs
+          : 0,
+        rangeEndMs: Number.isFinite(contextEndMs)
+          ? contextEndMs
+          : tableRangeEndExclusiveMs - 1,
       };
 
       for (const cost of costDocs) {
@@ -2924,7 +3321,11 @@ export async function loadPnLAnalyticsFromDailyMetrics(
         const weights = new Map<string, number>();
 
         for (const [key, bucket] of bucketEntries) {
-          const { overlapMs } = computeCostOverlapForRange(cost, bucket.rangeStartMs, bucket.rangeEndMs);
+          const { overlapMs } = computeCostOverlapForRange(
+            cost,
+            bucket.rangeStartMs,
+            bucket.rangeEndMs,
+          );
           if (overlapMs <= 0) {
             weights.set(key, 0);
             continue;
@@ -3011,22 +3412,38 @@ export async function loadPnLAnalyticsFromDailyMetrics(
 
   const totalsManualRate = resolveManualReturnRate(manualReturnRateDocs, {
     start: Number.isFinite(tableRangeStartMs) ? tableRangeStartMs : 0,
-    end: Number.isFinite(tableRangeEndMs) ? tableRangeEndMs : tableRangeEndExclusiveMs - 1,
+    end: Number.isFinite(tableRangeEndMs)
+      ? tableRangeEndMs
+      : tableRangeEndExclusiveMs - 1,
   });
-  applyManualReturnRateToPnLMetrics(tableTotals, totalRevenue, totalsManualRate);
+  applyManualReturnRateToPnLMetrics(
+    tableTotals,
+    totalRevenue,
+    totalsManualRate,
+  );
 
   const selectedManualRate = resolveManualReturnRate(manualReturnRateDocs, {
     start: Number.isFinite(selectedRangeStartMs) ? selectedRangeStartMs : 0,
-    end: Number.isFinite(selectedRangeEndMs) ? selectedRangeEndMs : selectedRangeEndExclusiveMs - 1,
+    end: Number.isFinite(selectedRangeEndMs)
+      ? selectedRangeEndMs
+      : selectedRangeEndExclusiveMs - 1,
   });
-  applyManualReturnRateToPnLMetrics(selectedTotals, selectedRevenue, selectedManualRate);
+  applyManualReturnRateToPnLMetrics(
+    selectedTotals,
+    selectedRevenue,
+    selectedManualRate,
+  );
 
   for (const bucket of buckets.values()) {
     const bucketManualRate = resolveManualReturnRate(manualReturnRateDocs, {
       start: bucket.rangeStartMs,
       end: bucket.rangeEndMs,
     });
-    applyManualReturnRateToPnLMetrics(bucket.metrics, bucket.revenue, bucketManualRate);
+    applyManualReturnRateToPnLMetrics(
+      bucket.metrics,
+      bucket.revenue,
+      bucketManualRate,
+    );
   }
 
   const tableTotalsFinal = finalizePnLMetrics(tableTotals);
@@ -3035,12 +3452,21 @@ export async function loadPnLAnalyticsFromDailyMetrics(
   let previousTotalsFinal: PnLMetrics | null = null;
   const previousRange = derivePreviousRange(range);
   if (previousRange) {
-    const previousFetched = await fetchDailyMetricsDocs(ctx, organizationId, previousRange);
+    const previousFetched = await fetchDailyMetricsDocs(
+      ctx,
+      organizationId,
+      previousRange,
+    );
     if (previousFetched) {
       const previousAggregates = mergeDailyMetrics(previousFetched.docs);
-      const previousWithCosts = costDocs.length > 0
-        ? applyOperationalCostsToAggregates(previousAggregates, costDocs, previousRange)
-        : previousAggregates;
+      const previousWithCosts =
+        costDocs.length > 0
+          ? applyOperationalCostsToAggregates(
+              previousAggregates,
+              costDocs,
+              previousRange,
+            )
+          : previousAggregates;
       const previousRatePercent = computeManualReturnRateForRange(
         manualReturnRateDocs,
         previousRange,
@@ -3070,8 +3496,14 @@ export async function loadPnLAnalyticsFromDailyMetrics(
       const previous = index > 0 ? periods[index - 1]! : null;
       current.growth = previous
         ? {
-            revenue: percentageChange(current.metrics.revenue, previous.metrics.revenue),
-            netProfit: percentageChange(current.metrics.netProfit, previous.metrics.netProfit),
+            revenue: percentageChange(
+              current.metrics.revenue,
+              previous.metrics.revenue,
+            ),
+            netProfit: percentageChange(
+              current.metrics.netProfit,
+              previous.metrics.netProfit,
+            ),
           }
         : null;
     }
@@ -3087,7 +3519,10 @@ export async function loadPnLAnalyticsFromDailyMetrics(
     });
   }
 
-  const metrics = buildPnLKpisFromTotals(selectedTotalsFinal, previousTotalsFinal);
+  const metrics = buildPnLKpisFromTotals(
+    selectedTotalsFinal,
+    previousTotalsFinal,
+  );
 
   return {
     result: {

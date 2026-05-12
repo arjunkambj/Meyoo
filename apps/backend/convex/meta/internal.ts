@@ -50,7 +50,8 @@ export const getLastSyncTimeInternal = internalQuery({
       .order("desc")
       .first();
 
-    const timestamp = lastSyncSession?.completedAt ?? lastSyncSession?.startedAt;
+    const timestamp =
+      lastSyncSession?.completedAt ?? lastSyncSession?.startedAt;
 
     return timestamp
       ? new Date(timestamp).toISOString()
@@ -123,7 +124,9 @@ export const getAccountTimezoneInternal = internalQuery({
     const account = await ctx.db
       .query("metaAdAccounts")
       .withIndex("by_account_org", (q) =>
-        q.eq("accountId", args.accountId).eq("organizationId", args.organizationId),
+        q
+          .eq("accountId", args.accountId)
+          .eq("organizationId", args.organizationId),
       )
       .first();
 

@@ -12,7 +12,7 @@ export const getOrganizationByUser = query({
   handler: async (ctx) => {
     const auth = await getUserAndOrg(ctx);
     if (!auth) return null;
-    const organization = await ctx.db.get(auth.orgId);
+    const organization = await ctx.db.get("organizations", auth.orgId);
 
     return organization;
   },
@@ -51,9 +51,7 @@ export const getCurrentBilling = query({
 
     const billing = await ctx.db
       .query("billing")
-      .withIndex("by_organization", (q) =>
-        q.eq("organizationId", auth.orgId),
-      )
+      .withIndex("by_organization", (q) => q.eq("organizationId", auth.orgId))
       .first();
 
     if (!billing) {
@@ -106,9 +104,7 @@ export const getCurrentUsage = query({
 
     const billing = await ctx.db
       .query("billing")
-      .withIndex("by_organization", (q) =>
-        q.eq("organizationId", auth.orgId),
-      )
+      .withIndex("by_organization", (q) => q.eq("organizationId", auth.orgId))
       .first();
 
     const plan = billing?.shopifyBilling?.plan ?? "free";
@@ -150,7 +146,7 @@ export const updateOrganizationPlanInternal = internalMutation({
     const { organizationId, plan } = args;
 
     // Get organization by ID
-    const organization = await ctx.db.get(organizationId);
+    const organization = await ctx.db.get("organizations", organizationId);
 
     if (!organization) {
       throw new Error(`Organization not found: ${organizationId}`);
@@ -158,7 +154,7 @@ export const updateOrganizationPlanInternal = internalMutation({
 
     // Update organization plan - only include fields that exist in organizations schema
     // Note: Billing is the source of truth. Do not mirror isPremium/trial on organizations.
-    await ctx.db.patch(organization._id, {
+    await ctx.db.patch("organizations", organization._id, {
       updatedAt: Date.now(),
     });
 
@@ -187,7 +183,7 @@ export const updateOrganizationPlanInternal = internalMutation({
     const isActive = plan !== "free" && normalizedShopifyStatus !== "PAUSED";
 
     if (billing) {
-      await ctx.db.patch(billing._id, {
+      await ctx.db.patch("billing", billing._id, {
         shopifyBilling: {
           plan,
           isActive,
@@ -218,7 +214,7 @@ export const updateOrganizationPlanInternal = internalMutation({
 
     // Create initial invoice when transitioning from free -> paid (idempotent-ish)
     if (becamePaid) {
-      const org = await ctx.db.get(organizationId);
+      const org = await ctx.db.get("organizations", organizationId);
 
       if (org?.ownerId) {
         // const periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -230,7 +226,7 @@ export const updateOrganizationPlanInternal = internalMutation({
           ownerId: org.ownerId,
           plan,
           description: args.subscriptionPlan,
-          currency: 'USD',
+          currency: "USD",
         });
       }
     }
@@ -265,7 +261,7 @@ export const updateOrganizationPlanInternalWithTracking = internalMutation({
     const { organizationId, plan, isUpgrade, previousSubscriptionId } = args;
 
     // Get organization by ID
-    const organization = await ctx.db.get(organizationId);
+    const organization = await ctx.db.get("organizations", organizationId);
 
     if (!organization) {
       throw new Error(`Organization not found: ${organizationId}`);
@@ -307,15 +303,19 @@ export const updateOrganizationPlanInternalWithTracking = internalMutation({
     }
 
     if (billing) {
-      await ctx.db.patch(billing._id, {
+      await ctx.db.patch("billing", billing._id, {
         shopifyBilling: {
           plan,
           isActive,
           shopifySubscriptionId: args.shopifySubscriptionId,
           status: args.shopifySubscriptionStatus,
-          previousSubscriptionId: isUpgrade ? previousSubscriptionId : billing.shopifyBilling?.previousSubscriptionId,
+          previousSubscriptionId: isUpgrade
+            ? previousSubscriptionId
+            : billing.shopifyBilling?.previousSubscriptionId,
           isUpgrading: isUpgrade,
-          lastTransitionAt: isUpgrade ? Date.now() : billing.shopifyBilling?.lastTransitionAt,
+          lastTransitionAt: isUpgrade
+            ? Date.now()
+            : billing.shopifyBilling?.lastTransitionAt,
           transitionHistory,
         },
         isPremium: plan !== "free" || derivedStatus === "trial",
@@ -332,7 +332,9 @@ export const updateOrganizationPlanInternalWithTracking = internalMutation({
           isActive,
           shopifySubscriptionId: args.shopifySubscriptionId,
           status: args.shopifySubscriptionStatus,
-          previousSubscriptionId: isUpgrade ? previousSubscriptionId : undefined,
+          previousSubscriptionId: isUpgrade
+            ? previousSubscriptionId
+            : undefined,
           isUpgrading: isUpgrade,
           lastTransitionAt: isUpgrade ? Date.now() : undefined,
           transitionHistory,
@@ -361,19 +363,20 @@ export const updateOrganizationPlanInternalWithTracking = internalMutation({
 
       for (const invoice of existingInvoices) {
         // Delete invoices from previous subscription for the same period
-        if (invoice.billingPeriodStart === periodStart && 
-            invoice.shopifySubscriptionId === previousSubscriptionId) {
-          await ctx.db.delete(invoice._id);
+        if (
+          invoice.billingPeriodStart === periodStart &&
+          invoice.shopifySubscriptionId === previousSubscriptionId
+        ) {
+          await ctx.db.delete("invoices", invoice._id);
         }
       }
     }
 
     // Create initial invoice when transitioning from free -> paid (idempotent-ish)
     if (becamePaid || isUpgrade) {
-      const org = await ctx.db.get(organizationId);
+      const org = await ctx.db.get("organizations", organizationId);
 
       if (org?.ownerId) {
-
         // Issue invoice if missing (dedup inside helper)
         {
           await createMonthlyInvoiceIfMissing(ctx, {
@@ -382,7 +385,7 @@ export const updateOrganizationPlanInternalWithTracking = internalMutation({
             plan,
             subscriptionId: args.shopifySubscriptionId,
             description: args.subscriptionPlan,
-            currency: 'USD',
+            currency: "USD",
             matchBySubscription: true,
           });
         }
@@ -423,7 +426,7 @@ export const updateOrganizationPlan = mutation({
     const { organizationId, plan } = args;
 
     // Get organization by ID
-    const organization = await ctx.db.get(organizationId);
+    const organization = await ctx.db.get("organizations", organizationId);
 
     if (!organization) {
       throw new Error(`Organization not found: ${organizationId}`);
@@ -431,7 +434,7 @@ export const updateOrganizationPlan = mutation({
 
     // Update organization plan - only include fields that exist in organizations schema
     // Note: Billing is the source of truth. Do not mirror isPremium/trial on organizations.
-    await ctx.db.patch(organization._id, {
+    await ctx.db.patch("organizations", organization._id, {
       updatedAt: Date.now(),
     });
 
@@ -468,7 +471,7 @@ export const updateOrganizationPlan = mutation({
     const isActive = plan !== "free" && normalizedShopifyStatus !== "PAUSED";
 
     if (billing) {
-      await ctx.db.patch(billing._id, {
+      await ctx.db.patch("billing", billing._id, {
         shopifyBilling: {
           plan,
           isActive,
@@ -499,7 +502,7 @@ export const updateOrganizationPlan = mutation({
 
     // Create initial invoice when transitioning from free -> paid (idempotent-ish)
     if (becamePaid) {
-      const org = await ctx.db.get(organizationId);
+      const org = await ctx.db.get("organizations", organizationId);
 
       if (org?.ownerId) {
         const now = new Date();

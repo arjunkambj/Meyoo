@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { usePaginatedQuery } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 
 import { api } from "@/libs/convexApi";
@@ -54,26 +55,24 @@ export function useIntegration() {
  * Get Shopify product variants with pagination (server-side)
  */
 export function useShopifyProductVariantsPaginated(
-  page?: number,
-  pageSize?: number,
-  searchTerm?: string
+  pageSize: number = 100,
+  searchTerm?: string,
 ) {
-  const args = useMemo(
-    () => ({ page, pageSize, searchTerm }),
-    [page, pageSize, searchTerm]
-  );
+  const args = useMemo(() => ({ searchTerm }), [searchTerm]);
 
-  const result = useQuery(
+  const { results, status, loadMore, isLoading } = usePaginatedQuery(
     api.shopify.publicQueries.getProductVariantsPaginated,
-    args
+    args,
+    { initialNumItems: pageSize },
   );
 
   return {
-    data: result?.data || [],
-    totalPages: result?.totalPages || 0,
-    totalItems: result?.totalItems || 0,
-    currentPage: result?.currentPage || 1,
-    loading: result === undefined,
+    data: results,
+    loading: isLoading && results.length === 0,
+    loadingMore: status === "LoadingMore",
+    hasMore: status === "CanLoadMore" || status === "LoadingMore",
+    loadMore,
+    status,
     error: null,
   };
 }

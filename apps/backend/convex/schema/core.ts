@@ -85,10 +85,7 @@ export const memberships = defineTable({
   userId: v.id("users"),
 
   // Access & role within org
-  role: v.union(
-    v.literal("StoreOwner"),
-    v.literal("StoreTeam"),
-  ),
+  role: v.union(v.literal("StoreOwner"), v.literal("StoreTeam")),
   status: v.union(
     v.literal("active"),
     v.literal("suspended"),
@@ -218,10 +215,7 @@ export const syncSessions = defineTable({
   organizationId: v.id("organizations"),
 
   // Platform and type
-  platform: v.union(
-    v.literal("shopify"),
-    v.literal("meta"),
-  ),
+  platform: v.union(v.literal("shopify"), v.literal("meta")),
   type: v.string(), // "full", "incremental", "orders", "products", etc.
 
   // Status
@@ -323,7 +317,7 @@ export const onboarding = defineTable({
   hasShopifySubscription: v.optional(v.boolean()),
   // Step-specific setup flags for 7-step onboarding
   isProductCostSetup: v.optional(v.boolean()), // step 5
-  isExtraCostSetup: v.optional(v.boolean()),   // step 6
+  isExtraCostSetup: v.optional(v.boolean()), // step 6
   hasMetaConnection: v.optional(v.boolean()),
   hasGoogleConnection: v.optional(v.boolean()),
   isInitialSyncComplete: v.optional(v.boolean()),
@@ -391,19 +385,22 @@ export const billing = defineTable({
       shopifySubscriptionId: v.optional(v.string()),
       // Raw Shopify subscription status as last seen (e.g., ACTIVE, CANCELLED, PAUSED)
       status: v.optional(v.string()),
-      
+
       // Tracking fields for plan transitions
       previousSubscriptionId: v.optional(v.string()), // Track replaced subscription
-      isUpgrading: v.optional(v.boolean()),          // Flag during plan transitions
-      lastTransitionAt: v.optional(v.number()),      // Timestamp of last plan change
-      transitionHistory: v.optional(v.array(         // Track all transitions
-        v.object({
-          fromPlan: v.string(),
-          toPlan: v.string(),
-          subscriptionId: v.string(),
-          timestamp: v.number(),
-        })
-      )),
+      isUpgrading: v.optional(v.boolean()), // Flag during plan transitions
+      lastTransitionAt: v.optional(v.number()), // Timestamp of last plan change
+      transitionHistory: v.optional(
+        v.array(
+          // Track all transitions
+          v.object({
+            fromPlan: v.string(),
+            toPlan: v.string(),
+            subscriptionId: v.string(),
+            timestamp: v.number(),
+          }),
+        ),
+      ),
     }),
   ),
   // Common billing fields
@@ -457,8 +454,8 @@ export const usage = defineTable({
   createdAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 })
-  .index("by_org_month", ["organizationId", "month"]) 
-  .index("by_org_month_type", ["organizationId", "month", "type"]) 
+  .index("by_org_month", ["organizationId", "month"])
+  .index("by_org_month_type", ["organizationId", "month", "type"])
   .index("by_user_month", ["subjectId", "month"]);
 
 // Invoices for billing history
@@ -508,11 +505,11 @@ export const invoices = defineTable({
 
   // Additional details
   downloadUrl: v.optional(v.string()),
-  
+
   // Shopify subscription tracking
-  shopifySubscriptionId: v.optional(v.string()),  // Link invoice to specific subscription
-  isSuperseded: v.optional(v.boolean()),         // Mark old invoices as replaced
-  
+  shopifySubscriptionId: v.optional(v.string()), // Link invoice to specific subscription
+  isSuperseded: v.optional(v.boolean()), // Mark old invoices as replaced
+
   metadata: v.optional(
     v.object({
       stripeInvoiceId: v.optional(v.string()),

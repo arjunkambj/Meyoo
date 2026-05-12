@@ -89,7 +89,7 @@ export const getById = internalQuery({
     userId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.userId);
+    return await ctx.db.get("users", args.userId);
   },
 });
 
@@ -143,10 +143,11 @@ export const upsertFromStackWebhook = internalMutation({
         });
       } else {
         const organization = await ctx.db.get(
+          "organizations",
           organizationId as Id<"organizations">,
         );
         if (organization && !organization.stackTeamId) {
-          await ctx.db.patch(organization._id, {
+          await ctx.db.patch("organizations", organization._id, {
             stackTeamId: args.stackId,
             ownerId: organization.ownerId ?? existingUser._id,
             updatedAt: now,
@@ -169,7 +170,7 @@ export const upsertFromStackWebhook = internalMutation({
         updatedAt: now,
       };
 
-      await ctx.db.patch(existingUser._id, patch);
+      await ctx.db.patch("users", existingUser._id, patch);
       await ensureStackUserWorkspace(
         ctx,
         existingUser._id,
@@ -205,7 +206,7 @@ export const upsertFromStackWebhook = internalMutation({
     } satisfies Omit<Doc<"users">, "_id" | "_creationTime">;
 
     const userId = await ctx.db.insert("users", insertDoc);
-    await ctx.db.patch(organizationId, { ownerId: userId });
+    await ctx.db.patch("organizations", organizationId, { ownerId: userId });
     await ensureStackUserWorkspace(ctx, userId, organizationId, now);
 
     return userId;
@@ -224,7 +225,7 @@ export const deleteFromStackWebhook = internalMutation({
 
     if (!existingUser) return;
 
-    await ctx.db.patch(existingUser._id, {
+    await ctx.db.patch("users", existingUser._id, {
       status: "deleted",
       appDeletedAt: Date.now(),
       updatedAt: Date.now(),

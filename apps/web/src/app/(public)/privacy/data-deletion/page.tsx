@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
@@ -197,9 +195,7 @@ export default function DataDeletionPage() {
                         </span>
                       </div>
                       <h3 className="font-medium mb-1">{step.title}</h3>
-                      <p className="text-sm text-muted">
-                        {step.description}
-                      </p>
+                      <p className="text-sm text-muted">{step.description}</p>
                     </div>
                   ))}
                 </div>
@@ -218,9 +214,7 @@ export default function DataDeletionPage() {
                   </h3>
                   <div className="bg-surface-secondary rounded-xl p-4 font-mono text-sm">
                     <p className="text-muted">To: hey@meyoo.io</p>
-                    <p className="text-muted">
-                      Subject: Data Deletion Request
-                    </p>
+                    <p className="text-muted">Subject: Data Deletion Request</p>
                     <br />
                     <p className="text-muted">
                       Hi Meyoo Team,
@@ -255,9 +249,7 @@ export default function DataDeletionPage() {
                       />
                       <div>
                         <p className="font-medium text-sm">Acknowledgment</p>
-                        <p className="text-sm text-muted">
-                          Within 24 hours
-                        </p>
+                        <p className="text-sm text-muted">Within 24 hours</p>
                       </div>
                     </li>
                     <li className="flex items-start gap-3">
@@ -267,9 +259,7 @@ export default function DataDeletionPage() {
                       />
                       <div>
                         <p className="font-medium text-sm">Processing</p>
-                        <p className="text-sm text-muted">
-                          Up to 30 days
-                        </p>
+                        <p className="text-sm text-muted">Up to 30 days</p>
                       </div>
                     </li>
                     <li className="flex items-start gap-3">

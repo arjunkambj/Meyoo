@@ -147,8 +147,7 @@ export async function loadCustomerJourneyStages(
   const awarenessCustomers = Math.max(metaTotals.impressions, 0);
   const interestCustomers = Math.max(metaTotals.clicks, 0);
   const considerationCustomers = Math.max(
-    (metrics.abandonedCartCustomers || 0) +
-      (metrics.periodCustomerCount || 0),
+    (metrics.abandonedCartCustomers || 0) + (metrics.periodCustomerCount || 0),
     0,
   );
   const purchaseCustomers = Math.max(metrics.periodCustomerCount || 0, 0);
@@ -192,9 +191,7 @@ export async function loadCustomerJourneyStages(
       stage: "Awareness",
       customers: awarenessCustomers,
       percentage:
-        awarenessCustomers > 0
-          ? 100
-          : toPercentage(awarenessCustomers),
+        awarenessCustomers > 0 ? 100 : toPercentage(awarenessCustomers),
       avgDays: 0,
       conversionRate: awarenessToInterest,
       icon: "solar:eye-bold-duotone",

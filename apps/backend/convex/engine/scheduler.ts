@@ -103,7 +103,7 @@ export const scheduleNext = internalMutation({
     }
 
     if (profile) {
-      await ctx.db.patch(profile._id, {
+      await ctx.db.patch("syncProfiles", profile._id, {
         nextScheduledSync: nextSyncTime,
         updatedAt: now,
       });

@@ -56,18 +56,12 @@ export default function NotFound() {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button variant="primary"
-           
-            size="lg"
-           
-            onPress={() => router.back()}
-          >
+          <Button variant="primary" size="lg" onPress={() => router.back()}>
             Go Back
           </Button>
 
           <Button
             size="lg"
-           
             variant="outline"
             onPress={() => router.push(dashboardRoute)}
           >

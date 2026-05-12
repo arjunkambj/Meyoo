@@ -45,7 +45,7 @@ export const getInsights = query({
     let insights: Doc<"metaInsights">[];
 
     if (args.accountId) {
-      const account = await ctx.db.get(args.accountId);
+      const account = await ctx.db.get("metaAdAccounts", args.accountId);
       if (!account) return [];
 
       if (args.dateRange) {

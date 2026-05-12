@@ -1,9 +1,119 @@
 import { v } from "convex/values";
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from "convex/server";
 import { query } from "../_generated/server";
-import type { Id } from "../_generated/dataModel";
+import type { QueryCtx } from "../_generated/server";
+import type { Doc, Id } from "../_generated/dataModel";
 import { findShopifyStoreByDomain, normalizeShopDomain } from "../utils/shop";
 import { verifyShopProvisionSignature } from "../utils/crypto";
 import { getUserAndOrg } from "../utils/auth";
+
+const variantPageItemFields = {
+  _id: v.id("shopifyProductVariants"),
+  _creationTime: v.number(),
+  organizationId: v.id("organizations"),
+  productId: v.id("shopifyProducts"),
+  shopifyId: v.string(),
+  shopifyProductId: v.string(),
+  sku: v.optional(v.string()),
+  barcode: v.optional(v.string()),
+  title: v.string(),
+  position: v.number(),
+  price: v.number(),
+  compareAtPrice: v.optional(v.number()),
+  inventoryQuantity: v.optional(v.number()),
+  inventoryPolicy: v.optional(v.string()),
+  inventoryManagement: v.optional(v.string()),
+  weight: v.optional(v.number()),
+  weightUnit: v.optional(v.string()),
+  option1: v.optional(v.string()),
+  option2: v.optional(v.string()),
+  option3: v.optional(v.string()),
+  available: v.optional(v.boolean()),
+  cogsPerUnit: v.optional(v.number()),
+  inventoryItemId: v.optional(v.string()),
+  taxable: v.optional(v.boolean()),
+  taxPercent: v.optional(v.number()),
+  taxRate: v.optional(v.number()),
+  handlingPerUnit: v.optional(v.number()),
+  grossMargin: v.optional(v.number()),
+  grossProfit: v.optional(v.number()),
+  shopifyCreatedAt: v.number(),
+  shopifyUpdatedAt: v.number(),
+  productName: v.string(),
+  productHandle: v.optional(v.string()),
+  productVendor: v.optional(v.string()),
+  productType: v.optional(v.string()),
+  productStatus: v.string(),
+  productImage: v.optional(v.string()),
+};
+
+const variantPageItem = v.object(variantPageItemFields);
+
+const normalizedSearch = (value?: string) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed.slice(0, 128) : undefined;
+};
+
+const variantCostPayload = (
+  variant: Doc<"shopifyProductVariants">,
+  cost?: Doc<"variantCosts"> | null,
+) => {
+  const {
+    productTitle,
+    productHandle,
+    productVendor,
+    productType,
+    productStatus,
+    productImage,
+    searchText: _searchText,
+    ...variantFields
+  } = variant;
+  const cogsPerUnit = cost?.cogsPerUnit;
+  const handlingPerUnit = cost?.handlingPerUnit;
+  const taxPercent = cost?.taxPercent;
+  const totalCost = (cogsPerUnit ?? 0) + (handlingPerUnit ?? 0);
+  const grossProfit = variant.price - totalCost;
+
+  return {
+    ...variantFields,
+    cogsPerUnit,
+    handlingPerUnit,
+    taxPercent,
+    taxRate: taxPercent,
+    grossProfit,
+    grossMargin: variant.price > 0 ? (grossProfit / variant.price) * 100 : 0,
+    productName: productTitle,
+    productHandle,
+    productVendor,
+    productType,
+    productStatus,
+    productImage,
+  };
+};
+
+const variantCostsForPage = async (
+  ctx: QueryCtx,
+  organizationId: Id<"organizations">,
+  variants: Doc<"shopifyProductVariants">[],
+) => {
+  const costs = await Promise.all(
+    variants.map((variant) =>
+      ctx.db
+        .query("variantCosts")
+        .withIndex("by_org_variant", (q) =>
+          q.eq("organizationId", organizationId).eq("variantId", variant._id),
+        )
+        .first(),
+    ),
+  );
+
+  return new Map(
+    variants.map((variant, index) => [variant._id, costs[index] ?? null]),
+  );
+};
 
 export const getStore = query({
   args: {},
@@ -16,7 +126,7 @@ export const getStore = query({
     return await ctx.db
       .query("shopifyStores")
       .withIndex("by_organization_and_active", (q) =>
-        q.eq("organizationId", orgId).eq("isActive", true)
+        q.eq("organizationId", orgId).eq("isActive", true),
       )
       .first();
   },
@@ -46,7 +156,7 @@ export const getProducts = query({
       shopifyUpdatedAt: v.number(),
       publishedAt: v.optional(v.number()),
       syncedAt: v.number(),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const auth = await getUserAndOrg(ctx);
@@ -62,176 +172,48 @@ export const getProducts = query({
 
 export const getProductVariantsPaginated = query({
   args: {
-    page: v.optional(v.number()),
-    pageSize: v.optional(v.number()),
+    paginationOpts: paginationOptsValidator,
     searchTerm: v.optional(v.string()),
   },
-  returns: v.object({
-    data: v.array(
-      v.object({
-        _id: v.id("shopifyProductVariants"),
-        _creationTime: v.number(),
-        organizationId: v.string(),
-        productId: v.id("shopifyProducts"),
-        shopifyId: v.string(),
-        shopifyProductId: v.string(),
-        sku: v.optional(v.string()),
-        barcode: v.optional(v.string()),
-        title: v.string(),
-        position: v.number(),
-        price: v.number(),
-        compareAtPrice: v.optional(v.number()),
-        inventoryQuantity: v.optional(v.number()),
-        inventoryPolicy: v.optional(v.string()),
-        inventoryManagement: v.optional(v.string()),
-        weight: v.optional(v.number()),
-        weightUnit: v.optional(v.string()),
-        option1: v.optional(v.string()),
-        option2: v.optional(v.string()),
-        option3: v.optional(v.string()),
-        available: v.optional(v.boolean()),
-        cogsPerUnit: v.optional(v.number()),
-        inventoryItemId: v.optional(v.string()),
-        taxable: v.optional(v.boolean()),
-        taxPercent: v.optional(v.number()),
-        taxRate: v.optional(v.number()),
-        handlingPerUnit: v.optional(v.number()),
-        grossMargin: v.optional(v.number()),
-        grossProfit: v.optional(v.number()),
-        shopifyCreatedAt: v.number(),
-        shopifyUpdatedAt: v.number(),
-        // Product info (joined)
-        productName: v.optional(v.string()),
-        productHandle: v.optional(v.string()),
-        productVendor: v.optional(v.string()),
-        productType: v.optional(v.string()),
-        productStatus: v.optional(v.string()),
-        productImage: v.optional(v.string()),
-      })
-    ),
-    totalPages: v.number(),
-    totalItems: v.number(),
-    currentPage: v.number(),
-  }),
+  returns: paginationResultValidator(variantPageItem),
   handler: async (ctx, args) => {
     const auth = await getUserAndOrg(ctx);
-    if (!auth)
-      return { data: [], totalPages: 0, totalItems: 0, currentPage: 1 };
-    const orgId = auth.orgId;
-    const page = args.page || 1;
-    const pageSize = Math.min(args.pageSize || 20, 1000); // Allow larger page sizes for bulk editing
-
-    // Build query with organization filter
-    const variantsQuery = ctx.db
-      .query("shopifyProductVariants")
-      .withIndex("by_organization", (q) => q.eq("organizationId", orgId));
-
-    // For search, we still need to collect all (can be optimized with full-text search later)
-    let paginatedVariants: any[];
-    let totalItems: number;
-
-    if (args.searchTerm) {
-      const searchLower = args.searchTerm.toLowerCase();
-
-      // Collect for search filtering
-      const allVariants = await variantsQuery.collect();
-
-      // Get products for search join
-      const products = await ctx.db
-        .query("shopifyProducts")
-        .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
-        .collect();
-
-      const productMap = new Map();
-      for (const product of products) {
-        productMap.set(product._id, product);
-      }
-
-      const filtered = allVariants.filter((variant) => {
-        const product = productMap.get(variant.productId);
-        return (
-          variant.title?.toLowerCase().includes(searchLower) ||
-          variant.sku?.toLowerCase().includes(searchLower) ||
-          variant.barcode?.toLowerCase().includes(searchLower) ||
-          product?.title?.toLowerCase().includes(searchLower) ||
-          product?.vendor?.toLowerCase().includes(searchLower)
-        );
-      });
-
-      totalItems = filtered.length;
-      const startIndex = (page - 1) * pageSize;
-      paginatedVariants = filtered.slice(startIndex, startIndex + pageSize);
-    } else {
-      const allVariants = await variantsQuery
-        .order("desc")
-        .collect();
-
-      totalItems = allVariants.length;
-      const startIndex = Math.max(0, (page - 1) * pageSize);
-      paginatedVariants = allVariants.slice(startIndex, startIndex + pageSize);
-    }
-
-    // Get products for join (only for paginated variants)
-    const productIds = [...new Set(paginatedVariants.map(v => v.productId))];
-    const products = await Promise.all(
-      productIds.map(id => ctx.db.get(id))
-    );
-
-    const productMap = new Map();
-    for (const product of products) {
-      if (product) productMap.set(product._id, product);
-    }
-
-    const totalPages = Math.ceil(totalItems / pageSize);
-
-    // Join with product data and apply default costs
-    // Load product-level cost components for tax percent
-    const pcc = await ctx.db
-      .query("variantCosts")
-      .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
-      .collect();
-    const pccByVariant = new Map<string, typeof pcc[0]>();
-    for (const row of pcc) pccByVariant.set(row.variantId, row);
-
-    const data = paginatedVariants.map((variant) => {
-      const product = productMap.get(variant.productId);
-
-      // Tax rate from product cost components when present
-      const variantPcc = pccByVariant.get(variant._id);
-      const cogsPerUnit = variantPcc?.cogsPerUnit;
-      const handlingPerUnit = variantPcc?.handlingPerUnit;
-      const taxPercent = variantPcc?.taxPercent;
-      const taxable = variant.taxable;
-
-      const totalCost =
-        (cogsPerUnit ?? 0) +
-        (handlingPerUnit ?? 0);
-      const grossProfit = variant.price - totalCost;
-      const grossMargin = variant.price > 0 ? (grossProfit / variant.price) * 100 : 0;
-
+    if (!auth) {
       return {
-        ...variant,
-        cogsPerUnit,
-        taxPercent,
-        taxRate: taxPercent,
-        taxable,
-        handlingPerUnit,
-        grossMargin,
-        grossProfit,
-        productName: product?.title,
-        productHandle: product?.handle,
-        productVendor: product?.vendor,
-        productType: product?.productType,
-        productStatus: product?.status,
-        productImage: product?.featuredImage,
+        page: [],
+        isDone: true,
+        continueCursor: args.paginationOpts.cursor ?? "",
       };
-    });
+    }
+
+    const orgId = auth.orgId;
+    const search = normalizedSearch(args.searchTerm);
+    const paginationOpts = {
+      ...args.paginationOpts,
+      maximumRowsRead: Math.max(args.paginationOpts.numItems + 100, 1_200),
+      maximumBytesRead: 4_000_000,
+    };
+
+    const result = search
+      ? await ctx.db
+          .query("shopifyProductVariants")
+          .withSearchIndex("search_text", (q) =>
+            q.search("searchText", search).eq("organizationId", orgId),
+          )
+          .paginate(paginationOpts)
+      : await ctx.db
+          .query("shopifyProductVariants")
+          .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
+          .order("desc")
+          .paginate(paginationOpts);
+
+    const costs = await variantCostsForPage(ctx, orgId, result.page);
 
     return {
-      data,
-      totalPages,
-      totalItems,
-      currentPage: page,
+      ...result,
+      page: result.page.map((variant) =>
+        variantCostPayload(variant, costs.get(variant._id)),
+      ),
     };
   },
 });
@@ -240,48 +222,7 @@ export const getProductVariants = query({
   args: {
     limit: v.optional(v.number()),
   },
-  returns: v.array(
-    v.object({
-      _id: v.id("shopifyProductVariants"),
-      _creationTime: v.number(),
-      organizationId: v.string(),
-      productId: v.id("shopifyProducts"),
-      shopifyId: v.string(),
-      shopifyProductId: v.string(),
-      sku: v.optional(v.string()),
-      barcode: v.optional(v.string()),
-      title: v.string(),
-      position: v.number(),
-      price: v.number(),
-      compareAtPrice: v.optional(v.number()),
-      inventoryQuantity: v.optional(v.number()),
-      inventoryPolicy: v.optional(v.string()),
-      inventoryManagement: v.optional(v.string()),
-      weight: v.optional(v.number()),
-      weightUnit: v.optional(v.string()),
-      option1: v.optional(v.string()),
-      option2: v.optional(v.string()),
-      option3: v.optional(v.string()),
-      available: v.optional(v.boolean()),
-      cogsPerUnit: v.optional(v.number()),
-      inventoryItemId: v.optional(v.string()),
-      taxable: v.optional(v.boolean()),
-      taxPercent: v.optional(v.number()),
-      taxRate: v.optional(v.number()),
-      handlingPerUnit: v.optional(v.number()),
-      grossMargin: v.optional(v.number()),
-      grossProfit: v.optional(v.number()),
-      shopifyCreatedAt: v.number(),
-      shopifyUpdatedAt: v.number(),
-      // Product info (joined)
-      productName: v.optional(v.string()),
-      productHandle: v.optional(v.string()),
-      productVendor: v.optional(v.string()),
-      productType: v.optional(v.string()),
-      productStatus: v.optional(v.string()),
-      productImage: v.optional(v.string()),
-    })
-  ),
+  returns: v.array(v.object(variantPageItemFields)),
   handler: async (ctx, args) => {
     const auth = await getUserAndOrg(ctx);
     if (!auth) return [];
@@ -293,64 +234,10 @@ export const getProductVariants = query({
       .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
       .take(args.limit || 100);
 
-    // Get unique product IDs
-    const productIds = [...new Set(variants.map((v) => v.productId))];
-
-    // Fetch all products in one query
-    const products = await ctx.db
-      .query("shopifyProducts")
-      .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
-      .collect();
-
-    // Create a map for quick product lookup
-    const productMap = new Map();
-
-    for (const product of products) {
-      if (productIds.includes(product._id)) {
-        productMap.set(product._id, product);
-      }
-    }
-
-    // Load cost components for the organization once
-    const costComponents = await ctx.db
-      .query("variantCosts")
-      .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
-      .collect();
-    const componentByVariant = new Map<Id<"shopifyProductVariants">, typeof costComponents[number]>();
-    for (const component of costComponents) {
-      componentByVariant.set(component.variantId, component);
-    }
-
-    // Join variant with product and cost component data
-    return variants.map((variant) => {
-      const product = productMap.get(variant.productId);
-      const component = componentByVariant.get(variant._id);
-      const cogsPerUnit = component?.cogsPerUnit;
-      const handlingPerUnit = component?.handlingPerUnit;
-      const taxPercent = component?.taxPercent;
-
-      const totalCost =
-        (cogsPerUnit ?? 0) + (handlingPerUnit ?? 0);
-      const grossProfit = variant.price - totalCost;
-      const grossMargin = variant.price > 0 ? (grossProfit / variant.price) * 100 : 0;
-
-      return {
-        ...variant,
-        cogsPerUnit,
-        handlingPerUnit,
-        taxPercent,
-        taxRate: taxPercent,
-        grossProfit,
-        grossMargin,
-        // Add product fields with "product" prefix
-        productName: product?.title,
-        productHandle: product?.handle,
-        productVendor: product?.vendor,
-        productType: product?.productType,
-        productStatus: product?.status,
-        productImage: product?.featuredImage,
-      };
-    });
+    const costs = await variantCostsForPage(ctx, orgId, variants);
+    return variants.map((variant) =>
+      variantCostPayload(variant, costs.get(variant._id)),
+    );
   },
 });
 
@@ -374,7 +261,7 @@ export const getPublicStoreByDomain = query({
       scope: v.string(),
       isActive: v.boolean(),
       webhooksRegistered: v.optional(v.boolean()),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     // Get the store by shop domain - no auth required for session management
@@ -385,7 +272,11 @@ export const getPublicStoreByDomain = query({
 
     let accessToken: string | undefined;
     if (args.nonce && args.sig) {
-      const ok = await verifyShopProvisionSignature(domain, args.nonce, args.sig);
+      const ok = await verifyShopProvisionSignature(
+        domain,
+        args.nonce,
+        args.sig,
+      );
       if (ok) {
         accessToken = store.accessToken;
       }
@@ -417,7 +308,7 @@ export const getPublicActiveStore = query({
       .withIndex("by_organization_and_active", (q) =>
         q
           .eq("organizationId", args.organizationId as Id<"organizations">)
-          .eq("isActive", true)
+          .eq("isActive", true),
       )
       .first();
 

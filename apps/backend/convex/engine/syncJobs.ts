@@ -24,10 +24,7 @@ export const triggerInitialSync = mutation({
     success: v.boolean(),
     jobId: v.string(),
   }),
-  handler: async (
-    ctx,
-    args,
-  ): Promise<{ success: boolean; jobId: string }> => {
+  handler: async (ctx, args): Promise<{ success: boolean; jobId: string }> => {
     const auth = await requireUserAndOrg(ctx);
 
     // Verify the user has access to this organization
@@ -81,10 +78,7 @@ export const triggerInitialSyncInternal = internalMutation({
     success: v.boolean(),
     jobId: v.string(),
   }),
-  handler: async (
-    ctx,
-    args,
-  ): Promise<{ success: boolean; jobId: string }> => {
+  handler: async (ctx, args): Promise<{ success: boolean; jobId: string }> => {
     try {
       const result = await ctx.runMutation(
         internal.engine.syncJobs.ensureInitialSync,
@@ -197,9 +191,7 @@ export const ensureInitialSync = internalMutation({
         platform: args.platform,
         dateRange: args.dateRange || { daysBack: 60 },
         syncSessionId: sessionId,
-        triggeredBy: args.triggeredBy
-          ? String(args.triggeredBy)
-          : undefined,
+        triggeredBy: args.triggeredBy ? String(args.triggeredBy) : undefined,
       },
       {
         onComplete: internal.engine.syncJobs.onInitialSyncComplete as any,
@@ -331,7 +323,9 @@ export const onInitialSyncComplete = internalMutation({
       // Determine if any costs exist for analytics
       const hasAnyCosts = (await ctx.db
         .query("globalCosts")
-        .withIndex("by_organization", (q) => q.eq("organizationId", organizationId))
+        .withIndex("by_organization", (q) =>
+          q.eq("organizationId", organizationId),
+        )
         .first())
         ? true
         : false;

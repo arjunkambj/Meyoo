@@ -42,9 +42,7 @@ async function loadMembership(
   );
 }
 
-function isAdminMembership(
-  membership: Doc<"memberships"> | null | undefined,
-) {
+function isAdminMembership(membership: Doc<"memberships"> | null | undefined) {
   return membership?.role === "StoreOwner";
 }
 
@@ -55,9 +53,7 @@ async function ensureAdminAccess(
   const auth = await requireUserAndOrg(ctx);
   const user = auth.user;
 
-  const targetOrgId =
-    organizationId ??
-    auth.orgId;
+  const targetOrgId = organizationId ?? auth.orgId;
 
   if (!targetOrgId) {
     throw new Error("Admin access required");
@@ -167,7 +163,7 @@ export const deleteOrgRecordsBatch = internalMutation({
       });
 
     for (const record of page.page) {
-      await ctx.db.delete(record._id);
+      await ctx.db.delete(args.table, record._id as any);
     }
 
     return {
@@ -200,7 +196,9 @@ export const deleteIntegrationSessionsByPlatformBatch = internalMutation({
     const page = await ctx.db
       .query("integrationSessions")
       .withIndex("by_org_and_platform", (q) =>
-        q.eq("organizationId", args.organizationId).eq("platform", args.platform),
+        q
+          .eq("organizationId", args.organizationId)
+          .eq("platform", args.platform),
       )
       .paginate({
         numItems: batchSize,
@@ -208,7 +206,7 @@ export const deleteIntegrationSessionsByPlatformBatch = internalMutation({
       });
 
     for (const session of page.page) {
-      await ctx.db.delete(session._id);
+      await ctx.db.delete("integrationSessions", session._id);
     }
 
     return {
@@ -266,7 +264,7 @@ export const resetMembersBatch = internalMutation({
 
       for (const membership of memberships) {
         if (membership.status !== "removed") {
-          await ctx.db.patch(membership._id, {
+          await ctx.db.patch("memberships", membership._id, {
             status: "removed",
             updatedAt: resetTimestamp,
           });
@@ -281,7 +279,7 @@ export const resetMembersBatch = internalMutation({
         .first();
 
       if (onboarding) {
-        await ctx.db.patch(onboarding._id, {
+        await ctx.db.patch("onboarding", onboarding._id, {
           onboardingStep: 1,
           isCompleted: false,
           hasShopifyConnection: false,
@@ -302,7 +300,7 @@ export const resetMembersBatch = internalMutation({
         email: member.email || null,
       });
 
-      await ctx.db.patch(member._id, {
+      await ctx.db.patch("users", member._id, {
         appDeletedAt: resetTimestamp,
         updatedAt: Date.now(),
       });
@@ -357,7 +355,7 @@ export const resetShopifyMembersBatch = internalMutation({
         .first();
 
       if (onboarding) {
-        await ctx.db.patch(onboarding._id, {
+        await ctx.db.patch("onboarding", onboarding._id, {
           hasShopifyConnection: false,
           hasShopifySubscription: false,
           isProductCostSetup: false,
@@ -368,7 +366,7 @@ export const resetShopifyMembersBatch = internalMutation({
         });
       }
 
-      await ctx.db.patch(member._id, {
+      await ctx.db.patch("users", member._id, {
         updatedAt: Date.now(),
       });
 
@@ -422,13 +420,13 @@ export const resetMetaMembersBatch = internalMutation({
         .first();
 
       if (onboarding) {
-        await ctx.db.patch(onboarding._id, {
+        await ctx.db.patch("onboarding", onboarding._id, {
           hasMetaConnection: false,
           updatedAt: Date.now(),
         });
       }
 
-      await ctx.db.patch(member._id, {
+      await ctx.db.patch("users", member._id, {
         isOnboarded: true,
         updatedAt: Date.now(),
       });
@@ -452,7 +450,7 @@ export const getUserById = internalQuery({
     userId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
+    const user = await ctx.db.get("users", args.userId);
 
     return user;
   },
@@ -597,7 +595,10 @@ export const recalculateAnalytics = action({
     skipped: v.number(),
     message: v.string(),
   }),
-  handler: async (ctx, args): Promise<{
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
     success: boolean;
     processed: number;
     updated: number;
@@ -704,16 +705,13 @@ export const recalculateAnalytics = action({
     }
 
     try {
-      await ctx.runMutation(
-        internal.engine.customers.rebuildCustomerSnapshot,
-        {
-          organizationId,
-          analysisWindowDays: Math.max(
-            1,
-            Math.min(daysBack, CUSTOMER_SNAPSHOT_MAX_DAYS),
-          ),
-        },
-      );
+      await ctx.runMutation(internal.engine.customers.rebuildCustomerSnapshot, {
+        organizationId,
+        analysisWindowDays: Math.max(
+          1,
+          Math.min(daysBack, CUSTOMER_SNAPSHOT_MAX_DAYS),
+        ),
+      });
     } catch (error) {
       console.warn(
         `[DEV_TOOLS] Failed to rebuild customer snapshot for org ${organizationId}:`,
@@ -769,7 +767,10 @@ export const deleteAnalyticsMetrics = action({
     deleted: v.number(),
     tables: v.record(v.string(), v.number()),
   }),
-  handler: async (ctx, args): Promise<{
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
     success: boolean;
     deleted: number;
     tables: Record<string, number>;
@@ -1004,10 +1005,7 @@ export const resetShopifyData = action({
     await deleteTableWithCount("shopifyProducts", "products");
     await deleteTableWithCount("shopifyOrders", "orders");
     await deleteTableWithCount("shopifyCustomers", "customers");
-    await deleteTableWithCount(
-      "customerMetricsSummaries",
-      "customerSummaries",
-    );
+    await deleteTableWithCount("customerMetricsSummaries", "customerSummaries");
     await deleteTableWithCount(
       "customerOverviewSummaries",
       "customerSummaries",
@@ -1134,14 +1132,20 @@ export const resetEverything = action({
     }
 
     // Meta integrations
-    for (const table of ["metaAdAccounts", "metaInsights"] satisfies OrgScopedTable[]) {
+    for (const table of [
+      "metaAdAccounts",
+      "metaInsights",
+    ] satisfies OrgScopedTable[]) {
       await deleteTable(table);
     }
 
     await deleteTable("integrationSessions");
 
     // Sync and scheduling state
-    for (const table of ["syncProfiles", "syncSessions"] satisfies OrgScopedTable[]) {
+    for (const table of [
+      "syncProfiles",
+      "syncSessions",
+    ] satisfies OrgScopedTable[]) {
       await deleteTable(table);
     }
 
@@ -1156,7 +1160,10 @@ export const resetEverything = action({
     }
 
     // Dashboard and compliance data
-    for (const table of ["dashboards", "gdprRequests"] satisfies OrgScopedTable[]) {
+    for (const table of [
+      "dashboards",
+      "gdprRequests",
+    ] satisfies OrgScopedTable[]) {
       await deleteTable(table);
     }
 

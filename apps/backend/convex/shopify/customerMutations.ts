@@ -1,4 +1,3 @@
-
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { internalMutation } from "../_generated/server";
@@ -34,18 +33,24 @@ type NormalizedCustomer = {
   syncedAt: number;
 };
 
-const normalizeCustomerAddress = (value: unknown): CustomerAddress | undefined => {
+const normalizeCustomerAddress = (
+  value: unknown,
+): CustomerAddress | undefined => {
   if (!value || typeof value !== "object") return undefined;
 
   const maybeAddress = value as Record<string, unknown>;
   const address: CustomerAddress = {
     country: toOptionalString(maybeAddress.country),
-    province: toOptionalString(maybeAddress.province ?? maybeAddress.provinceCode),
+    province: toOptionalString(
+      maybeAddress.province ?? maybeAddress.provinceCode,
+    ),
     city: toOptionalString(maybeAddress.city),
     zip: toOptionalString(maybeAddress.zip ?? maybeAddress.zipCode),
   };
 
-  return Object.values(address).some((part) => part !== undefined) ? address : undefined;
+  return Object.values(address).some((part) => part !== undefined)
+    ? address
+    : undefined;
 };
 
 const normalizeCustomerPayload = (
@@ -87,8 +92,7 @@ const normalizeCustomerPayload = (
     state: toOptionalString(raw.state),
     verifiedEmail:
       typeof raw.verifiedEmail === "boolean" ? raw.verifiedEmail : undefined,
-    taxExempt:
-      typeof raw.taxExempt === "boolean" ? raw.taxExempt : undefined,
+    taxExempt: typeof raw.taxExempt === "boolean" ? raw.taxExempt : undefined,
     defaultAddress: normalizeCustomerAddress(raw.defaultAddress),
     tags,
     note: toOptionalString(raw.note),
@@ -98,9 +102,10 @@ const normalizeCustomerPayload = (
     shopifyUpdatedAt: Number.isFinite(raw.shopifyUpdatedAt)
       ? Number(raw.shopifyUpdatedAt)
       : now,
-    syncedAt: raw.syncedAt && Number.isFinite(raw.syncedAt)
-      ? Number(raw.syncedAt)
-      : now,
+    syncedAt:
+      raw.syncedAt && Number.isFinite(raw.syncedAt)
+        ? Number(raw.syncedAt)
+        : now,
   };
 };
 
@@ -163,7 +168,10 @@ export const storeCustomersInternal = internalMutation({
     const organizationId = args.organizationId as Id<"organizations">;
     const now = Date.now();
 
-    const customersByStore = new Map<Id<"shopifyStores">, NormalizedCustomer[]>();
+    const customersByStore = new Map<
+      Id<"shopifyStores">,
+      NormalizedCustomer[]
+    >();
 
     for (const raw of args.customers) {
       const normalized = normalizeCustomerPayload(raw, organizationId, now);
@@ -196,7 +204,7 @@ export const storeCustomersInternal = internalMutation({
             ctx.db
               .query("shopifyCustomers")
               .withIndex("by_shopify_id_store", (q) =>
-                q.eq("shopifyId", shopifyId).eq("storeId", storeId)
+                q.eq("shopifyId", shopifyId).eq("storeId", storeId),
               )
               .first(),
           ),
@@ -214,7 +222,7 @@ export const storeCustomersInternal = internalMutation({
 
         if (existing) {
           if (hasCustomerChanges(existing, customer)) {
-            await ctx.db.patch(existing._id, {
+            await ctx.db.patch("shopifyCustomers", existing._id, {
               ...customer,
               syncedAt: now,
             });
@@ -237,7 +245,6 @@ export const storeCustomersInternal = internalMutation({
     return null;
   },
 });
-
 
 export const upsertCustomerFromWebhook = internalMutation({
   args: {
@@ -267,9 +274,14 @@ export const upsertCustomerFromWebhook = internalMutation({
       totalSpent: existing?.totalSpent ?? 0,
       tags:
         typeof args.customer.tags === "string"
-          ? (args.customer.tags as string).split(",").map((t) => t.trim()).filter(Boolean)
+          ? (args.customer.tags as string)
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
           : Array.isArray(args.customer.tags)
-            ? (args.customer.tags as string[]).map((t) => String(t).trim()).filter(Boolean)
+            ? (args.customer.tags as string[])
+                .map((t) => String(t).trim())
+                .filter(Boolean)
             : [],
       shopifyCreatedAt: toMs(args.customer.created_at) ?? Date.now(),
       shopifyUpdatedAt: toMs(args.customer.updated_at) ?? Date.now(),
@@ -277,7 +289,7 @@ export const upsertCustomerFromWebhook = internalMutation({
     };
 
     if (existing) {
-      await ctx.db.patch(existing._id, doc);
+      await ctx.db.patch("shopifyCustomers", existing._id, doc);
     } else {
       await ctx.db.insert("shopifyCustomers", doc);
     }
@@ -303,13 +315,12 @@ export const deleteCustomerInternal = internalMutation({
       .first();
 
     if (customer) {
-      await ctx.db.delete(customer._id);
+      await ctx.db.delete("shopifyCustomers", customer._id);
     }
 
     return null;
   },
 });
-
 
 export const updateCustomerStatusInternal = internalMutation({
   args: {
@@ -325,7 +336,7 @@ export const updateCustomerStatusInternal = internalMutation({
       .first();
 
     if (customer) {
-      await ctx.db.patch(customer._id, {
+      await ctx.db.patch("shopifyCustomers", customer._id, {
         state: args.state,
         shopifyUpdatedAt: Date.now(),
       });

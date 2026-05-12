@@ -1,7 +1,11 @@
 import { v } from "convex/values";
 import { createSimpleLogger } from "../../libs/logging/simple";
 import { internal } from "../_generated/api";
-import { internalAction, internalMutation, internalQuery } from "../_generated/server";
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+} from "../_generated/server";
 import type { Doc, Id } from "../_generated/dataModel";
 import { optionalEnv, requireEnv } from "../utils/env";
 import { msToDateString } from "../utils/date";
@@ -53,7 +57,8 @@ export const listMetaAccounts = internalQuery({
       const primary = list.find((x) => x.isPrimary === true) || list[0];
       if (primary) {
         const timezoneOffsetMinutes =
-          typeof primary.timezoneOffsetHours === "number" && Number.isFinite(primary.timezoneOffsetHours)
+          typeof primary.timezoneOffsetHours === "number" &&
+          Number.isFinite(primary.timezoneOffsetHours)
             ? Math.round(primary.timezoneOffsetHours * 60)
             : undefined;
         selected.push({
@@ -91,7 +96,10 @@ export const setCursor = internalMutation({
       .withIndex("by_name", (q) => q.eq("name", "meta:cursor"))
       .first();
     if (existing) {
-      await ctx.db.patch(existing._id, { value: { index: args.index }, updatedAt: Date.now() });
+      await ctx.db.patch("schedulerState", existing._id, {
+        value: { index: args.index },
+        updatedAt: Date.now(),
+      });
       return;
     }
     await ctx.db.insert("schedulerState", {
@@ -108,10 +116,15 @@ export const tick = internalAction({
   handler: async (ctx) => {
     const logger = createSimpleLogger("MetaScheduler");
     const tickMinutes = META_TICK_MINUTES;
-    const accounts = await ctx.runQuery(internal.engine.metaScheduler.listMetaAccounts, {});
+    const accounts = await ctx.runQuery(
+      internal.engine.metaScheduler.listMetaAccounts,
+      {},
+    );
     if (accounts.length === 0) return { processed: 0, deferred: 0 };
 
-    const start = (await ctx.runQuery(internal.engine.metaScheduler.getCursor, {})) % accounts.length;
+    const start =
+      (await ctx.runQuery(internal.engine.metaScheduler.getCursor, {})) %
+      accounts.length;
 
     let processed = 0;
     let deferred = 0;
@@ -122,8 +135,14 @@ export const tick = internalAction({
       platform: "meta",
     });
     const ticksPerHour = Math.max(1, Math.floor(60 / tickMinutes));
-    const nominalPerTick = Math.max(1, Math.floor((bucket?.limit ?? 10_000) / ticksPerHour));
-    const remaining = Math.max(0, (bucket?.limit ?? 10_000) - (bucket?.used ?? 0));
+    const nominalPerTick = Math.max(
+      1,
+      Math.floor((bucket?.limit ?? 10_000) / ticksPerHour),
+    );
+    const remaining = Math.max(
+      0,
+      (bucket?.limit ?? 10_000) - (bucket?.used ?? 0),
+    );
     const ceiling = META_BATCH_SIZE ?? nominalPerTick;
     const capacity = Math.min(nominalPerTick, remaining, ceiling);
     const toTake = Math.min(capacity, accounts.length);
@@ -137,7 +156,7 @@ export const tick = internalAction({
       const idx = (start + i) % accounts.length;
       const a = accounts[idx];
       if (!a) {
-        deferred += (toTake - i);
+        deferred += toTake - i;
         break;
       }
 
@@ -150,7 +169,7 @@ export const tick = internalAction({
         },
       );
       if (!acquired?.ok) {
-        deferred += (toTake - i);
+        deferred += toTake - i;
         break;
       }
 
@@ -159,7 +178,10 @@ export const tick = internalAction({
         const today =
           msToDateString(Date.now(), {
             timezone: a.timezone,
-            offsetMinutes: typeof a.timezoneOffsetMinutes === "number" ? a.timezoneOffsetMinutes : undefined,
+            offsetMinutes:
+              typeof a.timezoneOffsetMinutes === "number"
+                ? a.timezoneOffsetMinutes
+                : undefined,
           }) ?? new Date().toISOString().slice(0, 10);
         await ctx.runAction(internal.meta.sync.pullDaily, {
           organizationId: a.organizationId,
@@ -173,7 +195,9 @@ export const tick = internalAction({
     }
 
     const nextIndex = (start + processed) % accounts.length;
-    await ctx.runMutation(internal.engine.metaScheduler.setCursor, { index: nextIndex });
+    await ctx.runMutation(internal.engine.metaScheduler.setCursor, {
+      index: nextIndex,
+    });
 
     // compute duration if needed in logs
     if (LOG_META_ENABLED) {

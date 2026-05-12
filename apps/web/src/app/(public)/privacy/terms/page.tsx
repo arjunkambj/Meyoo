@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
@@ -85,7 +83,9 @@ export default function TermsOfServicePage() {
               Legal Agreement
             </span>
           </div>
-          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Terms of Service</h1>
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">
+            Terms of Service
+          </h1>
           <p className="text-base text-muted sm:text-lg">
             Last updated: {lastUpdated}
           </p>
@@ -849,12 +849,8 @@ export default function TermsOfServicePage() {
 
                 <Card className="bg-surface rounded-[2rem] shadow-none">
                   <Card.Content className="p-6">
-                    <h3 className="font-medium mb-3">
-                      Effect of Termination
-                    </h3>
-                    <p className="text-muted text-sm">
-                      Upon termination:
-                    </p>
+                    <h3 className="font-medium mb-3">Effect of Termination</h3>
+                    <p className="text-muted text-sm">Upon termination:</p>
                     <ul className="mt-2 space-y-1 text-sm text-muted">
                       <li>
                         • Your access to the Service will cease immediately

@@ -78,4 +78,3 @@ export async function fetchInsightsSince(
   // TODO: Include since parameter when real client is wired
   return client.getInsights(accountId, {});
 }
-

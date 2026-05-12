@@ -58,7 +58,9 @@ export const customerRedact = httpAction(async (ctx, request) => {
     // Verify webhook signature
     const isValid =
       process.env.NODE_ENV === "development" ||
-      (signature ? await WebhookUtils.verifyHMAC(rawBody, signature, SHOPIFY_API_SECRET) : false);
+      (signature
+        ? await WebhookUtils.verifyHMAC(rawBody, signature, SHOPIFY_API_SECRET)
+        : false);
 
     if (!isValid) {
       console.error("[GDPR Customer Redact] Invalid signature", {
@@ -97,10 +99,13 @@ export const customerRedact = httpAction(async (ctx, request) => {
         shop: domain,
         requestId,
       });
-      return new Response(JSON.stringify({ success: true, requestId, skipped: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ success: true, requestId, skipped: true }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     const customer = (data.customer ?? {}) as {
@@ -112,17 +117,14 @@ export const customerRedact = httpAction(async (ctx, request) => {
       ? data.orders_to_redact.map((id: unknown) => String(id))
       : [];
 
-    await ctx.runMutation(
-      internal.shopify.gdpr.handleGDPRRedact as any,
-      {
-        organizationId,
-        shopDomain: domain,
-        customerId: customer?.id ? String(customer.id) : "",
-        customerEmail: customer.email || "",
-        customerPhone: customer.phone || "",
-        ordersToRedact,
-      },
-    );
+    await ctx.runMutation(internal.shopify.gdpr.handleGDPRRedact as any, {
+      organizationId,
+      shopDomain: domain,
+      customerId: customer?.id ? String(customer.id) : "",
+      customerEmail: customer.email || "",
+      customerPhone: customer.phone || "",
+      ordersToRedact,
+    });
 
     // Log without PII (GDPR minimization)
     console.log("[GDPR Customer Redact] Request received", {
@@ -209,7 +211,9 @@ export const customerDataRequest = httpAction(async (ctx, request) => {
     // Verify webhook signature
     const isValid =
       process.env.NODE_ENV === "development" ||
-      (signature ? await WebhookUtils.verifyHMAC(rawBody, signature, SHOPIFY_API_SECRET) : false);
+      (signature
+        ? await WebhookUtils.verifyHMAC(rawBody, signature, SHOPIFY_API_SECRET)
+        : false);
 
     if (!isValid) {
       console.error("[GDPR Data Request] Invalid signature", {
@@ -247,10 +251,13 @@ export const customerDataRequest = httpAction(async (ctx, request) => {
         shop: domain,
         requestId,
       });
-      return new Response(JSON.stringify({ success: true, requestId, skipped: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ success: true, requestId, skipped: true }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     const customer = (data.customer ?? {}) as {
@@ -264,18 +271,15 @@ export const customerDataRequest = httpAction(async (ctx, request) => {
     const dataRequestId =
       (data.data_request?.id && String(data.data_request.id)) || "";
 
-    await ctx.runMutation(
-      internal.shopify.gdpr.handleGDPRDataRequest as any,
-      {
-        organizationId,
-        shopDomain: domain,
-        customerId: customer?.id ? String(customer.id) : "",
-        customerEmail: customer.email || "",
-        customerPhone: customer.phone || "",
-        ordersRequested,
-        dataRequestId,
-      },
-    );
+    await ctx.runMutation(internal.shopify.gdpr.handleGDPRDataRequest as any, {
+      organizationId,
+      shopDomain: domain,
+      customerId: customer?.id ? String(customer.id) : "",
+      customerEmail: customer.email || "",
+      customerPhone: customer.phone || "",
+      ordersRequested,
+      dataRequestId,
+    });
 
     // Log without PII (GDPR minimization)
     console.log("[GDPR Data Request] Request received", {
@@ -363,7 +367,9 @@ export const shopRedact = httpAction(async (ctx, request) => {
     // Verify webhook signature
     const isValid =
       process.env.NODE_ENV === "development" ||
-      (signature ? await WebhookUtils.verifyHMAC(rawBody, signature, SHOPIFY_API_SECRET) : false);
+      (signature
+        ? await WebhookUtils.verifyHMAC(rawBody, signature, SHOPIFY_API_SECRET)
+        : false);
 
     if (!isValid) {
       console.error("[GDPR Shop Redact] Invalid signature", {
@@ -401,22 +407,22 @@ export const shopRedact = httpAction(async (ctx, request) => {
         shop: domain,
         requestId,
       });
-      return new Response(JSON.stringify({ success: true, requestId, skipped: true }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ success: true, requestId, skipped: true }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     const shopId = data.shop_id ? String(data.shop_id) : "";
 
-    await ctx.runMutation(
-      internal.shopify.gdpr.handleGDPRShopRedact as any,
-      {
-        organizationId,
-        shopId,
-        shopDomain: domain,
-      },
-    );
+    await ctx.runMutation(internal.shopify.gdpr.handleGDPRShopRedact as any, {
+      organizationId,
+      shopId,
+      shopDomain: domain,
+    });
 
     // Log without PII (GDPR minimization)
     console.log("[GDPR Shop Redact] Request received", {

@@ -19,4 +19,3 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: base ? `${base}/sitemap.xml` : undefined,
   };
 }
-

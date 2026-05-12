@@ -9,7 +9,7 @@ export const getPrimaryCurrencyForOrg = query({
   handler: async (ctx, args): Promise<string | null> => {
     const orgId = args.orgId as Id<"organizations">;
 
-    const organization = await ctx.db.get(orgId);
+    const organization = await ctx.db.get("organizations", orgId);
     if (organization?.primaryCurrency) {
       return organization.primaryCurrency as string;
     }

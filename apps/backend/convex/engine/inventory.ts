@@ -353,7 +353,10 @@ const assignABCCategories = (
     };
   });
 
-  const totalRevenue = distribution.reduce((sum, item) => sum + item.revenue, 0);
+  const totalRevenue = distribution.reduce(
+    (sum, item) => sum + item.revenue,
+    0,
+  );
   const totalUnits = distribution.reduce((sum, item) => sum + item.units, 0);
 
   if (totalRevenue > 0) {
@@ -422,7 +425,10 @@ type SalesTotals = {
 
 const computeSalesTotals = (
   items: Array<Doc<"shopifyOrderItems">>,
-  variantLookup: Map<Id<"shopifyProductVariants">, Doc<"shopifyProductVariants">>,
+  variantLookup: Map<
+    Id<"shopifyProductVariants">,
+    Doc<"shopifyProductVariants">
+  >,
 ): SalesTotals => {
   let units = 0;
   let revenue = 0;
@@ -432,11 +438,11 @@ const computeSalesTotals = (
     const quantity = typeof item.quantity === "number" ? item.quantity : 0;
     units += quantity;
 
-    const variant = item.variantId ? variantLookup.get(item.variantId) : undefined;
+    const variant = item.variantId
+      ? variantLookup.get(item.variantId)
+      : undefined;
     const unitPrice =
-      typeof item.price === "number"
-        ? item.price
-        : variant?.price ?? 0;
+      typeof item.price === "number" ? item.price : (variant?.price ?? 0);
     const discount =
       typeof item.totalDiscount === "number" ? item.totalDiscount : 0;
     const lineRevenue = Math.max(0, unitPrice * quantity - discount);
@@ -576,8 +582,8 @@ function prepareInventorySummaries(
       weightedCostWeight > 0
         ? weightedCostSum / weightedCostWeight
         : defaultVariant
-        ? getVariantCost(defaultVariant)
-        : 0;
+          ? getVariantCost(defaultVariant)
+          : 0;
     const margin = price > 0 ? ((price - cost) / price) * 100 : 0;
 
     const stockStatus = classifyStockStatus(totalAvailable, avgDailySales);
@@ -603,8 +609,7 @@ function prepareInventorySummaries(
       lastSoldAt: stats?.lastSoldAt,
       abcCategory: abcCategories.get(product._id) ?? "C",
       variantCount: productVariants.length || 1,
-      variants:
-        variantSummaries.length > 1 ? variantSummaries : undefined,
+      variants: variantSummaries.length > 1 ? variantSummaries : undefined,
     });
   }
 
@@ -637,7 +642,10 @@ function buildOverview(
     { available: number; incoming: number; committed: number }
   >,
   orderItems: Array<Doc<"shopifyOrderItems">>,
-  variantLookup: Map<Id<"shopifyProductVariants">, Doc<"shopifyProductVariants">>,
+  variantLookup: Map<
+    Id<"shopifyProductVariants">,
+    Doc<"shopifyProductVariants">
+  >,
   analysisDays: number,
   deadStock: number,
 ): InventoryOverviewSummary {
@@ -657,7 +665,8 @@ function buildOverview(
   });
 
   const salesTotals = computeSalesTotals(orderItems, variantLookup);
-  const avgDailyUnitsSold = analysisDays > 0 ? salesTotals.units / analysisDays : 0;
+  const avgDailyUnitsSold =
+    analysisDays > 0 ? salesTotals.units / analysisDays : 0;
   const stockCoverageDays =
     avgDailyUnitsSold > 0
       ? Math.round(totalUnitsInStock / avgDailyUnitsSold)
@@ -733,7 +742,10 @@ export const rebuildInventorySnapshot = internalMutation({
         .collect(),
     ]);
 
-    const inventoryTotals = aggregateInventoryLevels(inventoryTotalsDocs, variants);
+    const inventoryTotals = aggregateInventoryLevels(
+      inventoryTotalsDocs,
+      variants,
+    );
 
     const {
       start,
@@ -742,7 +754,12 @@ export const rebuildInventorySnapshot = internalMutation({
     } = await resolveAnalysisWindow(ctx, orgId, analysisWindowDays);
     const analysisDays = normalizedAnalysisDays;
 
-    const { orders, orderItems } = await fetchOrdersWithItems(ctx, orgId, start, end);
+    const { orders, orderItems } = await fetchOrdersWithItems(
+      ctx,
+      orgId,
+      start,
+      end,
+    );
 
     const variantLookup = new Map<
       Id<"shopifyProductVariants">,
@@ -752,7 +769,11 @@ export const rebuildInventorySnapshot = internalMutation({
       variantLookup.set(variant._id, variant);
     });
 
-    const variantSales = buildVariantSalesMap(orderItems, orders, variantLookup);
+    const variantSales = buildVariantSalesMap(
+      orderItems,
+      orders,
+      variantLookup,
+    );
     const productSales = buildProductSalesMap(variantSales, variants);
     const abcCategories = assignABCCategories(products, productSales);
 
@@ -839,19 +860,19 @@ export const rebuildInventorySnapshot = internalMutation({
         sku: product.sku,
         image: product.image,
         category: product.category,
-      vendor: product.vendor,
-      stock: product.stock,
-      available: product.available,
-      reorderPoint: product.reorderPoint,
-      stockStatus: product.stockStatus,
-      price: product.price,
-      cost: product.cost,
-      margin: product.margin,
-      unitsSold: product.unitsSold,
-      periodRevenue: product.periodRevenue,
-      lastSoldAt: product.lastSoldAt,
-      abcCategory: product.abcCategory,
-      variantCount: product.variantCount,
+        vendor: product.vendor,
+        stock: product.stock,
+        available: product.available,
+        reorderPoint: product.reorderPoint,
+        stockStatus: product.stockStatus,
+        price: product.price,
+        cost: product.cost,
+        margin: product.margin,
+        unitsSold: product.unitsSold,
+        periodRevenue: product.periodRevenue,
+        lastSoldAt: product.lastSoldAt,
+        abcCategory: product.abcCategory,
+        variantCount: product.variantCount,
         variants: product.variants,
       });
     }

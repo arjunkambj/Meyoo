@@ -1,5 +1,3 @@
-"use client";
-
 import { Card } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { designSystem } from "@/libs/design-system";
@@ -32,7 +30,9 @@ export default function ContactPage() {
           <h1 className={`${designSystem.typography.sectionTitle} mb-3`}>
             Contact
           </h1>
-          <p className={`${designSystem.typography.sectionSubtitle} max-w-2xl mx-auto`}>
+          <p
+            className={`${designSystem.typography.sectionSubtitle} max-w-2xl mx-auto`}
+          >
             Questions about profit tracking? Let us know.
           </p>
         </div>

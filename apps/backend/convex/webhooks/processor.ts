@@ -46,7 +46,9 @@ export const getOnboardingByOrganization = internalQuery({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("onboarding")
-      .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
       .collect();
   },
 });
@@ -62,7 +64,7 @@ export const patchOnboardingById = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.onboardingId, args.patch as any);
+    await ctx.db.patch("onboarding", args.onboardingId, args.patch as any);
     return null;
   },
 });
@@ -86,7 +88,7 @@ export const updateOrganizationTrialDates = internalMutation({
       return null;
     }
 
-    await ctx.db.patch(billing._id, {
+    await ctx.db.patch("billing", billing._id, {
       trialStartDate: args.trialStartDate || Date.now(),
       trialEndDate: args.trialEndDate,
       trialEndsAt: args.trialEndDate,
@@ -113,7 +115,9 @@ export const getCurrentBilling = internalQuery({
   handler: async (ctx, args) => {
     return await ctx.db
       .query("billing")
-      .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
       .first();
   },
 });

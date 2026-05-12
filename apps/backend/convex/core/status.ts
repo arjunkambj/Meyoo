@@ -54,7 +54,9 @@ export const refreshIntegrationStatus = internalMutation({
 
     const existing = await ctx.db
       .query("integrationStatus")
-      .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
       .first();
 
     const payload = {
@@ -64,7 +66,7 @@ export const refreshIntegrationStatus = internalMutation({
     } as const;
 
     if (existing) {
-      await ctx.db.patch(existing._id, payload as any);
+      await ctx.db.patch("integrationStatus", existing._id, payload as any);
     } else {
       await ctx.db.insert("integrationStatus", payload as any);
     }

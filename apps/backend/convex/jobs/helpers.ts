@@ -31,7 +31,7 @@ export const createSyncSession = internalMutation({
     ) => {
       if (args.platform !== "shopify") return;
 
-      const session = await ctx.db.get(sessionId);
+      const session = await ctx.db.get("syncSessions", sessionId);
       if (!session) return;
 
       const metadata = (session.metadata || {}) as Record<string, any>;
@@ -46,7 +46,7 @@ export const createSyncSession = internalMutation({
         return;
       }
 
-      await ctx.db.patch(sessionId, {
+      await ctx.db.patch("syncSessions", sessionId, {
         metadata: {
           ...metadata,
           stageStatus: {
@@ -63,18 +63,15 @@ export const createSyncSession = internalMutation({
     };
 
     if (args.sessionId) {
-      const reserved = await ctx.db.get(args.sessionId);
+      const reserved = await ctx.db.get("syncSessions", args.sessionId);
 
       if (reserved) {
-        if (
-          reserved.status === "syncing" ||
-          reserved.status === "processing"
-        ) {
+        if (reserved.status === "syncing" || reserved.status === "processing") {
           return { sessionId: reserved._id, alreadyRunning: true };
         }
 
         if (reserved.status === "pending") {
-          await ctx.db.patch(reserved._id, {
+          await ctx.db.patch("syncSessions", reserved._id, {
             status: "syncing",
             startedAt: Date.now(),
             type: reserved.type || args.type,
@@ -106,7 +103,7 @@ export const createSyncSession = internalMutation({
 
       if (existing) {
         if (status === "pending") {
-          await ctx.db.patch(existing._id, {
+          await ctx.db.patch("syncSessions", existing._id, {
             status: "syncing",
             startedAt: Date.now(),
             type: existing.type || args.type,
@@ -174,7 +171,7 @@ export const updateSyncSession = internalMutation({
     const sessionId = args.sessionId;
 
     // Ensure the session still exists; if not, no-op to avoid throwing in background jobs
-    const existing = await ctx.db.get(sessionId);
+    const existing = await ctx.db.get("syncSessions", sessionId);
     if (!existing) return;
 
     const updates: {
@@ -201,7 +198,7 @@ export const updateSyncSession = internalMutation({
       updates.completedAt = args.completedAt;
     }
 
-    await ctx.db.patch(sessionId, updates);
+    await ctx.db.patch("syncSessions", sessionId, updates);
   },
 });
 
@@ -223,7 +220,7 @@ export const initializeSyncSessionBatches = internalMutation({
     ),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId);
+    const session = await ctx.db.get("syncSessions", args.sessionId);
     if (!session) return;
 
     const now = Date.now();
@@ -262,13 +259,11 @@ export const initializeSyncSessionBatches = internalMutation({
       totalBatches: nextTotalBatches,
       completedBatches: nextCompletedBatches,
       baselineRecords,
-      ordersQueued:
-        args.metrics?.ordersQueued ?? existingMetadata.ordersQueued,
+      ordersQueued: args.metrics?.ordersQueued ?? existingMetadata.ordersQueued,
       productsProcessed:
         args.metrics?.productsProcessed ?? existingMetadata.productsProcessed,
       customersProcessed:
-        args.metrics?.customersProcessed ??
-        existingMetadata.customersProcessed,
+        args.metrics?.customersProcessed ?? existingMetadata.customersProcessed,
       ordersProcessed: previousOrdersProcessed,
       lastActivityAt: now,
       progressUpdatedAt: now,
@@ -318,7 +313,7 @@ export const initializeSyncSessionBatches = internalMutation({
       }
     }
 
-    await ctx.db.patch(args.sessionId, patch);
+    await ctx.db.patch("syncSessions", args.sessionId, patch);
 
     if (shouldMarkCompleted) {
       await ctx.runMutation(internal.engine.syncJobs.onInitialSyncComplete, {
@@ -354,7 +349,7 @@ export const incrementSyncSessionProgress = internalMutation({
     recordsProcessedDelta: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId);
+    const session = await ctx.db.get("syncSessions", args.sessionId);
     if (!session) return null;
 
     const metadata = (session.metadata || {}) as Record<string, any>;
@@ -362,9 +357,10 @@ export const incrementSyncSessionProgress = internalMutation({
     const totalBatches = metadata.totalBatches ?? 0;
     const previousCompleted = metadata.completedBatches ?? 0;
     const nextCompletedRaw = previousCompleted + args.batchesCompletedDelta;
-    const nextCompleted = totalBatches > 0
-      ? Math.min(totalBatches, nextCompletedRaw)
-      : nextCompletedRaw;
+    const nextCompleted =
+      totalBatches > 0
+        ? Math.min(totalBatches, nextCompletedRaw)
+        : nextCompletedRaw;
 
     const nextRecordsProcessed =
       args.recordsProcessedDelta !== undefined
@@ -379,7 +375,7 @@ export const incrementSyncSessionProgress = internalMutation({
         ? previousOrdersProcessed + ordersProcessedDelta
         : previousOrdersProcessed;
 
-    await ctx.db.patch(args.sessionId, {
+    await ctx.db.patch("syncSessions", args.sessionId, {
       metadata: {
         ...metadata,
         totalBatches,
@@ -427,7 +423,7 @@ export const patchSyncSessionMetadata = internalMutation({
     }),
   },
   handler: async (ctx, args) => {
-    const session = await ctx.db.get(args.sessionId);
+    const session = await ctx.db.get("syncSessions", args.sessionId);
     if (!session) return;
 
     const existing = (session.metadata || {}) as Record<string, unknown>;
@@ -442,9 +438,8 @@ export const patchSyncSessionMetadata = internalMutation({
     }
 
     if (stageStatus) {
-      const existingStage = (
-        existing.stageStatus as Record<string, unknown> | undefined
-      ) || {};
+      const existingStage =
+        (existing.stageStatus as Record<string, unknown> | undefined) || {};
       nextMetadata.stageStatus = {
         ...existingStage,
         ...stageStatus,
@@ -459,7 +454,7 @@ export const patchSyncSessionMetadata = internalMutation({
       nextMetadata.syncedEntities = Array.from(merged);
     }
 
-    await ctx.db.patch(args.sessionId, {
+    await ctx.db.patch("syncSessions", args.sessionId, {
       metadata: nextMetadata,
     });
   },

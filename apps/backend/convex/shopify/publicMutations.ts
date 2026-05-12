@@ -11,7 +11,7 @@ export const setWebhooksRegisteredByDomain = mutation({
 
     if (!store) throw new Error("Store not found");
 
-    await ctx.db.patch(store._id, {
+    await ctx.db.patch("shopifyStores", store._id, {
       webhooksRegistered: args.value,
       updatedAt: Date.now(),
     });
@@ -41,7 +41,7 @@ export const checkAndSetWebhooksRegistered = mutation({
       };
     }
 
-    await ctx.db.patch(store._id, {
+    await ctx.db.patch("shopifyStores", store._id, {
       webhooksRegistered: true,
       updatedAt: Date.now(),
     });

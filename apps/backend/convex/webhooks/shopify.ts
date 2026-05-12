@@ -3,12 +3,7 @@ import { createSimpleLogger } from "../../libs/logging/simple";
 import { internal } from "../_generated/api";
 import { httpAction } from "../_generated/server";
 import { WebhookUtils } from "../core/integrationBase";
-import {
-  toNum,
-  toMoney,
-  toMs as toTs,
-  toStringArray,
-} from "../utils/shopify";
+import { toNum, toMoney, toMs as toTs, toStringArray } from "../utils/shopify";
 import { optionalEnv, requireEnv } from "../utils/env";
 import type { Id } from "../_generated/dataModel";
 import { msToDateString, type MsToDateOptions } from "../utils/date";
@@ -122,15 +117,11 @@ export const shopifyWebhook = httpAction(async (ctx, request) => {
 
     // Validate required headers
     if (!topic || !domain) {
-      logger.error(
-        "Missing required headers",
-        undefined,
-        {
-          topic,
-          domain,
-          requestId,
-        },
-      );
+      logger.error("Missing required headers", undefined, {
+        topic,
+        domain,
+        requestId,
+      });
       return new Response(
         JSON.stringify({ error: "Missing required headers" }),
         {
@@ -151,14 +142,10 @@ export const shopifyWebhook = httpAction(async (ctx, request) => {
         : false);
 
     if (!isValid) {
-      logger.error(
-        "Invalid signature",
-        undefined,
-        {
-          domain,
-          requestId,
-        },
-      );
+      logger.error("Invalid signature", undefined, {
+        domain,
+        requestId,
+      });
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
@@ -189,7 +176,7 @@ export const shopifyWebhook = httpAction(async (ctx, request) => {
     try {
       const fetched = await ctx.runQuery(
         internal.shopify.internalQueries.getStoreByDomain as any,
-        { shopDomain: domain }
+        { shopDomain: domain },
       );
       if (fetched) {
         store = fetched as StoreDoc;
@@ -225,10 +212,13 @@ export const shopifyWebhook = httpAction(async (ctx, request) => {
           organizationId: organizationId ? String(organizationId) : undefined,
         });
       }
-      return new Response(JSON.stringify({ success: true, duplicate: true, requestId }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ success: true, duplicate: true, requestId }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Inline topic handling – minimal writes + analytics touch
@@ -255,15 +245,11 @@ export const shopifyWebhook = httpAction(async (ctx, request) => {
   } catch (error) {
     const processingTime = Date.now() - requestStart;
     const { error: normalizedError, context } = normalizeError(error);
-    logger.error(
-      "Processing error",
-      normalizedError,
-      {
-        requestId,
-        processingTime,
-        ...context,
-      },
-    );
+    logger.error("Processing error", normalizedError, {
+      requestId,
+      processingTime,
+      ...context,
+    });
     return new Response(
       JSON.stringify({
         success: false,
@@ -320,9 +306,12 @@ async function handleTopicInline(
   let store: StoreShape | null = (args.store as StoreShape | null) ?? null;
 
   if (!store && organizationId) {
-    store = await ctx.runQuery(internal.shopify.internalQueries.getActiveStoreInternal, {
-      organizationId: String(organizationId),
-    });
+    store = await ctx.runQuery(
+      internal.shopify.internalQueries.getActiveStoreInternal,
+      {
+        organizationId: String(organizationId),
+      },
+    );
   }
 
   if (!organizationId && store) {
@@ -342,7 +331,10 @@ async function handleTopicInline(
     }
     if (!initialSyncChecked) {
       try {
-        initialSyncComplete = await hasCompletedInitialShopifySync(ctx as any, organizationId);
+        initialSyncComplete = await hasCompletedInitialShopifySync(
+          ctx as any,
+          organizationId,
+        );
       } catch (_error) {
         initialSyncComplete = false;
       }
@@ -380,9 +372,10 @@ async function handleTopicInline(
       const order = payload as any;
       const li = Array.isArray(order.line_items) ? order.line_items : [];
       const orderName = toOptionalString(order.name);
-      const orderNumber = toOptionalString(order.order_number ?? order.number)
-        ?? orderName?.replace(/^#/, "")
-        ?? String(order.id ?? "");
+      const orderNumber =
+        toOptionalString(order.order_number ?? order.number) ??
+        orderName?.replace(/^#/, "") ??
+        String(order.id ?? "");
       const orders = [
         {
           shopifyId: String(order.id),
@@ -420,7 +413,10 @@ async function handleTopicInline(
           totalTip: toMoney(order.total_tip_received),
           currency: order.currency,
           totalItems: li.length,
-          totalQuantity: li.reduce((s: number, x: any) => s + toNum(x.quantity), 0),
+          totalQuantity: li.reduce(
+            (s: number, x: any) => s + toNum(x.quantity),
+            0,
+          ),
           shippingAddress: order.shipping_address
             ? {
                 country: toOptionalString(order.shipping_address.country),
@@ -429,15 +425,17 @@ async function handleTopicInline(
                 zip: toOptionalString(order.shipping_address.zip),
               }
             : undefined,
-          tags: typeof order.tags === "string"
-            ? (order.tags as string).split(",").map((t: string) => t.trim()).filter(Boolean)
-            : undefined,
+          tags:
+            typeof order.tags === "string"
+              ? (order.tags as string)
+                  .split(",")
+                  .map((t: string) => t.trim())
+                  .filter(Boolean)
+              : undefined,
           note: toOptionalString(order.note),
           lineItems: li.map((x: any) => {
             const title =
-              toOptionalString(x.title) ??
-              toOptionalString(x.name) ??
-              "";
+              toOptionalString(x.title) ?? toOptionalString(x.name) ?? "";
 
             return {
               shopifyId: String(x.id),
@@ -457,11 +455,14 @@ async function handleTopicInline(
         },
       ];
 
-      await ctx.runMutation(internal.shopify.orderMutations.storeOrdersInternal, {
-        organizationId: organizationId,
-        storeId,
-        orders,
-      });
+      await ctx.runMutation(
+        internal.shopify.orderMutations.storeOrdersInternal,
+        {
+          organizationId: organizationId,
+          storeId,
+          orders,
+        },
+      );
       // analytics recalculation handled by storeOrdersInternal when appropriate
       break;
     }
@@ -512,13 +513,20 @@ async function handleTopicInline(
           vendor: toOptionalString(p.vendor),
           status: toOptionalString(p.status) ?? "",
           featuredImage: toOptionalString(p.image?.src),
-          totalInventory: variants.reduce((s: number, v: any) => s + toNum(v.inventory_quantity), 0),
+          totalInventory: variants.reduce(
+            (s: number, v: any) => s + toNum(v.inventory_quantity),
+            0,
+          ),
           totalVariants: variants.length,
-          tags: typeof p.tags === "string"
-            ? p.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
-            : Array.isArray(p.tags)
-              ? p.tags.map((t: any) => String(t).trim()).filter(Boolean)
-              : [],
+          tags:
+            typeof p.tags === "string"
+              ? p.tags
+                  .split(",")
+                  .map((t: string) => t.trim())
+                  .filter(Boolean)
+              : Array.isArray(p.tags)
+                ? p.tags.map((t: any) => String(t).trim()).filter(Boolean)
+                : [],
           shopifyCreatedAt: toNum(toTs(p.created_at) ?? Date.now()),
           shopifyUpdatedAt: toNum(toTs(p.updated_at) ?? Date.now()),
           publishedAt: toTs(p.published_at),
@@ -530,13 +538,18 @@ async function handleTopicInline(
               title,
               sku: toOptionalString(v.sku),
               barcode: toOptionalString(v.barcode),
-              position: Number.isFinite(toNum(v.position)) ? toNum(v.position) : 0,
+              position: Number.isFinite(toNum(v.position))
+                ? toNum(v.position)
+                : 0,
               price: toMoney(v.price),
               compareAtPrice: toMoney(v.compare_at_price),
               inventoryQuantity: toNum(v.inventory_quantity),
-              available: typeof v.available === "boolean" ? v.available : undefined,
+              available:
+                typeof v.available === "boolean" ? v.available : undefined,
               taxable: typeof v.taxable === "boolean" ? v.taxable : undefined,
-              inventoryItemId: v.inventory_item_id ? String(v.inventory_item_id) : undefined,
+              inventoryItemId: v.inventory_item_id
+                ? String(v.inventory_item_id)
+                : undefined,
               weight: toNum(v.weight),
               weightUnit: toOptionalString(v.weight_unit),
               option1: toOptionalString(v.option1),
@@ -548,11 +561,14 @@ async function handleTopicInline(
           }),
         },
       ];
-      await ctx.runMutation(internal.shopify.productMutations.storeProductsInternal, {
-        organizationId: organizationId,
-        storeId,
-        products,
-      });
+      await ctx.runMutation(
+        internal.shopify.productMutations.storeProductsInternal,
+        {
+          organizationId: organizationId,
+          storeId,
+          products,
+        },
+      );
       break;
     }
 
@@ -580,7 +596,8 @@ async function handleTopicInline(
       // Best-effort delete by id
       const shopifyId = String((payload as any).id);
       const existing = await ctx.runQuery(
-        (internal.shopify.internalQueries as any).getCustomerByShopifyIdInternal,
+        (internal.shopify.internalQueries as any)
+          .getCustomerByShopifyIdInternal,
         {
           organizationId,
           storeId,
@@ -655,13 +672,11 @@ async function handleTopicInline(
                 })
                 .filter(
                   (
-                    entry:
-                      | {
-                          lineItemId: string;
-                          quantity: number;
-                          subtotal: number;
-                        }
-                      | null,
+                    entry: {
+                      lineItemId: string;
+                      quantity: number;
+                      subtotal: number;
+                    } | null,
                   ): entry is {
                     lineItemId: string;
                     quantity: number;
@@ -673,14 +688,20 @@ async function handleTopicInline(
           processedAt: toTs(r.processed_at),
         },
       ];
-      await ctx.runMutation(internal.shopify.orderMutations.storeRefundsInternal, {
-        organizationId: organizationId,
-        refunds,
-      });
+      await ctx.runMutation(
+        internal.shopify.orderMutations.storeRefundsInternal,
+        {
+          organizationId: organizationId,
+          refunds,
+        },
+      );
       // analytics recalculation handled client-side
       const canSchedule = await ensureInitialSyncComplete();
       const dateOptions = await resolveDateOptions();
-      const refundDate = msToDateString(refunds[0]?.shopifyCreatedAt, dateOptions);
+      const refundDate = msToDateString(
+        refunds[0]?.shopifyCreatedAt,
+        dateOptions,
+      );
       if (canSchedule && refundDate) {
         await scheduleAnalyticsRebuild(
           ctx,
@@ -709,16 +730,22 @@ async function handleTopicInline(
           locationId: f.location_id ? String(f.location_id) : undefined,
           service: toOptionalString(f.service),
           lineItems: Array.isArray(f.line_items)
-            ? f.line_items.map((li: any) => ({ id: String(li.id), quantity: toNum(li.quantity) }))
+            ? f.line_items.map((li: any) => ({
+                id: String(li.id),
+                quantity: toNum(li.quantity),
+              }))
             : [],
           shopifyCreatedAt: toNum(toTs(f.created_at) ?? Date.now()),
           shopifyUpdatedAt: toTs(f.updated_at),
         },
       ];
-      await ctx.runMutation(internal.shopify.orderMutations.storeFulfillmentsInternal, {
-        organizationId: organizationId,
-        fulfillments,
-      });
+      await ctx.runMutation(
+        internal.shopify.orderMutations.storeFulfillmentsInternal,
+        {
+          organizationId: organizationId,
+          fulfillments,
+        },
+      );
       // analytics recalculation handled client-side
       break;
     }
@@ -798,10 +825,13 @@ async function handleTopicInline(
 
     case "collections/create": {
       if (!organizationId) break;
-      await ctx.runMutation(internal.shopify.collectionMutations.storeCollectionInternal, {
-        organizationId,
-        collection: payload as any,
-      } as any);
+      await ctx.runMutation(
+        internal.shopify.collectionMutations.storeCollectionInternal,
+        {
+          organizationId,
+          collection: payload as any,
+        } as any,
+      );
       break;
     }
 
@@ -847,10 +877,13 @@ async function handleTopicInline(
           processedAt: toTs(t.processed_at),
         },
       ];
-      await ctx.runMutation(internal.shopify.orderMutations.storeTransactionsInternal, {
-        organizationId: organizationId,
-        transactions: txs,
-      });
+      await ctx.runMutation(
+        internal.shopify.orderMutations.storeTransactionsInternal,
+        {
+          organizationId: organizationId,
+          transactions: txs,
+        },
+      );
       // analytics recalculation handled client-side
       break;
     }
@@ -862,12 +895,12 @@ async function handleTopicInline(
       const rawAmount = rawPurchase.amount ?? rawPurchase.price ?? 0;
       const normalizedAmount =
         typeof rawAmount === "object" && rawAmount !== null
-          ? rawAmount.amount ?? rawAmount.price ?? 0
+          ? (rawAmount.amount ?? rawAmount.price ?? 0)
           : rawAmount;
       const amount = toMoney(normalizedAmount);
       const currency =
         (typeof rawAmount === "object" && rawAmount !== null
-          ? rawAmount.currency_code ?? rawAmount.currency
+          ? (rawAmount.currency_code ?? rawAmount.currency)
           : undefined) ??
         rawPurchase.currency_code ??
         rawPurchase.currency;
@@ -896,14 +929,16 @@ async function handleTopicInline(
     case "app/uninstalled": {
       // Use domain from header, not payload (domain is from x-shopify-shop-domain header)
       const shopDomain = domain || (payload as any)?.shop_domain || ""; // domain is passed from parent scope
-      
+
       logger.info("Processing app/uninstalled webhook", {
         domain: shopDomain,
         organizationId: organizationId || "not found",
         payloadShopDomain: (payload as any)?.shop_domain,
       });
 
-      let orgId = organizationId ?? (store?.organizationId as Id<"organizations"> | undefined);
+      let orgId =
+        organizationId ??
+        (store?.organizationId as Id<"organizations"> | undefined);
 
       // If no organizationId, try to find it by shop domain
       if (!orgId && shopDomain) {
@@ -940,14 +975,10 @@ async function handleTopicInline(
           );
         } catch (e) {
           const { error: normalizedError, context } = normalizeError(e);
-          logger.error(
-            "Failed to mark store inactive",
-            normalizedError,
-            {
-              shopDomain,
-              ...context,
-            },
-          );
+          logger.error("Failed to mark store inactive", normalizedError, {
+            shopDomain,
+            ...context,
+          });
         }
       }
 
@@ -979,7 +1010,7 @@ async function handleTopicInline(
             organizationId: String(orgId),
             shopDomain,
           });
-          
+
           await ctx.runMutation(
             internal.shopify.lifecycle.handleAppUninstalled as any,
             { organizationId: String(orgId), shopDomain },
@@ -991,15 +1022,11 @@ async function handleTopicInline(
           });
         } catch (e) {
           const { error: normalizedError, context } = normalizeError(e);
-          logger.error(
-            "Failed to call handleAppUninstalled",
-            normalizedError,
-            {
-              organizationId: String(orgId),
-              shopDomain,
-              ...context,
-            },
-          );
+          logger.error("Failed to call handleAppUninstalled", normalizedError, {
+            organizationId: String(orgId),
+            shopDomain,
+            ...context,
+          });
         }
       } else {
         logger.warn("Cannot reset user state - missing organizationId", {
@@ -1015,21 +1042,32 @@ async function handleTopicInline(
       if (!organizationId) break;
       // Mark onboarding hasShopifySubscription = true
       try {
-        const obs = await ctx.runQuery(internal.webhooks.processor.getOnboardingByOrganization as any, {
-          organizationId,
-        });
+        const obs = await ctx.runQuery(
+          internal.webhooks.processor.getOnboardingByOrganization as any,
+          {
+            organizationId,
+          },
+        );
         const list = Array.isArray(obs) ? obs : obs ? [obs] : [];
         await Promise.all(
           list
             .filter((r: any) => r && !r.isCompleted)
             .map((r: any) =>
-              ctx.runMutation(internal.webhooks.processor.patchOnboardingById as any, {
-                onboardingId: r._id,
-                patch: { hasShopifySubscription: true, updatedAt: Date.now() },
-              }),
+              ctx.runMutation(
+                internal.webhooks.processor.patchOnboardingById as any,
+                {
+                  onboardingId: r._id,
+                  patch: {
+                    hasShopifySubscription: true,
+                    updatedAt: Date.now(),
+                  },
+                },
+              ),
             ),
         );
-      } catch (_e) { void 0; }
+      } catch (_e) {
+        void 0;
+      }
 
       // Resolve plan and update billing
       const nested = (payload as any)?.app_subscription || {};
@@ -1038,7 +1076,9 @@ async function handleTopicInline(
       const status = String(statusRaw).toUpperCase();
       if (!status || !nameRaw) break;
 
-      const mapPlan = (planName: string): "free" | "starter" | "growth" | "business" => {
+      const mapPlan = (
+        planName: string,
+      ): "free" | "starter" | "growth" | "business" => {
         const m: Record<string, "starter" | "growth" | "business"> = {
           "Starter Plan": "starter",
           "Growth Plan": "growth",
@@ -1054,17 +1094,20 @@ async function handleTopicInline(
         { organizationId },
       );
 
-      let resolvedPlan: "free" | "starter" | "growth" | "business" | null = null;
+      let resolvedPlan: "free" | "starter" | "growth" | "business" | null =
+        null;
       if (status === "ACTIVE") {
         resolvedPlan = mapPlan(String(nameRaw));
       } else if (status === "CANCELLED" || status === "EXPIRED") {
         // Protect against cancel of previous subscription after upgrade
         if (
-          currentBilling?.shopifyBilling?.previousSubscriptionId === subscriptionId
+          currentBilling?.shopifyBilling?.previousSubscriptionId ===
+          subscriptionId
         ) {
           resolvedPlan = null;
         } else if (
-          currentBilling?.shopifyBilling?.shopifySubscriptionId !== subscriptionId &&
+          currentBilling?.shopifyBilling?.shopifySubscriptionId !==
+            subscriptionId &&
           currentBilling?.shopifyBilling?.isActive
         ) {
           resolvedPlan = null; // Another sub is active; ignore
@@ -1078,20 +1121,28 @@ async function handleTopicInline(
         nested.billing_interval ||
         nested.interval ||
         "";
-      const billingCycle = /year/i.test(String(rawInterval)) ? "yearly" : undefined;
+      const billingCycle = /year/i.test(String(rawInterval))
+        ? "yearly"
+        : undefined;
 
       if (resolvedPlan) {
         const currentPlan = currentBilling?.shopifyBilling?.plan || "free";
         const isUpgrade =
-          resolvedPlan !== "free" && currentPlan !== resolvedPlan && status === "ACTIVE";
+          resolvedPlan !== "free" &&
+          currentPlan !== resolvedPlan &&
+          status === "ACTIVE";
 
         await ctx.runMutation(
-          internal.core.organizationBilling.updateOrganizationPlanInternalWithTracking,
+          internal.core.organizationBilling
+            .updateOrganizationPlanInternalWithTracking,
           {
             organizationId,
             plan: resolvedPlan,
-            shopifySubscriptionId: subscriptionId ? String(subscriptionId) : undefined,
-            shopifySubscriptionStatus: (payload as any)?.status || nested.status,
+            shopifySubscriptionId: subscriptionId
+              ? String(subscriptionId)
+              : undefined,
+            shopifySubscriptionStatus:
+              (payload as any)?.status || nested.status,
             billingCycle,
             isUpgrade,
             previousSubscriptionId: isUpgrade
@@ -1110,11 +1161,16 @@ async function handleTopicInline(
         if (trialEndsOn) {
           const ts = Date.parse(String(trialEndsOn));
           if (!isNaN(ts) && ts > Date.now()) {
-            await ctx.runMutation(internal.webhooks.processor.updateOrganizationTrialDates, {
-              organizationId,
-              trialEndDate: ts,
-              trialStartDate: createdAt ? Date.parse(String(createdAt)) : undefined,
-            });
+            await ctx.runMutation(
+              internal.webhooks.processor.updateOrganizationTrialDates,
+              {
+                organizationId,
+                trialEndDate: ts,
+                trialStartDate: createdAt
+                  ? Date.parse(String(createdAt))
+                  : undefined,
+              },
+            );
           }
         }
       }
@@ -1133,15 +1189,17 @@ async function handleTopicInline(
 
       // If cancelling current sub (and no other active), downgrade to free
       const isCurrent =
-        currentBilling?.shopifyBilling?.shopifySubscriptionId === subscriptionId ||
-        !currentBilling?.shopifyBilling?.isActive;
+        currentBilling?.shopifyBilling?.shopifySubscriptionId ===
+          subscriptionId || !currentBilling?.shopifyBilling?.isActive;
       if (isCurrent) {
         await ctx.runMutation(
           internal.core.organizationBilling.updateOrganizationPlanInternal,
           {
             organizationId,
             plan: "free",
-            shopifySubscriptionId: subscriptionId ? String(subscriptionId) : undefined,
+            shopifySubscriptionId: subscriptionId
+              ? String(subscriptionId)
+              : undefined,
             shopifySubscriptionStatus: "CANCELLED",
           } as any,
         );

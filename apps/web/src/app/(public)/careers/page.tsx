@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, Chip, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 
@@ -91,11 +89,11 @@ export default function CareersPage() {
               icon="solar:case-round-bold-duotone"
               width={16}
             />
-            <span className="text-sm font-medium text-muted">
-              Careers
-            </span>
+            <span className="text-sm font-medium text-muted">Careers</span>
           </div>
-          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Join Our Mission</h1>
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">
+            Join Our Mission
+          </h1>
           <p className="text-base text-muted sm:text-lg max-w-2xl mx-auto">
             Help us empower e-commerce businesses with profit intelligence.
             We&apos;re building the future of financial analytics for online
@@ -167,9 +165,7 @@ export default function CareersPage() {
 
                         <div className="space-y-4">
                           <div>
-                            <h4 className="font-medium mb-2">
-                              Requirements:
-                            </h4>
+                            <h4 className="font-medium mb-2">Requirements:</h4>
                             <ul className="space-y-1.5">
                               {position.requirements.map((req) => (
                                 <li
@@ -187,9 +183,7 @@ export default function CareersPage() {
                           </div>
 
                           <div>
-                            <h4 className="font-medium mb-2">
-                              Nice to Have:
-                            </h4>
+                            <h4 className="font-medium mb-2">Nice to Have:</h4>
                             <ul className="space-y-1.5">
                               {position.nice.map((item) => (
                                 <li
@@ -284,9 +278,7 @@ export default function CareersPage() {
               >
                 Send Your Resume
               </EmailButton>
-              <p className="text-sm text-muted mt-4">
-                Contact: arjun@meyoo.io
-              </p>
+              <p className="text-sm text-muted mt-4">Contact: arjun@meyoo.io</p>
             </Card.Content>
           </Card>
         </div>

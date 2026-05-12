@@ -44,7 +44,7 @@ export async function storeAdAccounts(
     };
 
     if (existing) {
-      await ctx.db.patch(existing._id, {
+      await ctx.db.patch("metaAdAccounts", existing._id, {
         ...accountData,
         syncedAt: existing.syncedAt ?? 0,
       });
@@ -104,7 +104,7 @@ export async function storeInsights(
     const insightData = buildInsightData(insight);
 
     if (existing) {
-      await ctx.db.patch(existing._id, insightData);
+      await ctx.db.patch("metaInsights", existing._id, insightData);
     } else {
       await ctx.db.insert("metaInsights", {
         organizationId,
@@ -133,7 +133,9 @@ function buildInsightData(insight: MetaInsight) {
     spend: parseMetricValue(insight.spend),
     reach: insight.reach ? parseMetricValue(insight.reach) : undefined,
     impressions: parseMetricValue(insight.impressions),
-    frequency: insight.frequency ? parseMetricValue(insight.frequency) : undefined,
+    frequency: insight.frequency
+      ? parseMetricValue(insight.frequency)
+      : undefined,
     clicks: parseMetricValue(insight.clicks),
     uniqueClicks: getActionValue(insight.actions, "unique_clicks"),
     ctr: insight.ctr ? parseMetricValue(insight.ctr) : undefined,
@@ -149,8 +151,12 @@ function buildInsightData(insight: MetaInsight) {
     initiateCheckout: getActionValue(insight.actions, "initiate_checkout"),
     pageViews: getActionValue(insight.actions, "page_view"),
     qualityRanking: insight.quality_ranking as string | undefined,
-    engagementRateRanking: insight.engagement_rate_ranking as string | undefined,
-    conversionRateRanking: insight.conversion_rate_ranking as string | undefined,
+    engagementRateRanking: insight.engagement_rate_ranking as
+      | string
+      | undefined,
+    conversionRateRanking: insight.conversion_rate_ranking as
+      | string
+      | undefined,
     viewContent: getActionValue(insight.actions, "view_content"),
     videoViews: getActionValue(insight.actions, "video_view"),
     video3SecViews: getActionValue(insight.actions, "video_3_sec_views"),
@@ -175,11 +181,12 @@ function getActionValue(
 ): number {
   if (!actions) return 0;
   const target = actionType.toLowerCase();
-  const action = actions.find((item) => (item.action_type ?? "").toLowerCase() === target);
+  const action = actions.find(
+    (item) => (item.action_type ?? "").toLowerCase() === target,
+  );
   if (!action) return 0;
 
   const value = action.value;
   if (value == null) return 0;
   return typeof value === "number" ? value : parseMetricValue(value);
 }
-

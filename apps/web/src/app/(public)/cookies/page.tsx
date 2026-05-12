@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
@@ -84,7 +82,9 @@ export default function CookiesPage() {
               Cookie Policy
             </span>
           </div>
-          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Cookie Policy</h1>
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">
+            Cookie Policy
+          </h1>
           <p className="text-base text-muted sm:text-lg">
             Last updated: {lastUpdated}
           </p>
@@ -147,7 +147,9 @@ export default function CookiesPage() {
 
           {/* Types of Cookies */}
           <div className="mb-8">
-            <h2 className="text-2xl font-medium mb-3">Types of Cookies We Use</h2>
+            <h2 className="text-2xl font-medium mb-3">
+              Types of Cookies We Use
+            </h2>
             <div className="space-y-6">
               {cookieTypes.map((type) => (
                 <Card
@@ -164,9 +166,7 @@ export default function CookiesPage() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="text-lg font-medium">
-                            {type.title}
-                          </h3>
+                          <h3 className="text-lg font-medium">{type.title}</h3>
                           {type.canDisable ? (
                             <span className="text-xs bg-warning/10 text-warning px-3 py-1 rounded-full">
                               Optional
@@ -177,9 +177,7 @@ export default function CookiesPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-muted mb-3">
-                          {type.description}
-                        </p>
+                        <p className="text-muted mb-3">{type.description}</p>
                         <div className="bg-surface-secondary rounded-xl p-4">
                           <p className="text-sm font-medium mb-2">Examples:</p>
                           <ul className="space-y-1">
@@ -377,8 +375,7 @@ export default function CookiesPage() {
                       Policy
                     </li>
                     <li>
-                      • <strong>Google:</strong> Adheres to Google Ads API
-                      Terms
+                      • <strong>Google:</strong> Adheres to Google Ads API Terms
                     </li>
                   </ul>
                 </Card.Content>
@@ -390,7 +387,9 @@ export default function CookiesPage() {
 
           {/* Updates & Contact */}
           <div className="mb-8">
-            <h2 className="text-2xl font-medium mb-3">Updates to This Policy</h2>
+            <h2 className="text-2xl font-medium mb-3">
+              Updates to This Policy
+            </h2>
             <Card className="bg-surface rounded-[2rem] shadow-none mb-3">
               <Card.Content className="p-6">
                 <p className="text-muted mb-3">

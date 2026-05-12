@@ -1,5 +1,5 @@
-import type { Id } from '../_generated/dataModel';
-import type { MutationCtx } from '../_generated/server';
+import type { Id } from "../_generated/dataModel";
+import type { MutationCtx } from "../_generated/server";
 
 export const PLAN_PRICES = {
   free: 0,
@@ -11,16 +11,17 @@ export const PLAN_PRICES = {
 type Plan = keyof typeof PLAN_PRICES;
 
 function makeInvoiceNumber(now = new Date()): string {
-  return `INV-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${
-    Math.random().toString(36).slice(2, 6).toUpperCase()
-  }`;
+  return `INV-${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${Math.random()
+    .toString(36)
+    .slice(2, 6)
+    .toUpperCase()}`;
 }
 
 export async function createMonthlyInvoiceIfMissing(
   ctx: MutationCtx,
   args: {
-    organizationId: Id<'organizations'>;
-    ownerId: Id<'users'>;
+    organizationId: Id<"organizations">;
+    ownerId: Id<"users">;
     plan: Plan;
     subscriptionId?: string;
     description?: string;
@@ -37,26 +38,29 @@ export async function createMonthlyInvoiceIfMissing(
     .slice(0, 10);
 
   const existing = await ctx.db
-    .query('invoices')
-    .withIndex('by_organization', (q: any) => q.eq('organizationId', args.organizationId))
+    .query("invoices")
+    .withIndex("by_organization", (q: any) =>
+      q.eq("organizationId", args.organizationId),
+    )
     .collect();
 
   const alreadyHasInvoice = existing.some((inv: any) => {
     if (inv.billingPeriodStart !== periodStart) return false;
-    if (args.matchBySubscription) return inv.shopifySubscriptionId === args.subscriptionId;
+    if (args.matchBySubscription)
+      return inv.shopifySubscriptionId === args.subscriptionId;
     return inv.plan === args.plan;
   });
 
   if (alreadyHasInvoice) return;
 
   const amount = PLAN_PRICES[args.plan] || 0;
-  await ctx.db.insert('invoices', {
+  await ctx.db.insert("invoices", {
     organizationId: args.organizationId,
     userId: args.ownerId,
     invoiceNumber: makeInvoiceNumber(now),
     amount,
-    currency: args.currency || 'USD',
-    status: 'paid',
+    currency: args.currency || "USD",
+    status: "paid",
     plan: args.plan,
     description: `${args.description || args.plan} - Monthly`,
     shopifySubscriptionId: args.subscriptionId,

@@ -234,30 +234,24 @@ async function executeShopifySync(
   args: SyncArgs,
 ) {
   if (args.syncType === "initial") {
-    const result = await ctx.runAction(
-      internal.shopify.sync.initial,
-      {
-        organizationId: args.organizationId,
-        dateRange: {
-          daysBack: args.dateRange?.daysBack ?? 60,
-        },
+    const result = await ctx.runAction(internal.shopify.sync.initial, {
+      organizationId: args.organizationId,
+      dateRange: {
+        daysBack: args.dateRange?.daysBack ?? 60,
       },
-    );
+    });
 
     return {
       recordsProcessed: result.recordsProcessed,
       dataChanged: result.dataChanged,
     };
   } else {
-    const incremental = await ctx.runAction(
-      internal.shopify.sync.incremental,
-      {
-        organizationId: args.organizationId,
-        since: args.dateRange?.startDate
-          ? Date.parse(args.dateRange.startDate)
-          : undefined,
-      },
-    );
+    const incremental = await ctx.runAction(internal.shopify.sync.incremental, {
+      organizationId: args.organizationId,
+      since: args.dateRange?.startDate
+        ? Date.parse(args.dateRange.startDate)
+        : undefined,
+    });
 
     return {
       recordsProcessed: incremental.recordsProcessed,
@@ -275,29 +269,23 @@ async function executeMetaSync(
 ) {
   // Use the production Meta sync pipeline backed by MetaAPIClient
   if (args.syncType === "initial") {
-    const res = await ctx.runAction(
-      internal.meta.sync.initial,
-      {
-        organizationId: String(args.organizationId),
-        dateRange: args.dateRange?.daysBack
-          ? { daysBack: args.dateRange.daysBack }
-          : undefined,
-      },
-    );
+    const res = await ctx.runAction(internal.meta.sync.initial, {
+      organizationId: String(args.organizationId),
+      dateRange: args.dateRange?.daysBack
+        ? { daysBack: args.dateRange.daysBack }
+        : undefined,
+    });
     return {
       recordsProcessed: res.recordsProcessed || 0,
       dataChanged: Boolean(res.dataChanged),
     };
   } else {
-    const res = await ctx.runAction(
-      internal.meta.sync.incremental,
-      {
-        organizationId: String(args.organizationId),
-        since: args.dateRange?.startDate
-          ? Date.parse(args.dateRange.startDate)
-          : undefined,
-      },
-    );
+    const res = await ctx.runAction(internal.meta.sync.incremental, {
+      organizationId: String(args.organizationId),
+      since: args.dateRange?.startDate
+        ? Date.parse(args.dateRange.startDate)
+        : undefined,
+    });
     return {
       recordsProcessed: res.recordsProcessed || 0,
       dataChanged: Boolean(res.dataChanged),
@@ -365,11 +353,11 @@ export const logSyncComplete = internalMutation({
     if (!args.syncId || args.syncId === "") return;
 
     // Update sync session status
-    const syncSession = await ctx.db.get(args.syncId);
+    const syncSession = await ctx.db.get("syncSessions", args.syncId);
 
     if (!syncSession) return;
 
-    await ctx.db.patch(args.syncId, {
+    await ctx.db.patch("syncSessions", args.syncId, {
       completedAt: Date.now(),
       status: args.success ? "completed" : "failed",
       recordsProcessed: args.recordsProcessed || 0,
@@ -412,7 +400,7 @@ export const logSyncComplete = internalMutation({
 
         if (successfulSyncs.length > 0) {
           // Update onboarding record instead of user
-          await ctx.db.patch(onboarding._id, {
+          await ctx.db.patch("onboarding", onboarding._id, {
             isInitialSyncComplete: true,
             updatedAt: Date.now(),
           });
@@ -456,4 +444,3 @@ function checkRateLimit(platform: string): boolean {
 /**
  * Batch sync for multiple organizations (used by scheduled jobs)
  */
-

@@ -11,7 +11,6 @@ import {
   Spinner,
   Table,
 } from "@heroui/react";
-import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
 import {
   useCallback,
@@ -23,6 +22,7 @@ import {
   type ReactElement,
 } from "react";
 import type { RowElement } from "@react-types/table";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -107,22 +107,14 @@ export default function VariantCostsClient({
   const router = useRouter();
   const user = useUser();
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(1);
   const pageSize = 1000;
   const [bulkValue, setBulkValue] = useState<string>("10");
   const [bulkType, setBulkType] = useState<"percent" | "flat">("percent");
-  const { data, totalPages, currentPage, loading } =
+  const { data, loading, loadingMore, hasMore, loadMore } =
     useShopifyProductVariantsPaginated(
-      page,
       pageSize,
       hideSearch ? undefined : search,
     );
-
-  useEffect(() => {
-    if (currentPage !== page) {
-      setPage(currentPage);
-    }
-  }, [currentPage, page, setPage]);
   const upsert = useUpsertVariantCosts();
   const saveAll = useSaveVariantCosts();
 
@@ -590,17 +582,18 @@ export default function VariantCostsClient({
     </div>
   );
 
-  const paginationContent =
-    totalPages > 1 ? (
-      <div className="flex justify-center pt-2">
-        <PaginationControls
-          page={currentPage}
-          total={totalPages}
-          size="sm"
-          onChange={setPage}
-        />
-      </div>
-    ) : undefined;
+  const paginationContent = hasMore ? (
+    <div className="flex justify-center pt-2">
+      <Button
+        variant="secondary"
+        size="sm"
+        isPending={loadingMore}
+        onPress={() => loadMore(pageSize)}
+      >
+        Load more
+      </Button>
+    </div>
+  ) : undefined;
 
   return (
     <div className="space-y-6">
@@ -746,10 +739,11 @@ export default function VariantCostsClient({
                               />
                             </button>
                             {img ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
+                              <Image
                                 src={img}
                                 alt={grp.productName}
+                                width={32}
+                                height={32}
                                 className="w-8 h-8 rounded object-cover flex-none"
                               />
                             ) : (

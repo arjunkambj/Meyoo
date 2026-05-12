@@ -4,7 +4,11 @@ import type { Infer } from "convex/values";
 
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
-import { internalAction, internalMutation, internalQuery } from "../_generated/server";
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+} from "../_generated/server";
 import type { ActionCtx } from "../_generated/server";
 import {
   ANALYTICS_SOURCE_KEYS,
@@ -18,7 +22,11 @@ import {
   toTimestampRange,
   validateDateRange,
 } from "../utils/analyticsSource";
-import { computeOverviewMetrics, computePlatformMetrics, computeChannelRevenue } from "../utils/analyticsAggregations";
+import {
+  computeOverviewMetrics,
+  computePlatformMetrics,
+  computeChannelRevenue,
+} from "../utils/analyticsAggregations";
 import { msToDateString, normalizeDateString } from "../utils/date";
 import { loadAnalyticsWithChunks } from "../utils/analyticsLoader";
 import type { AnalyticsResponse } from "../web/analyticsShared";
@@ -102,7 +110,9 @@ export const calculateAnalytics = internalAction({
     organizationId: v.string(),
     calculateProfits: v.optional(v.boolean()),
     hasHistoricalCosts: v.optional(v.boolean()),
-    syncType: v.optional(v.union(v.literal("initial"), v.literal("incremental"))),
+    syncType: v.optional(
+      v.union(v.literal("initial"), v.literal("incremental")),
+    ),
     dateRange: v.optional(
       v.object({
         startDate: v.optional(v.string()),
@@ -119,7 +129,11 @@ export const calculateAnalytics = internalAction({
   handler: async (
     ctx,
     args,
-  ): Promise<{ success: boolean; duration: number; datasetCounts: DatasetCounts }> => {
+  ): Promise<{
+    success: boolean;
+    duration: number;
+    datasetCounts: DatasetCounts;
+  }> => {
     const startedAt = Date.now();
     const fallbackDays = Math.max(1, args.dateRange?.daysBack ?? 30);
     const range = await resolveDateRangeOrDefault(
@@ -166,8 +180,12 @@ export const calculateAnalytics = internalAction({
         organizationId,
         startDate: range.startDate,
         endDate: range.endDate,
-        ...(range.startDateTimeUtc ? { startDateTimeUtc: range.startDateTimeUtc } : {}),
-        ...(range.endDateTimeUtc ? { endDateTimeUtc: range.endDateTimeUtc } : {}),
+        ...(range.startDateTimeUtc
+          ? { startDateTimeUtc: range.startDateTimeUtc }
+          : {}),
+        ...(range.endDateTimeUtc
+          ? { endDateTimeUtc: range.endDateTimeUtc }
+          : {}),
         ...(range.endDateTimeUtcExclusive
           ? { endDateTimeUtcExclusive: range.endDateTimeUtcExclusive }
           : {}),
@@ -238,8 +256,12 @@ export const calculateAnalytics = internalAction({
           organizationId,
           startDate: range.startDate,
           endDate: range.endDate,
-          ...(range.startDateTimeUtc ? { startDateTimeUtc: range.startDateTimeUtc } : {}),
-          ...(range.endDateTimeUtc ? { endDateTimeUtc: range.endDateTimeUtc } : {}),
+          ...(range.startDateTimeUtc
+            ? { startDateTimeUtc: range.startDateTimeUtc }
+            : {}),
+          ...(range.endDateTimeUtc
+            ? { endDateTimeUtc: range.endDateTimeUtc }
+            : {}),
           ...(range.endDateTimeUtcExclusive
             ? { endDateTimeUtcExclusive: range.endDateTimeUtcExclusive }
             : {}),
@@ -269,12 +291,13 @@ export const calculateAnalytics = internalAction({
       }
     };
 
-    const [metaInsightCount, costCount, sessionCount, analyticsCount] = await Promise.all([
-      accumulateSupplementalCounts("metaInsights"),
-      accumulateSupplementalCounts("globalCosts"),
-      accumulateSupplementalCounts("sessions"),
-      accumulateSupplementalCounts("analytics"),
-    ]);
+    const [metaInsightCount, costCount, sessionCount, analyticsCount] =
+      await Promise.all([
+        accumulateSupplementalCounts("metaInsights"),
+        accumulateSupplementalCounts("globalCosts"),
+        accumulateSupplementalCounts("sessions"),
+        accumulateSupplementalCounts("analytics"),
+      ]);
 
     counts.metaInsights = metaInsightCount;
     counts.globalCosts = costCount;
@@ -333,7 +356,7 @@ export const enqueueDailyRebuildRequests = internalMutation({
         const scopeChanged = nextScope !== existing.lastScope;
 
         if (shouldExtend || scopeChanged) {
-          await ctx.db.patch(existing._id, {
+          await ctx.db.patch("analyticsRebuildLocks", existing._id, {
             ...(shouldExtend ? { lockedUntil: lockExpiresAt } : {}),
             ...(scopeChanged ? { lastScope: nextScope ?? undefined } : {}),
             createdAt: existing.createdAt ?? now,
@@ -407,7 +430,7 @@ export const consumeRebuildLock = internalMutation({
       };
     }
 
-    await ctx.db.delete(lock._id);
+    await ctx.db.delete("analyticsRebuildLocks", lock._id);
 
     return {
       ready: true,
@@ -463,12 +486,15 @@ export const processRebuildLock = internalAction({
         },
       );
     } catch (error) {
-      await ctx.runMutation(internal.engine.analytics.enqueueDailyRebuildRequests, {
-        organizationId: args.organizationId,
-        dates: [args.date],
-        debounceMs: 10_000,
-        scope: result.scope ?? "analytics.debounce",
-      });
+      await ctx.runMutation(
+        internal.engine.analytics.enqueueDailyRebuildRequests,
+        {
+          organizationId: args.organizationId,
+          dates: [args.date],
+          debounceMs: 10_000,
+          scope: result.scope ?? "analytics.debounce",
+        },
+      );
       throw error;
     }
 
@@ -584,10 +610,15 @@ export const gatherSupplementalAnalyticsChunk = internalQuery({
         };
       }
       case "globalCosts": {
-        const result = await fetchGlobalCostsPage(ctx, organizationId, timestamps, {
-          cursor: args.cursor ?? null,
-          pageSize: args.pageSize,
-        });
+        const result = await fetchGlobalCostsPage(
+          ctx,
+          organizationId,
+          timestamps,
+          {
+            cursor: args.cursor ?? null,
+            pageSize: args.pageSize,
+          },
+        );
         return {
           items: result.docs,
           cursor: result.cursor ?? undefined,
@@ -595,10 +626,15 @@ export const gatherSupplementalAnalyticsChunk = internalQuery({
         };
       }
       case "sessions": {
-        const result = await fetchSessionsPage(ctx, organizationId, timestamps, {
-          cursor: args.cursor ?? null,
-          pageSize: args.pageSize,
-        });
+        const result = await fetchSessionsPage(
+          ctx,
+          organizationId,
+          timestamps,
+          {
+            cursor: args.cursor ?? null,
+            pageSize: args.pageSize,
+          },
+        );
         return {
           items: result.docs,
           cursor: result.cursor ?? undefined,
@@ -606,10 +642,15 @@ export const gatherSupplementalAnalyticsChunk = internalQuery({
         };
       }
       case "analytics": {
-        const result = await fetchShopifyAnalyticsPage(ctx, organizationId, range, {
-          cursor: args.cursor ?? null,
-          pageSize: args.pageSize,
-        });
+        const result = await fetchShopifyAnalyticsPage(
+          ctx,
+          organizationId,
+          range,
+          {
+            cursor: args.cursor ?? null,
+            pageSize: args.pageSize,
+          },
+        );
         return {
           items: result.docs,
           cursor: result.cursor ?? undefined,
@@ -632,8 +673,10 @@ export const getAvailableDateBounds = internalQuery({
     latest: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    const organization = await ctx.db.get(args.organizationId);
-    const dateOptions = organization?.timezone ? { timezone: organization.timezone } : undefined;
+    const organization = await ctx.db.get("organizations", args.organizationId);
+    const dateOptions = organization?.timezone
+      ? { timezone: organization.timezone }
+      : undefined;
     const earliestCandidates: string[] = [];
     const latestCandidates: string[] = [];
 
@@ -879,20 +922,27 @@ function toStringId(value: unknown): string {
   return String(value);
 }
 
-function classifyPaymentMethod(order: GenericRecord, transactions: GenericRecord[]): "prepaid" | "cod" | "other" {
+function classifyPaymentMethod(
+  order: GenericRecord,
+  transactions: GenericRecord[],
+): "prepaid" | "cod" | "other" {
   const financialStatus = String(
     order.financialStatus ?? order.financial_status ?? "",
   ).toLowerCase();
 
-  const primaryTx = transactions.find((tx) => String(tx.kind).toLowerCase() === "sale")
-    ?? transactions[0];
+  const primaryTx =
+    transactions.find((tx) => String(tx.kind).toLowerCase() === "sale") ??
+    transactions[0];
   const rawGateway = String(
     primaryTx?.gateway ?? order.gateway ?? order.paymentGateway,
   ).toLowerCase();
 
   const gateway = rawGateway.trim();
 
-  if (gateway.includes("cash_on_delivery") || gateway.includes("cash-on-delivery")) {
+  if (
+    gateway.includes("cash_on_delivery") ||
+    gateway.includes("cash-on-delivery")
+  ) {
     return "cod";
   }
 
@@ -908,7 +958,10 @@ function classifyPaymentMethod(order: GenericRecord, transactions: GenericRecord
     return "other";
   }
 
-  if (financialStatus.includes("pending") || financialStatus.includes("authorized")) {
+  if (
+    financialStatus.includes("pending") ||
+    financialStatus.includes("authorized")
+  ) {
     return "other";
   }
 
@@ -938,7 +991,9 @@ function resolveFulfillmentStatus(order: GenericRecord): string {
 }
 
 function isOrderFulfilled(order: GenericRecord): boolean {
-  const normalized = normalizeFulfillmentStatus(resolveFulfillmentStatus(order));
+  const normalized = normalizeFulfillmentStatus(
+    resolveFulfillmentStatus(order),
+  );
   if (!normalized) {
     return false;
   }
@@ -960,7 +1015,9 @@ function isOrderFulfilled(order: GenericRecord): boolean {
   return false;
 }
 
-function sanitizeDocument(doc: Record<string, unknown>): Record<string, unknown> {
+function sanitizeDocument(
+  doc: Record<string, unknown>,
+): Record<string, unknown> {
   const cleaned: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(doc)) {
     if (value === undefined) continue;
@@ -1011,13 +1068,19 @@ function buildDailyMetricsFromResponse(
   >();
 
   for (const customer of customerDocs) {
-    const key = toStringId(customer._id ?? customer.id ?? customer.customerId ?? customer.shopifyId);
+    const key = toStringId(
+      customer._id ?? customer.id ?? customer.customerId ?? customer.shopifyId,
+    );
     if (!key) {
       continue;
     }
 
-    const lifetimeOrders = toSafeNumber(customer.ordersCount ?? customer.orders_count);
-    const createdAt = toSafeNumber(customer.shopifyCreatedAt ?? customer.shopify_created_at);
+    const lifetimeOrders = toSafeNumber(
+      customer.ordersCount ?? customer.orders_count,
+    );
+    const createdAt = toSafeNumber(
+      customer.shopifyCreatedAt ?? customer.shopify_created_at,
+    );
 
     customerDetails.set(key, {
       lifetimeOrders: lifetimeOrders > 0 ? lifetimeOrders : undefined,
@@ -1067,7 +1130,9 @@ function buildDailyMetricsFromResponse(
   };
 
   for (const order of orders) {
-    const orderKey = toStringId(order._id ?? order.id ?? order.orderId ?? order.shopifyId);
+    const orderKey = toStringId(
+      order._id ?? order.id ?? order.orderId ?? order.shopifyId,
+    );
     const txs = transactionsByOrder.get(orderKey) ?? [];
     const classification = classifyPaymentMethod(order, txs);
     switch (classification) {
@@ -1104,13 +1169,15 @@ function buildDailyMetricsFromResponse(
     }
 
     const info = customerDetails.get(customerKey);
-    const existing = activityMap.get(customerKey) ?? {
-      orders: 0,
-      prepaidOrders: 0,
-      revenue: 0,
-      lifetimeOrders: info?.lifetimeOrders,
-      customerCreatedAt: info?.customerCreatedAt,
-    } satisfies ActivityAccumulator;
+    const existing =
+      activityMap.get(customerKey) ??
+      ({
+        orders: 0,
+        prepaidOrders: 0,
+        revenue: 0,
+        lifetimeOrders: info?.lifetimeOrders,
+        customerCreatedAt: info?.customerCreatedAt,
+      } satisfies ActivityAccumulator);
 
     existing.orders += 1;
     if (classification === "prepaid") {
@@ -1130,13 +1197,14 @@ function buildDailyMetricsFromResponse(
     activityMap.set(customerKey, existing);
   }
 
-  const paymentBreakdown = prepaidOrders + codOrders + otherOrders > 0
-    ? sanitizeDocument({
-        prepaidOrders: prepaidOrders || undefined,
-        codOrders: codOrders || undefined,
-        otherOrders: otherOrders || undefined,
-      })
-    : null;
+  const paymentBreakdown =
+    prepaidOrders + codOrders + otherOrders > 0
+      ? sanitizeDocument({
+          prepaidOrders: prepaidOrders || undefined,
+          codOrders: codOrders || undefined,
+          otherOrders: otherOrders || undefined,
+        })
+      : null;
 
   const newCustomers = toSafeNumber(summary?.newCustomers);
   const returningCustomers = toSafeNumber(summary?.returningCustomers);
@@ -1165,13 +1233,14 @@ function buildDailyMetricsFromResponse(
   // If not available, fall back to uniqueCustomers (paid customers only)
   const totalCustomers = toSafeNumber(summary?.customers) || uniqueCustomers;
 
-  const customerBreakdown = newCustomers + returningCustomers + repeatCustomers > 0
-    ? sanitizeDocument({
-        newCustomers: newCustomers || undefined,
-        returningCustomers: returningCustomers || undefined,
-        repeatCustomers: repeatCustomers || undefined,
-      })
-    : null;
+  const customerBreakdown =
+    newCustomers + returningCustomers + repeatCustomers > 0
+      ? sanitizeDocument({
+          newCustomers: newCustomers || undefined,
+          returningCustomers: returningCustomers || undefined,
+          repeatCustomers: repeatCustomers || undefined,
+        })
+      : null;
 
   // Calculate units sold from order items
   let unitsSold = 0;
@@ -1180,7 +1249,9 @@ function buildDailyMetricsFromResponse(
       item.orderId ?? item.order_id ?? item.order ?? item.shopifyOrderId,
     );
     // Skip cancelled orders
-    const order = orders.find(o => toStringId(o._id ?? o.id ?? o.orderId ?? o.shopifyId) === orderKey);
+    const order = orders.find(
+      (o) => toStringId(o._id ?? o.id ?? o.orderId ?? o.shopifyId) === orderKey,
+    );
     if (order && !isCancelledOrder(order)) {
       unitsSold += toSafeNumber(item.quantity);
     }
@@ -1225,7 +1296,10 @@ function buildDailyMetricsFromResponse(
     returnedOrders,
     sessions: analytics.reduce((sum, a) => sum + toSafeNumber(a.sessions), 0),
     visitors: analytics.reduce((sum, a) => sum + toSafeNumber(a.visitors), 0),
-    conversions: analytics.reduce((sum, a) => sum + toSafeNumber(a.conversions), 0),
+    conversions: analytics.reduce(
+      (sum, a) => sum + toSafeNumber(a.conversions),
+      0,
+    ),
   });
 
   const customersCreated = (() => {
@@ -1254,7 +1328,9 @@ function buildDailyMetricsFromResponse(
 
     let count = 0;
     for (const customer of customerDocs) {
-      const createdAt = toSafeNumber(customer.shopifyCreatedAt ?? customer.shopify_created_at);
+      const createdAt = toSafeNumber(
+        customer.shopifyCreatedAt ?? customer.shopify_created_at,
+      );
       if (!Number.isFinite(createdAt)) {
         continue;
       }
@@ -1265,22 +1341,24 @@ function buildDailyMetricsFromResponse(
     return count;
   })();
 
-  const activityList: CustomerDailyActivityPayload[] = Array.from(activityMap.entries()).map(
-    ([customerKey, activity]) => ({
-      customerKey,
-      orders: activity.orders,
-      prepaidOrders: activity.prepaidOrders,
-      revenue: activity.revenue,
-      lifetimeOrders: activity.lifetimeOrders,
-      customerCreatedAt: activity.customerCreatedAt,
-    }),
-  );
+  const activityList: CustomerDailyActivityPayload[] = Array.from(
+    activityMap.entries(),
+  ).map(([customerKey, activity]) => ({
+    customerKey,
+    orders: activity.orders,
+    prepaidOrders: activity.prepaidOrders,
+    revenue: activity.revenue,
+    lifetimeOrders: activity.lifetimeOrders,
+    customerCreatedAt: activity.customerCreatedAt,
+  }));
 
   const metricsPayload = {
     ...metrics,
     paymentBreakdown: paymentBreakdown ?? undefined,
     customerBreakdown: customerBreakdown ?? undefined,
-    channelRevenue: channelRevenueEntries.length ? channelRevenueEntries : undefined,
+    channelRevenue: channelRevenueEntries.length
+      ? channelRevenueEntries
+      : undefined,
   } as DailyMetricsPayload;
 
   return {
@@ -1358,14 +1436,12 @@ export const upsertDailyMetric = internalMutation({
     const existing = await ctx.db
       .query("dailyMetrics")
       .withIndex("by_organization_date", (q) =>
-        q
-          .eq("organizationId", args.organizationId)
-          .eq("date", args.date),
+        q.eq("organizationId", args.organizationId).eq("date", args.date),
       )
       .first();
 
     if (existing) {
-      await ctx.db.patch(existing._id, args.metrics as any);
+      await ctx.db.patch("dailyMetrics", existing._id, args.metrics as any);
     } else {
       await ctx.db.insert("dailyMetrics", {
         organizationId: args.organizationId,
@@ -1393,7 +1469,7 @@ export const clearCustomerDailyActivity = internalMutation({
         .paginate({ numItems: PAGE_SIZE, cursor });
 
       for (const doc of page.page) {
-        await ctx.db.delete(doc._id);
+        await ctx.db.delete("customerDailyActivities", doc._id);
       }
 
       if (page.isDone) {
@@ -1414,7 +1490,7 @@ export const clearCustomerDailyActivity = internalMutation({
       .first();
 
     if (summary) {
-      await ctx.db.delete(summary._id);
+      await ctx.db.delete("customerDailySummaries", summary._id);
     }
   },
 });
@@ -1468,7 +1544,11 @@ export const upsertCustomerDailySummary = internalMutation({
     } as const;
 
     if (existing) {
-      await ctx.db.patch(existing._id, payload as any);
+      await ctx.db.patch(
+        "customerDailySummaries",
+        existing._id,
+        payload as any,
+      );
     } else {
       await ctx.db.insert("customerDailySummaries", payload as any);
     }
@@ -1480,11 +1560,14 @@ export const getCustomerSummaryBeforeDate = internalQuery({
     organizationId: v.id("organizations"),
     date: v.string(),
   },
-  returns: v.union(v.null(), v.object({
-    date: v.string(),
-    customersCreated: v.number(),
-    totalCustomers: v.number(),
-  })),
+  returns: v.union(
+    v.null(),
+    v.object({
+      date: v.string(),
+      customersCreated: v.number(),
+      totalCustomers: v.number(),
+    }),
+  ),
   handler: async (ctx, args) => {
     const doc = await ctx.db
       .query("customerDailySummaries")
@@ -1528,7 +1611,9 @@ export const countCustomersBeforeUtcExclusive = internalQuery({
     const page = await ctx.db
       .query("shopifyCustomers")
       .withIndex("by_organization_and_created", (q) =>
-        q.eq("organizationId", args.organizationId).lt("shopifyCreatedAt", cutoffMs),
+        q
+          .eq("organizationId", args.organizationId)
+          .lt("shopifyCreatedAt", cutoffMs),
       )
       .order("asc")
       .paginate({
@@ -1584,7 +1669,10 @@ export const rebuildDailyMetrics = internalAction({
     let fallbackOffsetMinutes = 0;
     if (!timezone) {
       try {
-        const offset = await getShopUtcOffsetMinutes(ctx as any, String(args.organizationId));
+        const offset = await getShopUtcOffsetMinutes(
+          ctx as any,
+          String(args.organizationId),
+        );
         fallbackOffsetMinutes = Number.isFinite(offset) ? offset : 0;
       } catch (error) {
         console.warn("[Analytics] Failed to resolve shop offset", {
@@ -1621,11 +1709,8 @@ export const rebuildDailyMetrics = internalAction({
           data,
         };
 
-        const {
-          metrics,
-          customerActivities,
-          customersCreated,
-        } = buildDailyMetricsFromResponse(response);
+        const { metrics, customerActivities, customersCreated } =
+          buildDailyMetricsFromResponse(response);
 
         await ctx.runMutation(internal.engine.analytics.upsertDailyMetric, {
           organizationId: args.organizationId,
@@ -1633,19 +1718,32 @@ export const rebuildDailyMetrics = internalAction({
           metrics,
         });
 
-        await ctx.runMutation(internal.engine.analytics.clearCustomerDailyActivity, {
-          organizationId: args.organizationId,
-          date,
-        });
-
-        const ACTIVITY_CHUNK_SIZE = 64;
-        for (let index = 0; index < customerActivities.length; index += ACTIVITY_CHUNK_SIZE) {
-          const chunk = customerActivities.slice(index, index + ACTIVITY_CHUNK_SIZE);
-          await ctx.runMutation(internal.engine.analytics.insertCustomerDailyActivityChunk, {
+        await ctx.runMutation(
+          internal.engine.analytics.clearCustomerDailyActivity,
+          {
             organizationId: args.organizationId,
             date,
-            activities: chunk,
-          });
+          },
+        );
+
+        const ACTIVITY_CHUNK_SIZE = 64;
+        for (
+          let index = 0;
+          index < customerActivities.length;
+          index += ACTIVITY_CHUNK_SIZE
+        ) {
+          const chunk = customerActivities.slice(
+            index,
+            index + ACTIVITY_CHUNK_SIZE,
+          );
+          await ctx.runMutation(
+            internal.engine.analytics.insertCustomerDailyActivityChunk,
+            {
+              organizationId: args.organizationId,
+              date,
+              activities: chunk,
+            },
+          );
         }
 
         let totalCustomers = customersCreated;
@@ -1666,8 +1764,16 @@ export const rebuildDailyMetrics = internalAction({
               let baselineTotal = 0;
               let baselineCursor: string | null = null;
               const MAX_ITERATIONS = 128;
-              for (let iteration = 0; iteration < MAX_ITERATIONS; iteration += 1) {
-                const { count: pageCount, isDone, cursor: nextCursor } = (await ctx.runQuery(
+              for (
+                let iteration = 0;
+                iteration < MAX_ITERATIONS;
+                iteration += 1
+              ) {
+                const {
+                  count: pageCount,
+                  isDone,
+                  cursor: nextCursor,
+                } = (await ctx.runQuery(
                   internal.engine.analytics.countCustomersBeforeUtcExclusive,
                   {
                     organizationId: args.organizationId,
@@ -1689,11 +1795,15 @@ export const rebuildDailyMetrics = internalAction({
                 baselineCursor = nextCursor ?? null;
 
                 if (!baselineCursor) {
-                  console.warn("[Analytics] Missing cursor while counting customer baseline", {
-                    organizationId: args.organizationId,
-                    date,
-                    endDateTimeUtcExclusive: dateRange.endDateTimeUtcExclusive,
-                  });
+                  console.warn(
+                    "[Analytics] Missing cursor while counting customer baseline",
+                    {
+                      organizationId: args.organizationId,
+                      date,
+                      endDateTimeUtcExclusive:
+                        dateRange.endDateTimeUtcExclusive,
+                    },
+                  );
                   break;
                 }
               }
@@ -1703,20 +1813,26 @@ export const rebuildDailyMetrics = internalAction({
             }
           }
         } catch (summaryError) {
-          console.warn("[Analytics] Failed to derive customer summary baseline", {
-            organizationId: args.organizationId,
-            date,
-            error: summaryError,
-          });
+          console.warn(
+            "[Analytics] Failed to derive customer summary baseline",
+            {
+              organizationId: args.organizationId,
+              date,
+              error: summaryError,
+            },
+          );
           totalCustomers = customersCreated;
         }
 
-        await ctx.runMutation(internal.engine.analytics.upsertCustomerDailySummary, {
-          organizationId: args.organizationId,
-          date,
-          customersCreated,
-          totalCustomers,
-        });
+        await ctx.runMutation(
+          internal.engine.analytics.upsertCustomerDailySummary,
+          {
+            organizationId: args.organizationId,
+            date,
+            customersCreated,
+            totalCustomers,
+          },
+        );
 
         updated += 1;
       } catch (error) {

@@ -124,7 +124,10 @@ export async function getOrgTimeInfo(
       if (info?.timezoneIana) {
         timeZone = info.timezoneIana;
       }
-      if (typeof info?.offsetMinutes === "number" && Number.isFinite(info.offsetMinutes)) {
+      if (
+        typeof info?.offsetMinutes === "number" &&
+        Number.isFinite(info.offsetMinutes)
+      ) {
         offsetMinutes = info.offsetMinutes;
       }
     } catch (error) {
@@ -158,17 +161,21 @@ function computeDefaultDateStrings(
       return { startDate, endDate };
     } catch (error) {
       if (error instanceof RangeError) {
-        console.warn("[DateRange] Falling back to offset for invalid timezone", {
-          timeZone,
-          error,
-        });
+        console.warn(
+          "[DateRange] Falling back to offset for invalid timezone",
+          {
+            timeZone,
+            error,
+          },
+        );
       } else {
         throw error;
       }
     }
   }
 
-  const offset = typeof info.offsetMinutes === "number" ? info.offsetMinutes : 0;
+  const offset =
+    typeof info.offsetMinutes === "number" ? info.offsetMinutes : 0;
   const endLocalMs = now + offset * 60_000;
   const startLocalMs = endLocalMs - rangeMs;
 
@@ -197,7 +204,9 @@ export async function resolveDateRangeForOrganization(
 
   let timezone: string | null = timeContext?.timeZone ?? null;
   let offsetMinutes: number | null =
-    typeof timeContext?.offsetMinutes === "number" ? timeContext.offsetMinutes : null;
+    typeof timeContext?.offsetMinutes === "number"
+      ? timeContext.offsetMinutes
+      : null;
 
   if (!timezone) {
     try {
@@ -215,7 +224,8 @@ export async function resolveDateRangeForOrganization(
   }
 
   const rangeFromTimezone =
-    timezone && buildRangeWithTimezone(startDate, endDate, timezone, organizationId);
+    timezone &&
+    buildRangeWithTimezone(startDate, endDate, timezone, organizationId);
 
   if (rangeFromTimezone) {
     return rangeFromTimezone;
@@ -238,7 +248,10 @@ export async function resolveDateRangeForOrganization(
         }
         timezone = info.timezoneIana ?? null;
       }
-      if (typeof info?.offsetMinutes === "number" && Number.isFinite(info.offsetMinutes)) {
+      if (
+        typeof info?.offsetMinutes === "number" &&
+        Number.isFinite(info.offsetMinutes)
+      ) {
         offsetMinutes = info.offsetMinutes;
       }
     } catch (error) {
@@ -250,10 +263,7 @@ export async function resolveDateRangeForOrganization(
   }
 
   const minutes = offsetMinutes ?? 0;
-  const fallbackRange = toUtcRangeForOffset(
-    { startDate, endDate },
-    minutes,
-  );
+  const fallbackRange = toUtcRangeForOffset({ startDate, endDate }, minutes);
 
   return validateDateRange({
     startDate,
@@ -271,7 +281,12 @@ export async function defaultOrgDateRange(
 ): Promise<DateRange> {
   const info = await getOrgTimeInfo(ctx, organizationId);
   const { startDate, endDate } = computeDefaultDateStrings(info, daysBack);
-  return resolveDateRangeForOrganization(ctx, organizationId, { startDate, endDate }, info);
+  return resolveDateRangeForOrganization(
+    ctx,
+    organizationId,
+    { startDate, endDate },
+    info,
+  );
 }
 
 export async function resolveDateRangeOrDefault(
@@ -284,11 +299,16 @@ export async function resolveDateRangeOrDefault(
     return defaultOrgDateRange(ctx, organizationId, fallbackDays);
   }
 
-  const hasStart = typeof range.startDate === "string" && range.startDate.length > 0;
+  const hasStart =
+    typeof range.startDate === "string" && range.startDate.length > 0;
   const hasEnd = typeof range.endDate === "string" && range.endDate.length > 0;
 
   if (hasStart && hasEnd) {
-    return resolveDateRangeForOrganization(ctx, organizationId, range as RangeInput);
+    return resolveDateRangeForOrganization(
+      ctx,
+      organizationId,
+      range as RangeInput,
+    );
   }
 
   if (!hasStart && !hasEnd) {
@@ -296,8 +316,12 @@ export async function resolveDateRangeOrDefault(
   }
 
   const timeInfo = await getOrgTimeInfo(ctx, organizationId);
-  const normalizedStart = hasStart ? normalizeDateString(range.startDate as string) : null;
-  const normalizedEnd = hasEnd ? normalizeDateString(range.endDate as string) : null;
+  const normalizedStart = hasStart
+    ? normalizeDateString(range.startDate as string)
+    : null;
+  const normalizedEnd = hasEnd
+    ? normalizeDateString(range.endDate as string)
+    : null;
 
   let startDate: string;
   let endDate: string;

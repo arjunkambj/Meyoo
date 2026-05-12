@@ -9,7 +9,8 @@ export default function MarketingIntegrationsPage() {
           Connect Your Marketing Channels
         </h1>
         <p className="text-base text-muted">
-          Connect your advertising platforms to track ROAS and campaign performance
+          Connect your advertising platforms to track ROAS and campaign
+          performance
         </p>
       </div>
 

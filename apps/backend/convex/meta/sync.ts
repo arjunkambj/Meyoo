@@ -17,11 +17,14 @@ type AccountTimezoneSnapshot = {
   timezoneOffsetHours?: number;
 } | null;
 
-function buildTimezoneOptions(snapshot: AccountTimezoneSnapshot): MsToDateOptions | undefined {
+function buildTimezoneOptions(
+  snapshot: AccountTimezoneSnapshot,
+): MsToDateOptions | undefined {
   if (!snapshot) return undefined;
   const { timezone, timezoneOffsetHours } = snapshot;
   const offsetMinutes =
-    typeof timezoneOffsetHours === "number" && Number.isFinite(timezoneOffsetHours)
+    typeof timezoneOffsetHours === "number" &&
+    Number.isFinite(timezoneOffsetHours)
       ? Math.round(timezoneOffsetHours * 60)
       : undefined;
 
@@ -50,7 +53,7 @@ export const initial = internalAction({
     dateRange: v.optional(
       v.object({
         daysBack: v.number(),
-      })
+      }),
     ),
   },
   handler: async (ctx, args) => {
@@ -64,7 +67,7 @@ export const initial = internalAction({
         internal.meta.internal.getActiveSessionInternal,
         {
           organizationId: args.organizationId as Id<"organizations">,
-        }
+        },
       );
 
       if (!session) {
@@ -77,7 +80,7 @@ export const initial = internalAction({
         {
           organizationId: args.organizationId as Id<"organizations">,
           platform: "meta",
-        }
+        },
       );
 
       const client = new MetaAPIClient(accessToken);
@@ -100,7 +103,7 @@ export const initial = internalAction({
         {
           organizationId: args.organizationId as Id<"organizations">,
           accountId,
-        }
+        },
       );
       const timezoneOptions = buildTimezoneOptions(accountTimezone);
 
@@ -114,7 +117,8 @@ export const initial = internalAction({
       startDate.setDate(startDate.getDate() - daysBack);
 
       // Format dates for Meta API (YYYY-MM-DD)
-      const formatDate = (date: Date) => formatDateWithTimezone(date, timezoneOptions);
+      const formatDate = (date: Date) =>
+        formatDateWithTimezone(date, timezoneOptions);
 
       try {
         // Fetch insights with daily breakdown
@@ -131,7 +135,7 @@ export const initial = internalAction({
             },
             timeIncrement: "1", // Daily data
           },
-          getAllInsightsFields() // Get all available fields
+          getAllInsightsFields(), // Get all available fields
         );
 
         // production: omit record count chatter here; summary is logged below
@@ -160,7 +164,7 @@ export const initial = internalAction({
         const campaigns = await client.getCampaigns(
           accountId,
           ["id", "name", "status", "objective", "created_time", "updated_time"],
-          { limit: 500 }
+          { limit: 500 },
         );
 
         if (campaigns.data && campaigns.data.length > 0) {
@@ -260,12 +264,12 @@ export const pullDaily = internalAction({
       {
         organizationId: args.organizationId as Id<"organizations">,
         platform: "meta",
-      }
+      },
     );
     const client = new MetaAPIClient(accessToken);
 
     const fields = Array.from(
-      new Set([...getAllInsightsFields(), "date_start", "date_stop"])
+      new Set([...getAllInsightsFields(), "date_start", "date_stop"]),
     );
 
     const insights = await client.getAccountInsightsPaginated(
@@ -275,7 +279,7 @@ export const pullDaily = internalAction({
         timeRange: { since: args.date, until: args.date },
         timeIncrement: "1",
       },
-      fields
+      fields,
     );
 
     if (insights.length > 0) {

@@ -1,11 +1,10 @@
 "use client";
 
 import { Button, Chip, Input, Skeleton, Table } from "@heroui/react";
-import { PaginationControls } from "@/components/shared/PaginationControls";
 import { Icon } from "@iconify/react";
+import Image from "next/image";
 import {
   useCallback,
-  useEffect,
   useMemo,
   useState,
   type ComponentProps,
@@ -60,20 +59,14 @@ export default function ProductCostTable() {
   const currency = primaryCurrency;
   const currencySymbol = useMemo(() => getCurrencySymbol(currency), [currency]);
 
-  const [page, setPage] = useState(1);
   const pageSize = 200;
   const {
     data: variantData,
-    totalPages,
-    currentPage,
     loading,
-  } = useShopifyProductVariantsPaginated(page, pageSize, undefined);
-
-  useEffect(() => {
-    if (currentPage !== page) {
-      setPage(currentPage);
-    }
-  }, [currentPage, page, setPage]);
+    loadingMore,
+    hasMore,
+    loadMore,
+  } = useShopifyProductVariantsPaginated(pageSize);
 
   const variants = useMemo<VariantRow[]>(
     () => (Array.isArray(variantData) ? (variantData as VariantRow[]) : []),
@@ -274,13 +267,16 @@ export default function ProductCostTable() {
   );
 
   const paginationContent =
-    !loading && totalPages > 1 ? (
+    !loading && hasMore ? (
       <div className="flex justify-center">
-        <PaginationControls
-          page={currentPage}
-          total={totalPages}
-          onChange={setPage}
-        />
+        <Button
+          variant="secondary"
+          size="sm"
+          isPending={loadingMore}
+          onPress={() => loadMore(pageSize)}
+        >
+          Load more
+        </Button>
       </div>
     ) : null;
 
@@ -412,10 +408,11 @@ export default function ProductCostTable() {
                             />
                           </button>
                           {img ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                               src={img}
                               alt={grp.productName}
+                              width={32}
+                              height={32}
                               className="w-8 h-8 rounded object-cover flex-none"
                             />
                           ) : (

@@ -62,12 +62,18 @@ const pickLatestManualRate = (
 export const getCosts = query({
   args: {
     dateRange: v.optional(dateRangeValidator),
-    type: v.optional(v.union(v.literal("shipping"), v.literal("payment"), v.literal("operational"))),
+    type: v.optional(
+      v.union(
+        v.literal("shipping"),
+        v.literal("payment"),
+        v.literal("operational"),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     const auth = await getUserAndOrg(ctx);
     if (!auth) return [];
-    const orgId = auth.orgId as Id<'organizations'>;
+    const orgId = auth.orgId as Id<"organizations">;
 
     // Use proper index for type filtering
     let costs: Doc<"globalCosts">[];
@@ -84,9 +90,7 @@ export const getCosts = query({
     } else {
       costs = await ctx.db
         .query("globalCosts")
-        .withIndex("by_organization", (q) =>
-          q.eq("organizationId", orgId),
-        )
+        .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
         .collect();
     }
 
@@ -175,7 +179,11 @@ export const getManualReturnRate = query({
  */
 export const addCost = mutation({
   args: {
-    type: v.union(v.literal("shipping"), v.literal("payment"), v.literal("operational")),
+    type: v.union(
+      v.literal("shipping"),
+      v.literal("payment"),
+      v.literal("operational"),
+    ),
     name: v.string(),
     value: v.number(),
     calculation: v.union(
@@ -254,7 +262,7 @@ export const updateCost = mutation({
   handler: async (ctx, args) => {
     const { orgId } = await requireUserAndOrg(ctx);
 
-    const cost = await ctx.db.get(args.costId);
+    const cost = await ctx.db.get("globalCosts", args.costId);
 
     if (!cost || cost.organizationId !== orgId) {
       throw new Error("Cost not found or access denied");
@@ -270,7 +278,7 @@ export const updateCost = mutation({
     if (args.isActive !== undefined) updates.isActive = args.isActive;
     if (args.frequency !== undefined) updates.frequency = args.frequency;
 
-    await ctx.db.patch(args.costId, updates);
+    await ctx.db.patch("globalCosts", args.costId, updates);
 
     return { success: true };
   },
@@ -287,13 +295,13 @@ export const deleteCost = mutation({
   handler: async (ctx, args) => {
     const { user } = await requireUserAndOrg(ctx);
 
-    const cost = await ctx.db.get(args.costId);
+    const cost = await ctx.db.get("globalCosts", args.costId);
 
     if (!cost || cost.organizationId !== user.organizationId) {
       throw new Error("Cost not found or access denied");
     }
 
-    await ctx.db.delete(args.costId);
+    await ctx.db.delete("globalCosts", args.costId);
 
     return { success: true };
   },
@@ -318,18 +326,21 @@ export const upsertVariantCosts = mutation({
     const existing = await ctx.db
       .query("variantCosts")
       .withIndex("by_org_variant", (q) =>
-        q.eq("organizationId", orgId as Id<"organizations">).eq("variantId", args.variantId),
+        q
+          .eq("organizationId", orgId as Id<"organizations">)
+          .eq("variantId", args.variantId),
       )
       .first();
 
     // Only include fields that are explicitly provided to avoid wiping others
     const updates: any = { updatedAt: Date.now() };
     if (args.cogsPerUnit !== undefined) updates.cogsPerUnit = args.cogsPerUnit;
-    if (args.handlingPerUnit !== undefined) updates.handlingPerUnit = args.handlingPerUnit;
+    if (args.handlingPerUnit !== undefined)
+      updates.handlingPerUnit = args.handlingPerUnit;
     if (args.taxPercent !== undefined) updates.taxPercent = args.taxPercent;
 
     if (existing) {
-      await ctx.db.patch(existing._id, updates);
+      await ctx.db.patch("variantCosts", existing._id, updates);
     } else {
       await ctx.db.insert("variantCosts", {
         organizationId: orgId,
@@ -359,7 +370,7 @@ export const setManualReturnRate = mutation({
     const { user, orgId } = await requireUserAndOrg(ctx);
 
     const normalizedRate = clampPercentage(args.ratePercent);
-    const manualRateResult = await ctx.runMutation(
+    const manualRateResult = (await ctx.runMutation(
       internal.core.costs.upsertManualReturnRate,
       {
         organizationId: orgId as Id<"organizations">,
@@ -369,7 +380,7 @@ export const setManualReturnRate = mutation({
         effectiveFrom: args.effectiveFrom ?? Date.now(),
         isActive: normalizedRate > 0,
       },
-    ) as {
+    )) as {
       success: boolean;
       isActive: boolean;
       ratePercent: number;
@@ -377,11 +388,15 @@ export const setManualReturnRate = mutation({
     };
 
     if (manualRateResult.changed) {
-      await ctx.scheduler.runAfter(0, internal.engine.analytics.calculateAnalytics, {
-        organizationId: orgId,
-        dateRange: { daysBack: 90 },
-        syncType: "incremental",
-      });
+      await ctx.scheduler.runAfter(
+        0,
+        internal.engine.analytics.calculateAnalytics,
+        {
+          organizationId: orgId,
+          dateRange: { daysBack: 90 },
+          syncType: "incremental",
+        },
+      );
     }
 
     return {
@@ -403,7 +418,7 @@ export const saveVariantCosts = mutation({
         cogsPerUnit: v.optional(v.number()),
         taxPercent: v.optional(v.number()),
         handlingPerUnit: v.optional(v.number()),
-      })
+      }),
     ),
   },
   returns: v.object({ success: v.boolean() }),
@@ -424,18 +439,20 @@ export const saveVariantCosts = mutation({
       const existing = await ctx.db
         .query("variantCosts")
         .withIndex("by_org_variant", (q) =>
-          q.eq("organizationId", orgId).eq("variantId", cost.variantId)
+          q.eq("organizationId", orgId).eq("variantId", cost.variantId),
         )
         .first();
 
       // Build updates with only provided fields to prevent wiping existing values
       const updates: any = { updatedAt: Date.now() };
-      if (cost.cogsPerUnit !== undefined) updates.cogsPerUnit = cost.cogsPerUnit;
-      if (cost.handlingPerUnit !== undefined) updates.handlingPerUnit = cost.handlingPerUnit;
+      if (cost.cogsPerUnit !== undefined)
+        updates.cogsPerUnit = cost.cogsPerUnit;
+      if (cost.handlingPerUnit !== undefined)
+        updates.handlingPerUnit = cost.handlingPerUnit;
       if (cost.taxPercent !== undefined) updates.taxPercent = cost.taxPercent;
 
       if (existing) {
-        await ctx.db.patch(existing._id, updates);
+        await ctx.db.patch("variantCosts", existing._id, updates);
       } else {
         await ctx.db.insert("variantCosts", {
           organizationId: orgId,
@@ -456,12 +473,12 @@ export const saveVariantCosts = mutation({
     const onboarding = await ctx.db
       .query("onboarding")
       .withIndex("by_user_organization", (q) =>
-        q.eq("userId", user._id).eq("organizationId", orgId)
+        q.eq("userId", user._id).eq("organizationId", orgId),
       )
       .first();
 
     if (onboarding && onboarding.onboardingStep === 5) {
-      await ctx.db.patch(onboarding._id, {
+      await ctx.db.patch("onboarding", onboarding._id, {
         // Mark product cost setup complete at step 5
         isProductCostSetup: true,
         onboardingStep: 6,
@@ -487,14 +504,17 @@ export const getManualReturnRateEntries = internalQuery({
   handler: async (ctx, args) => {
     const docs = await ctx.db
       .query("manualReturnRates")
-      .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
       .collect();
 
     const start = args.windowStart ?? Number.NEGATIVE_INFINITY;
     const end = args.windowEnd ?? Number.POSITIVE_INFINITY;
 
     return docs.filter((doc) => {
-      const from = typeof doc.effectiveFrom === "number" ? doc.effectiveFrom : 0;
+      const from =
+        typeof doc.effectiveFrom === "number" ? doc.effectiveFrom : 0;
       const rawTo = doc.effectiveTo;
       const to =
         rawTo === undefined || rawTo === null
@@ -525,7 +545,9 @@ export const upsertManualReturnRate = internalMutation({
   handler: async (ctx, args) => {
     const docs = await ctx.db
       .query("manualReturnRates")
-      .withIndex("by_organization", (q) => q.eq("organizationId", args.organizationId))
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
       .collect();
 
     const normalizedRate = clampPercentage(args.ratePercent);
@@ -536,7 +558,12 @@ export const upsertManualReturnRate = internalMutation({
 
     if (!latest) {
       if (!shouldActivate) {
-        return { success: true, isActive: false, ratePercent: 0, changed: false } as const;
+        return {
+          success: true,
+          isActive: false,
+          ratePercent: 0,
+          changed: false,
+        } as const;
       }
 
       await ctx.db.insert("manualReturnRates", {
@@ -560,10 +587,15 @@ export const upsertManualReturnRate = internalMutation({
 
     if (!shouldActivate) {
       if (!latest.isActive) {
-        return { success: true, isActive: false, ratePercent: 0, changed: false } as const;
+        return {
+          success: true,
+          isActive: false,
+          ratePercent: 0,
+          changed: false,
+        } as const;
       }
 
-      await ctx.db.patch(latest._id, {
+      await ctx.db.patch("manualReturnRates", latest._id, {
         isActive: false,
         ratePercent: normalizedRate,
         note: note !== undefined ? note : latest.note,
@@ -604,10 +636,11 @@ export const upsertManualReturnRate = internalMutation({
       latest.ratePercent !== normalizedRate ||
       !latest.isActive ||
       (note !== undefined && note !== latest.note) ||
-      (updates.effectiveFrom !== undefined && updates.effectiveFrom !== latest.effectiveFrom);
+      (updates.effectiveFrom !== undefined &&
+        updates.effectiveFrom !== latest.effectiveFrom);
 
     if (hasChanged) {
-      await ctx.db.patch(latest._id, updates);
+      await ctx.db.patch("manualReturnRates", latest._id, updates);
     }
 
     return {
@@ -626,7 +659,7 @@ export const createVariantCosts = internalMutation({
       v.object({
         variantId: v.string(),
         cogsPerUnit: v.number(),
-      })
+      }),
     ),
   },
   returns: v.null(),
@@ -635,33 +668,38 @@ export const createVariantCosts = internalMutation({
     const variants = await ctx.db
       .query("shopifyProductVariants")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId)
+        q.eq("organizationId", args.organizationId),
       )
       .collect();
-    
-    const shopifyIdToVariantId = new Map<string, Id<"shopifyProductVariants">>();
+
+    const shopifyIdToVariantId = new Map<
+      string,
+      Id<"shopifyProductVariants">
+    >();
     for (const variant of variants) {
       shopifyIdToVariantId.set(variant.shopifyId, variant._id);
     }
-    
+
     // Create or update product cost components
     for (const component of args.components) {
       const variantId = shopifyIdToVariantId.get(component.variantId);
-      
+
       if (!variantId) {
-        console.warn(`Variant not found for Shopify ID: ${component.variantId}`);
+        console.warn(
+          `Variant not found for Shopify ID: ${component.variantId}`,
+        );
         continue;
       }
-      
+
       // Check if component already exists
       const existing = await ctx.db
         .query("variantCosts")
         .withIndex("by_variant", (q) => q.eq("variantId", variantId))
         .first();
-      
+
       if (existing) {
         // Update existing component
-        await ctx.db.patch(existing._id, {
+        await ctx.db.patch("variantCosts", existing._id, {
           cogsPerUnit: component.cogsPerUnit,
           updatedAt: Date.now(),
         });
@@ -701,19 +739,19 @@ export const validateCostDataCompleteness = internalQuery({
     const variants = await ctx.db
       .query("shopifyProductVariants")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId)
+        q.eq("organizationId", args.organizationId),
       )
       .collect();
-    
+
     const totalVariants = variants.length;
 
     // Check cost components
-  const costComponents = await ctx.db
-    .query("variantCosts")
-    .withIndex("by_organization", (q) =>
-      q.eq("organizationId", args.organizationId)
-    )
-    .collect();
+    const costComponents = await ctx.db
+      .query("variantCosts")
+      .withIndex("by_organization", (q) =>
+        q.eq("organizationId", args.organizationId),
+      )
+      .collect();
 
     const variantsWithCostComponentsIds = new Set<string>();
     const variantsWithCogsIds = new Set<string>();
@@ -725,51 +763,65 @@ export const validateCostDataCompleteness = internalQuery({
     }
     const variantsWithCostComponents = variantsWithCostComponentsIds.size;
     const variantsWithCOGS = variantsWithCogsIds.size;
-    
+
     // Check other cost types
     const costs = await ctx.db
       .query("globalCosts")
       .withIndex("by_org_and_active", (q) =>
-        q.eq("organizationId", args.organizationId).eq("isActive", true)
+        q.eq("organizationId", args.organizationId).eq("isActive", true),
       )
       .collect();
-    
+
     const hasTaxRate = costComponents.some((component) => {
       const value = component.taxPercent;
       return typeof value === "number" && value > 0;
     });
-    const hasShippingCosts = costs.some(c => c.type === "shipping");
-    const hasPaymentFees = costs.some(c => c.type === "payment");
-    
+    const hasShippingCosts = costs.some((c) => c.type === "shipping");
+    const hasPaymentFees = costs.some((c) => c.type === "payment");
+
     const recommendations: string[] = [];
-    
+
     // Calculate completeness
-    const effectiveVariantsWithCosts = Math.max(variantsWithCOGS, variantsWithCostComponents);
-    const completenessPercentage = totalVariants > 0 
-      ? Math.round((effectiveVariantsWithCosts / totalVariants) * 100)
-      : 0;
-    
+    const effectiveVariantsWithCosts = Math.max(
+      variantsWithCOGS,
+      variantsWithCostComponents,
+    );
+    const completenessPercentage =
+      totalVariants > 0
+        ? Math.round((effectiveVariantsWithCosts / totalVariants) * 100)
+        : 0;
+
     // Generate recommendations
     if (completenessPercentage < 50) {
-      recommendations.push("More than 50% of products are missing cost data. Consider updating costs in Shopify.");
+      recommendations.push(
+        "More than 50% of products are missing cost data. Consider updating costs in Shopify.",
+      );
     }
-    
+
     if (!hasTaxRate) {
-      recommendations.push("No tax rates configured at the product level. Add tax percentages to your variants for better reporting.");
+      recommendations.push(
+        "No tax rates configured at the product level. Add tax percentages to your variants for better reporting.",
+      );
     }
-    
+
     if (!hasShippingCosts) {
-      recommendations.push("No shipping costs configured. Consider setting up shipping rates.");
+      recommendations.push(
+        "No shipping costs configured. Consider setting up shipping rates.",
+      );
     }
-    
+
     if (!hasPaymentFees) {
-      recommendations.push("No payment processing fees configured. Add them for accurate profit calculations.");
+      recommendations.push(
+        "No payment processing fees configured. Add them for accurate profit calculations.",
+      );
     }
-    
+
     if (variantsWithCOGS < variantsWithCostComponents) {
-      recommendations.push("Some products have manual cost overrides. Ensure these are up to date.");
+      recommendations.push(
+        "Some products have manual cost overrides. Ensure these are up to date.",
+      );
     }
-    
+
     return {
       totalVariants,
       variantsWithCOGS,

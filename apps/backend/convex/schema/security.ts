@@ -48,10 +48,7 @@ export const webhookReceipts = defineTable({
   shopDomain: v.string(),
 
   // Processing outcome
-  status: v.union(
-    v.literal("processed"),
-    v.literal("failed"),
-  ),
+  status: v.union(v.literal("processed"), v.literal("failed")),
   processedAt: v.number(),
   error: v.optional(v.string()),
 })

@@ -196,5 +196,4 @@ export const customerDailySummaries = defineTable({
   date: v.string(),
   customersCreated: v.number(),
   totalCustomers: v.number(),
-})
-  .index("by_org_date", ["organizationId", "date"]);
+}).index("by_org_date", ["organizationId", "date"]);

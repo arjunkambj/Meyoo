@@ -82,7 +82,7 @@ export const trackActivity = internalMutation({
         updatedAt: now,
       });
 
-      profile = await ctx.db.get(profileId);
+      profile = await ctx.db.get("syncProfiles", profileId);
     }
 
     if (!profile) {
@@ -106,7 +106,7 @@ export const trackActivity = internalMutation({
       ) || SYNC_TIERS[0];
 
     // Update profile
-    await ctx.db.patch(profile._id, {
+    await ctx.db.patch("syncProfiles", profile._id, {
       activityScore: newScore,
       lastActivityAt: now,
       syncFrequency: tier.syncsPerDay,
@@ -196,7 +196,7 @@ export const updateSyncMetrics = internalMutation({
     // Detailed metrics previously lived in the syncHistory table.
     // With that table removed, keep lightweight tracking on the profile.
 
-    await ctx.db.patch(profile._id, {
+    await ctx.db.patch("syncProfiles", profile._id, {
       lastSync: Date.now(),
       updatedAt: Date.now(),
     });

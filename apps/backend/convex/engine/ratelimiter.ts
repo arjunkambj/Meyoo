@@ -41,9 +41,12 @@ export const acquire = internalMutation({
   returns: v.object({ ok: v.boolean(), resetAt: v.number() }),
   handler: async (ctx, args) => {
     const { start, end } = currentHourWindow();
-    const res = await ctx.runQuery((internal as any).engine.ratelimiter.getBucket, {
-      platform: args.platform,
-    });
+    const res = await ctx.runQuery(
+      (internal as any).engine.ratelimiter.getBucket,
+      {
+        platform: args.platform,
+      },
+    );
 
     // Fresh window if expired or not existing
     let doc = await (ctx.db as any)

@@ -2,7 +2,10 @@ import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
-import { validateDateRange, type AnalyticsSourceKey } from "../utils/analyticsSource";
+import {
+  validateDateRange,
+  type AnalyticsSourceKey,
+} from "../utils/analyticsSource";
 import { getUserAndOrg } from "../utils/auth";
 import { computePlatformMetrics } from "../utils/analyticsAggregations";
 import type { PlatformMetrics } from "@repo/types";
@@ -31,9 +34,14 @@ export const getPlatformMetricsSummary = query({
     if (!auth) return null;
 
     const range = validateDateRange(args.dateRange);
-    const response = await loadAnalytics(ctx, auth.orgId as Id<"organizations">, range, {
-      datasets: PLATFORM_METRIC_DATASETS,
-    });
+    const response = await loadAnalytics(
+      ctx,
+      auth.orgId as Id<"organizations">,
+      range,
+      {
+        datasets: PLATFORM_METRIC_DATASETS,
+      },
+    );
 
     const metrics = computePlatformMetrics(response);
 

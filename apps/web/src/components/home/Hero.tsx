@@ -30,7 +30,7 @@ const Hero = () => {
             <div className="group mb-6 cursor-pointer rounded-xl bg-surface-secondary px-1 py-1">
               <Chip
                 className="rounded-lg bg-surface px-1.5 text-xs uppercase tracking-[0.05em] font-medium"
-                variant="flat"
+                variant="soft"
               >
                 Built for D2C brands
                 <Icon
@@ -60,10 +60,9 @@ const Hero = () => {
             {/* CTA Buttons */}
             <div className="mt-10 sm:mt-12 flex flex-row flex-wrap justify-center sm:justify-start items-center gap-4">
               <Link href="/sign-in">
-                <Button variant="primary"
+                <Button
+                  variant="primary"
                   className="w-auto h-10 sm:h-11 transition-all duration-200 active:scale-100"
-                 
-                 
                   size="lg"
                 >
                   Start 28-day Trial

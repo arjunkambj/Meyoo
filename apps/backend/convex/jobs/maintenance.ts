@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
+import type { Id } from "../_generated/dataModel";
 import {
   internalAction,
   internalMutation,
@@ -46,7 +47,7 @@ export const cleanupOldData = internalAction({
 
     // Fetch all old records in parallel for faster execution
     const syncCutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    
+
     const [oldAuditLogs, oldSyncSessions, expiredCache] = await Promise.all([
       ctx.runQuery(internal.jobs.maintenance.getOldRecords, {
         table: "auditLogs",
@@ -237,12 +238,18 @@ export const getActiveTrials = internalQuery({
  */
 export const deleteRecord = internalMutation({
   args: {
-    table: v.string(),
-    id: v.any(),
+    table: v.union(v.literal("auditLogs"), v.literal("syncSessions")),
+    id: v.union(v.id("auditLogs"), v.id("syncSessions")),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.id);
+    if (args.table === "auditLogs") {
+      await ctx.db.delete("auditLogs", args.id as Id<"auditLogs">);
+      return null;
+    }
+
+    await ctx.db.delete("syncSessions", args.id as Id<"syncSessions">);
+    return null;
   },
 });
 
@@ -263,7 +270,7 @@ export const expireTrial = internalMutation({
       .first();
 
     if (billing) {
-      await ctx.db.patch(billing._id, {
+      await ctx.db.patch("billing", billing._id, {
         isTrialActive: false,
         hasTrialExpired: true,
         updatedAt: Date.now(),
@@ -286,7 +293,7 @@ export const expireTrial = internalMutation({
 
       if (onboarding) {
         // Mark billing as not completed so user must go through billing
-        await ctx.db.patch(onboarding._id, {
+        await ctx.db.patch("onboarding", onboarding._id, {
           hasShopifySubscription: false,
           updatedAt: Date.now(),
         });

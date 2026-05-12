@@ -135,7 +135,7 @@ export const getAnalytics = query({
   args: {
     dateRange: dateRangeValidator,
     granularity: v.optional(
-      v.union(v.literal("daily"), v.literal("weekly"), v.literal("monthly"))
+      v.union(v.literal("daily"), v.literal("weekly"), v.literal("monthly")),
     ),
   },
   returns: v.union(
@@ -145,7 +145,7 @@ export const getAnalytics = query({
       organizationId: v.string(),
       result: v.optional(v.any()),
       meta: v.optional(v.any()),
-    })
+    }),
   ),
   handler: async (ctx, args) => {
     const auth = await getUserAndOrg(ctx);
@@ -155,7 +155,7 @@ export const getAnalytics = query({
     const clamped = clampDateRangeForGranularity(args.dateRange, granularity);
     const range = validateDateRange(clamped);
     const organizationId = auth.orgId as Id<"organizations">;
-    const organization = await ctx.db.get(organizationId);
+    const organization = await ctx.db.get("organizations", organizationId);
     const primaryCurrency =
       (organization && typeof organization.primaryCurrency === "string"
         ? organization.primaryCurrency
@@ -165,7 +165,7 @@ export const getAnalytics = query({
       ctx,
       organizationId,
       range,
-      granularity
+      granularity,
     );
 
     let result: PnLAnalyticsResult = {
@@ -186,10 +186,23 @@ export const getAnalytics = query({
       result.metrics === null;
 
     if (needsFallback) {
-      const fallbackAnalytics = await loadAnalytics(ctx, organizationId, range, {
-        datasets: ["orders", "globalCosts", "manualReturnRates", "metaInsights"] as const,
-      });
-      const fallbackResult = computePnLAnalytics(fallbackAnalytics, granularity);
+      const fallbackAnalytics = await loadAnalytics(
+        ctx,
+        organizationId,
+        range,
+        {
+          datasets: [
+            "orders",
+            "globalCosts",
+            "manualReturnRates",
+            "metaInsights",
+          ] as const,
+        },
+      );
+      const fallbackResult = computePnLAnalytics(
+        fallbackAnalytics,
+        granularity,
+      );
       result = {
         ...fallbackResult,
         primaryCurrency,

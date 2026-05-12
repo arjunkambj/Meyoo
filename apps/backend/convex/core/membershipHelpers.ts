@@ -34,7 +34,7 @@ export async function ensureActiveMembership(
   const assignedBy = existing?.assignedBy ?? options.assignedBy ?? userId;
 
   if (existing) {
-    await ctx.db.patch(existing._id, {
+    await ctx.db.patch("memberships", existing._id, {
       role,
       status: "active",
       seatType,

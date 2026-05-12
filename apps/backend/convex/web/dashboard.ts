@@ -1,7 +1,12 @@
 import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import { action, query, type ActionCtx, type QueryCtx } from "../_generated/server";
+import {
+  action,
+  query,
+  type ActionCtx,
+  type QueryCtx,
+} from "../_generated/server";
 import { api } from "../_generated/api";
 import { dateRangeValidator } from "./analyticsShared";
 import { percentageChange } from "../utils/analytics/shared";
@@ -16,9 +21,15 @@ import type {
 import { onboardingStatusValidator } from "../utils/onboardingValidators";
 import { getUserAndOrg } from "../utils/auth";
 import { resolveDashboardConfig } from "../utils/dashboardConfig";
-import { computeIntegrationStatus, integrationStatusValidator } from "../utils/integrationStatus";
+import {
+  computeIntegrationStatus,
+  integrationStatusValidator,
+} from "../utils/integrationStatus";
 import { loadOverviewFromDailyMetrics } from "../utils/dailyMetrics";
-import { defaultOrgDateRange, resolveDateRangeForOrganization } from "../utils/orgDateRange";
+import {
+  defaultOrgDateRange,
+  resolveDateRangeForOrganization,
+} from "../utils/orgDateRange";
 
 type IntegrationStatus = Awaited<ReturnType<typeof computeIntegrationStatus>>;
 type OverviewPayload = {
@@ -41,7 +52,9 @@ type OverviewArgs = {
   dateRange?: DateRange;
 };
 
-function cloneOverview(overview: OverviewComputation | null): OverviewComputation | null {
+function cloneOverview(
+  overview: OverviewComputation | null,
+): OverviewComputation | null {
   if (!overview) return null;
 
   return {
@@ -51,13 +64,15 @@ function cloneOverview(overview: OverviewComputation | null): OverviewComputatio
   } satisfies OverviewComputation;
 }
 
-function resolvePreviousMetricValue(metric: MetricValue | null | undefined): number {
+function resolvePreviousMetricValue(
+  metric: MetricValue | null | undefined,
+): number {
   if (!metric) {
     return 0;
   }
 
   const { value, change, previousValue } = metric;
-  if (typeof previousValue === 'number' && Number.isFinite(previousValue)) {
+  if (typeof previousValue === "number" && Number.isFinite(previousValue)) {
     return previousValue;
   }
   if (!Number.isFinite(value) || !Number.isFinite(change)) {
@@ -144,7 +159,9 @@ function applyUtmRoasMetric(
   overview.summary.metaROAS = value;
   overview.summary.metaROASChange = existingChange ?? 0;
 
-  const previousMetaRoasValue = resolvePreviousMetricValue(overview.metrics?.metaROAS);
+  const previousMetaRoasValue = resolvePreviousMetricValue(
+    overview.metrics?.metaROAS,
+  );
   const metric: MetricValue = {
     value,
     change: Number.isFinite(existingChange) ? existingChange : 0,
@@ -181,7 +198,10 @@ export const getOverviewData = query({
       meta: v.optional(v.any()),
     }),
   ),
-  handler: async (ctx: QueryCtx, args: OverviewArgs): Promise<OverviewPayload | null> => {
+  handler: async (
+    ctx: QueryCtx,
+    args: OverviewArgs,
+  ): Promise<OverviewPayload | null> => {
     const auth = await getUserAndOrg(ctx);
     if (!auth) return null;
 
@@ -204,17 +224,19 @@ export const getOverviewData = query({
     const userRole = auth.membership?.role ?? null;
     const canViewDevTools = userRole === "StoreOwner";
     // Read cached status via query to avoid recomputation and large reads
-    const integrationStatus = await ctx.runQuery(api.core.status.getIntegrationStatus, {});
-    const onboardingStatus = await ctx.runQuery(api.core.onboarding.getOnboardingStatus, {});
-    const orgDoc = await ctx.db.get(orgId);
+    const integrationStatus = await ctx.runQuery(
+      api.core.status.getIntegrationStatus,
+      {},
+    );
+    const onboardingStatus = await ctx.runQuery(
+      api.core.onboarding.getOnboardingStatus,
+      {},
+    );
+    const orgDoc = await ctx.db.get("organizations", orgId);
     const primaryCurrency = orgDoc?.primaryCurrency ?? "USD";
 
     // ONLY read from dailyMetrics (aggregated data) - no raw order reads
-    const dailyOverview = await loadOverviewFromDailyMetrics(
-      ctx,
-      orgId,
-      range,
-    );
+    const dailyOverview = await loadOverviewFromDailyMetrics(ctx, orgId, range);
 
     if (!dailyOverview) {
       // Metrics not yet calculated - return calculating state
@@ -231,7 +253,8 @@ export const getOverviewData = query({
         meta: {
           strategy: "dailyMetrics",
           status: "calculating",
-          message: "Metrics are being calculated. This usually takes 10-30 seconds after sync completion.",
+          message:
+            "Metrics are being calculated. This usually takes 10-30 seconds after sync completion.",
           userRole,
           canViewDevTools,
         },
@@ -291,7 +314,10 @@ const getOverviewDataActionDefinition = {
       meta: v.optional(v.any()),
     }),
   ),
-  handler: async (ctx: ActionCtx, args: OverviewArgs): Promise<OverviewPayload | null> => {
+  handler: async (
+    ctx: ActionCtx,
+    args: OverviewArgs,
+  ): Promise<OverviewPayload | null> => {
     return ctx.runQuery(api.web.dashboard.getOverviewData, args);
   },
 };

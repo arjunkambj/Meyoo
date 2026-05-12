@@ -93,7 +93,9 @@ export const fetchMetaAccountsAction = action({
       if (adAccounts.length === 0 && (businessesData.data?.length || 0) > 0) {
         const allBusinessAdAccounts: Array<Record<string, any>> = [];
 
-        for (const business of businessesData.data as Array<Record<string, any>>) {
+        for (const business of businessesData.data as Array<
+          Record<string, any>
+        >) {
           const businessRes = await fetch(
             `https://graph.facebook.com/${version}/${String(business.id)}/adaccounts?fields=id,name,currency,timezone_name,account_status,spend_cap,amount_spent&limit=100&access_token=${accessToken}`,
           );
@@ -107,22 +109,23 @@ export const fetchMetaAccountsAction = action({
         }
 
         if (allBusinessAdAccounts.length > 0) {
-          adAccounts = allBusinessAdAccounts.map((acc: Record<string, any>) =>
-            ({
-              id: String(acc.id || ""),
-              name: String(acc.name || ""),
-              currency: String(acc.currency || "USD"),
-              timezone_name: String(acc.timezone_name || "UTC"),
-              account_status: Number(acc.account_status ?? 1),
-              spend_cap: acc.spend_cap
-                ? parseFloat(String(acc.spend_cap))
-                : undefined,
-              amount_spent: acc.amount_spent
-                ? parseFloat(String(acc.amount_spent))
-                : undefined,
-              business_id: acc.business?.id,
-              business_name: acc.business?.name,
-            }) as MetaAdAccount,
+          adAccounts = allBusinessAdAccounts.map(
+            (acc: Record<string, any>) =>
+              ({
+                id: String(acc.id || ""),
+                name: String(acc.name || ""),
+                currency: String(acc.currency || "USD"),
+                timezone_name: String(acc.timezone_name || "UTC"),
+                account_status: Number(acc.account_status ?? 1),
+                spend_cap: acc.spend_cap
+                  ? parseFloat(String(acc.spend_cap))
+                  : undefined,
+                amount_spent: acc.amount_spent
+                  ? parseFloat(String(acc.amount_spent))
+                  : undefined,
+                business_id: acc.business?.id,
+                business_name: acc.business?.name,
+              }) as MetaAdAccount,
           );
         }
       }

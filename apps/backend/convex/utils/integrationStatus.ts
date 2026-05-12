@@ -76,7 +76,12 @@ export const emptyIntegrationStatus = (): IntegrationStatus => ({
   shopify: {
     connected: false,
     initialSynced: false,
-    stages: { products: false, inventory: false, customers: false, orders: false },
+    stages: {
+      products: false,
+      inventory: false,
+      customers: false,
+      orders: false,
+    },
   },
   meta: {
     connected: false,
@@ -145,9 +150,13 @@ export async function computeIntegrationStatus(
     initialShopify &&
       (initialShopify.status === "completed" ||
         dbHasExpectedOrders ||
-        (stages.products && stages.inventory && stages.customers && stages.orders) ||
+        (stages.products &&
+          stages.inventory &&
+          stages.customers &&
+          stages.orders) ||
         (typeof (initialShopify.metadata as any)?.ordersQueued === "number" &&
-          typeof (initialShopify.metadata as any)?.ordersProcessed === "number" &&
+          typeof (initialShopify.metadata as any)?.ordersProcessed ===
+            "number" &&
           (initialShopify.metadata as any).ordersProcessed >=
             (initialShopify.metadata as any).ordersQueued)),
   );
@@ -163,7 +172,9 @@ export async function computeIntegrationStatus(
 
   // Make readiness depend on session completion rather than scanning orders/insights.
   const analyticsReady = Boolean(
-    (latestShopify[0] || latestMeta[0] || onboarding?.onboardingData?.analyticsTriggeredAt) &&
+    (latestShopify[0] ||
+      latestMeta[0] ||
+      onboarding?.onboardingData?.analyticsTriggeredAt) &&
       (shopifyStore ? shopifyInitialComplete : true),
   );
 
@@ -179,7 +190,9 @@ export async function computeIntegrationStatus(
       initialSynced: shopifyInitialComplete,
       stages,
       lastInitialCompletedAt:
-        initialShopify?.status === "completed" ? initialShopify.completedAt : undefined,
+        initialShopify?.status === "completed"
+          ? initialShopify.completedAt
+          : undefined,
       lastSyncAt: latestShopify[0]?.completedAt ?? latestShopify[0]?.startedAt,
       expectedOrders,
       // Intentionally omit ordersInDb to avoid heavy reads; a separate
@@ -190,7 +203,9 @@ export async function computeIntegrationStatus(
       connected: Boolean(metaSession),
       initialSynced: metaInitialComplete,
       lastInitialCompletedAt:
-        initialMeta?.status === "completed" ? initialMeta.completedAt : undefined,
+        initialMeta?.status === "completed"
+          ? initialMeta.completedAt
+          : undefined,
       lastSyncAt: latestMeta[0]?.completedAt ?? latestMeta[0]?.startedAt,
     },
     analytics: {

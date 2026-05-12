@@ -138,7 +138,8 @@ export async function loadAnalyticsWithChunks(
   options?: LoadAnalyticsActionOptions,
 ): Promise<{ data: AnalyticsSourceData; meta?: Record<string, unknown> }> {
   const requested = options?.datasets ? new Set(options.datasets) : null;
-  const shouldFetch = (key: AnalyticsSourceKey) => shouldFetchDataset(requested, key);
+  const shouldFetch = (key: AnalyticsSourceKey) =>
+    shouldFetchDataset(requested, key);
 
   const data = createEmptyAnalyticsData();
   const meta: Record<string, unknown> = {};
@@ -148,7 +149,9 @@ export async function loadAnalyticsWithChunks(
     organizationId: organizationId as string,
     startDate: range.startDate,
     endDate: range.endDate,
-    ...(range.startDateTimeUtc ? { startDateTimeUtc: range.startDateTimeUtc } : {}),
+    ...(range.startDateTimeUtc
+      ? { startDateTimeUtc: range.startDateTimeUtc }
+      : {}),
     ...(range.endDateTimeUtc ? { endDateTimeUtc: range.endDateTimeUtc } : {}),
     ...(range.endDateTimeUtcExclusive
       ? { endDateTimeUtcExclusive: range.endDateTimeUtcExclusive }
@@ -162,7 +165,8 @@ export async function loadAnalyticsWithChunks(
   let orderChunkSize = DEFAULT_ORDER_CHUNK_SIZE;
   let reducedOrderChunk = false;
   const maxOrders = options?.limits?.maxOrders;
-  let remainingOrders = typeof maxOrders === "number" && maxOrders > 0 ? maxOrders : null;
+  let remainingOrders =
+    typeof maxOrders === "number" && maxOrders > 0 ? maxOrders : null;
 
   while (true) {
     if (remainingOrders !== null && remainingOrders <= 0) {
@@ -170,9 +174,13 @@ export async function loadAnalyticsWithChunks(
       break;
     }
 
-    const effectiveChunkSize = remainingOrders !== null
-      ? Math.max(MIN_ORDER_CHUNK_SIZE, Math.min(orderChunkSize, remainingOrders))
-      : orderChunkSize;
+    const effectiveChunkSize =
+      remainingOrders !== null
+        ? Math.max(
+            MIN_ORDER_CHUNK_SIZE,
+            Math.min(orderChunkSize, remainingOrders),
+          )
+        : orderChunkSize;
 
     const chunkArgs = {
       ...baseArgs,
@@ -203,8 +211,14 @@ export async function loadAnalyticsWithChunks(
         );
         break;
       } catch (error) {
-        if (isTooManyReadsError(error) && orderChunkSize > MIN_ORDER_CHUNK_SIZE) {
-          orderChunkSize = Math.max(MIN_ORDER_CHUNK_SIZE, Math.floor(orderChunkSize / 2));
+        if (
+          isTooManyReadsError(error) &&
+          orderChunkSize > MIN_ORDER_CHUNK_SIZE
+        ) {
+          orderChunkSize = Math.max(
+            MIN_ORDER_CHUNK_SIZE,
+            Math.floor(orderChunkSize / 2),
+          );
           reducedOrderChunk = true;
           continue;
         }
@@ -285,7 +299,10 @@ export async function loadAnalyticsWithChunks(
     ? Array.from(uniqueMaps.variantCosts.values())
     : [];
 
-  const supplementalCollectors = buildSupplementalCollectors(shouldFetch, uniqueMaps);
+  const supplementalCollectors = buildSupplementalCollectors(
+    shouldFetch,
+    uniqueMaps,
+  );
 
   for (const dataset of supplementalCollectors) {
     let cursor: string | null = null;
@@ -303,7 +320,11 @@ export async function loadAnalyticsWithChunks(
         ...(cursor ? { cursor } : {}),
       } as const;
 
-      let result: { items: Doc<any>[]; cursor?: string | null; isDone: boolean };
+      let result: {
+        items: Doc<any>[];
+        cursor?: string | null;
+        isDone: boolean;
+      };
 
       while (true) {
         try {
@@ -313,8 +334,14 @@ export async function loadAnalyticsWithChunks(
           );
           break;
         } catch (error) {
-          if (isTooManyReadsError(error) && pageSize > MIN_SUPPLEMENTAL_CHUNK_SIZE) {
-            pageSize = Math.max(MIN_SUPPLEMENTAL_CHUNK_SIZE, Math.floor(pageSize / 2));
+          if (
+            isTooManyReadsError(error) &&
+            pageSize > MIN_SUPPLEMENTAL_CHUNK_SIZE
+          ) {
+            pageSize = Math.max(
+              MIN_SUPPLEMENTAL_CHUNK_SIZE,
+              Math.floor(pageSize / 2),
+            );
             supplementalMeta.reduced = true;
             supplementalMeta.pageSize = pageSize;
             continue;
@@ -342,7 +369,9 @@ export async function loadAnalyticsWithChunks(
   }
 
   if (shouldFetch("manualReturnRates")) {
-    const windowStart = Number.isFinite(rangeStartMs) ? rangeStartMs : undefined;
+    const windowStart = Number.isFinite(rangeStartMs)
+      ? rangeStartMs
+      : undefined;
     const windowEnd = Number.isFinite(rangeEndExclusiveMs)
       ? rangeEndExclusiveMs - 1
       : undefined;

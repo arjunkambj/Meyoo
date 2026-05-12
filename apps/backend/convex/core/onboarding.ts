@@ -2,12 +2,21 @@ import { v } from "convex/values";
 import { internal, api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
-import { internalMutation, internalQuery, mutation, query } from "../_generated/server";
+import {
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+} from "../_generated/server";
 import { ensureActiveMembership } from "./membershipHelpers";
 import { getIntegrationStatusForOrg } from "./status";
 import { createJob, PRIORITY } from "../engine/workpool";
 import { findShopifyStoreByDomain, normalizeShopDomain } from "../utils/shop";
-import { getUserAndOrg, requireUserAndOrg, type UserAndOrg } from "../utils/auth";
+import {
+  getUserAndOrg,
+  requireUserAndOrg,
+  type UserAndOrg,
+} from "../utils/auth";
 import { buildDateSpan } from "../utils/date";
 import { getOrgTimeInfo } from "../utils/orgDateRange";
 import { optionalEnv } from "../utils/env";
@@ -37,14 +46,19 @@ const ACTIVE_SYNC_STATUSES = new Set<SyncSessionStatus>([
   "syncing",
 ]);
 
-const ONBOARDING_STEP_NUMBER_VALUES = Object.values(ONBOARDING_STEPS) as OnboardingStepNumber[];
-const ONBOARDING_STEP_KEY_VALUES = Object.values(ONBOARDING_STEP_KEYS) as OnboardingStepKey[];
+const ONBOARDING_STEP_NUMBER_VALUES = Object.values(
+  ONBOARDING_STEPS,
+) as OnboardingStepNumber[];
+const ONBOARDING_STEP_KEY_VALUES = Object.values(
+  ONBOARDING_STEP_KEYS,
+) as OnboardingStepKey[];
 
 const isOnboardingStepNumber = (value: number): value is OnboardingStepNumber =>
   ONBOARDING_STEP_NUMBER_VALUES.includes(value as OnboardingStepNumber);
 
 const isOnboardingStepKey = (value: unknown): value is OnboardingStepKey =>
-  typeof value === "string" && ONBOARDING_STEP_KEY_VALUES.includes(value as OnboardingStepKey);
+  typeof value === "string" &&
+  ONBOARDING_STEP_KEY_VALUES.includes(value as OnboardingStepKey);
 
 const isInitialSyncSession = (session: Doc<"syncSessions">): boolean =>
   session.type === "initial" || session.metadata?.isInitialSync === true;
@@ -176,28 +190,31 @@ const getOnboardingStatusForAuth = async (ctx: QueryCtx, auth: UserAndOrg) => {
   }
 
   const shopifySessionsForStatus = initialShopifySession
-    ? shopifySessions.some((session) => session._id === initialShopifySession._id)
+    ? shopifySessions.some(
+        (session) => session._id === initialShopifySession._id,
+      )
       ? shopifySessions
       : [...shopifySessions, initialShopifySession]
     : shopifySessions;
 
-  const shopifyMetadata = (
-    initialShopifySession?.metadata ??
+  const shopifyMetadata = (initialShopifySession?.metadata ??
     latestShopifySession?.metadata ??
-    {}
-  ) as Record<string, unknown> | undefined;
+    {}) as Record<string, unknown> | undefined;
   const shopifyStages = extractStageFlags(shopifyMetadata);
 
   const shopifyOverall = deriveOverallState(shopifySessionsForStatus);
   const metaOverall = deriveOverallState(metaSessions);
 
   const rawCurrentStep = onboarding.onboardingStep ?? ONBOARDING_STEPS.SHOPIFY;
-  const currentStep: OnboardingStepNumber = isOnboardingStepNumber(rawCurrentStep)
+  const currentStep: OnboardingStepNumber = isOnboardingStepNumber(
+    rawCurrentStep,
+  )
     ? rawCurrentStep
     : ONBOARDING_STEPS.SHOPIFY;
 
   const completedStepsRaw = onboarding.onboardingData?.completedSteps ?? [];
-  const completedSteps: OnboardingStepKey[] = completedStepsRaw.filter(isOnboardingStepKey);
+  const completedSteps: OnboardingStepKey[] =
+    completedStepsRaw.filter(isOnboardingStepKey);
 
   return {
     completed: onboarding.isCompleted || false,
@@ -213,7 +230,8 @@ const getOnboardingStatusForAuth = async (ctx: QueryCtx, auth: UserAndOrg) => {
     analyticsTriggeredAt:
       onboarding.onboardingData?.analyticsTriggeredAt || undefined,
     lastSyncCheckAt: onboarding.onboardingData?.lastSyncCheckAt || undefined,
-    syncCheckAttempts: onboarding.onboardingData?.syncCheckAttempts || undefined,
+    syncCheckAttempts:
+      onboarding.onboardingData?.syncCheckAttempts || undefined,
     syncStatus: {
       shopify: latestShopifySession
         ? {
@@ -315,7 +333,7 @@ export const getOrCreateOnboarding = async (
       updatedAt: Date.now(),
     });
 
-    onboarding = await ctx.db.get(onboardingId);
+    onboarding = await ctx.db.get("onboarding", onboardingId);
   }
 
   return onboarding;
@@ -351,7 +369,7 @@ export const updateBusinessProfile = mutation({
     }
 
     if (args.organizationName !== undefined) {
-      await ctx.db.patch(user.organizationId, {
+      await ctx.db.patch("organizations", user.organizationId, {
         name: args.organizationName,
         updatedAt: Date.now(),
       });
@@ -367,19 +385,20 @@ export const updateBusinessProfile = mutation({
       throw new Error("Failed to get onboarding record");
     }
 
-    await ctx.db.patch(onboarding._id, {
+    await ctx.db.patch("onboarding", onboarding._id, {
       onboardingData: {
         ...onboarding.onboardingData,
         setupDate:
           onboarding.onboardingData?.setupDate || new Date().toISOString(),
         completedSteps: onboarding.onboardingData?.completedSteps || [],
         mobileCountryCode:
-          args.mobileCountryCode ?? onboarding.onboardingData?.mobileCountryCode,
+          args.mobileCountryCode ??
+          onboarding.onboardingData?.mobileCountryCode,
       },
       updatedAt: Date.now(),
     });
 
-    await ctx.db.patch(user._id, userUpdates);
+    await ctx.db.patch("users", user._id, userUpdates);
 
     return { success: true };
   },
@@ -408,11 +427,7 @@ export const updateOnboardingState = mutation({
     const { user, orgId } = await requireUserAndOrg(ctx);
 
     // Get or create onboarding record
-    const onboarding = await getOrCreateOnboarding(
-      ctx,
-      user._id,
-      orgId,
-    );
+    const onboarding = await getOrCreateOnboarding(ctx, user._id, orgId);
 
     if (!onboarding) {
       throw new Error("Failed to get onboarding record");
@@ -457,10 +472,10 @@ export const updateOnboardingState = mutation({
     if (args.isComplete !== undefined) {
       updates.isCompleted = args.isComplete;
       // Also update user's isOnboarded flag
-      await ctx.db.patch(user._id, { isOnboarded: args.isComplete });
+      await ctx.db.patch("users", user._id, { isOnboarded: args.isComplete });
     }
 
-    await ctx.db.patch(onboarding._id, updates);
+    await ctx.db.patch("onboarding", onboarding._id, updates);
 
     // Check if we should trigger analytics
     const shouldTriggerAnalytics =
@@ -502,7 +517,7 @@ export const joinDemoOrganization = mutation({
       };
     }
 
-    const demoOrg = await ctx.db.get(demoOrgId);
+    const demoOrg = await ctx.db.get("organizations", demoOrgId);
     if (!demoOrg) {
       return {
         success: false,
@@ -520,7 +535,7 @@ export const joinDemoOrganization = mutation({
     const now = Date.now();
 
     if (resolvedCurrency !== demoOrg.primaryCurrency) {
-      await ctx.db.patch(demoOrgId, {
+      await ctx.db.patch("organizations", demoOrgId, {
         primaryCurrency: resolvedCurrency,
         updatedAt: now,
       });
@@ -534,13 +549,13 @@ export const joinDemoOrganization = mutation({
       .first();
 
     if (existingMembership && existingMembership.status !== "removed") {
-      await ctx.db.patch(existingMembership._id, {
+      await ctx.db.patch("memberships", existingMembership._id, {
         status: "removed",
         updatedAt: now,
       });
     }
 
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch("users", user._id, {
       organizationId: demoOrgId,
       status: "active",
       isOnboarded: true,
@@ -587,7 +602,7 @@ export const joinDemoOrganization = mutation({
     };
 
     if (onboarding) {
-      await ctx.db.patch(onboarding._id, {
+      await ctx.db.patch("onboarding", onboarding._id, {
         organizationId: demoOrgId,
         onboardingStep: ONBOARDING_STEPS.COMPLETE,
         isCompleted: true,
@@ -690,13 +705,17 @@ export const completeOnboarding = mutation({
     if (onboarding.isInitialSyncComplete !== allSyncsComplete) {
       onboardingPatch.isInitialSyncComplete = allSyncsComplete;
     }
-    onboardingPatch.onboardingData = onboardingData as Doc<"onboarding">["onboardingData"];
+    onboardingPatch.onboardingData =
+      onboardingData as Doc<"onboarding">["onboardingData"];
     onboardingPatch.updatedAt = now;
 
-    await ctx.db.patch(onboarding._id, onboardingPatch);
+    await ctx.db.patch("onboarding", onboarding._id, onboardingPatch);
 
     if (!user.isOnboarded) {
-      await ctx.db.patch(user._id, { isOnboarded: true, updatedAt: now });
+      await ctx.db.patch("users", user._id, {
+        isOnboarded: true,
+        updatedAt: now,
+      });
     }
 
     if (!onboarding.isCompleted) {
@@ -754,7 +773,7 @@ export const finishOnboardingInBackground = internalMutation({
       !existingProfile.nextScheduledSync ||
       existingProfile.nextScheduledSync > kickstartAt
     ) {
-      await ctx.db.patch(existingProfile._id, {
+      await ctx.db.patch("syncProfiles", existingProfile._id, {
         nextScheduledSync: kickstartAt,
         updatedAt: now,
       });
@@ -820,7 +839,8 @@ export const finishOnboardingInBackground = internalMutation({
             dateRange: { daysBack: 60 },
           },
           {
-            onComplete: internal.engine.syncJobs.onInitialSyncComplete as unknown,
+            onComplete: internal.engine.syncJobs
+              .onInitialSyncComplete as unknown,
             context: {
               organizationId: args.organizationId,
               platform,
@@ -846,9 +866,13 @@ export const finishOnboardingInBackground = internalMutation({
         reason: "onboarding_complete",
       },
     );
-    await ctx.scheduler.runAfter(0, internal.core.status.refreshIntegrationStatus, {
-      organizationId: args.organizationId,
-    });
+    await ctx.scheduler.runAfter(
+      0,
+      internal.core.status.refreshIntegrationStatus,
+      {
+        organizationId: args.organizationId,
+      },
+    );
 
     return { syncJobs, syncErrors };
   },
@@ -976,22 +1000,35 @@ export const monitorInitialSyncs = internalMutation({
         timeSinceLastActivity < 2 * 60 * 1000;
 
       if (isActivelySyncing) {
-        console.log(`[MONITOR_CRON] Session still active - last activity ${Math.floor(timeSinceLastActivity / 1000)}s ago`);
+        console.log(
+          `[MONITOR_CRON] Session still active - last activity ${Math.floor(timeSinceLastActivity / 1000)}s ago`,
+        );
         return { finalized: false };
       }
 
       const inactiveMinutes = Math.floor(timeSinceLastActivity / (60 * 1000));
-      console.log(`[MONITOR_CRON] Session inactive for ${Math.floor(timeSinceLastActivity / 1000)}s (${inactiveMinutes} minutes), checking completion criteria...`);
+      console.log(
+        `[MONITOR_CRON] Session inactive for ${Math.floor(timeSinceLastActivity / 1000)}s (${inactiveMinutes} minutes), checking completion criteria...`,
+      );
 
       // Detect stuck sessions: inactive >30min with minimal progress
       const STUCK_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
       if (timeSinceLastActivity > STUCK_TIMEOUT_MS) {
-        const completedBatches = typeof metadata.completedBatches === "number" ? metadata.completedBatches : 0;
-        const totalBatches = typeof metadata.totalBatches === "number" ? metadata.totalBatches : 0;
-        const progressPercent = totalBatches > 0 ? Math.round((completedBatches / totalBatches) * 100) : 0;
+        const completedBatches =
+          typeof metadata.completedBatches === "number"
+            ? metadata.completedBatches
+            : 0;
+        const totalBatches =
+          typeof metadata.totalBatches === "number" ? metadata.totalBatches : 0;
+        const progressPercent =
+          totalBatches > 0
+            ? Math.round((completedBatches / totalBatches) * 100)
+            : 0;
 
         if (progressPercent < 50) {
-          console.log(`[MONITOR_CRON] 🚨 STUCK SESSION DETECTED - Inactive ${inactiveMinutes}min with only ${progressPercent}% progress (${completedBatches}/${totalBatches} batches)`);
+          console.log(
+            `[MONITOR_CRON] 🚨 STUCK SESSION DETECTED - Inactive ${inactiveMinutes}min with only ${progressPercent}% progress (${completedBatches}/${totalBatches} batches)`,
+          );
           return {
             finalized: false,
             shouldFail: true,
@@ -999,7 +1036,9 @@ export const monitorInitialSyncs = internalMutation({
           };
         }
 
-        console.log(`[MONITOR_CRON] Session inactive ${inactiveMinutes}min but has ${progressPercent}% progress - allowing more time`);
+        console.log(
+          `[MONITOR_CRON] Session inactive ${inactiveMinutes}min but has ${progressPercent}% progress - allowing more time`,
+        );
       }
 
       const totalBatches =
@@ -1056,14 +1095,20 @@ export const monitorInitialSyncs = internalMutation({
           stageStatus.customers === "completed",
       );
 
-      console.log(`[MONITOR_CRON] Completion checks: batches=${isBatchesComplete} (${completedBatches}/${totalBatches}), orders=${isOrdersComplete} (${normalizedOrdersProcessed}/${ordersQueued}), stages=${isStagesComplete}`);
+      console.log(
+        `[MONITOR_CRON] Completion checks: batches=${isBatchesComplete} (${completedBatches}/${totalBatches}), orders=${isOrdersComplete} (${normalizedOrdersProcessed}/${ordersQueued}), stages=${isStagesComplete}`,
+      );
 
       if (!isBatchesComplete && !isOrdersComplete && !isStagesComplete) {
-        console.log(`[MONITOR_CRON] Session not ready to finalize - no completion criteria met`);
+        console.log(
+          `[MONITOR_CRON] Session not ready to finalize - no completion criteria met`,
+        );
         return { finalized: false };
       }
 
-      console.log(`[MONITOR_CRON] Session meets completion criteria - finalizing...`);
+      console.log(
+        `[MONITOR_CRON] Session meets completion criteria - finalizing...`,
+      );
 
       const nextMetadata: Record<string, any> = { ...metadata };
 
@@ -1095,14 +1140,11 @@ export const monitorInitialSyncs = internalMutation({
       syncedEntities.add("orders");
       nextMetadata.syncedEntities = Array.from(syncedEntities);
 
-      await ctx.db.patch(session._id, {
+      await ctx.db.patch("syncSessions", session._id, {
         status: "completed",
         completedAt: session.completedAt ?? Date.now(),
         recordsProcessed:
-          recordsProcessed ??
-          normalizedOrdersProcessed ??
-          ordersQueued ??
-          0,
+          recordsProcessed ?? normalizedOrdersProcessed ?? ordersQueued ?? 0,
         metadata: nextMetadata,
       });
 
@@ -1137,7 +1179,7 @@ export const monitorInitialSyncs = internalMutation({
             skipUpdate.analyticsCalculationStatus = "not_started";
           }
 
-          await ctx.db.patch(onboarding._id, skipUpdate as any);
+          await ctx.db.patch("onboarding", onboarding._id, skipUpdate as any);
           skippedCount += 1;
           continue;
         }
@@ -1156,7 +1198,7 @@ export const monitorInitialSyncs = internalMutation({
 
         // Check Shopify connection and sync status
         if (!onboarding.hasShopifyConnection) {
-          await ctx.db.patch(onboarding._id, {
+          await ctx.db.patch("onboarding", onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
             analyticsCalculationStatus: "not_started",
@@ -1179,7 +1221,7 @@ export const monitorInitialSyncs = internalMutation({
             shopifyCompleted = true;
           } else if (finalizeResult.shouldFail) {
             // Session is stuck - mark as failed and trigger analytics anyway
-            await ctx.db.patch(shopifySession._id, {
+            await ctx.db.patch("syncSessions", shopifySession._id, {
               status: "failed",
               completedAt: now,
               metadata: {
@@ -1195,8 +1237,12 @@ export const monitorInitialSyncs = internalMutation({
         }
 
         // Check if Shopify is still syncing (after finalization attempt)
-        if (!shopifyCompleted && !sessionStuckOrFailed && ACTIVE_SYNC_STATUSES.has(shopifyStatus as any)) {
-          await ctx.db.patch(onboarding._id, {
+        if (
+          !shopifyCompleted &&
+          !sessionStuckOrFailed &&
+          ACTIVE_SYNC_STATUSES.has(shopifyStatus as any)
+        ) {
+          await ctx.db.patch("onboarding", onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
             analyticsCalculationStatus: "pending",
@@ -1207,7 +1253,7 @@ export const monitorInitialSyncs = internalMutation({
 
         // Check if Shopify failed
         if (shopifyStatus === "failed" && !shopifyCompleted) {
-          await ctx.db.patch(onboarding._id, {
+          await ctx.db.patch("onboarding", onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
             analyticsCalculationStatus: "failed",
@@ -1217,7 +1263,7 @@ export const monitorInitialSyncs = internalMutation({
 
         // Shopify must be completed at this point
         if (!shopifyCompleted) {
-          await ctx.db.patch(onboarding._id, {
+          await ctx.db.patch("onboarding", onboarding._id, {
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
           });
@@ -1246,7 +1292,7 @@ export const monitorInitialSyncs = internalMutation({
             metaCompleted = metaStatus === "completed";
 
             if (ACTIVE_SYNC_STATUSES.has(metaStatus as any)) {
-              await ctx.db.patch(onboarding._id, {
+              await ctx.db.patch("onboarding", onboarding._id, {
                 lastMonitorCheckAt: now,
                 monitorCheckCount: checkCount,
                 analyticsCalculationStatus: "pending",
@@ -1264,7 +1310,7 @@ export const monitorInitialSyncs = internalMutation({
         // All syncs complete - trigger analytics calculation
         if (shopifyCompleted && metaCompleted) {
           // Mark as calculating
-          await ctx.db.patch(onboarding._id, {
+          await ctx.db.patch("onboarding", onboarding._id, {
             analyticsCalculationStatus: "calculating",
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
@@ -1288,7 +1334,11 @@ export const monitorInitialSyncs = internalMutation({
             dateOptions,
           );
 
-          for (let index = 0; index < dates.length; index += ONBOARDING_ANALYTICS_REBUILD_CHUNK_SIZE) {
+          for (
+            let index = 0;
+            index < dates.length;
+            index += ONBOARDING_ANALYTICS_REBUILD_CHUNK_SIZE
+          ) {
             const chunk = dates.slice(
               index,
               index + ONBOARDING_ANALYTICS_REBUILD_CHUNK_SIZE,
@@ -1317,7 +1367,7 @@ export const monitorInitialSyncs = internalMutation({
             analyticsCount += 1;
           }
 
-          await ctx.db.patch(onboarding._id, {
+          await ctx.db.patch("onboarding", onboarding._id, {
             analyticsCalculationStatus: "completed",
           });
 
@@ -1325,25 +1375,25 @@ export const monitorInitialSyncs = internalMutation({
 
           // Best-effort snapshot refresh
           try {
-            await ctx.runMutation(internal.core.status.refreshIntegrationStatus, {
-              organizationId: orgId,
-            });
+            await ctx.runMutation(
+              internal.core.status.refreshIntegrationStatus,
+              {
+                organizationId: orgId,
+              },
+            );
           } catch (_error) {
             // Best-effort refresh; ignore failures
           }
         }
       } catch (error) {
-        console.error(
-          `[MONITOR_CRON] Org ${orgId}: ERROR during monitoring`,
-          {
-            onboardingId: onboarding._id,
-            error,
-          },
-        );
+        console.error(`[MONITOR_CRON] Org ${orgId}: ERROR during monitoring`, {
+          onboardingId: onboarding._id,
+          error,
+        });
 
         // Mark as failed so we can investigate
         try {
-          await ctx.db.patch(onboarding._id, {
+          await ctx.db.patch("onboarding", onboarding._id, {
             analyticsCalculationStatus: "failed",
             lastMonitorCheckAt: now,
             monitorCheckCount: checkCount,
@@ -1377,7 +1427,8 @@ export const monitorInitialSyncs = internalMutation({
  * Save initial cost setup for historical data
  */
 const ONBOARDING_COST_LOOKBACK_DAYS = 60;
-const ONBOARDING_COST_LOOKBACK_MS = ONBOARDING_COST_LOOKBACK_DAYS * 24 * 60 * 60 * 1000;
+const ONBOARDING_COST_LOOKBACK_MS =
+  ONBOARDING_COST_LOOKBACK_DAYS * 24 * 60 * 60 * 1000;
 const ONBOARDING_ANALYTICS_REBUILD_CHUNK_SIZE = 5;
 
 export const saveInitialCosts = mutation({
@@ -1399,16 +1450,26 @@ export const saveInitialCosts = mutation({
       throw new Error("User has no organization");
     }
 
-    const onboarding = await getOrCreateOnboarding(ctx, user._id, user.organizationId);
+    const onboarding = await getOrCreateOnboarding(
+      ctx,
+      user._id,
+      user.organizationId,
+    );
 
     if (!onboarding) {
       throw new Error("Failed to get onboarding record");
     }
 
     // If step 6 already completed, advance accordingly
-    if (onboarding.onboardingStep === ONBOARDING_STEPS.COSTS && onboarding.isExtraCostSetup) {
+    if (
+      onboarding.onboardingStep === ONBOARDING_STEPS.COSTS &&
+      onboarding.isExtraCostSetup
+    ) {
       const nextStep = ONBOARDING_STEPS.COMPLETE;
-      await ctx.db.patch(onboarding._id, { onboardingStep: nextStep, updatedAt: Date.now() });
+      await ctx.db.patch("onboarding", onboarding._id, {
+        onboardingStep: nextStep,
+        updatedAt: Date.now(),
+      });
       return { success: true, nextStep };
     }
 
@@ -1440,7 +1501,7 @@ export const saveInitialCosts = mutation({
           !existingPerOrder.isDefault;
 
         if (shouldUpdate) {
-          await ctx.db.patch(existingPerOrder._id, {
+          await ctx.db.patch("globalCosts", existingPerOrder._id, {
             calculation: "fixed",
             value: args.shippingCost,
             frequency: "per_order",
@@ -1465,14 +1526,14 @@ export const saveInitialCosts = mutation({
           calculation: "fixed",
           value: args.shippingCost,
           frequency: "per_order",
-        isActive: true,
-        isDefault: true,
-        effectiveFrom: retroactiveEffectiveFrom,
-        createdAt: now,
-        updatedAt: now,
-      } as any);
-      analyticsNeedsRefresh = true;
-    }
+          isActive: true,
+          isDefault: true,
+          effectiveFrom: retroactiveEffectiveFrom,
+          createdAt: now,
+          updatedAt: now,
+        } as any);
+        analyticsNeedsRefresh = true;
+      }
     }
 
     // Create payment fee record if provided
@@ -1480,7 +1541,9 @@ export const saveInitialCosts = mutation({
       const existingPayment = await ctx.db
         .query("globalCosts")
         .withIndex("by_org_and_type", (q) =>
-          q.eq("organizationId", user.organizationId as Id<"organizations">).eq("type", "payment"),
+          q
+            .eq("organizationId", user.organizationId as Id<"organizations">)
+            .eq("type", "payment"),
         )
         .first();
 
@@ -1493,7 +1556,7 @@ export const saveInitialCosts = mutation({
           !existingPayment.isDefault;
 
         if (shouldUpdate) {
-          await ctx.db.patch(existingPayment._id, {
+          await ctx.db.patch("globalCosts", existingPayment._id, {
             calculation: "percentage",
             value: args.paymentFeePercent,
             frequency: "percentage",
@@ -1518,14 +1581,14 @@ export const saveInitialCosts = mutation({
           calculation: "percentage",
           value: args.paymentFeePercent,
           frequency: "percentage",
-        isActive: true,
-        isDefault: true,
-        effectiveFrom: retroactiveEffectiveFrom,
-        createdAt: now,
-        updatedAt: now,
-      } as any);
-      analyticsNeedsRefresh = true;
-    }
+          isActive: true,
+          isDefault: true,
+          effectiveFrom: retroactiveEffectiveFrom,
+          createdAt: now,
+          updatedAt: now,
+        } as any);
+        analyticsNeedsRefresh = true;
+      }
     }
 
     // Create operating costs record if provided
@@ -1549,7 +1612,7 @@ export const saveInitialCosts = mutation({
           !existingOp.isDefault;
 
         if (shouldUpdate) {
-          await ctx.db.patch(existingOp._id, {
+          await ctx.db.patch("globalCosts", existingOp._id, {
             calculation: "fixed",
             value: args.operatingCosts,
             frequency: "monthly",
@@ -1574,23 +1637,24 @@ export const saveInitialCosts = mutation({
           calculation: "fixed",
           value: args.operatingCosts,
           frequency: "monthly",
-        isActive: true,
-        isDefault: true,
-        effectiveFrom: retroactiveEffectiveFrom,
-        createdAt: now,
-        updatedAt: now,
-      } as any);
-      analyticsNeedsRefresh = true;
-    }
+          isActive: true,
+          isDefault: true,
+          effectiveFrom: retroactiveEffectiveFrom,
+          createdAt: now,
+          updatedAt: now,
+        } as any);
+        analyticsNeedsRefresh = true;
+      }
     }
 
     // Update onboarding record without moving backwards.
     // If the user is at or beyond the COSTS step, advance to COMPLETE; otherwise keep current step.
-    const advanceToComplete = (onboarding.onboardingStep || 1) >= ONBOARDING_STEPS.COSTS;
+    const advanceToComplete =
+      (onboarding.onboardingStep || 1) >= ONBOARDING_STEPS.COSTS;
     const actualNextStep = advanceToComplete
       ? ONBOARDING_STEPS.COMPLETE
-      : (onboarding.onboardingStep || ONBOARDING_STEPS.MARKETING);
-    await ctx.db.patch(onboarding._id, {
+      : onboarding.onboardingStep || ONBOARDING_STEPS.MARKETING;
+    await ctx.db.patch("onboarding", onboarding._id, {
       isExtraCostSetup: true,
       onboardingStep: actualNextStep,
       updatedAt: Date.now(),
@@ -1613,11 +1677,15 @@ export const saveInitialCosts = mutation({
     }
 
     if (analyticsNeedsRefresh) {
-      await ctx.scheduler.runAfter(0, internal.engine.analytics.calculateAnalytics, {
-        organizationId: user.organizationId,
-        dateRange: { daysBack: 90 },
-        syncType: "incremental",
-      });
+      await ctx.scheduler.runAfter(
+        0,
+        internal.engine.analytics.calculateAnalytics,
+        {
+          organizationId: user.organizationId,
+          dateRange: { daysBack: 90 },
+          syncType: "incremental",
+        },
+      );
     }
 
     // production: avoid noisy onboarding logs
@@ -1686,12 +1754,15 @@ export const connectShopifyStore = mutation({
         if (
           existingStore.organizationId &&
           user.organizationId &&
-          existingStore.organizationId !== (user.organizationId as Id<"organizations">)
+          existingStore.organizationId !==
+            (user.organizationId as Id<"organizations">)
         ) {
-          throw new Error("This Shopify store is already connected to another organization.");
+          throw new Error(
+            "This Shopify store is already connected to another organization.",
+          );
         }
         // Reactivate existing store
-        await ctx.db.patch(existingStore._id, {
+        await ctx.db.patch("shopifyStores", existingStore._id, {
           organizationId: user.organizationId,
           accessToken: args.accessToken,
           scope: args.scope,
@@ -1718,9 +1789,9 @@ export const connectShopifyStore = mutation({
 
       if (user.organizationId) {
         const orgId = user.organizationId as Id<"organizations">;
-        const orgDoc = await ctx.db.get(orgId);
+        const orgDoc = await ctx.db.get("organizations", orgId);
         if (!orgDoc || orgDoc.primaryCurrency !== currency) {
-          await ctx.db.patch(orgId, {
+          await ctx.db.patch("organizations", orgId, {
             primaryCurrency: currency,
             updatedAt: Date.now(),
           });
@@ -1738,13 +1809,12 @@ export const connectShopifyStore = mutation({
       if (billingRecord) {
         const now = Date.now();
         const needsTrialInit =
-          !billingRecord.trialStartDate ||
-          billingRecord.hasTrialExpired;
+          !billingRecord.trialStartDate || billingRecord.hasTrialExpired;
 
         if (needsTrialInit) {
           const trialEndDate = now + 28 * 24 * 60 * 60 * 1000;
 
-          await ctx.db.patch(billingRecord._id, {
+          await ctx.db.patch("billing", billingRecord._id, {
             trialStartDate: now,
             trialEndDate,
             trialEndsAt: trialEndDate,
@@ -1767,12 +1837,19 @@ export const connectShopifyStore = mutation({
       try {
         const tz = args.shopData?.timezone;
         if (tz && isIanaTimeZone(tz) && user.organizationId) {
-          const org = await ctx.db.get(user.organizationId as Id<"organizations">);
+          const org = await ctx.db.get(
+            "organizations",
+            user.organizationId as Id<"organizations">,
+          );
           if (!org || org.timezone !== tz) {
-            await ctx.db.patch(user.organizationId as Id<"organizations">, {
-              timezone: tz,
-              updatedAt: Date.now(),
-            });
+            await ctx.db.patch(
+              "organizations",
+              user.organizationId as Id<"organizations">,
+              {
+                timezone: tz,
+                updatedAt: Date.now(),
+              },
+            );
           }
         }
       } catch (e) {
@@ -1833,7 +1910,7 @@ export const connectShopifyStore = mutation({
         updatedAt: Date.now(),
       };
 
-      await ctx.db.patch(onboarding._id, onboardingUpdates);
+      await ctx.db.patch("onboarding", onboarding._id, onboardingUpdates);
 
       console.log(
         `[ONBOARDING] Successfully connected Shopify store for ${user.email}. Sync will be triggered by callback.`,
@@ -1895,14 +1972,16 @@ export const markAnalyticsCompleted = internalMutation({
     jobCount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const existing = await ctx.db.get(args.onboardingId);
+    const existing = await ctx.db.get("onboarding", args.onboardingId);
 
     if (!existing) {
-      console.warn(`[ONBOARDING] Cannot mark analytics completed - onboarding ${args.onboardingId} not found`);
+      console.warn(
+        `[ONBOARDING] Cannot mark analytics completed - onboarding ${args.onboardingId} not found`,
+      );
       return;
     }
 
-    await ctx.db.patch(args.onboardingId, {
+    await ctx.db.patch("onboarding", args.onboardingId, {
       analyticsCalculationStatus: "completed",
       lastMonitorCheckAt: Date.now(),
       onboardingData: {

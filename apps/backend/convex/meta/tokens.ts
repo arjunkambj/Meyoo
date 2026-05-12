@@ -33,7 +33,9 @@ export async function exchangeForLongLivedUserToken(
   if (!res.ok) {
     const text = await res.text();
     logger.error("Meta token exchange failed", new Error(text));
-    throw new Error(`Meta token exchange failed: ${res.status} ${res.statusText}`);
+    throw new Error(
+      `Meta token exchange failed: ${res.status} ${res.statusText}`,
+    );
   }
 
   const data = (await res.json()) as MetaTokenExchangeResponse;

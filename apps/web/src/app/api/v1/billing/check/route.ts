@@ -55,16 +55,18 @@ export async function GET(req: NextRequest) {
 
     const billingResult = await checkBillingStatus(session);
 
-      const res = NextResponse.json({
-        hasActivePayment: billingResult.hasActivePayment,
-        shop,
-      });
-      res.headers.set("X-Request-Id", requestId);
-      if (userTag) res.headers.set("X-User-Tag", userTag);
-      return res;
+    const res = NextResponse.json({
+      hasActivePayment: billingResult.hasActivePayment,
+      shop,
+    });
+    res.headers.set("X-Request-Id", requestId);
+    if (userTag) res.headers.set("X-User-Tag", userTag);
+    return res;
   } catch (error) {
     const requestId = genRequestId(req);
-    logger.error("Error checking billing status", error as Error, { requestId });
+    logger.error("Error checking billing status", error as Error, {
+      requestId,
+    });
     const res = NextResponse.json(
       { error: "Failed to check billing status", requestId },
       { status: 500 },

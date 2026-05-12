@@ -1,4 +1,3 @@
-
 import type { Doc } from "../_generated/dataModel";
 
 export const toOptionalString = (value: unknown): string | undefined => {
@@ -40,22 +39,25 @@ const ORDER_COMPARE_FIELDS: ReadonlyArray<keyof Doc<"shopifyOrders">> = [
   "shippingAddress",
 ];
 
-const LINE_ITEM_COMPARE_FIELDS: ReadonlyArray<keyof Doc<"shopifyOrderItems">> = [
-  "shopifyProductId",
-  "shopifyVariantId",
-  "productId",
-  "variantId",
-  "title",
-  "variantTitle",
-  "sku",
-  "quantity",
-  "price",
-  "totalDiscount",
-  "fulfillableQuantity",
-  "fulfillmentStatus",
-];
+const LINE_ITEM_COMPARE_FIELDS: ReadonlyArray<keyof Doc<"shopifyOrderItems">> =
+  [
+    "shopifyProductId",
+    "shopifyVariantId",
+    "productId",
+    "variantId",
+    "title",
+    "variantTitle",
+    "sku",
+    "quantity",
+    "price",
+    "totalDiscount",
+    "fulfillableQuantity",
+    "fulfillmentStatus",
+  ];
 
-const TRANSACTION_COMPARE_FIELDS: ReadonlyArray<keyof Doc<"shopifyTransactions">> = [
+const TRANSACTION_COMPARE_FIELDS: ReadonlyArray<
+  keyof Doc<"shopifyTransactions">
+> = [
   "orderId",
   "shopifyOrderId",
   "kind",

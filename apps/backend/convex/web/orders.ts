@@ -4,7 +4,11 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { action, query } from "../_generated/server";
 import { api } from "../_generated/api";
 import { dateRangeValidator } from "./analyticsShared";
-import { validateDateRange, getRangeEndExclusiveMs, getRangeStartMs } from "../utils/analyticsSource";
+import {
+  validateDateRange,
+  getRangeEndExclusiveMs,
+  getRangeStartMs,
+} from "../utils/analyticsSource";
 import { getUserAndOrg } from "../utils/auth";
 import {
   DEFAULT_JOURNEY_STAGES,
@@ -37,13 +41,16 @@ type OrdersScanCursor = {
 
 const isPresentShopifyId = (value: string) => {
   const normalized = value.trim().toLowerCase();
-  return normalized !== "" && normalized !== "undefined" && normalized !== "null";
+  return (
+    normalized !== "" && normalized !== "undefined" && normalized !== "null"
+  );
 };
 
 const isDisplayableOrder = (order: Doc<"shopifyOrders">) =>
   isPresentShopifyId(order.shopifyId) &&
-  [order.orderNumber, order.name]
-    .some((value) => value.trim().replace(/^#$/, "").length > 0);
+  [order.orderNumber, order.name].some(
+    (value) => value.trim().replace(/^#$/, "").length > 0,
+  );
 
 function matchesStatusFilter(
   order: Doc<"shopifyOrders">,
@@ -243,13 +250,13 @@ const safeNumber = (value: number | null | undefined): number =>
   typeof value === "number" && Number.isFinite(value) ? value : 0;
 
 function buildInsightsKpis(
-  metrics: OrdersOverviewMetrics | null
+  metrics: OrdersOverviewMetrics | null,
 ): OrdersInsightsKPIs | null {
   if (!metrics) return null;
 
   const withChange = (
     value: number | null | undefined,
-    change: number | null | undefined
+    change: number | null | undefined,
   ): MetricWithChange => ({
     value: safeNumber(value),
     change: safeNumber(change),
@@ -260,15 +267,15 @@ function buildInsightsKpis(
     repeatRate: withChange(metrics.repeatRate, metrics.changes.repeatRate),
     rtoRevenueLoss: withChange(
       metrics.rtoRevenueLoss,
-      metrics.changes.rtoRevenueLoss
+      metrics.changes.rtoRevenueLoss,
     ),
     abandonedCustomers: withChange(
       metrics.abandonedCustomers,
-      metrics.changes.abandonedCustomers
+      metrics.changes.abandonedCustomers,
     ),
     fulfillmentRate: withChange(
       metrics.fulfillmentRate,
-      metrics.changes.fulfillmentRate
+      metrics.changes.fulfillmentRate,
     ),
   };
 }
@@ -282,7 +289,7 @@ function computeCancelRate(metrics: OrdersOverviewMetrics | null): number {
 }
 
 function computeFulfillmentMetricsFromOverview(
-  dailyOverview: DailyMetricsOverview | null
+  dailyOverview: DailyMetricsOverview | null,
 ): OrdersFulfillmentMetrics {
   if (!dailyOverview) {
     return { ...ZERO_FULFILLMENT_METRICS };
@@ -484,14 +491,14 @@ export const getOrdersAnalytics = query({
     const requestedSize = args.pageSize ?? DEFAULT_ORDERS_PAGE_SIZE;
     const pageSize = Math.max(
       MIN_ORDERS_PAGE_SIZE,
-      Math.min(requestedSize, MAX_ORDERS_PAGE_SIZE)
+      Math.min(requestedSize, MAX_ORDERS_PAGE_SIZE),
     );
     const desiredStartIndex = (requestedPage - 1) * pageSize;
 
     const overviewPromise = loadOverviewFromDailyMetrics(
       ctx,
       auth.orgId as Id<"organizations">,
-      range
+      range,
     );
 
     const rangeStartMs = getRangeStartMs(range);
@@ -506,7 +513,10 @@ export const getOrdersAnalytics = query({
       ctx.db
         .query("shopifyOrders")
         .withIndex("by_org_created_shopifyId", (q) => {
-          const base = q.eq("organizationId", auth.orgId as Id<"organizations">);
+          const base = q.eq(
+            "organizationId",
+            auth.orgId as Id<"organizations">,
+          );
 
           if (!cursor) {
             return base
@@ -580,7 +590,9 @@ export const getOrdersAnalytics = query({
 
       if (pageCustomerIds.length > 0) {
         const customerDocs = await Promise.all(
-          pageCustomerIds.map((id) => ctx.db.get(id as Id<"shopifyCustomers">)),
+          pageCustomerIds.map((id) =>
+            ctx.db.get("shopifyCustomers", id as Id<"shopifyCustomers">),
+          ),
         );
         pageCustomerIds.forEach((id, index) => {
           customerCache.set(id, customerDocs[index] ?? null);
@@ -588,7 +600,9 @@ export const getOrdersAnalytics = query({
       }
 
       const filtered = page.filter((order) => {
-        const customerKey = order.customerId ? (order.customerId as string) : null;
+        const customerKey = order.customerId
+          ? (order.customerId as string)
+          : null;
         let customerDoc: Doc<"shopifyCustomers"> | null | undefined = null;
         if (customerKey) {
           customerDoc = customerCache.get(customerKey) ?? null;
@@ -658,10 +672,13 @@ export const getOrdersAnalytics = query({
     const averageProfitPerOrder = totalProfit / totalOrderCount;
     const averageTaxPerOrder = totalTaxes / totalOrderCount;
     const averageShippingPerOrder = totalShippingCost / totalOrderCount;
-    const averageProfitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+    const averageProfitMargin =
+      totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
 
     const analyticsOrders = matchedOrders.map((order) => {
-      const customerKey = order.customerId ? (order.customerId as string) : null;
+      const customerKey = order.customerId
+        ? (order.customerId as string)
+        : null;
       let customerDoc: Doc<"shopifyCustomers"> | null | undefined = null;
       if (customerKey) {
         customerDoc = customerCache.get(customerKey) ?? null;
@@ -681,16 +698,14 @@ export const getOrdersAnalytics = query({
       ? totalFiltered
       : desiredStartIndex + analyticsOrders.length;
     const estimatedTotal =
-      hasMoreMatches || !lastPageIsDone
-        ? knownTotal + pageSize
-        : knownTotal;
+      hasMoreMatches || !lastPageIsDone ? knownTotal + pageSize : knownTotal;
     const totalPages = Math.max(1, Math.ceil(estimatedTotal / pageSize));
     const resolvedPage =
       analyticsOrders.length > 0
         ? Math.min(requestedPage, totalPages)
         : Math.min(
             Math.max(1, Math.ceil(knownTotal / Math.max(pageSize, 1))),
-            totalPages
+            totalPages,
           );
 
     return {
@@ -733,7 +748,7 @@ export const getOrdersInsights = query({
       loadOverviewFromDailyMetrics(
         ctx,
         auth.orgId as Id<"organizations">,
-        range
+        range,
       ),
       loadCustomerJourneyStages(ctx, auth.orgId as Id<"organizations">, range),
     ]);
@@ -743,7 +758,9 @@ export const getOrdersInsights = query({
     const cancelRate = computeCancelRate(metrics);
     const returnRate =
       dailyOverview && dailyOverview.aggregates.orders > 0
-        ? (dailyOverview.aggregates.returnedOrders / dailyOverview.aggregates.orders) * 100
+        ? (dailyOverview.aggregates.returnedOrders /
+            dailyOverview.aggregates.orders) *
+          100
         : 0;
 
     return {
@@ -761,7 +778,7 @@ const analyticsActionReturns = v.union(
     dateRange: dateRangeValidator,
     organizationId: v.string(),
     result: v.optional(v.any()),
-  })
+  }),
 );
 
 type OrdersAnalyticsActionPayload = {

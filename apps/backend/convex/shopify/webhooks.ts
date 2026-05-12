@@ -1,4 +1,3 @@
-
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
@@ -33,7 +32,7 @@ export const webhooks = {
             {
               organizationId,
               orders: [payload],
-            }
+            },
           );
           break;
 
@@ -51,7 +50,7 @@ export const webhooks = {
               orderId: String(orderIdentifier),
               financialStatus: "cancelled",
               fulfillmentStatus: "cancelled",
-            }
+            },
           );
           break;
         }
@@ -86,7 +85,7 @@ export const webhooks = {
             {
               organizationId,
               products: [payload],
-            }
+            },
           );
           break;
 
@@ -98,7 +97,7 @@ export const webhooks = {
             .first();
 
           if (product) {
-            await ctx.db.patch(product._id, {
+            await ctx.db.patch("shopifyProducts", product._id, {
               status: "deleted",
               syncedAt: Date.now(),
             });
@@ -133,7 +132,7 @@ export const webhooks = {
         {
           organizationId,
           customers: [payload],
-        }
+        },
       );
 
       return null;
@@ -186,7 +185,7 @@ export const webhooks = {
               lineItemId: item.line_item_id,
               quantity: item.quantity,
               subtotal: parseFloat(item.subtotal || "0"),
-            })
+            }),
           ) || [],
         shopifyCreatedAt: payload.created_at,
         processedAt: payload.processed_at,
@@ -209,7 +208,7 @@ export const webhooks = {
         internal.shopify.lifecycle.handleAppUninstallInternal,
         {
           shopDomain: args.shopDomain,
-        }
+        },
       );
 
       return null;
@@ -242,7 +241,7 @@ export const webhooks = {
         const customer = await ctx.db
           .query("shopifyCustomers")
           .withIndex("by_shopify_id_store", (q) =>
-            q.eq("shopifyId", args.customerId).eq("storeId", store._id)
+            q.eq("shopifyId", args.customerId).eq("storeId", store._id),
           )
           .first();
 
@@ -321,12 +320,12 @@ export const webhooks = {
         const customer = await ctx.db
           .query("shopifyCustomers")
           .withIndex("by_shopify_id_store", (q) =>
-            q.eq("shopifyId", args.customerId).eq("storeId", store._id)
+            q.eq("shopifyId", args.customerId).eq("storeId", store._id),
           )
           .first();
 
         if (customer) {
-          await ctx.db.patch(customer._id, {
+          await ctx.db.patch("shopifyCustomers", customer._id, {
             // Redact personal information
             email: "[REDACTED]",
             firstName: "[REDACTED]",
@@ -350,7 +349,7 @@ export const webhooks = {
           : [];
 
         for (const order of orders) {
-          await ctx.db.patch(order._id, {
+          await ctx.db.patch("shopifyOrders", order._id, {
             // Redact personal information
             email: "[REDACTED]",
             shippingAddress: {
@@ -424,7 +423,7 @@ export const webhooks = {
         }
 
         // Mark store as uninstalled and redacted
-        await ctx.db.patch(store._id, {
+        await ctx.db.patch("shopifyStores", store._id, {
           isActive: false,
           uninstalledAt: Date.now(),
         });
@@ -435,12 +434,12 @@ export const webhooks = {
           .withIndex("by_org_and_platform", (q) =>
             q
               .eq("organizationId", store.organizationId as Id<"organizations">)
-              .eq("platform", "shopify")
+              .eq("platform", "shopify"),
           )
           .collect();
 
         for (const session of sessions) {
-          await ctx.db.patch(session._id, {
+          await ctx.db.patch("integrationSessions", session._id, {
             isActive: false,
           });
         }

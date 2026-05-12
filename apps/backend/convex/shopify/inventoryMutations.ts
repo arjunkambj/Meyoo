@@ -1,4 +1,3 @@
-
 import { v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import { internalMutation } from "../_generated/server";
@@ -18,7 +17,7 @@ export const updateInventoryLevelInternal = internalMutation({
     const _products = await ctx.db
       .query("shopifyProducts")
       .withIndex("by_organization", (q) =>
-        q.eq("organizationId", args.organizationId as Id<"organizations">)
+        q.eq("organizationId", args.organizationId as Id<"organizations">),
       )
       .collect();
 

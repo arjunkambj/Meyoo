@@ -2,7 +2,7 @@ import type {
   AnalyticsSourceData,
   AnalyticsSourceResponse,
   MetricValue,
-} from '@repo/types';
+} from "@repo/types";
 
 type DatasetResponse<T> = AnalyticsSourceResponse<T> | null | undefined;
 
@@ -10,16 +10,22 @@ export type AnyRecord = Record<string, unknown>;
 
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
-export function filterAccountLevelMetaInsights(metaInsights: AnyRecord[]): AnyRecord[] {
+export function filterAccountLevelMetaInsights(
+  metaInsights: AnyRecord[],
+): AnyRecord[] {
   return metaInsights.filter((insight) => {
-    const entityType = typeof insight?.entityType === 'string'
-      ? insight.entityType.toLowerCase()
-      : null;
-    return entityType === null || entityType === 'account';
+    const entityType =
+      typeof insight?.entityType === "string"
+        ? insight.entityType.toLowerCase()
+        : null;
+    return entityType === null || entityType === "account";
   });
 }
 
-export function parseDateBoundary(value: string | undefined, end = false): number {
+export function parseDateBoundary(
+  value: string | undefined,
+  end = false,
+): number {
   if (!value) {
     const now = new Date();
     if (end) {
@@ -30,8 +36,8 @@ export function parseDateBoundary(value: string | undefined, end = false): numbe
     return now.getTime();
   }
 
-  const suffix = end ? 'T23:59:59.999Z' : 'T00:00:00.000Z';
-  const normalized = value.includes('T') ? value : `${value}${suffix}`;
+  const suffix = end ? "T23:59:59.999Z" : "T00:00:00.000Z";
+  const normalized = value.includes("T") ? value : `${value}${suffix}`;
   const parsed = Date.parse(normalized);
   if (Number.isNaN(parsed)) {
     const fallback = new Date();
@@ -47,36 +53,40 @@ export function parseDateBoundary(value: string | undefined, end = false): numbe
 
 export function getFrequencyDurationMs(cost: AnyRecord): number | null {
   const rawFrequency = String(
-    cost.frequency ?? cost.recurrence ?? cost.intervalUnit ?? cost.interval ?? '',
+    cost.frequency ??
+      cost.recurrence ??
+      cost.intervalUnit ??
+      cost.interval ??
+      "",
   ).toLowerCase();
 
   switch (rawFrequency) {
-    case 'day':
-    case 'daily':
+    case "day":
+    case "daily":
       return DAY_MS;
-    case 'week':
-    case 'weekly':
+    case "week":
+    case "weekly":
       return 7 * DAY_MS;
-    case 'biweekly':
-    case 'fortnight':
-    case 'fortnightly':
+    case "biweekly":
+    case "fortnight":
+    case "fortnightly":
       return 14 * DAY_MS;
-    case 'month':
-    case 'monthly':
+    case "month":
+    case "monthly":
       return 30 * DAY_MS;
-    case 'bimonthly':
+    case "bimonthly":
       return 60 * DAY_MS;
-    case 'quarter':
-    case 'quarterly':
+    case "quarter":
+    case "quarterly":
       return 91 * DAY_MS;
-    case 'semiannual':
-    case 'semiannually':
-    case 'biannual':
+    case "semiannual":
+    case "semiannually":
+    case "biannual":
       return 182 * DAY_MS;
-    case 'year':
-    case 'yearly':
-    case 'annual':
-    case 'annually':
+    case "year":
+    case "yearly":
+    case "annual":
+    case "annually":
       return 365 * DAY_MS;
     default:
       return null;
@@ -112,10 +122,10 @@ export function computeCostOverlap(
 }
 
 export function safeNumber(value: unknown): number {
-  if (typeof value === 'number' && Number.isFinite(value)) {
+  if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     const trimmed = value.trim();
     if (trimmed.length === 0) return 0;
     const parsed = Number(trimmed);
@@ -124,22 +134,31 @@ export function safeNumber(value: unknown): number {
   return 0;
 }
 
-export function sumBy<T>(items: T[] | undefined, getter: (item: T) => number): number {
+export function sumBy<T>(
+  items: T[] | undefined,
+  getter: (item: T) => number,
+): number {
   if (!items?.length) return 0;
   return items.reduce((total, item) => total + getter(item), 0);
 }
 
 export function toStringId(value: unknown): string {
-  if (typeof value === 'string') return value;
-  if (value && typeof value === 'object') {
-    if ('id' in (value as AnyRecord) && typeof (value as AnyRecord).id === 'string') {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    if (
+      "id" in (value as AnyRecord) &&
+      typeof (value as AnyRecord).id === "string"
+    ) {
       return (value as AnyRecord).id as string;
     }
-    if ('_id' in (value as AnyRecord) && typeof (value as AnyRecord)._id === 'string') {
+    if (
+      "_id" in (value as AnyRecord) &&
+      typeof (value as AnyRecord)._id === "string"
+    ) {
       return (value as AnyRecord)._id as string;
     }
   }
-  return String(value ?? '');
+  return String(value ?? "");
 }
 
 export function ensureDataset<T = AnyRecord>(
@@ -149,9 +168,13 @@ export function ensureDataset<T = AnyRecord>(
   return (response.data ?? {}) as AnalyticsSourceData<T>;
 }
 
-export function defaultMetric(value = 0, change = 0, previousValue?: number): MetricValue {
+export function defaultMetric(
+  value = 0,
+  change = 0,
+  previousValue?: number,
+): MetricValue {
   const metric: MetricValue = { value, change };
-  if (typeof previousValue === 'number' && Number.isFinite(previousValue)) {
+  if (typeof previousValue === "number" && Number.isFinite(previousValue)) {
     metric.previousValue = previousValue;
   }
   return metric;
@@ -220,13 +243,19 @@ export function resolveManualReturnRate(
     if (activeFlag === false) {
       const from = safeNumber(entry.effectiveFrom ?? entry.createdAt ?? 0);
       const toRaw = entry.effectiveTo;
-      const to = toRaw === undefined || toRaw === null ? Number.POSITIVE_INFINITY : safeNumber(toRaw);
+      const to =
+        toRaw === undefined || toRaw === null
+          ? Number.POSITIVE_INFINITY
+          : safeNumber(toRaw);
       return overlapsWindow(from, to, window) && window !== undefined;
     }
 
     const from = safeNumber(entry.effectiveFrom ?? entry.createdAt ?? 0);
     const toRaw = entry.effectiveTo;
-    const to = toRaw === undefined || toRaw === null ? Number.POSITIVE_INFINITY : safeNumber(toRaw);
+    const to =
+      toRaw === undefined || toRaw === null
+        ? Number.POSITIVE_INFINITY
+        : safeNumber(toRaw);
     return overlapsWindow(from, to, window);
   });
 
@@ -235,13 +264,19 @@ export function resolveManualReturnRate(
   }
 
   filtered.sort((a, b) => {
-    const aTimestamp = safeNumber(a.updatedAt ?? a.effectiveFrom ?? a.createdAt ?? 0);
-    const bTimestamp = safeNumber(b.updatedAt ?? b.effectiveFrom ?? b.createdAt ?? 0);
+    const aTimestamp = safeNumber(
+      a.updatedAt ?? a.effectiveFrom ?? a.createdAt ?? 0,
+    );
+    const bTimestamp = safeNumber(
+      b.updatedAt ?? b.effectiveFrom ?? b.createdAt ?? 0,
+    );
     return bTimestamp - aTimestamp;
   });
 
   const selected = filtered[0]!;
-  const rawRate = safeNumber(selected.ratePercent ?? selected.rate ?? selected.value ?? 0);
+  const rawRate = safeNumber(
+    selected.ratePercent ?? selected.rate ?? selected.value ?? 0,
+  );
   return { ratePercent: clampPercentage(rawRate) };
 }
 

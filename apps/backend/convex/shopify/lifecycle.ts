@@ -1,4 +1,3 @@
-
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
@@ -19,11 +18,11 @@ export const handleAppUninstallInternal = internalMutation({
     const store = await findShopifyStoreByDomain(ctx.db, args.shopDomain);
 
     if (store) {
-      await ctx.db.patch(store._id, {
+      await ctx.db.patch("shopifyStores", store._id, {
         isActive: false,
         uninstalledAt: Date.now(),
       });
-      
+
       logger.info("Marked Shopify store as inactive", {
         storeId: store._id,
         shopDomain: args.shopDomain,
@@ -38,7 +37,6 @@ export const handleAppUninstallInternal = internalMutation({
     return null;
   },
 });
-
 
 export const handleAppUninstalled = internalMutation({
   args: {
@@ -64,31 +62,29 @@ export const handleAppUninstalled = internalMutation({
       const users = await ctx.db
         .query("users")
         .withIndex("by_organization", (q) =>
-          q.eq("organizationId", organizationId)
+          q.eq("organizationId", organizationId),
         )
         .collect();
 
       for (const user of users) {
         const uninstallTimestamp = Date.now();
-          const onboardingResetData = {
-            completedSteps: [],
-            setupDate: new Date(uninstallTimestamp).toISOString(),
-          };
+        const onboardingResetData = {
+          completedSteps: [],
+          setupDate: new Date(uninstallTimestamp).toISOString(),
+        };
 
         try {
           // Mark existing memberships as removed so the user no longer belongs to the org
           const memberships = await ctx.db
             .query("memberships")
             .withIndex("by_org_user", (q) =>
-              q
-                .eq("organizationId", organizationId)
-                .eq("userId", user._id),
+              q.eq("organizationId", organizationId).eq("userId", user._id),
             )
             .collect();
 
           for (const membership of memberships) {
             if (membership.status !== "removed") {
-              await ctx.db.patch(membership._id, {
+              await ctx.db.patch("memberships", membership._id, {
                 status: "removed",
                 updatedAt: uninstallTimestamp,
               });
@@ -101,12 +97,15 @@ export const handleAppUninstalled = internalMutation({
             .withIndex("by_user_organization", (q) =>
               q
                 .eq("userId", user._id)
-                .eq("organizationId", user.organizationId as Id<"organizations">),
+                .eq(
+                  "organizationId",
+                  user.organizationId as Id<"organizations">,
+                ),
             )
             .first();
 
           if (onboarding) {
-            await ctx.db.patch(onboarding._id, {
+            await ctx.db.patch("onboarding", onboarding._id, {
               hasShopifyConnection: false,
               hasShopifySubscription: false,
               hasMetaConnection: false,
@@ -145,7 +144,7 @@ export const handleAppUninstalled = internalMutation({
           });
 
           // Record uninstall timestamp on the user for audit purposes
-          await ctx.db.patch(user._id, {
+          await ctx.db.patch("users", user._id, {
             appDeletedAt: uninstallTimestamp,
             updatedAt: Date.now(),
           });
@@ -163,9 +162,9 @@ export const handleAppUninstalled = internalMutation({
       }
 
       // STEP 2: RESET ORGANIZATION STATE
-      const organization = await ctx.db.get(organizationId);
+      const organization = await ctx.db.get("organizations", organizationId);
       if (organization) {
-        await ctx.db.patch(organization._id, {
+        await ctx.db.patch("organizations", organization._id, {
           isPremium: false,
           updatedAt: Date.now(),
         });
@@ -174,12 +173,12 @@ export const handleAppUninstalled = internalMutation({
         const billingRecord = await ctx.db
           .query("billing")
           .withIndex("by_organization", (q) =>
-            q.eq("organizationId", organization._id)
+            q.eq("organizationId", organization._id),
           )
           .first();
 
         if (billingRecord) {
-          await ctx.db.delete(billingRecord._id);
+          await ctx.db.delete("billing", billingRecord._id);
         }
       }
 
@@ -195,7 +194,7 @@ export const handleAppUninstalled = internalMutation({
       const stores = await ctx.db
         .query("shopifyStores")
         .withIndex("by_organization", (q) =>
-          q.eq("organizationId", organizationId)
+          q.eq("organizationId", organizationId),
         )
         .collect();
 

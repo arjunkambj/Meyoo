@@ -90,7 +90,7 @@ export const shopifyOrders = defineTable({
       province: v.optional(v.string()),
       city: v.optional(v.string()),
       zip: v.optional(v.string()),
-    })
+    }),
   ),
 
   // Tags and notes
@@ -195,6 +195,15 @@ export const shopifyProductVariants = defineTable({
   organizationId: v.id("organizations"),
   productId: v.id("shopifyProducts"),
 
+  // Denormalized product fields for bounded list/search reads
+  productTitle: v.string(),
+  productHandle: v.optional(v.string()),
+  productVendor: v.optional(v.string()),
+  productType: v.optional(v.string()),
+  productStatus: v.string(),
+  productImage: v.optional(v.string()),
+  searchText: v.string(),
+
   // Identifiers
   shopifyId: v.string(),
   shopifyProductId: v.string(),
@@ -240,7 +249,11 @@ export const shopifyProductVariants = defineTable({
   .index("by_sku", ["sku"])
   .index("by_barcode", ["barcode"])
   .index("by_organization", ["organizationId"])
-  .index("by_inventory_item", ["organizationId", "inventoryItemId"]);
+  .index("by_inventory_item", ["organizationId", "inventoryItemId"])
+  .searchIndex("search_text", {
+    searchField: "searchText",
+    filterFields: ["organizationId"],
+  });
 
 // Shopify customers
 export const shopifyCustomers = defineTable({
@@ -272,7 +285,7 @@ export const shopifyCustomers = defineTable({
       province: v.optional(v.string()),
       city: v.optional(v.string()),
       zip: v.optional(v.string()),
-    })
+    }),
   ),
 
   // Metadata
@@ -349,8 +362,8 @@ export const shopifyRefunds = defineTable({
         lineItemId: v.string(),
         quantity: v.number(),
         subtotal: v.number(),
-      })
-    )
+      }),
+    ),
   ),
 
   // Timestamps
@@ -392,8 +405,8 @@ export const shopifyFulfillments = defineTable({
       v.object({
         id: v.string(),
         quantity: v.number(),
-      })
-    )
+      }),
+    ),
   ),
 
   // Timestamps

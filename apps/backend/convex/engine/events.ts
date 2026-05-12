@@ -294,7 +294,7 @@ export const processEventQueue: any = internalMutation({
       .take(100);
 
     for (const log of oldLogs) {
-      await ctx.db.delete(log._id);
+      await ctx.db.delete("auditLogs", log._id);
     }
 
     return { cleaned: oldLogs.length };

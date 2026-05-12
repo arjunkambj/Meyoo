@@ -1,4 +1,3 @@
-
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
@@ -30,7 +29,7 @@ export const handleGDPRDataRequest = internalMutation({
       const customer = await ctx.db
         .query("shopifyCustomers")
         .withIndex("by_shopify_id_store", (q) =>
-          q.eq("shopifyId", args.customerId).eq("storeId", store._id)
+          q.eq("shopifyId", args.customerId).eq("storeId", store._id),
         )
         .first();
 
@@ -125,12 +124,12 @@ export const handleGDPRRedact = internalMutation({
       const customer = await ctx.db
         .query("shopifyCustomers")
         .withIndex("by_shopify_id_store", (q) =>
-          q.eq("shopifyId", args.customerId).eq("storeId", store._id)
+          q.eq("shopifyId", args.customerId).eq("storeId", store._id),
         )
         .first();
 
       if (customer) {
-        await ctx.db.delete(customer._id);
+        await ctx.db.delete("shopifyCustomers", customer._id);
         redactedRecords++;
       }
 
@@ -149,7 +148,7 @@ export const handleGDPRRedact = internalMutation({
 
       for (const order of ordersToUpdate) {
         // Redact personal information
-        await ctx.db.patch(order._id, {
+        await ctx.db.patch("shopifyOrders", order._id, {
           email: "REDACTED",
           phone: "REDACTED",
           // Note: We're not redacting address fields as they're not in the schema
@@ -216,19 +215,16 @@ export const handleGDPRShopRedact = internalMutation({
         {
           organizationId: args.organizationId,
           shopDomain: args.shopDomain,
-        }
+        },
       );
 
       // Call the comprehensive app uninstall handler for complete data reset
       // This will delete all integration data and reset user state
       // We'll call the internal mutation directly
-      await ctx.runMutation(
-        internal.shopify.lifecycle.handleAppUninstalled,
-        {
-          organizationId: args.organizationId,
-          shopDomain: args.shopDomain,
-        }
-      );
+      await ctx.runMutation(internal.shopify.lifecycle.handleAppUninstalled, {
+        organizationId: args.organizationId,
+        shopDomain: args.shopDomain,
+      });
 
       // Log the GDPR shop redact for compliance
       await ctx.db.insert("gdprRequests", {

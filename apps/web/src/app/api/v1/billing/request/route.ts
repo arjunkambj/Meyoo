@@ -136,7 +136,9 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (error) {
     const requestId = genRequestId(req);
-    logger.error("Error requesting billing charge", error as Error, { requestId });
+    logger.error("Error requesting billing charge", error as Error, {
+      requestId,
+    });
 
     // Provide more specific error messages
     const errorMessage =

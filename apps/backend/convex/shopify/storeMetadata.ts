@@ -8,13 +8,13 @@ export const updateStoreLastSyncInternal = internalMutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const store = await ctx.db.get(args.storeId);
+    const store = await ctx.db.get("shopifyStores", args.storeId);
 
     if (!store) {
       throw new Error(`Shopify store not found: ${args.storeId}`);
     }
 
-    await ctx.db.patch(args.storeId, {
+    await ctx.db.patch("shopifyStores", args.storeId, {
       lastSyncAt: args.timestamp,
       updatedAt: Date.now(),
     });

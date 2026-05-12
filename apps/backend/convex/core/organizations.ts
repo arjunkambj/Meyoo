@@ -1,7 +1,12 @@
 import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 
-import { internalMutation, internalQuery, mutation, query } from "../_generated/server";
+import {
+  internalMutation,
+  internalQuery,
+  mutation,
+  query,
+} from "../_generated/server";
 import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
 
 /**
@@ -19,7 +24,7 @@ export const getOrganizationTimezoneInternal = internalQuery({
     timezone: v.optional(v.string()),
   }),
   handler: async (ctx, args) => {
-    const organization = await ctx.db.get(args.organizationId);
+    const organization = await ctx.db.get("organizations", args.organizationId);
     return {
       timezone: organization?.timezone,
     };
@@ -32,7 +37,7 @@ export const setOrganizationTimezoneInternal = internalMutation({
     timezone: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.patch(args.organizationId, {
+    await ctx.db.patch("organizations", args.organizationId, {
       timezone: args.timezone,
       updatedAt: Date.now(),
     });
@@ -56,7 +61,7 @@ export const getByIdInternal = internalQuery({
     organizationId: v.id("organizations"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.organizationId);
+    return await ctx.db.get("organizations", args.organizationId);
   },
 });
 
@@ -106,7 +111,9 @@ export const getCurrentOrganization = query({
         : userWithCreatedAt.createdAt;
 
     // Get organization details
-    const org = organizationId ? await ctx.db.get(organizationId) : null;
+    const org = organizationId
+      ? await ctx.db.get("organizations", organizationId)
+      : null;
 
     return {
       id: organizationId,
@@ -151,7 +158,7 @@ export const getOrganization = query({
     if (auth.orgId !== args.organizationId) return null;
 
     // Get the organization
-    const organization = await ctx.db.get(args.organizationId);
+    const organization = await ctx.db.get("organizations", args.organizationId);
 
     if (!organization) {
       return null;
@@ -210,9 +217,7 @@ export const updateOrganization = mutation({
     const organizationId = auth.orgId;
 
     // Get the organization record
-    const organization = await ctx.db.get(
-      organizationId,
-    );
+    const organization = await ctx.db.get("organizations", organizationId);
 
     if (!organization) {
       throw new Error("Organization not found");
@@ -231,12 +236,13 @@ export const updateOrganization = mutation({
     if (args.name !== undefined) orgUpdates.name = args.name;
     if (args.currency !== undefined) {
       orgUpdates.locale = args.currency; // Legacy consumers expect locale to mirror currency
-      (orgUpdates as { primaryCurrency?: string }).primaryCurrency = args.currency;
+      (orgUpdates as { primaryCurrency?: string }).primaryCurrency =
+        args.currency;
     }
     if (args.timezone !== undefined) orgUpdates.timezone = args.timezone;
 
     // Update the organization record
-    await ctx.db.patch(organizationId, orgUpdates);
+    await ctx.db.patch("organizations", organizationId, orgUpdates);
 
     return { success: true };
   },
@@ -276,8 +282,7 @@ export const getInvoices = query({
   }),
   handler: async (ctx, args) => {
     const auth = await getUserAndOrg(ctx);
-    if (!auth)
-      return { page: [], continueCursor: "", isDone: true };
+    if (!auth) return { page: [], continueCursor: "", isDone: true };
 
     // Query invoices for this organization using the index for pagination
     const organizationId = auth.orgId;
@@ -331,7 +336,7 @@ export const deleteInvoice = mutation({
     const auth = await requireUserAndOrg(ctx);
 
     // Get the invoice to verify ownership
-    const invoice = await ctx.db.get(args.invoiceId);
+    const invoice = await ctx.db.get("invoices", args.invoiceId);
     if (!invoice) {
       throw new ConvexError("Invoice not found");
     }
@@ -342,7 +347,7 @@ export const deleteInvoice = mutation({
     }
 
     // Delete the invoice
-    await ctx.db.delete(args.invoiceId);
+    await ctx.db.delete("invoices", args.invoiceId);
 
     return { success: true };
   },

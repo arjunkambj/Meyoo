@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, Separator } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
@@ -135,13 +133,13 @@ export default function DataProtectionPage() {
               Data Protection
             </span>
           </div>
-          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">Data Protection</h1>
+          <h1 className="text-3xl font-medium mb-3 sm:text-4xl lg:text-5xl">
+            Data Protection
+          </h1>
           <p className="text-base text-muted sm:text-lg mb-2">
             Your Rights and Our Commitments
           </p>
-          <p className="text-sm text-muted">
-            Last updated: {lastUpdated}
-          </p>
+          <p className="text-sm text-muted">Last updated: {lastUpdated}</p>
         </div>
       </section>
 
@@ -197,9 +195,7 @@ export default function DataProtectionPage() {
                         />
                       </div>
                       <div>
-                        <h3 className="font-medium mb-2">
-                          {principle.title}
-                        </h3>
+                        <h3 className="font-medium mb-2">{principle.title}</h3>
                         <p className="text-sm text-muted">
                           {principle.description}
                         </p>
@@ -483,8 +479,7 @@ export default function DataProtectionPage() {
                   </p>
                   <ul className="space-y-2 text-sm text-muted">
                     <li>
-                      • App review policy violations are monitored
-                      continuously
+                      • App review policy violations are monitored continuously
                     </li>
                     <li>
                       • Platform policy compliance is verified before any data
@@ -523,8 +518,8 @@ export default function DataProtectionPage() {
                       available
                     </li>
                     <li>
-                      • Merchant data protection measures are regularly
-                      reviewed and updated
+                      • Merchant data protection measures are regularly reviewed
+                      and updated
                     </li>
                     <li>
                       • GDPR webhook implementations are tested and verified

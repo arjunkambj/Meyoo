@@ -40,7 +40,10 @@ const resolveCustomerName = (customer: Doc<"shopifyCustomers">): string => {
   return "Anonymous";
 };
 
-const resolveSegment = (lifetimeOrders: number, lifetimeValue: number): string => {
+const resolveSegment = (
+  lifetimeOrders: number,
+  lifetimeValue: number,
+): string => {
   if (lifetimeOrders <= 0) return "prospect";
   if (lifetimeOrders === 1) return "new";
   if (lifetimeValue >= 1000) return "champion";
@@ -61,7 +64,8 @@ const buildOrderStats = (
     const stats = map.get(customerId) ?? { ...emptyStats };
 
     const createdAt = order.shopifyCreatedAt;
-    const totalPrice = typeof order.totalPrice === "number" ? order.totalPrice : 0;
+    const totalPrice =
+      typeof order.totalPrice === "number" ? order.totalPrice : 0;
     const value = Number.isFinite(totalPrice) ? Math.max(totalPrice, 0) : 0;
 
     if (!isCancelledOrder(order)) {
@@ -141,7 +145,8 @@ const buildCustomerSnapshots = (
 
     const lifetimeOrders = Math.max(customer.ordersCount ?? 0, 0);
     const lifetimeValue = Math.max(customer.totalSpent ?? 0, 0);
-    const avgOrderValue = lifetimeOrders > 0 ? lifetimeValue / lifetimeOrders : 0;
+    const avgOrderValue =
+      lifetimeOrders > 0 ? lifetimeValue / lifetimeOrders : 0;
     const name = resolveCustomerName(customer);
     const email = customer.email ?? undefined;
     const segment = resolveSegment(lifetimeOrders, lifetimeValue);
@@ -239,7 +244,10 @@ export const rebuildCustomerSnapshot = internalMutation({
 
     windowStartMs = Math.max(0, windowStartMs);
 
-    if (!Number.isFinite(windowStartMs) || !Number.isFinite(windowEndMsExclusive)) {
+    if (
+      !Number.isFinite(windowStartMs) ||
+      !Number.isFinite(windowEndMsExclusive)
+    ) {
       throw new Error("Invalid snapshot window values provided");
     }
 
@@ -248,7 +256,10 @@ export const rebuildCustomerSnapshot = internalMutation({
     }
 
     const windowDurationMs = Math.max(0, windowEndMsExclusive - windowStartMs);
-    const analysisWindowDays = Math.max(1, Math.round(windowDurationMs / MS_IN_DAY));
+    const analysisWindowDays = Math.max(
+      1,
+      Math.round(windowDurationMs / MS_IN_DAY),
+    );
 
     const [customers, orders] = await Promise.all([
       ctx.db
@@ -267,7 +278,10 @@ export const rebuildCustomerSnapshot = internalMutation({
     ]);
 
     const orderStats = buildOrderStats(orders);
-    const { snapshots, overview } = buildCustomerSnapshots(customers, orderStats);
+    const { snapshots, overview } = buildCustomerSnapshots(
+      customers,
+      orderStats,
+    );
 
     const computedAt = Date.now();
 
@@ -276,7 +290,7 @@ export const rebuildCustomerSnapshot = internalMutation({
       .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
       .collect();
     for (const doc of existingSnapshots) {
-      await ctx.db.delete(doc._id);
+      await ctx.db.delete("customerMetricsSummaries", doc._id);
     }
 
     const existingOverviews = await ctx.db
@@ -284,7 +298,7 @@ export const rebuildCustomerSnapshot = internalMutation({
       .withIndex("by_organization", (q) => q.eq("organizationId", orgId))
       .collect();
     for (const doc of existingOverviews) {
-      await ctx.db.delete(doc._id);
+      await ctx.db.delete("customerOverviewSummaries", doc._id);
     }
 
     for (const snapshot of snapshots) {

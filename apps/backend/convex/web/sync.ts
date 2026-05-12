@@ -66,15 +66,20 @@ export const getSyncSessions = query({
     const orgId = auth.orgId as Id<"organizations">;
     const MAX_LIMIT = 200;
     const DEFAULT_LIMIT = 50;
-    const limit = args.limit && args.limit > 0
-      ? Math.min(Math.floor(args.limit), MAX_LIMIT)
-      : DEFAULT_LIMIT;
+    const limit =
+      args.limit && args.limit > 0
+        ? Math.min(Math.floor(args.limit), MAX_LIMIT)
+        : DEFAULT_LIMIT;
     const platformFilter =
-      args.platform && typeof args.platform === "string" && isSyncPlatform(args.platform)
+      args.platform &&
+      typeof args.platform === "string" &&
+      isSyncPlatform(args.platform)
         ? args.platform
         : undefined;
     const statusFilter =
-      args.status && typeof args.status === "string" && isSyncStatus(args.status)
+      args.status &&
+      typeof args.status === "string" &&
+      isSyncStatus(args.status)
         ? args.status
         : undefined;
 
@@ -115,7 +120,9 @@ export const getSyncSessions = query({
         .take(limit);
     }
 
-    const limited = sessions.sort((a, b) => (b.startedAt || 0) - (a.startedAt || 0));
+    const limited = sessions.sort(
+      (a, b) => (b.startedAt || 0) - (a.startedAt || 0),
+    );
 
     return limited.map((session) => ({
       id: session._id,

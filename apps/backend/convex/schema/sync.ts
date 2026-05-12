@@ -21,7 +21,7 @@ export const syncProfiles = defineTable({
       type: v.string(), // "login", "dashboard", "report", etc.
       points: v.number(),
       metadata: v.optional(v.any()),
-    })
+    }),
   ),
 
   // Sync frequency
@@ -45,21 +45,21 @@ export const syncProfiles = defineTable({
           webhooksEnabled: v.boolean(),
           realTimeProducts: v.boolean(),
           realTimeOrders: v.boolean(),
-        })
+        }),
       ),
       meta: v.optional(
         v.object({
           insightsFields: v.array(v.string()),
           datePreset: v.string(),
-        })
+        }),
       ),
       google: v.optional(
         v.object({
           customerIds: v.array(v.string()),
           reportTypes: v.array(v.string()),
-        })
+        }),
       ),
-    })
+    }),
   ),
 
   createdAt: v.number(),

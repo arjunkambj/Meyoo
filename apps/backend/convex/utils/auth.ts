@@ -45,7 +45,7 @@ async function loadOrganizationById(
   organizationId: Id<"organizations">,
 ) {
   if ("db" in ctx) {
-    return await ctx.db.get(organizationId);
+    return await ctx.db.get("organizations", organizationId);
   }
 
   return await ctx.runQuery(internal.core.organizations.getByIdInternal, {

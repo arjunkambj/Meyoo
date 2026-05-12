@@ -145,9 +145,9 @@ const emptyOverview = {
   deadStock: 0,
 };
 
-function decodeInventoryCursor(
-  rawCursor: string | null | undefined,
-): { page: number } {
+function decodeInventoryCursor(rawCursor: string | null | undefined): {
+  page: number;
+} {
   if (!rawCursor) {
     return { page: 1 };
   }
@@ -178,7 +178,10 @@ function toIsoString(timestamp: number | undefined): string | undefined {
   return new Date(timestamp).toISOString();
 }
 
-function matchesSearch(product: InventoryProduct, term: string | null): boolean {
+function matchesSearch(
+  product: InventoryProduct,
+  term: string | null,
+): boolean {
   if (!term) {
     return true;
   }
@@ -274,8 +277,8 @@ function buildVariantProductMap(
       typeof product.productId === "string"
         ? product.productId
         : product.productId
-        ? String(product.productId)
-        : null;
+          ? String(product.productId)
+          : null;
 
     if (!productId) {
       continue;
@@ -298,7 +301,11 @@ async function fetchOrderItemsForOrders(
 ): Promise<Array<Doc<"shopifyOrderItems">>> {
   const items: Array<Doc<"shopifyOrderItems">> = [];
 
-  for (let index = 0; index < orderIds.length; index += ORDER_ITEMS_BATCH_SIZE) {
+  for (
+    let index = 0;
+    index < orderIds.length;
+    index += ORDER_ITEMS_BATCH_SIZE
+  ) {
     const batch = orderIds.slice(index, index + ORDER_ITEMS_BATCH_SIZE);
     const batchResults = await Promise.all(
       batch.map((orderId) =>
@@ -399,7 +406,10 @@ async function computeUnitsSoldForRange(
 async function loadSnapshot(
   ctx: QueryCtx,
   orgId: Id<"organizations">,
-): Promise<{ overview: InventoryOverviewRow | null; products: InventoryProductRow[] }> {
+): Promise<{
+  overview: InventoryOverviewRow | null;
+  products: InventoryProductRow[];
+}> {
   const db = ctx.db as any;
   const overview = (await db
     .query("inventoryOverviewSummaries")
@@ -426,8 +436,8 @@ function mapProduct(doc: InventoryProductRow): InventoryProduct {
     typeof doc.productId === "string"
       ? doc.productId
       : doc.productId
-      ? String(doc.productId)
-      : "unknown";
+        ? String(doc.productId)
+        : "unknown";
 
   return {
     id: productId,
@@ -549,9 +559,10 @@ export const getInventoryAnalytics = query({
     const normalizedSearch = args.searchTerm
       ? args.searchTerm.trim().toLowerCase()
       : null;
-    const normalizedCategory = args.category && args.category !== "all"
-      ? args.category.trim().toLowerCase()
-      : null;
+    const normalizedCategory =
+      args.category && args.category !== "all"
+        ? args.category.trim().toLowerCase()
+        : null;
     const stockLevel = args.stockLevel ?? "all";
     const rawSortBy = args.sortBy ?? "available";
     const sortBy = rawSortBy === "turnoverRate" ? "unitsSold" : rawSortBy;
@@ -599,8 +610,10 @@ export const getInventoryAnalytics = query({
     const sorted = sortProducts(filtered, sortBy, sortOrder);
 
     const total = sorted.length;
-    const totalPages = total === 0 ? 0 : Math.max(1, Math.ceil(total / pageSize));
-    const effectivePage = totalPages === 0 ? 1 : Math.min(requestedPage, totalPages);
+    const totalPages =
+      total === 0 ? 0 : Math.max(1, Math.ceil(total / pageSize));
+    const effectivePage =
+      totalPages === 0 ? 1 : Math.min(requestedPage, totalPages);
     const startIndex = (effectivePage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     const pageEntries = sorted.slice(startIndex, endIndex);
@@ -637,7 +650,10 @@ export const getInventoryAnalytics = query({
   },
 });
 
-const severityRank: Record<"critical" | "low" | "reorder" | "overstock", number> = {
+const severityRank: Record<
+  "critical" | "low" | "reorder" | "overstock",
+  number
+> = {
   critical: 0,
   low: 1,
   reorder: 2,
@@ -695,7 +711,8 @@ export const getStockAlerts = query({
     for (const productRow of snapshot.products) {
       const product = mapProduct(productRow);
       const sku = product.variants?.[0]?.sku ?? product.sku ?? "N/A";
-      const avgDailySales = windowDays > 0 ? (product.unitsSold ?? 0) / windowDays : 0;
+      const avgDailySales =
+        windowDays > 0 ? (product.unitsSold ?? 0) / windowDays : 0;
       const daysUntilStockout =
         avgDailySales > 0
           ? Number(Math.max(0, product.available / avgDailySales).toFixed(1))
@@ -718,7 +735,10 @@ export const getStockAlerts = query({
       };
 
       if (product.available <= 0 || product.stockStatus === "out") {
-        pushAlert("critical", "Product is out of stock. Immediate reorder required.");
+        pushAlert(
+          "critical",
+          "Product is out of stock. Immediate reorder required.",
+        );
         continue;
       }
 

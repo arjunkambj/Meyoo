@@ -84,7 +84,7 @@ export const patchStoreUsersBatch = internalMutation({
 
     let changed = 0;
     for (const storeId of args.storeIds) {
-      const store = await ctx.db.get(storeId);
+      const store = await ctx.db.get("shopifyStores", storeId);
       if (!store) continue;
       if (store.userId === args.userId) continue;
 
@@ -95,7 +95,7 @@ export const patchStoreUsersBatch = internalMutation({
         }
       }
 
-      await ctx.db.patch(storeId, {
+      await ctx.db.patch("shopifyStores", storeId, {
         userId: args.userId,
         updatedAt: Date.now(),
       });

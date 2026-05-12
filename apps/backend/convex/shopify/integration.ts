@@ -1,4 +1,3 @@
-
 import type { GenericActionCtx } from "convex/server";
 import { internal } from "../_generated/api";
 import type { DataModel, Doc, Id } from "../_generated/dataModel";
@@ -24,13 +23,10 @@ export const shopify: any = createIntegration({
       },
     ): Promise<SyncResult> => {
       const daysBack = args.dateRange?.daysBack ?? 60;
-      const response = (await ctx.runAction(
-        internal.shopify.sync.initial,
-        {
-          organizationId: args.organizationId as Id<"organizations">,
-          dateRange: { daysBack },
-        },
-      )) as {
+      const response = (await ctx.runAction(internal.shopify.sync.initial, {
+        organizationId: args.organizationId as Id<"organizations">,
+        dateRange: { daysBack },
+      })) as {
         success: boolean;
         recordsProcessed: number;
         dataChanged: boolean;
@@ -62,13 +58,10 @@ export const shopify: any = createIntegration({
       },
     ): Promise<SyncResult> => {
       const sinceMs = args.since ? Date.parse(args.since) : undefined;
-      const response = (await ctx.runAction(
-        internal.shopify.sync.incremental,
-        {
-          organizationId: args.organizationId as Id<"organizations">,
-          since: Number.isFinite(sinceMs) ? sinceMs : undefined,
-        },
-      )) as {
+      const response = (await ctx.runAction(internal.shopify.sync.incremental, {
+        organizationId: args.organizationId as Id<"organizations">,
+        since: Number.isFinite(sinceMs) ? sinceMs : undefined,
+      })) as {
         success: boolean;
         recordsProcessed: number;
         dataChanged: boolean;
@@ -81,7 +74,7 @@ export const shopify: any = createIntegration({
         dataChanged: response.dataChanged,
         errors: response.success
           ? response.errors
-          : response.errors ?? ["Incremental sync failed"],
+          : (response.errors ?? ["Incremental sync failed"]),
       } satisfies SyncResult;
     },
 
@@ -134,10 +127,13 @@ export const shopify: any = createIntegration({
     "orders/create": async (ctx: any, payload: any) => {
       const order = parseOrderWebhook(payload);
 
-      await ctx.runMutation(internal.shopify.orderMutations.storeOrdersInternal, {
-        organizationId: payload.organizationId as Id<"organizations">,
-        orders: [order as unknown as any],
-      });
+      await ctx.runMutation(
+        internal.shopify.orderMutations.storeOrdersInternal,
+        {
+          organizationId: payload.organizationId as Id<"organizations">,
+          orders: [order as unknown as any],
+        },
+      );
     },
 
     /**
@@ -151,7 +147,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: payload.organizationId as Id<"organizations">,
           products: [product as Doc<"shopifyProducts">],
-        }
+        },
       );
     },
 
@@ -166,7 +162,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: payload.organizationId as Id<"organizations">,
           product: product as Doc<"shopifyProducts">,
-        }
+        },
       );
     },
 
@@ -180,7 +176,7 @@ export const shopify: any = createIntegration({
         internal.shopify.lifecycle.handleAppUninstallInternal,
         {
           shopDomain: shop_domain,
-        }
+        },
       );
     },
 
@@ -196,7 +192,7 @@ export const shopify: any = createIntegration({
           organizationId: payload.organizationId as Id<"organizations">,
           orderId: (order as Record<string, unknown>).shopifyId as string,
           fulfillmentStatus: "fulfilled",
-        }
+        },
       );
     },
 
@@ -212,7 +208,7 @@ export const shopify: any = createIntegration({
           organizationId: payload.organizationId as Id<"organizations">,
           orderId: (order as Record<string, unknown>).shopifyId as string,
           fulfillmentStatus: "partially_fulfilled",
-        }
+        },
       );
     },
 
@@ -228,7 +224,7 @@ export const shopify: any = createIntegration({
           organizationId: payload.organizationId as Id<"organizations">,
           orderId: (order as Record<string, unknown>).shopifyId as string,
           financialStatus: "paid",
-        }
+        },
       );
     },
 
@@ -245,7 +241,7 @@ export const shopify: any = createIntegration({
           orderId: (order as Record<string, unknown>).shopifyId as string,
           financialStatus: "cancelled",
           fulfillmentStatus: "cancelled",
-        }
+        },
       );
     },
 
@@ -260,7 +256,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: payload.organizationId as Id<"organizations">,
           customerId: (customer as Record<string, unknown>).shopifyId as string,
-        }
+        },
       );
     },
 
@@ -276,7 +272,7 @@ export const shopify: any = createIntegration({
           organizationId: payload.organizationId as Id<"organizations">,
           customerId: (customer as Record<string, unknown>).shopifyId as string,
           state: "enabled",
-        }
+        },
       );
     },
 
@@ -292,7 +288,7 @@ export const shopify: any = createIntegration({
           organizationId: customer.organizationId as Id<"organizations">,
           customerId: String(customer.shopifyId),
           state: "disabled",
-        }
+        },
       );
     },
 
@@ -310,7 +306,7 @@ export const shopify: any = createIntegration({
         {
           organizationId,
           productId: String(id),
-        }
+        },
       );
     },
 
@@ -328,7 +324,7 @@ export const shopify: any = createIntegration({
           inventoryItemId: String(inventory_item_id ?? ""),
           locationId: String(location_id ?? ""),
           available: Number(available ?? 0),
-        }
+        },
       );
     },
 
@@ -348,7 +344,7 @@ export const shopify: any = createIntegration({
           inventoryItemId: String(id ?? ""),
           sku: (sku as string) || undefined,
           tracked: Boolean(tracked),
-        }
+        },
       );
     },
 
@@ -368,7 +364,7 @@ export const shopify: any = createIntegration({
           inventoryItemId: String(id ?? ""),
           sku: (sku as string) || undefined,
           tracked: Boolean(tracked),
-        }
+        },
       );
     },
 
@@ -383,7 +379,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: organizationId as Id<"organizations">,
           inventoryItemId: String(id ?? ""),
-        }
+        },
       );
     },
 
@@ -398,7 +394,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: fulfillment.organizationId as Id<"organizations">,
           fulfillment,
-        }
+        },
       );
     },
 
@@ -418,7 +414,7 @@ export const shopify: any = createIntegration({
           shopId: String(id ?? ""),
           domain: String(domain ?? ""),
           planName: String(plan_name ?? ""),
-        }
+        },
       );
     },
 
@@ -433,7 +429,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: collection.organizationId as Id<"organizations">,
           collection,
-        }
+        },
       );
     },
 
@@ -448,7 +444,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: collection.organizationId as Id<"organizations">,
           collection,
-        }
+        },
       );
     },
 
@@ -463,7 +459,7 @@ export const shopify: any = createIntegration({
         {
           organizationId: organizationId as Id<"organizations">,
           collectionId: String(id ?? ""),
-        }
+        },
       );
     },
   },
@@ -497,7 +493,6 @@ export const shopify: any = createIntegration({
   apiCost: 0,
 });
 
-
 type WebhookPayload = Record<string, unknown>;
 
 function parseOrderWebhook(payload: WebhookPayload): WebhookPayload {
@@ -512,7 +507,9 @@ function parseCustomerWebhook(payload: WebhookPayload): WebhookPayload {
   return payload;
 }
 
-function parseFulfillmentWebhook(payload: WebhookPayload): Record<string, unknown> {
+function parseFulfillmentWebhook(
+  payload: WebhookPayload,
+): Record<string, unknown> {
   const trackingNumbers =
     payload.tracking_numbers == null
       ? []
@@ -545,7 +542,9 @@ function parseFulfillmentWebhook(payload: WebhookPayload): Record<string, unknow
   };
 }
 
-function parseCollectionWebhook(payload: WebhookPayload): Record<string, unknown> {
+function parseCollectionWebhook(
+  payload: WebhookPayload,
+): Record<string, unknown> {
   return {
     organizationId: payload.organizationId,
     shopifyId: String(payload.id),

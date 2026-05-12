@@ -9,8 +9,14 @@ import { cn } from "@/libs/utils";
 export type PricingTierCardButton = {
   label: string;
   className?: string;
-  color?: string;
-  variant?: "solid" | "flat" | "primary" | "secondary" | "tertiary" | "outline" | "danger" | "danger-soft" | "ghost";
+  variant?:
+    | "primary"
+    | "secondary"
+    | "tertiary"
+    | "outline"
+    | "danger"
+    | "danger-soft"
+    | "ghost";
   onPress?: () => void;
   isLoading?: boolean;
   disabled?: boolean;
@@ -48,7 +54,6 @@ export function PricingTierCard({
   className,
 }: PricingTierCardProps) {
   const {
-    color,
     disabled,
     fullWidth: _fullWidth,
     isLoading,
@@ -56,12 +61,6 @@ export function PricingTierCard({
     variant,
     ...buttonProps
   } = button;
-  const buttonVariant =
-    variant === "solid"
-      ? "primary"
-      : variant === "flat"
-        ? "tertiary"
-        : variant;
   const price =
     typeof tier.price === "string"
       ? tier.price
@@ -75,7 +74,7 @@ export function PricingTierCard({
   const cardClassName = cn(
     "flex h-full w-full flex-col rounded-[2rem] bg-surface-secondary px-5 py-5 shadow-none transition-all duration-300",
     highlight ? highlightClassNames[highlight] : null,
-    className
+    className,
   );
 
   return (
@@ -111,13 +110,12 @@ export function PricingTierCard({
             {...buttonProps}
             className={cn(
               "h-10 w-full font-semibold transition-all duration-200 active:scale-100",
-              button.className
+              button.className,
             )}
             isDisabled={disabled}
             isPending={isLoading}
-            color={color}
             size={button.size ?? "md"}
-            variant={buttonVariant}
+            variant={variant}
           >
             {label}
           </Button>

@@ -16,13 +16,17 @@ const SHOPIFY_WEBHOOK_DEBUG = optionalEnv("SHOPIFY_WEBHOOK_DEBUG") === "1";
 
 const compactShopData = (data: Record<string, unknown>) =>
   Object.fromEntries(
-    Object.entries(data).filter(([, value]) => value !== undefined && value !== null),
+    Object.entries(data).filter(
+      ([, value]) => value !== undefined && value !== null,
+    ),
   );
 
 /**
  * Fetches shop data from Shopify GraphQL API
  */
-export async function fetchShopData(session: Session): Promise<Record<string, unknown>> {
+export async function fetchShopData(
+  session: Session,
+): Promise<Record<string, unknown>> {
   try {
     const client = new ShopifyGraphQLClient({
       shopDomain: session.shop,

@@ -56,13 +56,12 @@ export const createOrAttachFromShopifyOAuth = mutation({
 
     if (existingStore) {
       // Store already linked – do NOT reassign user/organization based on email.
-      user = await ctx.db.get(existingStore.userId);
+      user = await ctx.db.get("users", existingStore.userId);
       organizationId = existingStore.organizationId as Id<"organizations">;
 
       // Soft update store details and credentials only.
-      await ctx.db.patch(existingStore._id, {
-        storeName:
-          args.shopData?.shopName || existingStore.storeName || shop,
+      await ctx.db.patch("shopifyStores", existingStore._id, {
+        storeName: args.shopData?.shopName || existingStore.storeName || shop,
         primaryCurrency:
           args.shopData?.currency || existingStore.primaryCurrency || "USD",
         operatingCountry:
@@ -94,7 +93,7 @@ export const createOrAttachFromShopifyOAuth = mutation({
           lastLoginAt: now,
           createdAt: now,
         });
-        user = await ctx.db.get(userId);
+        user = await ctx.db.get("users", userId);
       }
       if (!user) throw new Error("Failed to create or load user");
 
@@ -107,14 +106,13 @@ export const createOrAttachFromShopifyOAuth = mutation({
           isPremium: false,
           requiresUpgrade: false,
           locale: "en-US",
-          timezone:
-            isIanaTimeZone(args.shopData?.timezone)
-              ? (args.shopData?.timezone as string)
-              : undefined, // leave undefined if not a valid IANA zone
+          timezone: isIanaTimeZone(args.shopData?.timezone)
+            ? (args.shopData?.timezone as string)
+            : undefined, // leave undefined if not a valid IANA zone
           primaryCurrency: args.shopData?.currency || "USD",
           createdAt: now,
         });
-        await ctx.db.patch(user._id, { organizationId });
+        await ctx.db.patch("users", user._id, { organizationId });
       }
 
       await ctx.db.insert("shopifyStores", {
@@ -141,7 +139,7 @@ export const createOrAttachFromShopifyOAuth = mutation({
       throw new Error("Missing user or org context");
 
     const orgId = organizationId as Id<"organizations">;
-    const currentOrg = await ctx.db.get(orgId);
+    const currentOrg = await ctx.db.get("organizations", orgId);
     const incomingCurrency =
       args.shopData?.currency ||
       existingStore?.primaryCurrency ||
@@ -160,26 +158,21 @@ export const createOrAttachFromShopifyOAuth = mutation({
     }
     if (Object.keys(orgUpdates).length > 0) {
       orgUpdates.updatedAt = now;
-      await ctx.db.patch(orgId, orgUpdates);
+      await ctx.db.patch("organizations", orgId, orgUpdates);
     }
 
     await ensureActiveMembership(
       ctx,
       orgId,
-      user._id as Id<'users'>,
+      user._id as Id<"users">,
       "StoreOwner",
       {
         assignedAt: now,
-        assignedBy: user._id as Id<'users'>,
+        assignedBy: user._id as Id<"users">,
       },
     );
 
-    await ensureShopifyOnboarding(
-      ctx,
-      user._id as Id<'users'>,
-      orgId,
-      now,
-    );
+    await ensureShopifyOnboarding(ctx, user._id as Id<"users">, orgId, now);
 
     // After provisioning, trigger initial Shopify sync if not already synced
     try {
