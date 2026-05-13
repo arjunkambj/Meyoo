@@ -2014,9 +2014,11 @@ async function aggregateMetaInsightsForRange(
   const records = await ctx.db
     .query("metaInsights")
     .withIndex("by_org_date", (q) =>
-      q.eq("organizationId", organizationId).gte("date", range.startDate),
+      q
+        .eq("organizationId", organizationId)
+        .gte("date", range.startDate)
+        .lte("date", range.endDate),
     )
-    .filter((q) => q.lte(q.field("date"), range.endDate))
     .collect();
 
   const overallTotals = createEmptyMetaTotals();

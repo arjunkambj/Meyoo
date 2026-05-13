@@ -79,7 +79,7 @@ export const platformRateLimits = defineTable({
   limit: v.number(),
   updatedAt: v.number(),
 })
-  .index("by_platform", ["platform"])
+  .index("by_platform_and_window_start", ["platform", "windowStart"])
   .index("by_window", ["windowEnd"]);
 
 /**

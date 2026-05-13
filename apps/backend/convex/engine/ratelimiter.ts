@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { internalMutation, internalQuery } from "../_generated/server";
-import { internal } from "../_generated/api";
 
 /**
  * Simple token-bucket rate limiter per platform using platformRateLimits table.
@@ -14,21 +13,25 @@ function currentHourWindow() {
   return { start, end: start + hourMs };
 }
 
+const HOURLY_LIMIT = 10_000;
+
 export const getBucket = internalQuery({
   args: { platform: v.string() },
   handler: async (ctx, args) => {
     const { start, end } = currentHourWindow();
     const existing = await (ctx.db as any)
       .query("platformRateLimits")
-      .withIndex("by_platform", (q: any) => q.eq("platform", args.platform))
+      .withIndex("by_platform_and_window_start", (q: any) =>
+        q.eq("platform", args.platform).eq("windowStart", start),
+      )
       .first();
-    if (!existing || existing.windowEnd <= Date.now()) {
+    if (!existing) {
       return {
         platform: args.platform,
         windowStart: start,
         windowEnd: end,
         used: 0,
-        limit: args.platform === "meta" ? 10_000 : 10_000,
+        limit: HOURLY_LIMIT,
         updatedAt: Date.now(),
       };
     }
@@ -41,26 +44,21 @@ export const acquire = internalMutation({
   returns: v.object({ ok: v.boolean(), resetAt: v.number() }),
   handler: async (ctx, args) => {
     const { start, end } = currentHourWindow();
-    const res = await ctx.runQuery(
-      (internal as any).engine.ratelimiter.getBucket,
-      {
-        platform: args.platform,
-      },
-    );
 
-    // Fresh window if expired or not existing
     let doc = await (ctx.db as any)
       .query("platformRateLimits")
-      .withIndex("by_platform", (q: any) => q.eq("platform", args.platform))
+      .withIndex("by_platform_and_window_start", (q: any) =>
+        q.eq("platform", args.platform).eq("windowStart", start),
+      )
       .first();
 
-    if (!doc || doc.windowEnd <= Date.now()) {
+    if (!doc) {
       const id = await (ctx.db as any).insert("platformRateLimits", {
         platform: args.platform,
         windowStart: start,
         windowEnd: end,
         used: 0,
-        limit: res.limit,
+        limit: HOURLY_LIMIT,
         updatedAt: Date.now(),
       });
       doc = await (ctx.db as any).get(id);

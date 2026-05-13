@@ -432,6 +432,11 @@ export const billing = defineTable({
   .index("by_organization", ["organizationId"])
   .index("by_organization_type", ["organizationType"])
   .index("by_status", ["status"])
+  .index("by_trial_status_and_end", [
+    "isTrialActive",
+    "hasTrialExpired",
+    "trialEndDate",
+  ])
   .index("by_org_type_status", [
     "organizationId",
     "organizationType",

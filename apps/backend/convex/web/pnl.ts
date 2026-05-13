@@ -2,12 +2,11 @@ import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
 import { query } from "../_generated/server";
-import { dateRangeValidator, loadAnalytics } from "./analyticsShared";
+import { dateRangeValidator } from "./analyticsShared";
 import { validateDateRange } from "../utils/analyticsSource";
 import { getUserAndOrg } from "../utils/auth";
 import { loadPnLAnalyticsFromDailyMetrics } from "../utils/dailyMetrics";
 import type { PnLAnalyticsResult, PnLGranularity } from "@repo/types";
-import { computePnLAnalytics } from "../utils/analytics/pnl";
 
 type DateRangeArg = {
   startDate: string;
@@ -168,7 +167,7 @@ export const getAnalytics = query({
       granularity,
     );
 
-    let result: PnLAnalyticsResult = {
+    const result: PnLAnalyticsResult = {
       ...dailyMetrics.result,
       primaryCurrency,
     };
@@ -180,39 +179,15 @@ export const getAnalytics = query({
       primaryCurrency,
     };
 
-    const needsFallback =
+    const isPending =
       !dailyMetrics.meta.selectedHasData ||
       !dailyMetrics.meta.hasData ||
       result.metrics === null;
 
-    if (needsFallback) {
-      const fallbackAnalytics = await loadAnalytics(
-        ctx,
-        organizationId,
-        range,
-        {
-          datasets: [
-            "orders",
-            "globalCosts",
-            "manualReturnRates",
-            "metaInsights",
-          ] as const,
-        },
-      );
-      const fallbackResult = computePnLAnalytics(
-        fallbackAnalytics,
-        granularity,
-      );
-      result = {
-        ...fallbackResult,
-        primaryCurrency,
-        tableRange: result.tableRange ?? fallbackResult.tableRange,
-      };
+    if (isPending) {
       meta = {
         ...meta,
-        strategy: "rawFallback",
-        status: fallbackResult.metrics ? "ready" : "pending",
-        fallbackApplied: true,
+        status: "pending",
       };
     }
 

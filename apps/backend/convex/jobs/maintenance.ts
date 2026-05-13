@@ -147,7 +147,7 @@ export const checkExpiredTrials = internalAction({
  */
 export const getOldRecords = internalQuery({
   args: {
-    table: v.string(),
+    table: v.union(v.literal("auditLogs"), v.literal("syncSessions")),
     cutoffDate: v.number(),
     limit: v.number(),
   },
@@ -163,20 +163,11 @@ export const getOldRecords = internalQuery({
         .take(limit);
     }
 
-    if (table === "syncSessions") {
-      return await ctx.db
-        .query("syncSessions")
-        .withIndex("by_started_at", (q) => q.lt("startedAt", cutoffDate))
-        .order("asc")
-        .take(limit);
-    }
-
-    const genericQuery = (ctx.db.query as any)(table as any);
-    const allRecords = await genericQuery.collect();
-
-    return allRecords
-      .filter((r: any) => r.createdAt && r.createdAt < cutoffDate)
-      .slice(0, limit);
+    return await ctx.db
+      .query("syncSessions")
+      .withIndex("by_started_at", (q) => q.lt("startedAt", cutoffDate))
+      .order("asc")
+      .take(limit);
   },
 });
 
@@ -216,18 +207,24 @@ export const getActiveTrials = internalQuery({
     }),
   ),
   handler: async (ctx) => {
-    const billingRecords = await ctx.db.query("billing").collect();
+    const now = Date.now();
+    const billingRecords = await ctx.db
+      .query("billing")
+      .withIndex("by_trial_status_and_end", (q) =>
+        q
+          .eq("isTrialActive", true)
+          .eq("hasTrialExpired", false)
+          .lte("trialEndDate", now),
+      )
+      .collect();
 
-    return billingRecords
-      .filter((billing) => billing.isTrialActive && !billing.hasTrialExpired)
-      .filter((billing) => billing.trialEndDate || billing.trialEndsAt)
-      .map((billing) => ({
-        _id: billing._id,
-        organizationId: billing.organizationId,
-        isTrialActive: billing.isTrialActive,
-        hasTrialExpired: billing.hasTrialExpired,
-        trialEndDate: billing.trialEndDate ?? billing.trialEndsAt,
-      }));
+    return billingRecords.map((billing) => ({
+      _id: billing._id,
+      organizationId: billing.organizationId,
+      isTrialActive: billing.isTrialActive,
+      hasTrialExpired: billing.hasTrialExpired,
+      trialEndDate: billing.trialEndDate,
+    }));
   },
 });
 
