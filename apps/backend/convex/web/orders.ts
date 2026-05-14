@@ -1,8 +1,7 @@
 import { v } from "convex/values";
 
 import type { Doc, Id } from "../_generated/dataModel";
-import { action, query } from "../_generated/server";
-import { api } from "../_generated/api";
+import { query } from "../_generated/server";
 import { dateRangeValidator } from "./analyticsShared";
 import {
   validateDateRange,
@@ -769,55 +768,5 @@ export const getOrdersInsights = query({
       cancelRate,
       returnRate,
     } satisfies OrdersInsightsPayload;
-  },
-});
-
-const analyticsActionReturns = v.union(
-  v.null(),
-  v.object({
-    dateRange: dateRangeValidator,
-    organizationId: v.string(),
-    result: v.optional(v.any()),
-  }),
-);
-
-type OrdersAnalyticsActionPayload = {
-  dateRange: { startDate: string; endDate: string };
-  organizationId: string;
-  result?: unknown;
-};
-
-export const getAnalytics = action({
-  args: {
-    dateRange: dateRangeValidator,
-    status: v.optional(v.string()),
-    searchTerm: v.optional(v.string()),
-    sortBy: v.optional(v.string()),
-    sortOrder: v.optional(v.union(v.literal("asc"), v.literal("desc"))),
-    page: v.optional(v.number()),
-    pageSize: v.optional(v.number()),
-  },
-  returns: analyticsActionReturns,
-  handler: async (ctx, args): Promise<OrdersAnalyticsActionPayload | null> => {
-    const auth = await getUserAndOrg(ctx);
-    if (!auth) return null;
-
-    const range = validateDateRange(args.dateRange);
-
-    const result = await ctx.runQuery(api.web.orders.getOrdersAnalytics, {
-      dateRange: range,
-      status: args.status,
-      searchTerm: args.searchTerm,
-      sortBy: args.sortBy,
-      sortOrder: args.sortOrder,
-      page: args.page,
-      pageSize: args.pageSize,
-    });
-
-    return {
-      dateRange: range,
-      organizationId: auth.orgId,
-      result,
-    } satisfies OrdersAnalyticsActionPayload;
   },
 });

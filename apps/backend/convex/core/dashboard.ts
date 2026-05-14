@@ -1,35 +1,11 @@
 import { v } from "convex/values";
-import { mutation, query } from "../_generated/server";
-import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
-import { resolveDashboardConfig } from "../utils/dashboardConfig";
+import { mutation } from "../_generated/server";
+import { requireUserAndOrg } from "../utils/auth";
 
 /**
  * Dashboard configuration management
  * Clean 2-zone layout: Zone 1 for KPIs, Zone 2 for Widgets
  */
-
-// ============ QUERIES ============
-
-/**
- * Get dashboard layout configuration
- */
-export const getDashboardLayout = query({
-  args: {},
-  returns: v.union(
-    v.null(),
-    v.object({
-      kpis: v.array(v.string()), // KPI metric IDs
-      widgets: v.array(v.string()), // Widget IDs
-    }),
-  ),
-  handler: async (ctx) => {
-    const auth = await getUserAndOrg(ctx);
-    if (!auth) return null;
-    return await resolveDashboardConfig(ctx, auth.user._id, auth.orgId);
-  },
-});
-
-// ============ MUTATIONS ============
 
 /**
  * Update dashboard layout configuration

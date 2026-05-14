@@ -1,12 +1,7 @@
 import { v } from "convex/values";
 
 import type { Id } from "../_generated/dataModel";
-import {
-  action,
-  query,
-  type ActionCtx,
-  type QueryCtx,
-} from "../_generated/server";
+import { query, type QueryCtx } from "../_generated/server";
 import { api } from "../_generated/api";
 import { dateRangeValidator } from "./analyticsShared";
 import { percentageChange } from "../utils/analytics/shared";
@@ -288,41 +283,6 @@ export const getOverviewData = query({
     return basePayload;
   },
 });
-
-const getOverviewDataActionDefinition = {
-  args: {
-    timeRange: v.optional(v.string()),
-    startDate: v.optional(v.string()),
-    endDate: v.optional(v.string()),
-    dateRange: v.optional(dateRangeValidator),
-  },
-  returns: v.union(
-    v.null(),
-    v.object({
-      dateRange: dateRangeValidator,
-      organizationId: v.string(),
-      overview: v.optional(v.any()),
-      platformMetrics: v.optional(v.any()),
-      channelRevenue: v.optional(v.any()),
-      primaryCurrency: v.optional(v.string()),
-      dashboardConfig: v.object({
-        kpis: v.array(v.string()),
-        widgets: v.array(v.string()),
-      }),
-      integrationStatus: integrationStatusValidator,
-      onboardingStatus: onboardingStatusValidator,
-      meta: v.optional(v.any()),
-    }),
-  ),
-  handler: async (
-    ctx: ActionCtx,
-    args: OverviewArgs,
-  ): Promise<OverviewPayload | null> => {
-    return ctx.runQuery(api.web.dashboard.getOverviewData, args);
-  },
-};
-
-export const getOverviewDataAction = action(getOverviewDataActionDefinition);
 
 function parseTimeRange(timeRange?: string | null): number {
   switch (timeRange) {

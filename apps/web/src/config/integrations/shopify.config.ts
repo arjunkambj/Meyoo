@@ -168,13 +168,6 @@ export const SHOPIFY_CONFIG = {
 } as const;
 
 /**
- * Get all webhook topics as an array
- */
-export function getAllWebhookTopics(): string[] {
-  return Object.values(SHOPIFY_CONFIG.WEBHOOKS);
-}
-
-/**
  * Get critical webhook topics (minimum required)
  */
 export function getCriticalWebhookTopics(): string[] {
@@ -186,11 +179,4 @@ export function getCriticalWebhookTopics(): string[] {
     SHOPIFY_CONFIG.WEBHOOKS.ORDER_CREATE,
     SHOPIFY_CONFIG.WEBHOOKS.INVENTORY_LEVELS_UPDATE,
   ];
-}
-
-/**
- * Check if a webhook topic is valid
- */
-export function isValidWebhookTopic(topic: string): boolean {
-  return getAllWebhookTopics().includes(topic);
 }

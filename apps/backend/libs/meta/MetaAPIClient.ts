@@ -146,7 +146,7 @@ export class MetaAPIClient {
 
   constructor(
     private accessToken: string,
-    config: MetaAPIClientConfig = {}
+    config: MetaAPIClientConfig = {},
   ) {
     this.apiVersion = config.apiVersion || META_CONFIG.API_VERSION;
     this.baseURL =
@@ -159,7 +159,7 @@ export class MetaAPIClient {
   async getAccountInsights(
     accountId: string,
     params: InsightsParams,
-    fields?: string[]
+    fields?: string[],
   ): Promise<APIResponse<MetaInsight[]>> {
     const endpoint = `${accountId}/insights`;
     const urlParams = this.buildInsightsParams(params);
@@ -181,7 +181,7 @@ export class MetaAPIClient {
   async getAccountInsightsPaginated(
     accountId: string,
     params: InsightsParams,
-    fields?: string[]
+    fields?: string[],
   ): Promise<MetaInsight[]> {
     const endpoint = `${accountId}/insights`;
     const urlParams = this.buildInsightsParams(params);
@@ -239,7 +239,8 @@ export class MetaAPIClient {
       dateRangeRequested:
         params.timeRange || params.datePreset || "no date specified",
       firstResultDate: allResults[0]?.date_start ?? "no results",
-      lastResultDate: allResults[allResults.length - 1]?.date_start ?? "no results",
+      lastResultDate:
+        allResults[allResults.length - 1]?.date_start ?? "no results",
     });
 
     return allResults;
@@ -251,7 +252,7 @@ export class MetaAPIClient {
   async getCampaignInsights(
     campaignId: string,
     params: InsightsParams,
-    fields?: string[]
+    fields?: string[],
   ): Promise<APIResponse<MetaInsight[]>> {
     const endpoint = `${campaignId}/insights`;
     const urlParams = this.buildInsightsParams(params);
@@ -272,7 +273,7 @@ export class MetaAPIClient {
   async getCampaigns(
     accountId: string,
     fields: string[],
-    filters?: CampaignFilters
+    filters?: CampaignFilters,
   ): Promise<APIResponse<MetaCampaign[]>> {
     const endpoint = `${accountId}/campaigns`;
     const params = new URLSearchParams({
@@ -289,7 +290,7 @@ export class MetaAPIClient {
             operator: "IN",
             value: filters.effectiveStatus,
           },
-        ])
+        ]),
       );
     }
 
@@ -304,7 +305,7 @@ export class MetaAPIClient {
   async getAdSets(
     campaignId: string,
     fields: string[],
-    filters?: CampaignFilters
+    filters?: CampaignFilters,
   ): Promise<APIResponse<MetaAdSet[]>> {
     const endpoint = `${campaignId}/adsets`;
     const params = new URLSearchParams({
@@ -321,7 +322,7 @@ export class MetaAPIClient {
             operator: "IN",
             value: filters.effectiveStatus,
           },
-        ])
+        ]),
       );
     }
 
@@ -336,7 +337,7 @@ export class MetaAPIClient {
   async getAds(
     adSetId: string,
     fields: string[],
-    filters?: CampaignFilters
+    filters?: CampaignFilters,
   ): Promise<APIResponse<MetaAd[]>> {
     const endpoint = `${adSetId}/ads`;
     const params = new URLSearchParams({
@@ -353,7 +354,7 @@ export class MetaAPIClient {
             operator: "IN",
             value: filters.effectiveStatus,
           },
-        ])
+        ]),
       );
     }
 
@@ -367,7 +368,7 @@ export class MetaAPIClient {
    */
   async getAdAccounts(
     userId: string = "me",
-    fields: string[] = ["id", "name", "currency", "timezone_name", "business"]
+    fields: string[] = ["id", "name", "currency", "timezone_name", "business"],
   ): Promise<APIResponse<MetaAdAccount[]>> {
     const endpoint = `${userId}/adaccounts`;
     const params = new URLSearchParams({
@@ -384,7 +385,7 @@ export class MetaAPIClient {
    * Get account details with budget information
    */
   async getAccountDetails(
-    accountId: string
+    accountId: string,
   ): Promise<APIResponse<MetaAdAccount>> {
     // Ensure account ID is in the correct format
     const formattedAccountId = accountId.startsWith("act_")
@@ -457,7 +458,7 @@ export class MetaAPIClient {
         JSON.stringify({
           since: params.timeRange.since,
           until: params.timeRange.until,
-        })
+        }),
       );
     }
 
@@ -499,10 +500,12 @@ export class MetaAPIClient {
         host: parsed.host,
         path: parsed.pathname,
         totalParams: searchParams.length,
-        paramsPreview: searchParams.slice(0, previewLimit).map(([key, value]) => ({
-          key,
-          value: value.length > 32 ? `${value.slice(0, 32)}...` : value,
-        })),
+        paramsPreview: searchParams
+          .slice(0, previewLimit)
+          .map(([key, value]) => ({
+            key,
+            value: value.length > 32 ? `${value.slice(0, 32)}...` : value,
+          })),
         truncated: searchParams.length > previewLimit,
       };
     } catch {
@@ -555,13 +558,13 @@ export class MetaAPIClient {
       logger.error(
         `[MetaAPIClient] API Error:`,
         new Error(errorData.error?.message || "Unknown error"),
-        errorData
+        errorData,
       );
 
       throw new MetaAPIError(
         response.status,
         response.statusText,
-        errorData.error || { message: "Unknown error" }
+        errorData.error || { message: "Unknown error" },
       );
     }
 
@@ -588,7 +591,7 @@ export class MetaAPIClient {
    * Handle paginated requests
    */
   async *getPaginatedData<T>(
-    initialUrl: string
+    initialUrl: string,
   ): AsyncGenerator<T[], void, unknown> {
     let url: string | undefined = initialUrl;
     let pageNumber = 0;
@@ -638,7 +641,7 @@ export class MetaAPIClient {
 /**
  * Meta API Error
  */
-export class MetaAPIError extends Error {
+class MetaAPIError extends Error {
   constructor(
     public statusCode: number,
     public statusText: string,
@@ -647,10 +650,10 @@ export class MetaAPIError extends Error {
       type?: string;
       code?: number;
       fbtrace_id?: string;
-    }
+    },
   ) {
     super(
-      `Meta API error: ${statusCode} ${statusText}${errorData ? ` - ${errorData.message}` : ""}`
+      `Meta API error: ${statusCode} ${statusText}${errorData ? ` - ${errorData.message}` : ""}`,
     );
     this.name = "MetaAPIError";
   }

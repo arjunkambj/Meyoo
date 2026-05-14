@@ -1277,9 +1277,7 @@ export class ShopifyGraphQLClient {
     }
   }
 
-  private extractThrottleStatus(
-    extensions: unknown,
-  ): {
+  private extractThrottleStatus(extensions: unknown): {
     currentlyAvailable?: number;
     restoreRate?: number;
     maximumAvailable?: number;
@@ -1287,13 +1285,15 @@ export class ShopifyGraphQLClient {
     if (!extensions || typeof extensions !== "object") return null;
     const cost = (extensions as { cost?: unknown }).cost;
     if (!cost || typeof cost !== "object") return null;
-    const throttleStatus = (cost as {
-      throttleStatus?: {
-        currentlyAvailable?: number;
-        restoreRate?: number;
-        maximumAvailable?: number;
-      };
-    }).throttleStatus;
+    const throttleStatus = (
+      cost as {
+        throttleStatus?: {
+          currentlyAvailable?: number;
+          restoreRate?: number;
+          maximumAvailable?: number;
+        };
+      }
+    ).throttleStatus;
     if (!throttleStatus || typeof throttleStatus !== "object") return null;
     return throttleStatus as {
       currentlyAvailable?: number;
@@ -1320,7 +1320,8 @@ export class ShopifyGraphQLClient {
       return attemptDelay;
     }
 
-    const restoreRate = throttleStatus.restoreRate ||
+    const restoreRate =
+      throttleStatus.restoreRate ||
       SHOPIFY_CONFIG.API.RATE_LIMIT.GRAPHQL.RESTORE_RATE;
     const currentlyAvailable = throttleStatus.currentlyAvailable ?? 0;
 
@@ -1329,9 +1330,8 @@ export class ShopifyGraphQLClient {
     }
 
     const deficit = Math.max(0, this.SAFETY_BUFFER - currentlyAvailable);
-    const computedDelay = deficit > 0
-      ? Math.ceil(deficit / restoreRate) * 1000
-      : 0;
+    const computedDelay =
+      deficit > 0 ? Math.ceil(deficit / restoreRate) * 1000 : 0;
 
     const delay = Math.max(attemptDelay, computedDelay);
     const jitter = 0.9 + Math.random() * 0.2;
@@ -1350,7 +1350,8 @@ export class ShopifyGraphQLClient {
     const currentlyAvailable = throttleStatus.currentlyAvailable ?? 0;
     if (currentlyAvailable >= this.SAFETY_BUFFER) return;
 
-    const restoreRate = throttleStatus.restoreRate ||
+    const restoreRate =
+      throttleStatus.restoreRate ||
       SHOPIFY_CONFIG.API.RATE_LIMIT.GRAPHQL.RESTORE_RATE;
     if (!restoreRate) return;
 
@@ -1547,7 +1548,7 @@ export class ShopifyGraphQLClient {
   }
 }
 
-export class ShopifyAPIError extends Error {
+class ShopifyAPIError extends Error {
   constructor(
     message: string,
     public code: string,

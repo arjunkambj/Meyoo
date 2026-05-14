@@ -2,12 +2,7 @@ import { v } from "convex/values";
 import type { MutationCtx } from "../_generated/server";
 import { mutation, query } from "../_generated/server";
 import { createNewUserData } from "./workspaceProvisioning";
-import { ensureActiveMembership } from "./membershipHelpers";
-import {
-  getStackIdentity,
-  getUserAndOrg,
-  requireUserAndOrg,
-} from "../utils/auth";
+import { getUserAndOrg, requireUserAndOrg } from "../utils/auth";
 
 /**
  * Team Management
@@ -24,73 +19,6 @@ export const canManageTeam = query({
     const auth = await getUserAndOrg(ctx);
     if (!auth) return false;
     return auth.membership?.role === "StoreOwner";
-  },
-});
-
-/**
- * Sync an accepted Stack Auth team invitation into Convex membership state.
- */
-export const syncCurrentStackTeamMembership = mutation({
-  args: {
-    teamId: v.string(),
-  },
-  returns: v.union(
-    v.null(),
-    v.object({
-      role: v.union(v.literal("StoreOwner"), v.literal("StoreTeam")),
-    }),
-  ),
-  handler: async (ctx, args) => {
-    const stack = await getStackIdentity(ctx);
-    if (!stack)
-      throw new Error("User must be signed in to sync team membership");
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_stack_id", (q) => q.eq("stackId", stack.stackId))
-      .first();
-    if (!user) throw new Error("User not found");
-
-    const organization = await ctx.db
-      .query("organizations")
-      .withIndex("by_stack_team", (q) => q.eq("stackTeamId", args.teamId))
-      .first();
-    if (!organization) return null;
-
-    const membership = await ctx.db
-      .query("memberships")
-      .withIndex("by_org_user", (q) =>
-        q.eq("organizationId", organization._id).eq("userId", user._id),
-      )
-      .first();
-
-    if (membership?.status === "active") {
-      const role =
-        membership.role === "StoreOwner" ? "StoreOwner" : "StoreTeam";
-      return { role } as const;
-    }
-
-    const now = Date.now();
-    await ensureActiveMembership(
-      ctx as unknown as MutationCtx,
-      organization._id,
-      user._id,
-      "StoreTeam",
-      {
-        assignedAt: now,
-        assignedBy: organization.ownerId,
-      },
-    );
-
-    await ctx.db.patch("users", user._id, {
-      organizationId: organization._id,
-      selectedTeamId: args.teamId,
-      teamIds: Array.from(new Set([...(user.teamIds ?? []), args.teamId])),
-      status: "active",
-      updatedAt: now,
-    });
-
-    return { role: "StoreTeam" } as const;
   },
 });
 
@@ -133,69 +61,6 @@ export const getTeamMembers = query({
         updatedAt: u.updatedAt,
       };
     });
-  },
-});
-
-/**
- * Get team membership stats for the current organization
- */
-export const getTeamStats = query({
-  args: {},
-  returns: v.object({
-    totalMembers: v.number(),
-    activeMembers: v.number(),
-    suspendedMembers: v.number(),
-    owners: v.number(),
-    teamMembers: v.number(),
-    freeSeats: v.number(),
-    paidSeats: v.number(),
-    aiSeats: v.number(),
-  }),
-  handler: async (ctx) => {
-    const auth = await getUserAndOrg(ctx);
-    if (!auth) {
-      return {
-        totalMembers: 0,
-        activeMembers: 0,
-        suspendedMembers: 0,
-        owners: 0,
-        teamMembers: 0,
-        freeSeats: 0,
-        paidSeats: 0,
-        aiSeats: 0,
-      };
-    }
-
-    const memberships = (
-      await ctx.db
-        .query("memberships")
-        .withIndex("by_org", (q) => q.eq("organizationId", auth.orgId))
-        .collect()
-    ).filter((membership) => membership.status !== "removed");
-
-    return {
-      totalMembers: memberships.length,
-      activeMembers: memberships.filter(
-        (membership) => membership.status === "active",
-      ).length,
-      suspendedMembers: memberships.filter(
-        (membership) => membership.status === "suspended",
-      ).length,
-      owners: memberships.filter(
-        (membership) => membership.role === "StoreOwner",
-      ).length,
-      teamMembers: memberships.filter(
-        (membership) => membership.role === "StoreTeam",
-      ).length,
-      freeSeats: memberships.filter(
-        (membership) => membership.seatType === "free",
-      ).length,
-      paidSeats: memberships.filter(
-        (membership) => membership.seatType === "paid",
-      ).length,
-      aiSeats: memberships.filter((membership) => membership.hasAIAccess)
-        .length,
-    };
   },
 });
 

@@ -1,6 +1,7 @@
 import { optionalEnv } from "@/libs/env";
 
-const NEXT_PUBLIC_META_API_VERSION = optionalEnv("NEXT_PUBLIC_META_API_VERSION") ?? "v23.0";
+const NEXT_PUBLIC_META_API_VERSION =
+  optionalEnv("NEXT_PUBLIC_META_API_VERSION") ?? "v23.0";
 
 export const META_CONFIG = {
   API_VERSION: NEXT_PUBLIC_META_API_VERSION,
@@ -148,24 +149,3 @@ export const META_CONFIG = {
     MAX_LIMIT: 500,
   },
 } as const;
-
-// Type exports
-export type MetaSyncType =
-  (typeof META_CONFIG.SYNC_TYPES)[keyof typeof META_CONFIG.SYNC_TYPES];
-export type MetaDatePreset =
-  (typeof META_CONFIG.DATE_PRESETS)[keyof typeof META_CONFIG.DATE_PRESETS];
-export type MetaEffectiveStatus = (typeof META_CONFIG.EFFECTIVE_STATUS)[number];
-
-// Helper function to get all insights fields
-export function getAllInsightsFields(): string[] {
-  return [
-    ...META_CONFIG.INSIGHTS_FIELDS.BASIC,
-    ...META_CONFIG.INSIGHTS_FIELDS.ENGAGEMENT,
-    ...META_CONFIG.INSIGHTS_FIELDS.CONVERSIONS,
-    ...META_CONFIG.INSIGHTS_FIELDS.ACTIONS,
-    ...META_CONFIG.INSIGHTS_FIELDS.VIDEO,
-    ...META_CONFIG.INSIGHTS_FIELDS.CATALOG,
-    ...META_CONFIG.INSIGHTS_FIELDS.QUALITY,
-    ...META_CONFIG.INSIGHTS_FIELDS.OTHER,
-  ];
-}

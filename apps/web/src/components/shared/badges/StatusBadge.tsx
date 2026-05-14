@@ -3,7 +3,7 @@
 import { Chip, cn } from "@heroui/react";
 import type React from "react";
 
-export type StatusType =
+type StatusType =
   | "success"
   | "warning"
   | "danger"
@@ -12,14 +12,14 @@ export type StatusType =
   | "primary"
   | "secondary";
 
-export interface StatusConfig {
+interface StatusConfig {
   label: string;
   type: StatusType;
   icon?: string;
 }
 
 // Predefined status configurations for common use cases
-export const ORDER_STATUS_CONFIG: Record<string, StatusConfig> = {
+const ORDER_STATUS_CONFIG: Record<string, StatusConfig> = {
   pending: {
     label: "Pending",
     type: "warning",
@@ -55,7 +55,7 @@ export const ORDER_STATUS_CONFIG: Record<string, StatusConfig> = {
   },
 };
 
-export const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
+const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
   pending: {
     label: "Pending",
     type: "warning",
@@ -89,7 +89,7 @@ export const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
   },
 };
 
-export const FULFILLMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
+const FULFILLMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
   unfulfilled: {
     label: "Unfulfilled",
     type: "default",
@@ -178,7 +178,7 @@ export const FULFILLMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
   },
 };
 
-export const STOCK_STATUS_CONFIG: Record<string, StatusConfig> = {
+const STOCK_STATUS_CONFIG: Record<string, StatusConfig> = {
   in_stock: {
     label: "In Stock",
     type: "success",
@@ -206,7 +206,7 @@ export const STOCK_STATUS_CONFIG: Record<string, StatusConfig> = {
   },
 };
 
-export const PRODUCT_STATUS_CONFIG: Record<string, StatusConfig> = {
+const PRODUCT_STATUS_CONFIG: Record<string, StatusConfig> = {
   active: {
     label: "Active",
     type: "success",
@@ -220,7 +220,7 @@ export const PRODUCT_STATUS_CONFIG: Record<string, StatusConfig> = {
   },
 };
 
-export const CUSTOMER_STATUS_CONFIG: Record<string, StatusConfig> = {
+const CUSTOMER_STATUS_CONFIG: Record<string, StatusConfig> = {
   converted: {
     label: "Converted",
     type: "success",
@@ -233,7 +233,7 @@ export const CUSTOMER_STATUS_CONFIG: Record<string, StatusConfig> = {
   },
 };
 
-export interface StatusBadgeProps {
+interface StatusBadgeProps {
   status: string;
   config?: Record<string, StatusConfig>;
   size?: "sm" | "md" | "lg";
@@ -242,7 +242,7 @@ export interface StatusBadgeProps {
   className?: string;
 }
 
-export function StatusBadge({
+function StatusBadge({
   status,
   config,
   size = "sm",
@@ -318,11 +318,11 @@ export function StatusBadge({
         "capitalize",
         isFulfilledOrUnfulfilled &&
           "bg-surface-tertiary text-foreground dark:text-foreground",
-        className
+        className,
       )}
       color={isFulfilledOrUnfulfilled ? "default" : getColor(statusConfig.type)}
       size={size}
-            variant={variant}
+      variant={variant}
     >
       {statusConfig.label}
     </Chip>
@@ -330,26 +330,6 @@ export function StatusBadge({
 }
 
 // Export a compound component for easy access to specific status types
-export const OrderStatusBadge: React.FC<Omit<StatusBadgeProps, "config">> = (
-  props
-) => <StatusBadge {...props} config={ORDER_STATUS_CONFIG} />;
-
-export const PaymentStatusBadge: React.FC<Omit<StatusBadgeProps, "config">> = (
-  props
-) => <StatusBadge {...props} config={PAYMENT_STATUS_CONFIG} />;
-
 export const FulfillmentStatusBadge: React.FC<
   Omit<StatusBadgeProps, "config">
 > = (props) => <StatusBadge {...props} config={FULFILLMENT_STATUS_CONFIG} />;
-
-export const StockStatusBadge: React.FC<Omit<StatusBadgeProps, "config">> = (
-  props
-) => <StatusBadge {...props} config={STOCK_STATUS_CONFIG} />;
-
-export const ProductStatusBadge: React.FC<Omit<StatusBadgeProps, "config">> = (
-  props
-) => <StatusBadge {...props} config={PRODUCT_STATUS_CONFIG} />;
-
-export const CustomerStatusBadge: React.FC<Omit<StatusBadgeProps, "config">> = (
-  props
-) => <StatusBadge {...props} config={CUSTOMER_STATUS_CONFIG} />;

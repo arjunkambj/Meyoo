@@ -44,18 +44,6 @@ export const setOrganizationTimezoneInternal = internalMutation({
   },
 });
 
-export const getByStackTeamIdInternal = internalQuery({
-  args: {
-    stackTeamId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("organizations")
-      .withIndex("by_stack_team", (q) => q.eq("stackTeamId", args.stackTeamId))
-      .first();
-  },
-});
-
 export const getByIdInternal = internalQuery({
   args: {
     organizationId: v.id("organizations"),

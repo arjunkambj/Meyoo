@@ -3,7 +3,7 @@
  * No external dependencies, suitable for server-side Convex environment
  */
 
-export type LogLevel = "debug" | "info" | "warn" | "error";
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 export interface SimpleLogger {
   debug(message: string, data?: unknown): void;
@@ -83,20 +83,5 @@ export function createSimpleLogger(context: string): SimpleLogger {
           : {};
       log("error", message, { ...base, error: errorInfo });
     },
-  };
-}
-
-/**
- * Shortened logger for minimal overhead
- */
-export function log(context: string) {
-  const logger = createSimpleLogger(context);
-
-  return {
-    d: (message: string, data?: unknown) => logger.debug(message, data),
-    i: (message: string, data?: unknown) => logger.info(message, data),
-    w: (message: string, data?: unknown) => logger.warn(message, data),
-    e: (message: string, error?: unknown, data?: unknown) =>
-      logger.error(message, error, data),
   };
 }

@@ -177,31 +177,3 @@ export const SHOPIFY_CONFIG = {
     SYNC_IN_PROGRESS: "Sync already in progress",
   },
 } as const;
-
-/**
- * Get all webhook topics as an array
- */
-export function getAllWebhookTopics(): string[] {
-  return Object.values(SHOPIFY_CONFIG.WEBHOOKS);
-}
-
-/**
- * Get critical webhook topics (minimum required)
- */
-export function getCriticalWebhookTopics(): string[] {
-  return [
-    SHOPIFY_CONFIG.WEBHOOKS.APP_UNINSTALLED,
-    SHOPIFY_CONFIG.WEBHOOKS.PRODUCT_CREATE,
-    SHOPIFY_CONFIG.WEBHOOKS.PRODUCT_UPDATE,
-    SHOPIFY_CONFIG.WEBHOOKS.PRODUCT_DELETE,
-    SHOPIFY_CONFIG.WEBHOOKS.ORDER_CREATE,
-    SHOPIFY_CONFIG.WEBHOOKS.INVENTORY_LEVELS_UPDATE,
-  ];
-}
-
-/**
- * Check if a webhook topic is valid
- */
-export function isValidWebhookTopic(topic: string): boolean {
-  return getAllWebhookTopics().includes(topic);
-}

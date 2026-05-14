@@ -42,29 +42,3 @@ export const parseMoney = (
 
   return roundMoney(parsed);
 };
-
-/**
- * Sums an array of monetary values and rounds the result
- *
- * @param values - Array of numeric values to sum
- * @returns The sum rounded to 2 decimal places
- */
-export const sumMoney = (values: (number | undefined | null)[]): number => {
-  const sum = values.reduce((acc, val) => (acc ?? 0) + (val || 0), 0);
-
-  return roundMoney(sum);
-};
-
-/**
- * Calculates a percentage of a monetary value and rounds the result
- *
- * @param value - The base monetary value
- * @param percentage - The percentage to calculate (e.g., 10 for 10%)
- * @returns The calculated percentage value rounded to 2 decimal places
- */
-export const percentageOfMoney = (
-  value: number,
-  percentage: number,
-): number => {
-  return roundMoney((value * percentage) / 100);
-};

@@ -109,7 +109,6 @@ import type * as utils_org from "../utils/org.js";
 import type * as utils_orgDateRange from "../utils/orgDateRange.js";
 import type * as utils_shop from "../utils/shop.js";
 import type * as utils_shopify from "../utils/shopify.js";
-import type * as web_analytics from "../web/analytics.js";
 import type * as web_analyticsShared from "../web/analyticsShared.js";
 import type * as web_dashboard from "../web/dashboard.js";
 import type * as web_integrationRequests from "../web/integrationRequests.js";
@@ -230,7 +229,6 @@ declare const fullApi: ApiFromModules<{
   "utils/orgDateRange": typeof utils_orgDateRange;
   "utils/shop": typeof utils_shop;
   "utils/shopify": typeof utils_shopify;
-  "web/analytics": typeof web_analytics;
   "web/analyticsShared": typeof web_analyticsShared;
   "web/dashboard": typeof web_dashboard;
   "web/integrationRequests": typeof web_integrationRequests;

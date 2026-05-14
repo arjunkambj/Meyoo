@@ -2,7 +2,6 @@
 
 import { Input } from "@heroui/react";
 import type { InputProps } from "@heroui/react";
-import React from "react";
 
 import { sanitizeDecimal } from "./sanitize";
 
@@ -27,5 +26,3 @@ export function NumericInput({ onValueChange, ...rest }: NumericInputProps) {
     />
   );
 }
-
-export { sanitizeDecimal };

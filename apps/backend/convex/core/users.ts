@@ -84,15 +84,6 @@ const ensureStackUserWorkspace = async (
   await ensureDefaultDashboard(ctx, userId, organizationId, now);
 };
 
-export const getById = internalQuery({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.get("users", args.userId);
-  },
-});
-
 export const getUserByStackIdInternal = internalQuery({
   args: {
     stackId: v.string(),

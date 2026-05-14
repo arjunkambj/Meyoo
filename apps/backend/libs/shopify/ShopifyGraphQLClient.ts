@@ -395,7 +395,7 @@ export class ShopifyGraphQLClient {
    */
   async getProductsSimple(
     first: number = SHOPIFY_CONFIG.QUERIES.PRODUCTS_BATCH_SIZE,
-    after?: string | null
+    after?: string | null,
   ) {
     const query = `
       query GetProductsSimple($first: Int!, $after: String) {
@@ -467,7 +467,7 @@ export class ShopifyGraphQLClient {
   async getProductVariants(
     productId: string,
     first: number = 100,
-    after?: string | null
+    after?: string | null,
   ) {
     const query = `
       query GetProductVariants($productId: ID!, $first: Int!, $after: String) {
@@ -701,7 +701,7 @@ export class ShopifyGraphQLClient {
   async getOrdersSimple(
     first: number = SHOPIFY_CONFIG.QUERIES.ORDERS_BATCH_SIZE,
     after?: string | null,
-    query?: string
+    query?: string,
   ) {
     const graphqlQuery = `
       query GetOrdersSimple($first: Int!, $after: String, $query: String) {
@@ -803,7 +803,7 @@ export class ShopifyGraphQLClient {
   async getCustomers(
     first: number = 50,
     after: string | null = null,
-    query?: string
+    query?: string,
   ) {
     const graphqlQuery = `
       query GetCustomers($first: Int!, $after: String, $query: String) {
@@ -1214,7 +1214,7 @@ export class ShopifyGraphQLClient {
   private async makeRequest<T>(
     query: string,
     variables?: Record<string, unknown>,
-    attempt = 0
+    attempt = 0,
   ): Promise<GraphQLResponse<T>> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
@@ -1349,9 +1349,7 @@ export class ShopifyGraphQLClient {
     }
   }
 
-  private extractThrottleStatus(
-    extensions: unknown,
-  ): {
+  private extractThrottleStatus(extensions: unknown): {
     currentlyAvailable?: number;
     restoreRate?: number;
     maximumAvailable?: number;
@@ -1386,7 +1384,8 @@ export class ShopifyGraphQLClient {
       return attemptDelay;
     }
 
-    const restoreRate = throttleStatus.restoreRate ||
+    const restoreRate =
+      throttleStatus.restoreRate ||
       SHOPIFY_CONFIG.API.RATE_LIMIT.GRAPHQL.RESTORE_RATE;
     const currentlyAvailable = throttleStatus.currentlyAvailable ?? 0;
 
@@ -1395,9 +1394,8 @@ export class ShopifyGraphQLClient {
     }
 
     const deficit = Math.max(0, this.SAFETY_BUFFER - currentlyAvailable);
-    const computedDelay = deficit > 0
-      ? Math.ceil(deficit / restoreRate) * 1000
-      : 0;
+    const computedDelay =
+      deficit > 0 ? Math.ceil(deficit / restoreRate) * 1000 : 0;
 
     const delay = Math.max(attemptDelay, computedDelay);
     const jitter = 0.9 + Math.random() * 0.2;
@@ -1416,7 +1414,8 @@ export class ShopifyGraphQLClient {
     const currentlyAvailable = throttleStatus.currentlyAvailable ?? 0;
     if (currentlyAvailable >= this.SAFETY_BUFFER) return;
 
-    const restoreRate = throttleStatus.restoreRate ||
+    const restoreRate =
+      throttleStatus.restoreRate ||
       SHOPIFY_CONFIG.API.RATE_LIMIT.GRAPHQL.RESTORE_RATE;
     if (!restoreRate) return;
 
@@ -1499,9 +1498,12 @@ export class ShopifyGraphQLClient {
         if (node.inventoryLevels?.edges) {
           for (const edge of node.inventoryLevels.edges) {
             const quantities = edge.node.quantities || [];
-            const available = quantities.find((q) => q.name === "available")?.quantity ?? null;
-            const incoming = quantities.find((q) => q.name === "incoming")?.quantity ?? null;
-            const committed = quantities.find((q) => q.name === "committed")?.quantity ?? null;
+            const available =
+              quantities.find((q) => q.name === "available")?.quantity ?? null;
+            const incoming =
+              quantities.find((q) => q.name === "incoming")?.quantity ?? null;
+            const committed =
+              quantities.find((q) => q.name === "committed")?.quantity ?? null;
 
             // Add backward-compatible fields
             (edge.node as any).availableQuantity = available;
@@ -1701,11 +1703,11 @@ export class ShopifyGraphQLClient {
   }
 }
 
-export class ShopifyAPIError extends Error {
+class ShopifyAPIError extends Error {
   constructor(
     message: string,
     public code: string,
-    public details?: unknown
+    public details?: unknown,
   ) {
     super(message);
     this.name = "ShopifyAPIError";

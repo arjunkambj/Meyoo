@@ -150,13 +150,6 @@ export const META_CONFIG = {
   },
 } as const;
 
-// Type exports
-export type MetaSyncType =
-  (typeof META_CONFIG.SYNC_TYPES)[keyof typeof META_CONFIG.SYNC_TYPES];
-export type MetaDatePreset =
-  (typeof META_CONFIG.DATE_PRESETS)[keyof typeof META_CONFIG.DATE_PRESETS];
-export type MetaEffectiveStatus = (typeof META_CONFIG.EFFECTIVE_STATUS)[number];
-
 // Helper function to get all insights fields
 export function getAllInsightsFields(): string[] {
   return [
