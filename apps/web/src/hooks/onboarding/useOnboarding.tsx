@@ -4,21 +4,13 @@ import { useMutation } from "convex/react";
 import { useQuery } from "convex-helpers/react/cache/hooks";
 import { api } from "@/libs/convexApi";
 import type { OnboardingStatus } from "@repo/types";
-import { createContext, useContext } from "react";
-import type { ReactNode } from "react";
 
-function useOnboardingInternal() {
+export function useOnboarding() {
   const snapshot = useQuery(api.core.onboarding.getOnboardingSnapshot);
   const status = snapshot?.status as OnboardingStatus | null | undefined;
   const integrationStatus = snapshot?.integrationStatus;
   type Overall = "unsynced" | "syncing" | "complete" | "failed";
   const syncStatus = status?.syncStatus;
-  const updateStateMutation = useMutation(
-    api.core.onboarding.updateOnboardingState
-  );
-  const updateProfileMutation = useMutation(
-    api.core.onboarding.updateBusinessProfile
-  );
   const completeMutation = useMutation(api.core.onboarding.completeOnboarding);
 
   const shopifyOverall = syncStatus?.shopify?.overallState as
@@ -57,35 +49,6 @@ function useOnboardingInternal() {
   const isShopifyCustomersSynced = Boolean(shopifyStages?.customers);
   const isShopifyOrdersSynced = Boolean(shopifyStages?.orders);
 
-  // Next step navigation
-  const nextStep = async () => {
-    if (!status) return { success: false, error: "Status not loaded" };
-    const next = (status.currentStep || 1) + 1;
-
-    try {
-      await updateStateMutation({ step: next });
-
-      return { success: true, nextStep: next };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
-  };
-
-  // Update business profile
-  const updateBusinessProfile = async (data: {
-    organizationName?: string;
-    mobileNumber?: string;
-    mobileCountryCode?: string;
-  }) => {
-    try {
-      const result = await updateProfileMutation(data);
-
-      return { success: true, data: result };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
-  };
-
   // Finish onboarding
   const finishOnboarding = async () => {
     try {
@@ -117,9 +80,6 @@ function useOnboardingInternal() {
     },
     syncStatus,
     integrationStatus,
-    // New functions
-    nextStep,
-    updateBusinessProfile,
     finishOnboarding,
     // Connection status helpers
     hasShopify: status?.connections?.shopify || false,
@@ -145,68 +105,5 @@ function useOnboardingInternal() {
     isShopifyOrdersSynced,
     shopifyExpectedOrders,
     shopifyOrdersInDb,
-  };
-}
-
-type OnboardingContextValue = ReturnType<typeof useOnboardingInternal>;
-
-const OnboardingContext = createContext<OnboardingContextValue | null>(null);
-
-export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const value = useOnboardingInternal();
-
-  return (
-    <OnboardingContext.Provider value={value}>
-      {children}
-    </OnboardingContext.Provider>
-  );
-}
-
-/**
- * Get current onboarding status
- */
-export function useOnboarding(): OnboardingContextValue {
-  const context = useContext(OnboardingContext);
-
-  if (!context) {
-    throw new Error("useOnboarding must be used within OnboardingProvider");
-  }
-
-  return context;
-}
-
-/**
- * Update onboarding state
- */
-export function useUpdateOnboardingState() {
-  const mutation = useMutation(api.core.onboarding.updateOnboardingState);
-
-  return async (data: {
-    step?: number;
-    connections?: {
-      shopify?: boolean;
-      meta?: boolean;
-    };
-    completedSteps?: string[];
-    isComplete?: boolean;
-  }) => {
-    try {
-      const result = await mutation(data);
-
-      return {
-        success: true,
-        shouldTriggerAnalytics: result.shouldTriggerAnalytics,
-      };
-    } catch (error) {
-      // Failed to update onboarding state
-
-      return {
-        success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to update onboarding state",
-      };
-    }
   };
 }

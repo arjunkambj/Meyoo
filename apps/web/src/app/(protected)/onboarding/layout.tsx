@@ -1,25 +1,23 @@
 import { Suspense, type ReactNode } from "react";
+import { ensureNeedsOnboarding } from "@/app/onboarding-functions";
 import { OnboardingLayoutClient } from "@/components/onboarding/layouts/OnboardingLayoutClient";
 import { UserProvider } from "@/contexts/UserContext";
-import { OnboardingProvider } from "@/hooks/onboarding/useOnboarding";
 
 export default async function OnboardingLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  // Removed server-side status check to avoid duplicate queries
-  // OnboardingLayoutClient handles redirect logic via client-side query
+  await ensureNeedsOnboarding();
+
   return (
     <Suspense fallback={null}>
       <UserProvider>
-        <OnboardingProvider>
-          <section>
-            <OnboardingLayoutClient>
-              <div className="w-full h-full">{children}</div>
-            </OnboardingLayoutClient>
-          </section>
-        </OnboardingProvider>
+        <section>
+          <OnboardingLayoutClient>
+            <div className="w-full h-full">{children}</div>
+          </OnboardingLayoutClient>
+        </section>
       </UserProvider>
     </Suspense>
   );

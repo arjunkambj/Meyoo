@@ -12,7 +12,6 @@ import {
   COMPLETE_ROUTE,
 } from "@/constants/onboarding";
 import { optimisticNavigationAtom, completeStepAtom, setNavigationPendingAtom } from "@/store/onboarding";
-import { useUpdateOnboardingState } from "@/hooks/onboarding/useOnboarding";
 
 interface NavigationButtonsProps {
   onNext?: () => Promise<boolean> | boolean; // Return false to prevent navigation
@@ -43,7 +42,6 @@ const NavigationButtons = memo(function NavigationButtons({
 }: NavigationButtonsProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const updateOnboardingState = useUpdateOnboardingState();
   const [internalLoading, setInternalLoading] = useState(false);
   
   const optimisticNavigation = useSetAtom(optimisticNavigationAtom);
@@ -107,35 +105,6 @@ const NavigationButtons = memo(function NavigationButtons({
         optimisticNavigation({ step: nextStepInfo.id, route: nextRoute });
       }
 
-      // Persist next step on the server BEFORE navigation to avoid RouteGuard race
-      // This prevents getting bounced back to the same step when server state lags
-      if (nextStepInfo?.id) {
-        console.log(
-          `[NavigationButtons] Persisting onboarding state to step ${nextStepInfo.id} before navigation (${nextRoute})`
-        );
-        try {
-          const res = await updateOnboardingState({ step: nextStepInfo.id });
-          if (!res?.success) {
-            console.error(
-              "[NavigationButtons] Onboarding state update did not succeed; halting navigation"
-            );
-            setInternalLoading(false);
-            setNavigationPending(false);
-            return;
-          }
-        } catch (err) {
-          console.error(
-            "[NavigationButtons] Failed to update onboarding state (blocking nav for safety):",
-            err
-          );
-          // If server update fails, stop here and let user retry
-          setInternalLoading(false);
-          setNavigationPending(false);
-          return;
-        }
-      }
-
-      // Navigate after server acknowledges step update
       router.push(nextRoute as Route);
     } catch (error) {
       console.error("Navigation error:", error);
@@ -151,7 +120,6 @@ const NavigationButtons = memo(function NavigationButtons({
     optimisticNavigation,
     router,
     setNavigationPending,
-    updateOnboardingState,
   ]);
 
   const handlePrevious = useCallback(() => {

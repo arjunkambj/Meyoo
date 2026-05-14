@@ -1,7 +1,8 @@
 import { useUser as useStackUser } from "@stackframe/stack";
+import { useQuery } from "convex-helpers/react/cache/hooks";
 
 import { useUserContext } from "@/contexts/UserContext";
-import { useOnboarding } from "@/hooks/onboarding/useOnboarding";
+import { api } from "@/libs/convexApi";
 
 /**
  * Get current authenticated user
@@ -29,7 +30,7 @@ export function useUser() {
     primaryCurrency,
   } = useUserContext();
   const typedUser = user ? (user as UserProfile) : null;
-  const { status: onboardingStatus } = useOnboarding();
+  const integrationOverview = useQuery(api.core.integrationOverview.getOverview);
   const updateProfile = async (data: {
     name?: string;
     email?: string;
@@ -59,8 +60,8 @@ export function useUser() {
     role: membershipRole ?? null,
     membershipRole,
     organizationId,
-    hasShopifyConnection: onboardingStatus?.connections?.shopify || false,
-    hasMetaConnection: onboardingStatus?.connections?.meta || false,
+    hasShopifyConnection: integrationOverview?.shopify.connected || false,
+    hasMetaConnection: integrationOverview?.meta.connected || false,
     primaryCurrency,
     isLoading: loading,
     updateProfile,
@@ -74,15 +75,14 @@ export function useIsOnboarded() {
 }
 
 export function useIntegrationStatus() {
-  const { status: onboardingStatus } = useOnboarding();
+  const integrationOverview = useQuery(api.core.integrationOverview.getOverview);
 
   return {
-    hasShopify: onboardingStatus?.connections?.shopify || false,
-    hasMeta: onboardingStatus?.connections?.meta || false,
-    isInitialSyncComplete: onboardingStatus?.isInitialSyncComplete || false,
+    hasShopify: integrationOverview?.shopify.connected || false,
+    hasMeta: integrationOverview?.meta.connected || false,
     hasAnyIntegration: !!(
-      onboardingStatus?.connections?.shopify ||
-      onboardingStatus?.connections?.meta
+      integrationOverview?.shopify.connected ||
+      integrationOverview?.meta.connected
     ),
   };
 }

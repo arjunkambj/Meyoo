@@ -206,8 +206,7 @@ export async function GET(req: NextRequest) {
         });
       }
 
-      // Decide next step based on billing state
-      const redirectUrl = await getRedirectUrl(token, session.shop);
+      const redirectUrl = getRedirectUrl(session.shop);
       const res = NextResponse.redirect(redirectUrl);
       res.headers.set("X-Request-Id", requestId);
       return res;

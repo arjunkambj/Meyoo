@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import type { Route } from "next";
 import type React from "react";
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { useSetAtom, useAtomValue } from "jotai";
 import {
   getStepByRoute,
@@ -12,115 +12,28 @@ import {
 } from "@/constants/onboarding";
 import {
   onboardingStateAtom,
-  setOnboardingDataAtom,
-  setOnboardingLoadingAtom,
   navigateToStepAtom,
   prefetchRouteAtom,
 } from "@/store/onboarding";
 import { navigationPendingAtom, setNavigationPendingAtom } from "@/store/onboarding";
-import { OnboardingSkeleton } from "./OnboardingSkeleton";
 import { Logo } from "@/components/shared/Logo";
 import UserProfile from "@/components/shared/UserProfile";
 import MinimalProgressBar from "../MinimalProgressBar";
-import { useUserContext } from "@/contexts/UserContext";
-import { useOnboarding } from "@/hooks/onboarding/useOnboarding";
-import type { UserProfile as UserProfileDoc } from "@/hooks/mainapp/useUser";
 
-// Hook for batched onboarding data with Jotai integration
-const useOnboardingData = () => {
+const useNextRoutePrefetch = (
+  currentStep: number,
+  pathname: string | null,
+) => {
   const router = useRouter();
-  const {
-    user,
-    loading: userLoading,
-  } = useUserContext();
-  const {
-    status,
-    loading: onboardingLoading,
-  } = useOnboarding();
-  const [didOnboardingLoadTimeout, setDidOnboardingLoadTimeout] =
-    useState(false);
-
-  const setOnboardingData = useSetAtom(setOnboardingDataAtom);
-  const setLoading = useSetAtom(setOnboardingLoadingAtom);
   const prefetchRoute = useSetAtom(prefetchRouteAtom);
 
   useEffect(() => {
-    if (!onboardingLoading || userLoading || !user) {
-      setDidOnboardingLoadTimeout(false);
-      return;
+    const nextStep = getNextStep(currentStep, pathname ?? undefined);
+    if (nextStep?.route) {
+      router.prefetch(nextStep.route as Route);
+      prefetchRoute(nextStep.route);
     }
-
-    const timeout = window.setTimeout(() => {
-      setDidOnboardingLoadTimeout(true);
-    }, 2500);
-
-    return () => window.clearTimeout(timeout);
-  }, [onboardingLoading, user, userLoading]);
-
-  const isLoading =
-    userLoading || (onboardingLoading && !didOnboardingLoadTimeout);
-  // Stack metadata is the only source of truth for gating dashboard access.
-  useEffect(() => {
-    if (!isLoading && user?.isOnboarded) {
-      router.replace("/overview");
-    }
-  }, [isLoading, router, user?.isOnboarded]);
-
-  // Update Jotai store when data changes
-  useEffect(() => {
-    const profile = user as UserProfileDoc | null;
-    const normalizedUser: UserProfileDoc | null = profile
-      ? {
-          _id: typeof profile._id === "string" ? profile._id : undefined,
-          name: typeof profile.name === "string" ? profile.name : undefined,
-          email: typeof profile.email === "string" ? profile.email : undefined,
-          organizationId:
-            typeof profile.organizationId === "string"
-              ? profile.organizationId
-              : undefined,
-          isOnboarded:
-            typeof profile.isOnboarded === "boolean"
-              ? profile.isOnboarded
-              : undefined,
-          hasMetaConnection:
-            typeof profile.hasMetaConnection === "boolean"
-              ? profile.hasMetaConnection
-              : undefined,
-        }
-      : null;
-
-    if (!isLoading) {
-      setOnboardingData({
-        user: normalizedUser,
-        status,
-        connections: status?.connections
-          ? [
-              { platform: "shopify", isActive: status.connections.shopify },
-              { platform: "meta", isActive: status.connections.meta },
-            ]
-          : null,
-      });
-      setLoading(false);
-    } else {
-      setLoading(true);
-    }
-  }, [user, status, isLoading, setOnboardingData, setLoading]);
-
-  // Prefetch next route for instant navigation
-  useEffect(() => {
-    if (!isLoading && !user?.isOnboarded && status?.currentStep) {
-      const nextStep = getNextStep(
-        status.currentStep,
-        typeof window !== "undefined" ? window.location.pathname : undefined
-      );
-      if (nextStep?.route) {
-        router.prefetch(nextStep.route as Route);
-        prefetchRoute(nextStep.route);
-      }
-    }
-  }, [isLoading, prefetchRoute, router, status?.currentStep, user?.isOnboarded]);
-
-  return { isLoading };
+  }, [currentStep, pathname, prefetchRoute, router]);
 };
 
 interface OnboardingLayoutClientProps {
@@ -131,7 +44,6 @@ export const OnboardingLayoutClient = memo(function OnboardingLayoutClient({
   children,
 }: OnboardingLayoutClientProps) {
   const pathname = usePathname();
-  const { isLoading } = useOnboardingData();
 
   // Get state from Jotai atoms
   const onboardingState = useAtomValue(onboardingStateAtom);
@@ -142,6 +54,7 @@ export const OnboardingLayoutClient = memo(function OnboardingLayoutClient({
   // Determine current step from route; fall back to stored state
   const stepMeta = useMemo(() => getStepByRoute(pathname), [pathname]);
   const currentStep = stepMeta?.id ?? onboardingState.currentStep;
+  useNextRoutePrefetch(currentStep, pathname);
 
   // Update Jotai state when route changes
   useEffect(() => {
@@ -176,11 +89,6 @@ export const OnboardingLayoutClient = memo(function OnboardingLayoutClient({
     [pathname]
   );
   const containerWidthClass = isWide ? "max-w-7xl" : "max-w-3xl";
-
-  // Show skeleton while loading
-  if (isLoading || onboardingState.isLoading) {
-    return <OnboardingSkeleton currentStep={currentStep} />;
-  }
 
   return (
     <div className="relative flex min-h-dvh w-full bg-background overflow-x-hidden">

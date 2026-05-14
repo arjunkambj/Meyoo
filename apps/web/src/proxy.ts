@@ -7,6 +7,9 @@ const createRouteMatcher =
     const pathname = request.nextUrl.pathname;
     return patterns.some((pattern) => {
       const prefix = pattern.replace("(.*)", "");
+      if (prefix === "/") {
+        return pathname === "/";
+      }
       return pathname === prefix || pathname.startsWith(prefix);
     });
   };
@@ -20,6 +23,14 @@ const safeReturnPath = (value: string | null) => {
   if (!value?.startsWith("/") || value.startsWith("//")) return null;
   return value;
 };
+
+const getOnboarded = (metadata: unknown) =>
+  Boolean(
+    metadata &&
+      typeof metadata === "object" &&
+      "onboarded" in metadata &&
+      metadata.onboarded,
+  );
 
 // Public routes that don't require authentication
 const isPublicRoute = createRouteMatcher([
@@ -105,6 +116,21 @@ export default async function proxy(request: Request & { nextUrl: URL }) {
       if (returnUrl) {
         return redirect(request, returnUrl);
       }
+    }
+
+    const isOnboardingPath = pathname.startsWith("/onboarding");
+    const isOnboarded = getOnboarded(user?.clientReadOnlyMetadata);
+
+    if (isOnboardingPath && isOnboarded) {
+      return redirect(request, "/overview");
+    }
+
+    if (pathname === "/onboarding") {
+      return redirect(request, "/onboarding/shopify");
+    }
+
+    if (!isOnboardingPath && !isOnboarded) {
+      return redirect(request, "/onboarding/shopify");
     }
 
     return;

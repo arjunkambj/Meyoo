@@ -271,6 +271,7 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
+  stack_auth: import("@stackframe/stack/_generated/component.js").ComponentApi<"stack_auth">;
   mainWorkpool: import("@convex-dev/workpool/_generated/component.js").ComponentApi<"mainWorkpool">;
   actionRetrier: import("@convex-dev/action-retrier/_generated/component.js").ComponentApi<"actionRetrier">;
 };

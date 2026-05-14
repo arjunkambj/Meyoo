@@ -1,9 +1,7 @@
 "use server";
 
-import { fetchMutation } from "convex/nextjs";
 import { redirect } from "next/navigation";
 
-import { api } from "@/libs/convexApi";
 import { stackServerApp } from "@/stack/server";
 
 const getOnboarded = (metadata: unknown) =>
@@ -21,35 +19,20 @@ export async function ensureOnboarded() {
     redirect("/sign-in");
   }
 
-  const token = await stackServerApp.getConvexHttpClientAuth({
-    tokenStore: "nextjs-cookie",
-  });
-  const selectedTeamId = user.selectedTeam?.id;
-  const syncedMembership = selectedTeamId
-    ? await fetchMutation(
-        api.core.teams.syncCurrentStackTeamMembership,
-        { teamId: selectedTeamId },
-        { token },
-      )
-    : null;
+  if (!getOnboarded(user.clientReadOnlyMetadata)) {
+    redirect("/onboarding/shopify");
+  }
+}
 
-  const shouldAutoOnboardTeamMember =
-    syncedMembership?.role === "StoreTeam" &&
-    !getOnboarded(user.clientReadOnlyMetadata);
+export async function ensureNeedsOnboarding() {
+  const user = await stackServerApp.getUser();
 
-  if (shouldAutoOnboardTeamMember) {
-    await user.setClientReadOnlyMetadata({
-      ...user.clientReadOnlyMetadata,
-      onboarded: true,
-      onboardedAt: new Date().toISOString(),
-    });
+  if (!user) {
+    redirect("/sign-in");
   }
 
-  if (
-    !shouldAutoOnboardTeamMember &&
-    !getOnboarded(user.clientReadOnlyMetadata)
-  ) {
-    redirect("/onboarding");
+  if (getOnboarded(user.clientReadOnlyMetadata)) {
+    redirect("/overview");
   }
 }
 

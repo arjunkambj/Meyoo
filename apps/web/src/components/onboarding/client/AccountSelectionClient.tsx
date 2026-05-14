@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/libs/convexApi";
-import { useOnboarding, useUpdateOnboardingState } from "@/hooks";
+import { useOnboarding } from "@/hooks";
 import { Icon } from "@iconify/react";
 import { trackOnboardingAction, trackOnboardingView } from "@/libs/analytics";
 import { useSetAtom } from "jotai";
@@ -17,7 +17,6 @@ export default function AccountSelectionClient() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasPrimarySet, setHasPrimarySet] = useState(false);
   const { status } = useOnboarding();
-  const updateOnboardingState = useUpdateOnboardingState();
   const setNavigationPending = useSetAtom(setNavigationPendingAtom);
 
   // Fetch ad accounts
@@ -57,8 +56,6 @@ export default function AccountSelectionClient() {
     // If already has primary set, just navigate
     if (hasPrimarySet) {
       trackOnboardingAction("accounts", "continue", { selected: selectedAccount });
-      // Keep server step in sync (advance to step 5: products)
-      await updateOnboardingState({ step: 5 });
       setNavigationPending(true);
       router.push("/onboarding/products");
       return;
@@ -77,9 +74,6 @@ export default function AccountSelectionClient() {
 
       // Success toasts removed per onboarding policy
 
-      // Navigate to products page (step 5)
-      // Persist progression to Products so RouteGuard allows step 5
-      await updateOnboardingState({ step: 5 });
       setNavigationPending(true);
       router.push("/onboarding/products");
     } catch (error) {
@@ -91,11 +85,8 @@ export default function AccountSelectionClient() {
 
   const handleSkip = () => {
     trackOnboardingAction("accounts", "skip");
-    // Skipping should still advance the flow
-    updateOnboardingState({ step: 5 }).finally(() => {
-      setNavigationPending(true);
-      router.push("/onboarding/products");
-    });
+    setNavigationPending(true);
+    router.push("/onboarding/products");
   };
 
   // Loading state

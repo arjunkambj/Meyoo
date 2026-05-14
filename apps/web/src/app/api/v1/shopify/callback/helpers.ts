@@ -144,31 +144,10 @@ export async function triggerInitialSync(
   }
 }
 
-/**
- * Determines the redirect URL based on onboarding status
- */
-export async function getRedirectUrl(
-  token: string,
-  shopDomain: string,
-): Promise<string> {
+export function getRedirectUrl(shopDomain: string) {
   const baseUrl = NEXT_PUBLIC_APP_URL.trim().replace(/\/$/, "");
 
-  try {
-    const status = await fetchQuery(
-      api.core.onboarding.getOnboardingStatus,
-      {},
-      { token },
-    );
-
-    if (status?.connections?.shopify && status?.hasShopifySubscription) {
-      return `${baseUrl}/onboarding/marketing`;
-    }
-
-    return `${baseUrl}/onboarding/billing?shop=${encodeURIComponent(shopDomain)}`;
-  } catch {
-    // Fallback to billing page on error
-    return `${baseUrl}/onboarding/billing?shop=${encodeURIComponent(shopDomain)}`;
-  }
+  return `${baseUrl}/onboarding/billing?shop=${encodeURIComponent(shopDomain)}`;
 }
 
 /**
