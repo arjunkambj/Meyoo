@@ -127,9 +127,9 @@ export default function SignInPage() {
             variant="primary"
             className="h-10 w-full"
             isDisabled={isGoogleLoading || isVerifying}
-            isPending={isEmailLoading}
             type="submit"
           >
+            {isEmailLoading ? <Spinner color="current" size="sm" /> : null}
             {isEmailLoading ? "Sending..." : "Continue with Email"}
           </Button>
         </form>
@@ -158,12 +158,12 @@ export default function SignInPage() {
             <Button
               className="h-8 px-2 text-muted hover:text-foreground"
               isDisabled={isGoogleLoading || isVerifying || resendCooldown > 0}
-              isPending={isEmailLoading}
               size="sm"
               type="button"
               variant="tertiary"
               onPress={() => void handleSendMagicLink("resend")}
             >
+              {isEmailLoading ? <Spinner color="current" size="sm" /> : null}
               {isEmailLoading ? "Sending..." : "Resend code"}
             </Button>
             <button
@@ -190,7 +190,6 @@ export default function SignInPage() {
       </div>
 
       <Button
-        isPending={isGoogleLoading}
         isDisabled={isEmailLoading || isVerifying}
         className="h-10 w-full"
         variant="tertiary"
@@ -203,7 +202,11 @@ export default function SignInPage() {
           }
         }}
       >
-        {!isGoogleLoading && <Icon icon="logos:google-icon" width={18} />}
+        {isGoogleLoading ? (
+          <Spinner color="current" size="sm" />
+        ) : (
+          <Icon icon="logos:google-icon" width={18} />
+        )}
         {isGoogleLoading ? "Redirecting..." : "Continue with Google"}
       </Button>
 

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@heroui/styles";
+@import "lenis/dist/lenis.css";
 
 @theme {
   --animate-marquee: marquee var(--duration, 25s) linear infinite;
