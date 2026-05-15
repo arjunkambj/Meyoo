@@ -3,7 +3,14 @@
 import { Avatar } from "@heroui/react";
 import React from "react";
 import { Icon } from "@iconify/react";
+import { m } from "motion/react";
 import { designSystem } from "@/libs/design-system";
+import {
+  interactiveCardVariants,
+  revealContainerVariants,
+  revealItemVariants,
+  revealViewport,
+} from "@/components/home/motionVariants";
 
 const testimonials = [
   {
@@ -50,24 +57,50 @@ const Testimonial = () => {
       className={`relative flex w-full flex-col items-center justify-center py-16 sm:py-20 lg:py-24 ${designSystem.background.gradient}`}
     >
       <div className={designSystem.spacing.container}>
-        <div className="text-center">
-          <div className={designSystem.typography.sectionChip}>
+        <m.div
+          className="text-center"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
+          <m.div
+            className={designSystem.typography.sectionChip}
+            variants={revealItemVariants}
+          >
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Testimonial
             </span>
-          </div>
-        </div>
-        <h2 className={designSystem.typography.sectionTitle}>What customers say</h2>
-        <p className={designSystem.typography.sectionSubtitle}>Loved by operators and teams.</p>
+          </m.div>
+          <m.h2
+            className={designSystem.typography.sectionTitle}
+            variants={revealItemVariants}
+          >
+            What customers say
+          </m.h2>
+          <m.p
+            className={designSystem.typography.sectionSubtitle}
+            variants={revealItemVariants}
+          >
+            Loved by operators and teams.
+          </m.p>
+        </m.div>
       </div>
-      <div
+      <m.div
         className={`relative mx-auto mt-16 grid w-full max-w-7xl items-stretch gap-5 px-4 sm:px-6 lg:px-8 md:grid-cols-2 lg:grid-cols-3`}
+        initial="initial"
+        variants={revealContainerVariants}
+        viewport={revealViewport}
+        whileInView="animate"
       >
         {testimonials.map((testimonial) => (
-          <article
+          <m.article
             key={testimonial.id}
-            className="group relative flex h-full min-h-[22rem] flex-col rounded-[2rem] bg-surface px-6 py-5 transition-all duration-300 hover:-translate-y-1 sm:px-7 sm:py-6"
+            className="group relative flex h-full min-h-[22rem] flex-col rounded-[2rem] bg-surface-secondary p-1.5"
+            variants={interactiveCardVariants}
+            whileHover="hover"
           >
+            <div className="flex h-full flex-col rounded-[2rem] bg-surface px-6 py-5 sm:px-7 sm:py-6">
               <div className="mb-4">
                 <div className="inline-flex text-accent">
                   <Icon icon="ri:double-quotes-l" width={40} />
@@ -99,9 +132,10 @@ const Testimonial = () => {
                   </p>
                 </div>
               </div>
-          </article>
+            </div>
+          </m.article>
         ))}
-      </div>
+      </m.div>
     </section>
   );
 };

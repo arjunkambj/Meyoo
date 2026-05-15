@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Card, Switch } from "@heroui/react";
+import { m } from "motion/react";
 import React, { useMemo, useState } from "react";
 
 import { Icon } from "@iconify/react";
@@ -10,6 +11,12 @@ import { designSystem } from "@/libs/design-system";
 import type { Route } from "next";
 import Link from "next/link";
 import { NumberTicker } from "@/components/shared/NumberTicker";
+import {
+  revealCardVariants,
+  revealContainerVariants,
+  revealItemVariants,
+  revealViewport,
+} from "@/components/home/motionVariants";
 
 const usePrevious = <T,>(value: T) => {
   const ref = React.useRef<T>(value);
@@ -67,23 +74,42 @@ const Pricing = () => {
       <div
         className={`${designSystem.spacing.container} mx-auto max-w-7xl flex flex-col gap-4 sm:gap-5`}
       >
-        <div className="mb-8 flex flex-col items-center text-center">
-          <div className={designSystem.typography.sectionChip}>
+        <m.div
+          className="mb-8 flex flex-col items-center text-center"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
+          <m.div
+            className={designSystem.typography.sectionChip}
+            variants={revealItemVariants}
+          >
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Plans
             </span>
-          </div>
-          <h2 className={designSystem.typography.sectionTitle}>
+          </m.div>
+          <m.h2
+            className={designSystem.typography.sectionTitle}
+            variants={revealItemVariants}
+          >
             Simple, transparent pricing
-          </h2>
-          <p
+          </m.h2>
+          <m.p
             className={`${designSystem.typography.sectionSubtitle} max-w-2xl mx-auto`}
+            variants={revealItemVariants}
           >
             Start free for 28 days. Scale as you grow. Cancel anytime.
-          </p>
-        </div>
+          </m.p>
+        </m.div>
 
-        <div className="flex items-center justify-center gap-4 text-sm">
+        <m.div
+          className="flex items-center justify-center gap-4 text-sm"
+          initial="initial"
+          variants={revealItemVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
           <span
             className={`font-medium transition-colors ${billingCycle === FrequencyEnum.Monthly ? "text-foreground" : "text-muted-foreground"}`}
           >
@@ -113,44 +139,56 @@ const Pricing = () => {
               Save 20%
             </span>
           </div>
-        </div>
+        </m.div>
 
         {freeTier ? (
-          <Card
+          <m.div
+            initial="initial"
+            variants={revealCardVariants}
+            viewport={revealViewport}
+            whileInView="animate"
             className="mx-auto w-full max-w-3xl rounded-3xl bg-surface-secondary p-1.5 shadow-none"
           >
-            <Card.Content className="flex flex-col gap-2 rounded-2xl bg-surface px-6 py-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-2.5">
-                <Icon
-                  icon="solar:bolt-bold"
-                  className="size-10 shrink-0 text-accent"
-                />
-                <div className="space-y-0.5">
-                  <h3 className="text-lg font-medium tracking-tight text-foreground">
-                    Start free with your first 300 orders
-                  </h3>
-                  <p className="text-sm text-muted">
-                    {freeTier.description}
-                  </p>
+            <Card className="rounded-[inherit] bg-transparent shadow-none">
+              <Card.Content className="flex flex-col gap-2 rounded-2xl bg-surface px-6 py-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-2.5">
+                  <Icon
+                    icon="solar:bolt-bold"
+                    className="size-10 shrink-0 text-accent"
+                  />
+                  <div className="space-y-0.5">
+                    <h3 className="text-lg font-medium tracking-tight text-foreground">
+                      Start free with your first 300 orders
+                    </h3>
+                    <p className="text-sm text-muted">
+                      {freeTier.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex shrink-0 items-center">
-                <Link href={freeTier.href as Route}>
-                  <Button
-                    className="h-10 font-semibold transition-all duration-200 active:scale-100"
-                    variant={freeTier.buttonVariant}
-                    size="md"
-                  >
-                    {freeTier.buttonText}
-                  </Button>
-                </Link>
-              </div>
-            </Card.Content>
-          </Card>
+                <div className="flex shrink-0 items-center">
+                  <Link href={freeTier.href as Route}>
+                    <Button
+                      className="h-10 font-semibold transition-all duration-200 active:scale-100"
+                      variant={freeTier.buttonVariant}
+                      size="md"
+                    >
+                      {freeTier.buttonText}
+                    </Button>
+                  </Link>
+                </div>
+              </Card.Content>
+            </Card>
+          </m.div>
         ) : null}
 
-        <div className="grid items-stretch gap-5 md:grid-cols-3">
+        <m.div
+          className="grid items-stretch gap-5 md:grid-cols-3"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
           {paidTiers.map((tier) => {
             const price = getTierPrice(tier, billingCycle);
             const periodCopy =
@@ -159,10 +197,12 @@ const Pricing = () => {
             const shouldAnimate = Number.isFinite(currentPriceValue);
 
             return (
-              <Card
+              <m.div
                 key={tier.key}
                 className="flex h-full w-full flex-col rounded-[2rem] bg-surface px-5 py-5 shadow-none transition-all duration-300"
+                variants={revealCardVariants}
               >
+                <Card className="flex h-full bg-transparent shadow-none">
                 <Card.Content className="flex h-full flex-col p-0">
                   <div className="flex flex-col gap-2">
                     <div className="space-y-1.5">
@@ -229,10 +269,11 @@ const Pricing = () => {
                     </ul>
                   </div>
                 </Card.Content>
-              </Card>
+                </Card>
+              </m.div>
             );
           })}
-        </div>
+        </m.div>
       </div>
     </section>
   );

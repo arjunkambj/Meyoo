@@ -19,6 +19,12 @@
       "skillPath": "skills/heroui-react/SKILL.md",
       "computedHash": "c9e1bb41fbc3cee782faae08bd465ae05cd685a6ed7cc3392464fdf29b3ab467"
     },
+    "motion": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "motion/SKILL.md",
+      "computedHash": "d7c0539701283262ad97226463e11a3785700f401463b51c6963006e03358e66"
+    },
     "stack-auth-convex": {
       "source": "arjunkambj/stack-auth-convex",
       "sourceType": "github",

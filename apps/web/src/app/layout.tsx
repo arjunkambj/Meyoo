@@ -9,39 +9,32 @@ import { stackServerApp } from "@/stack/server";
 import { Providers } from "@/components/Providers";
 import { siteConfig } from "@/constants/config/site";
 
-const description =
-  "Meyoo gives D2C teams one clean view of revenue, ad spend, costs, and true profit.";
-const ogImageUrl =
-  "https://hsuvzu8f2y.ufs.sh/f/7HGbSLA9igLNnKyY0SOVxEvhuNrTFGK39MspOgHXizj2kSPl";
-
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  metadataBase: process.env.NEXT_PUBLIC_APP_URL
-    ? new URL(process.env.NEXT_PUBLIC_APP_URL)
-    : undefined,
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL!),
   title: {
     default: "Meyoo — Profit Analytics for D2C Brands",
     template: `%s - ${siteConfig.name}`,
   },
-  description,
+  description: siteConfig.description,
   icons: {
     icon: "/favicon.svg",
   },
   openGraph: {
     title: "Meyoo - Profit Analytics for D2C Brands",
-    description,
+    description: siteConfig.description,
     url: "/",
     siteName: siteConfig.name,
     images: [
       {
-        url: ogImageUrl,
-        width: 1200,
-        height: 630,
-        alt: "Meyoo profit analytics dashboard preview",
+        url: siteConfig.ogImage.url,
+        width: siteConfig.ogImage.width,
+        height: siteConfig.ogImage.height,
+        alt: siteConfig.ogImage.alt,
       },
     ],
     locale: "en_US",
@@ -50,8 +43,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Meyoo - Profit Analytics for D2C Brands",
-    description,
-    images: [ogImageUrl],
+    description: siteConfig.description,
+    images: [siteConfig.ogImage.url],
   },
   alternates: {
     canonical: "/",

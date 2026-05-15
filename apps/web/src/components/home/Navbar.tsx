@@ -2,12 +2,14 @@
 
 import { Button, Modal } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { m } from "motion/react";
 import type { Route } from "next";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Logo } from "@/components/shared/Logo";
 import { designSystem } from "@/libs/design-system";
+import { cn } from "@/libs/utils";
 
 const navItems: { name: string; href: Route }[] = [
   { name: "About", href: "/about" },
@@ -15,15 +17,71 @@ const navItems: { name: string; href: Route }[] = [
   { name: "Pricing", href: "/pricing" },
 ];
 
+const navVariants = {
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.36, ease: "easeOut" as const },
+    y: 0,
+  },
+  initial: { opacity: 0, y: -20 },
+};
+
+const navItemVariants = {
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.28, ease: "easeOut" as const },
+    y: 0,
+  },
+  initial: { opacity: 0, y: -10 },
+};
+
 export default function CenteredNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [isPastHero, setIsPastHero] = useState(false);
   const currentPath = usePathname();
   const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (!isClient) return;
+
+    if (currentPath !== "/") {
+      setIsPastHero(true);
+      return;
+    }
+
+    const hero = document.querySelector<HTMLElement>("[data-home-hero]");
+
+    if (!hero) {
+      throw new Error("Home hero marker is required for navbar state");
+    }
+
+    const updateNavState = () => {
+      setIsPastHero(hero.getBoundingClientRect().bottom <= 88);
+    };
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+
+      if (!entry) {
+        throw new Error("Navbar hero observer did not receive an entry");
+      }
+
+      setIsPastHero(!entry.isIntersecting);
+    }, { rootMargin: "-88px 0px 0px 0px" });
+
+    updateNavState();
+    observer.observe(hero);
+    window.addEventListener("resize", updateNavState, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateNavState);
+    };
+  }, [currentPath, isClient]);
 
   // Lock body scroll when mobile menu is open to reduce paint cost
   useEffect(() => {
@@ -40,19 +98,41 @@ export default function CenteredNavbar() {
   }, [isClient, isMenuOpen]);
 
   return (
-    <div className="sticky top-0 bg-background z-50 w-full py-1">
-      <div className={`${designSystem.spacing.container} flex w-full`}>
-        <nav className="flex w-full items-center gap-2 rounded-2xl bg-transparent px-2 py-2.5 transition-all duration-300 sm:gap-4 sm:px-4 sm:py-2.5 md:px-6 md:py-4">
+    <div className="sticky top-0 z-50 w-full">
+      <m.div
+        className={cn(
+          designSystem.spacing.container,
+          "flex w-full transition-all duration-700 ease-out",
+          isPastHero && "mt-2 max-w-5xl"
+        )}
+        animate="animate"
+        initial="initial"
+        variants={navVariants}
+      >
+        <m.nav
+          className={cn(
+            "flex w-full items-center gap-2 px-2 transition-all duration-700 ease-out sm:gap-4 sm:px-4 md:px-6",
+            isPastHero
+              ? "rounded-2xl bg-surface py-1.5 sm:py-1.5 md:py-2"
+              : "rounded-none bg-background py-2.5 sm:py-2.5 md:py-4"
+          )}
+        >
           {/* Left side - Logo */}
-          <div className="shrink-0">
+          <m.div className="shrink-0" variants={navItemVariants}>
             <Logo href="/" />
-          </div>
+          </m.div>
 
           {/* Center - Navigation Items */}
           <div className="hidden flex-1 justify-center md:flex">
-            <div className="flex items-center gap-10">
+            <m.div
+              className="flex items-center gap-10"
+              variants={{
+                animate: { transition: { staggerChildren: 0.045 } },
+                initial: {},
+              }}
+            >
               {navItems.map((item) => (
-                <div key={item.name}>
+                <m.div key={item.name} variants={navItemVariants}>
                   <Button
                     className={`relative px-3 py-2 transition-all bg-transparent hover:bg-transparent duration-300 font-medium text-sm group h-auto min-w-0 ${
                       currentPath === item.href
@@ -70,13 +150,16 @@ export default function CenteredNavbar() {
                       }`}
                     />
                   </Button>
-                </div>
+                </m.div>
               ))}
-            </div>
+            </m.div>
           </div>
 
           {/* Right side - CTA (Meyoo) */}
-          <div className="hidden shrink-0 grow-0 md:flex">
+          <m.div
+            className="hidden shrink-0 grow-0 md:flex"
+            variants={navItemVariants}
+          >
             <Button
               variant="primary"
               className="w-full font-semibold"
@@ -85,7 +168,7 @@ export default function CenteredNavbar() {
               Get started
               <Icon className="ml-1" icon="solar:alt-arrow-right-linear" />
             </Button>
-          </div>
+          </m.div>
 
           {/* Mobile Menu Toggle */}
           <div className="ml-auto shrink-0 grow-0 md:hidden">
@@ -168,8 +251,8 @@ export default function CenteredNavbar() {
               </Modal.Container>
             </Modal.Backdrop>
           </Modal>
-        </nav>
-      </div>
+        </m.nav>
+      </m.div>
     </div>
   );
 }

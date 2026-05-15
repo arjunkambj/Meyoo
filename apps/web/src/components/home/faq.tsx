@@ -2,7 +2,14 @@
 
 import { Accordion, Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { m } from "motion/react";
 import { designSystem } from "@/libs/design-system";
+import {
+  revealCardVariants,
+  revealContainerVariants,
+  revealItemVariants,
+  revealViewport,
+} from "@/components/home/motionVariants";
 
 const faqs = [
   {
@@ -43,19 +50,45 @@ const Faq = () => {
       className={`relative pt-16 sm:pt-20 lg:pt-24 2xl:pt-28 pb-16 sm:pb-20 lg:pb-24 2xl:pb-28 ${designSystem.background.gradient} w-full scroll-mt-24`}
     >
       <div className={`${designSystem.spacing.container} mx-auto max-w-7xl`}>
-        <div className="text-center mb-16">
-          <div className={designSystem.typography.sectionChip}>
+        <m.div
+          className="text-center mb-16"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
+          <m.div
+            className={designSystem.typography.sectionChip}
+            variants={revealItemVariants}
+          >
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               FAQ
             </span>
-          </div>
-          <h2 className={designSystem.typography.sectionTitle}>Common Questions</h2>
-          <p className={designSystem.typography.sectionSubtitle}>
+          </m.div>
+          <m.h2
+            className={designSystem.typography.sectionTitle}
+            variants={revealItemVariants}
+          >
+            Common Questions
+          </m.h2>
+          <m.p
+            className={designSystem.typography.sectionSubtitle}
+            variants={revealItemVariants}
+          >
             We&apos;re here to help you get the most out of Meyoo.
-          </p>
-        </div>
-        <div className="grid gap-10 md:grid-cols-2 lg:gap-14">
-          <div className="flex flex-col justify-center gap-4">
+          </m.p>
+        </m.div>
+        <m.div
+          className="grid gap-10 md:grid-cols-2 lg:gap-14"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
+          <m.div
+            className="flex flex-col justify-center gap-4"
+            variants={revealCardVariants}
+          >
               <h3 className="text-2xl font-medium tracking-tight">
                 Need personalized help?
               </h3>
@@ -74,7 +107,8 @@ const Faq = () => {
                   Email hey@meyoo.io
                 </Button>
               </a>
-          </div>
+          </m.div>
+          <m.div variants={revealCardVariants}>
           <Accordion hideSeparator className="w-full">
             {faqs.map((faq) => (
               <Accordion.Item
@@ -100,7 +134,8 @@ const Faq = () => {
               </Accordion.Item>
             ))}
           </Accordion>
-        </div>
+          </m.div>
+        </m.div>
       </div>
     </section>
   );

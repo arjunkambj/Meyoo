@@ -1,7 +1,16 @@
 "use client";
 
+import { m } from "motion/react";
 import Image from "next/image";
 import { designSystem } from "@/libs/design-system";
+import { cn } from "@/libs/utils";
+import {
+  interactiveCardVariants,
+  interactiveImageVariants,
+  revealContainerVariants,
+  revealItemVariants,
+  revealViewport,
+} from "@/components/home/motionVariants";
 
 type FeatureCard = {
   id: number;
@@ -52,7 +61,7 @@ const featureCardSpan = (index: number) =>
   index < 2 ? "lg:col-span-3" : "lg:col-span-2";
 
 const featureImageArea = (index: number) =>
-  index < 2 ? "aspect-[4/3] lg:aspect-[16/9]" : "aspect-[4/3]";
+  index < 2 ? "aspect-[3/2] lg:aspect-[2/1]" : "aspect-[3/2]";
 
 const featureImageScale = (index: number) =>
   index < 2 ? "" : "scale-110";
@@ -65,33 +74,66 @@ const Feature = () => {
       <div
         className={`${designSystem.spacing.container} flex w-full flex-col items-center justify-center`}
       >
-        <div className={designSystem.typography.sectionChip}>
-          <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
-            Features
-          </span>
-        </div>
-        <h2 className={`relative z-20 ${designSystem.typography.sectionTitle}`}>
-          Everything You Need to Grow
-        </h2>
-        <p className={`${designSystem.typography.sectionSubtitle} max-w-2xl mx-auto`}>
-          Powerful features designed specifically for D2C brands. Track every metric that matters and make data-driven decisions with confidence.
-        </p>
+        <m.div
+          className="flex flex-col items-center text-center"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
+          <m.div
+            className={designSystem.typography.sectionChip}
+            variants={revealItemVariants}
+          >
+            <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
+              Features
+            </span>
+          </m.div>
+          <m.h2
+            className={`relative z-20 ${designSystem.typography.sectionTitle}`}
+            variants={revealItemVariants}
+          >
+            Everything You Need to Grow
+          </m.h2>
+          <m.p
+            className={`${designSystem.typography.sectionSubtitle} max-w-2xl mx-auto`}
+            variants={revealItemVariants}
+          >
+            Powerful features designed specifically for D2C brands. Track every metric that matters and make data-driven decisions with confidence.
+          </m.p>
+        </m.div>
 
-        <div className="mx-auto mt-16 grid w-full max-w-7xl grid-cols-1 gap-5 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-6">
+        <m.div
+          className="mx-auto mt-16 grid w-full max-w-7xl grid-cols-1 gap-5 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-6"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
           {featureData.map((item, index) => (
-            <article
+            <m.article
               key={item.id}
-              className={`group relative flex h-full flex-col rounded-[2rem] bg-surface-secondary p-1.5 transition-all duration-300 hover:scale-[1.02] ${featureCardSpan(index)}`}
+              className={cn(
+                "group relative flex h-full flex-col rounded-[2rem] bg-surface-secondary p-1.5",
+                featureCardSpan(index)
+              )}
+              variants={interactiveCardVariants}
+              whileHover="hover"
             >
               <div className="flex h-full flex-col rounded-[2rem] bg-surface p-1.5">
                 <div className={`relative ${featureImageArea(index)} overflow-hidden rounded-[2rem] bg-gradient-to-br from-accent/5 via-accent/[0.025] to-transparent`}>
-                  <Image
-                    src={item.image}
-                    alt=""
-                    fill
-                    sizes={index < 2 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
-                    className={`object-cover ${featureImageScale(index)}`}
-                  />
+                  <m.div
+                    className="absolute inset-0"
+                    variants={interactiveImageVariants}
+                  >
+                    <Image
+                      src={item.image}
+                      alt=""
+                      fill
+                      sizes={index < 2 ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
+                      className={cn("object-cover", featureImageScale(index))}
+                    />
+                  </m.div>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
                 </div>
                 <div className="mt-5 w-full flex-1 p-4">
@@ -103,9 +145,9 @@ const Feature = () => {
                   </p>
                 </div>
               </div>
-            </article>
+            </m.article>
           ))}
-        </div>
+        </m.div>
       </div>
     </section>
   );

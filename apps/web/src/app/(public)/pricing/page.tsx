@@ -1,4 +1,5 @@
 import { Pricing } from "@/components/home/Pricing";
+import { siteConfig } from "@/constants/config/site";
 import { designSystem } from "@/libs/design-system";
 import type { Metadata } from "next";
 
@@ -13,10 +14,10 @@ export const metadata: Metadata = {
     url: "/pricing",
     images: [
       {
-        url: "/dark-meyoo.png",
-        width: 1200,
-        height: 630,
-        alt: "Meyoo dashboard preview",
+        url: siteConfig.ogImage.url,
+        width: siteConfig.ogImage.width,
+        height: siteConfig.ogImage.height,
+        alt: siteConfig.ogImage.alt,
       },
     ],
   },
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     title: "Pricing — Meyoo",
     description:
       "Simple, transparent pricing. Start free for 28 days. Scale as you grow. Cancel anytime.",
-    images: ["/dark-meyoo.png"],
+    images: [siteConfig.ogImage.url],
   },
 };
 

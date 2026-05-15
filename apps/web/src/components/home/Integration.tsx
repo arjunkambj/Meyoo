@@ -1,11 +1,18 @@
 "use client";
 
 import React from "react";
+import { m } from "motion/react";
 
 import { cn } from "@/libs/utils";
 import { designSystem } from "@/libs/design-system";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
+import {
+  revealCardVariants,
+  revealContainerVariants,
+  revealItemVariants,
+  revealViewport,
+} from "@/components/home/motionVariants";
 
 type IntegrationLogo =
   | { name: string; className?: string; icon: string; image?: never }
@@ -58,19 +65,42 @@ const Integration = () => {
       className={`relative flex w-full flex-col items-center justify-center py-16 sm:py-20 lg:py-24 ${designSystem.background.gradient}`}
     >
       <div className={designSystem.spacing.container}>
-        <div className="text-center">
-          <div className={designSystem.typography.sectionChip}>
+        <m.div
+          className="text-center"
+          initial="initial"
+          variants={revealContainerVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
+          <m.div
+            className={designSystem.typography.sectionChip}
+            variants={revealItemVariants}
+          >
             <span className="text-sm uppercase tracking-[0.15em] font-medium text-accent/70">
               Integrations
             </span>
-          </div>
-        </div>
-        <h2 className={designSystem.typography.sectionTitle}>How Meyoo Works</h2>
-        <p className={`${designSystem.typography.sectionSubtitle} max-w-2xl mx-auto`}>
+          </m.div>
+          <m.h2
+            className={designSystem.typography.sectionTitle}
+            variants={revealItemVariants}
+          >
+            How Meyoo Works
+          </m.h2>
+          <m.p
+            className={`${designSystem.typography.sectionSubtitle} max-w-2xl mx-auto`}
+            variants={revealItemVariants}
+          >
           From setup to scale in three simple steps: connect your tools, unlock insights, and make better decisions to grow your brand.
-        </p>
+          </m.p>
+        </m.div>
 
-        <div className="relative mt-16">
+        <m.div
+          className="relative mt-16"
+          initial="initial"
+          variants={revealItemVariants}
+          viewport={revealViewport}
+          whileInView="animate"
+        >
           <div className="flex overflow-hidden p-2 [--duration:25s] [--gap:1rem] [gap:var(--gap)]">
             {Array.from({ length: 4 }).map((_, groupIndex) => (
               <div
@@ -107,10 +137,17 @@ const Integration = () => {
           </div>
           <div className="pointer-events-none absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-background via-background/80 to-transparent"></div>
           <div className="pointer-events-none absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-background via-background/80 to-transparent"></div>
-        </div>
+        </m.div>
       </div>
-      <div className="relative mx-auto mt-16 grid min-h-[28rem] w-full max-w-7xl items-stretch gap-5 px-4 sm:px-6 lg:px-8 md:grid-cols-2 lg:grid-cols-3">
+      <m.div
+        className="relative mx-auto mt-16 grid min-h-[28rem] w-full max-w-7xl items-stretch gap-5 px-4 sm:px-6 lg:px-8 md:grid-cols-2 lg:grid-cols-3"
+        initial="initial"
+        variants={revealContainerVariants}
+        viewport={revealViewport}
+        whileInView="animate"
+      >
         {howItWorks.map((feature, index) => (
+          <m.div key={index} variants={revealCardVariants}>
           <PinContainer
             key={index}
             className="group w-full rounded-[2rem] bg-surface-secondary p-1.5 transition-all duration-300 hover:scale-[1.02]"
@@ -143,8 +180,9 @@ const Integration = () => {
               </div>
             </div>
           </PinContainer>
+          </m.div>
         ))}
-      </div>
+      </m.div>
     </section>
   );
 };

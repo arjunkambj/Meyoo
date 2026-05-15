@@ -5,6 +5,8 @@ import { Hero } from "@/components/home/Hero";
 import { Integration } from "@/components/home/Integration";
 import { Pricing } from "@/components/home/Pricing";
 import { Testimonial } from "@/components/home/Testimonial";
+import { siteConfig } from "@/constants/config/site";
+import type { Metadata } from "next";
 
 export default function Home() {
   return (
@@ -23,7 +25,6 @@ export default function Home() {
     </div>
   );
 }
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Meyoo — Profit Analytics for D2C Brands",
@@ -36,10 +37,10 @@ export const metadata: Metadata = {
     url: "/",
     images: [
       {
-        url: "/dark-meyoo.png",
-        width: 1200,
-        height: 630,
-        alt: "Meyoo dashboard preview",
+        url: siteConfig.ogImage.url,
+        width: siteConfig.ogImage.width,
+        height: siteConfig.ogImage.height,
+        alt: siteConfig.ogImage.alt,
       },
     ],
   },
@@ -48,6 +49,6 @@ export const metadata: Metadata = {
     title: "Know your true profit.",
     description:
       "One clean view of revenue, costs, spend, and profit—plus a 28-day free trial so you can grow with confidence.",
-    images: ["/dark-meyoo.png"],
+    images: [siteConfig.ogImage.url],
   },
 };

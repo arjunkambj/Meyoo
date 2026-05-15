@@ -2,11 +2,17 @@
 
 import { Button, Card, Chip } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { m } from "motion/react";
 import React from "react";
 
 import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from "@/components/theme/ThemeProvider";
 import { designSystem } from "@/libs/design-system";
+import {
+  revealContainerVariants,
+  revealItemVariants,
+} from "@/components/home/motionVariants";
 
 const d2cBrands = [
   { name: "Allbirds", logo: "/logos/d2c/allbirds.svg", width: 96 },
@@ -17,17 +23,47 @@ const d2cBrands = [
   { name: "Gymshark", logo: "/logos/d2c/gymshark.svg", width: 118 },
 ];
 
+const dashboardVariants = {
+  animate: {
+    opacity: 1,
+    transition: { delay: 0.16, duration: 0.48, ease: "easeOut" as const },
+    y: 0,
+  },
+  initial: { opacity: 0, y: 14 },
+};
+
 const Hero = () => {
+  const { resolvedTheme } = useTheme();
+  const dashboardPreview =
+    resolvedTheme === "dark"
+      ? {
+          alt: "Meyoo dashboard preview (dark)",
+          src: "/dark.png",
+        }
+      : {
+          alt: "Meyoo dashboard preview (light)",
+          src: "/light.png",
+        };
+
   return (
     <section
+      data-home-hero
       className={`relative w-full min-h-[calc(90vh)] flex items-center justify-center overflow-hidden mt-13 ${designSystem.background.gradient} pb-10 sm:pb-14 lg:pb-16`}
     >
       <div className={`${designSystem.spacing.container} relative z-10`}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-14 lg:gap-16 items-center">
           {/* Left Column - Text Content */}
-          <div className="text-center sm:text-left flex flex-col items-center sm:items-start px-2 sm:px-0">
+          <m.div
+            className="text-center sm:text-left flex flex-col items-center sm:items-start px-2 sm:px-0"
+            animate="animate"
+            initial="initial"
+            variants={revealContainerVariants}
+          >
             {/* Category Chip */}
-            <div className="group mb-6 cursor-pointer rounded-xl bg-surface-secondary px-1 py-1">
+            <m.div
+              className="group mb-6 cursor-pointer rounded-xl bg-surface-secondary px-1 py-1"
+              variants={revealItemVariants}
+            >
               <Chip
                 className="rounded-lg bg-surface px-1.5 text-xs uppercase tracking-[0.05em] font-medium"
                 variant="soft"
@@ -38,9 +74,12 @@ const Hero = () => {
                   icon="solar:alt-arrow-right-linear"
                 />
               </Chip>
-            </div>
+            </m.div>
             {/* Header  */}
-            <h1 className="mb-6 flex max-w-3xl flex-col text-pretty font-semibold leading-[1.02] tracking-normal">
+            <m.h1
+              className="mb-6 flex max-w-3xl flex-col text-pretty font-semibold leading-[1.02] tracking-normal"
+              variants={revealItemVariants}
+            >
               <span className="block text-balance text-5xl sm:text-6xl lg:text-7xl">
                 Make Better Decisions
               </span>
@@ -48,17 +87,23 @@ const Hero = () => {
               <span className="block text-balance text-4xl font-medium leading-[1.08] sm:text-5xl lg:text-6xl">
                 For your <span className="text-accent">Shopify store</span>
               </span>
-            </h1>
+            </m.h1>
 
             {/* Professional info */}
-            <p className="text-sm sm:text-base lg:text-lg text-muted leading-relaxed text-pretty text-center sm:text-left max-w-2xl mx-auto sm:mx-0 mb-0">
+            <m.p
+              className="text-sm sm:text-base lg:text-lg text-muted leading-relaxed text-pretty text-center sm:text-left max-w-2xl mx-auto sm:mx-0 mb-0"
+              variants={revealItemVariants}
+            >
               Meyoo tracks sales, ad spend, product costs, shipping, discounts,
               and fees in one dashboard, so you know what each order, ad, and
               SKU actually makes.
-            </p>
+            </m.p>
 
             {/* CTA Buttons */}
-            <div className="mt-10 sm:mt-12 flex flex-row flex-wrap justify-center sm:justify-start items-center gap-4">
+            <m.div
+              className="mt-10 sm:mt-12 flex flex-row flex-wrap justify-center sm:justify-start items-center gap-4"
+              variants={revealItemVariants}
+            >
               <Link href="/sign-in">
                 <Button
                   variant="primary"
@@ -78,46 +123,49 @@ const Hero = () => {
                   View pricing
                 </Button>
               </Link>
-            </div>
+            </m.div>
 
             {/* Trust line */}
-            <div className="mt-3 sm:mt-4">
+            <m.div
+              className="mt-3 sm:mt-4"
+              variants={revealItemVariants}
+            >
               <div className="inline-flex items-center text-xs sm:text-sm text-muted">
                 <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0 font-medium sm:justify-start sm:gap-x-3">
                   <span>Free for 300 orders/month/store</span>
                 </span>
               </div>
-            </div>
-          </div>
+            </m.div>
+          </m.div>
 
           {/* Right Column - Dashboard Preview */}
-          <div className="relative flex justify-center lg:justify-end px-2 sm:px-0 animate-in fade-in slide-in-from-bottom-5 duration-700">
+          <m.div
+            className="relative flex justify-center lg:justify-end px-2 sm:px-0"
+            animate="animate"
+            initial="initial"
+            variants={dashboardVariants}
+          >
             <Card className="relative h-[320px] shadow-none w-full max-w-[720px] rounded-2xl sm:rounded-3xl bg-surface-secondary p-1 sm:p-1.5 backdrop-blur-sm sm:h-[420px] md:h-[560px] lg:h-[640px] ring-1 ring-surface-tertiary">
               <Card.Content className="relative size-full rounded-[16px] sm:rounded-[20px] bg-surface-secondary overflow-hidden p-0">
-                {/* Light mode preview */}
                 <Image
-                  alt="Meyoo dashboard preview (light)"
-                  className="block dark:hidden size-full rounded-[16px] sm:rounded-[20px] object-cover object-left-top transition-transform duration-300 scale-[1.02]  hover:scale-[1.03]"
+                  alt={dashboardPreview.alt}
+                  className="size-full rounded-[16px] sm:rounded-[20px] object-cover object-left-top transition-transform duration-300 scale-[1.02] hover:scale-[1.03]"
                   fill
                   priority
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  src="/light.png"
-                />
-                {/* Dark mode preview */}
-                <Image
-                  alt="Meyoo dashboard preview (dark)"
-                  className="hidden dark:block size-full rounded-[16px] sm:rounded-[20px] object-cover object-left-top transition-transform duration-300 scale-[1.02] hover:scale-[1.03]"
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  src="/dark.png"
+                  src={dashboardPreview.src}
                 />
               </Card.Content>
             </Card>
-          </div>
+          </m.div>
         </div>
 
-        <div className="mt-20">
+        <m.div
+          className="mt-20"
+          animate="animate"
+          initial="initial"
+          variants={revealItemVariants}
+        >
           <div className="mx-auto w-full max-w-7xl px-2 sm:px-4">
             <div className="grid grid-cols-3 sm:flex sm:flex-nowrap items-center justify-between gap-6 sm:gap-8 lg:gap-12 text-muted">
               {d2cBrands.map((brand) => (
@@ -136,7 +184,7 @@ const Hero = () => {
               ))}
             </div>
           </div>
-        </div>
+        </m.div>
       </div>
     </section>
   );
